@@ -1,5 +1,5 @@
-pluginManagement {
-    repositories {
-        maven { url = 'https://maven.parchmentmc.org' } // Add this line
-    }
-}
+ pluginManagement {
+     repositories {
+         maven { url = 'https://maven.parchmentmc.org' } // Add this line
+     }
+ }

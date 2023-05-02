@@ -8,8 +8,9 @@ import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
-import net.sodiumstudio.befriendmobs.entitiy.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.inventory.AbstractInventoryMenuBefriended;
+import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
+import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 
 public class ClientboundBefriendedGuiOpenPacket implements Packet<ClientGamePacketListener> {
 
@@ -29,22 +30,27 @@ public class ClientboundBefriendedGuiOpenPacket implements Packet<ClientGamePack
 		this.entityId = pBuffer.readInt();
 	}
 
+
+	@Override
 	public void write(FriendlyByteBuf pBuffer) {
 		pBuffer.writeByte(this.containerId);
 		pBuffer.writeVarInt(this.size);
 		pBuffer.writeInt(this.entityId);
 	}
 
+	@SuppressWarnings("resource")
+	@Override
 	public void handle(ClientGamePacketListener handler) {
-		@SuppressWarnings("resource")
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(this, handler, mc);
 		Entity entity = mc.level.getEntity(getEntityId());
 		if (entity instanceof IBefriendedMob bef) {
 			LocalPlayer localplayer = mc.player;
-			SimpleContainer simplecontainer = new SimpleContainer(getSize());
-			AbstractInventoryMenuBefriended menu =
-					bef.makeMenu(getContainerId(), localplayer.getInventory(), simplecontainer);
+			BefriendedInventory inv = new BefriendedInventory(getSize());
+			BefriendedInventoryMenu menu =
+					bef.makeMenu(getContainerId(), localplayer.getInventory(), inv);
+			if (menu == null)
+				return;
 			localplayer.containerMenu = menu;
 			mc.setScreen(menu.makeGui());
 		}

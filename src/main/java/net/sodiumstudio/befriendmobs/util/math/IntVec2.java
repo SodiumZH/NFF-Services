@@ -20,20 +20,25 @@ public class IntVec2
 	{
 		this(0, 0);
 	}
-	
-	public static IntVec2 of(int x, int y)
+
+	public static IntVec2 valueOf(int x, int y)
 	{
 		return new IntVec2(x, y);
 	}
 	
-	public static IntVec2 of(int val)
+	public static IntVec2 valueOf(int val)
 	{
 		return new IntVec2(val);
 	}
 	
-	public static IntVec2 of()
+	public static IntVec2 zero()
 	{
 		return new IntVec2();
+	}
+	
+	public boolean equals(IntVec2 other)
+	{
+		return this.x == other.x && this.y == other.y;
 	}
 	
 	public IntVec2 copy()
@@ -84,26 +89,34 @@ public class IntVec2
 		return this;
 	}
 	
-	/* Utility for inventory menu XY handling */
+	/* Utility for befriendedInventory menu XY handling */
 	
+	// Move an IntVec2 to the nth slot below
+	// Set value!!
 	public IntVec2 slotBelow(int n)
 	{
 		y = y + 18 * n;
 		return this;
 	}
 	
+	// Move an IntVec2 to the slot below
+	// Set value!!
 	public IntVec2 slotBelow()
 	{
 		y = y + 18;
 		return this;
 	}
 	
+	// Move an IntVec2 to the nth slot on the right
+	// Set value!!
 	public IntVec2 slotRight(int n)
 	{
 		x = x + 18 * n;
 		return this;
 	}
 	
+	// Move an IntVec2 to the nth slot on the right
+	// Set value!!
 	public IntVec2 slotRight()
 	{
 		x = x + 18;
@@ -130,4 +143,14 @@ public class IntVec2
 		return this;
 	}
 
+	// Get slot coordinate from this as the base point.
+	// e.g. for base point v, v.coord(1,2) means v.slotRight(1).slotBelow(2)
+	// This method returns a new IntVec2 object and doesn't change the input vector.
+	// Designed for locating slot in 2D asset array of item slots.
+	public IntVec2 coord(int x, int y)
+	{
+		return new IntVec2(this.x + 18 * x, this.y + 18 * y);
+	}
+	
+	
 }

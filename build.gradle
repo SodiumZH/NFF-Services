@@ -18,7 +18,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '1.0.0-alpha.1'
+version = '0.0.1-alpha'
 group = 'net.sodiumstudio.befriendmobs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'befriendmobs'
 
@@ -64,10 +64,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'befriendmobs'
+            property 'forge.enabledGameTestNamespaces', 'dwmg'
 
             mods {
-                befriendmobs {
+                dwmg {
                     source sourceSets.main
                 }
             }
@@ -81,10 +81,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'befriendmobs'
+            property 'forge.enabledGameTestNamespaces', 'dwmg'
 
             mods {
-                befriendmobs {
+                dwmg {
                     source sourceSets.main
                 }
             }
@@ -109,10 +109,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'befriendmobs'
+            property 'forge.enabledGameTestNamespaces', 'dwmg'
 
             mods {
-                befriendmobs {
+                dwmg {
                     source sourceSets.main
                 }
             }
@@ -126,10 +126,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'befriendmobs', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'dwmg', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                befriendmobs {
+                dwmg {
                     source sourceSets.main
                 }
             }
@@ -168,7 +168,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.57'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -177,11 +177,19 @@ dependencies {
     // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
 
     // Examples using mod jars from ./libs
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+    //implementation fg.deobf("blank:optifine-${mc_version}:1.0.0")
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    //implementation fg.deobf("curse.maven:hmag-537613:4392755")
+	//implementation fg.deobf("curse.maven:gog4-228948:4249761")
+	//implementation fg.deobf("curse.maven:geckolib-388172:4181370")
+	//implementation fg.deobf("curse.maven:monstersandgirls-592109:4434538")
+	//implementation fg.deobf("curse.maven:tf-227639:4337390")
+	//implementation fg.deobf("curse.maven:citadel-331936:3683007")
+	//implementation fg.deobf("curse.maven:am-426558:3853078")
 	
 }
 
@@ -190,11 +198,11 @@ jar {
     manifest {
         attributes([
                 "Specification-Title"     : "befriendmobs",
-                "Specification-Vendor"    : "befriendmobssareus",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Specification-Vendor"    : "sodiumstudio",
+                "Specification-Version"   : "0.0.1-alpha",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "befriendmobssareus",
+                "Implementation-Vendor"   : "sodiumstudio",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
