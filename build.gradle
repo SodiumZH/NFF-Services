@@ -189,7 +189,7 @@ jar {
         ])
     }
     from sourceSets.main.allSource
-    duplicatesStrategy "exclude"
+    duplicatesStrategy "include"
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
