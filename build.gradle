@@ -142,7 +142,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
      // Put repositories for dependencies here
-	
+
 	maven {
         url "https://www.cursemaven.com"
         content {

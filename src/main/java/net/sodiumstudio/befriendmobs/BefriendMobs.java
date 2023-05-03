@@ -1,12 +1,13 @@
 package net.sodiumstudio.befriendmobs;
 
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 
 // This class will be the mod main class of future Befriending Mob API library.
 
-//@Mod(....)
+@Mod(BefriendMobs.MOD_ID)
 public class BefriendMobs {
 
 	public static final String MOD_ID = "befriendmobs";
