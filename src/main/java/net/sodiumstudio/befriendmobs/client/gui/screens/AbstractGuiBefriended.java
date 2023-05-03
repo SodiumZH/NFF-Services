@@ -1,5 +1,7 @@
 package net.sodiumstudio.befriendmobs.client.gui.screens;
 
+
+
 import java.text.DecimalFormat;
 
 import javax.annotation.Nullable;
@@ -10,8 +12,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -40,7 +43,7 @@ public abstract class AbstractGuiBefriended extends AbstractContainerScreen<Befr
 	public AbstractGuiBefriended(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob, boolean renderName)
 	{
-		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getName() : new TextComponent(""));
+		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getDisplayName() : MutableComponent.create(new LiteralContents("")));
 		this.mob = mob;
 		this.passEvents = false;
 	}
@@ -80,7 +83,7 @@ public abstract class AbstractGuiBefriended extends AbstractContainerScreen<Befr
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
-		Component info = new TextComponent("HP: " + hp + " / " + maxHp);
+		Component info = MutableComponent.create(new LiteralContents("HP: " + hp + " / " + maxHp));
 		font.draw(poseStack, info, position.x, position.y, color);
 	}
 	
@@ -99,12 +102,12 @@ public abstract class AbstractGuiBefriended extends AbstractContainerScreen<Befr
 		String maxHp = df.format(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH));
 		String atk = df.format(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE));
 		String def = df.format(mob.asMob().getAttributeValue(Attributes.ARMOR));
-		Component hpcomp = new TranslatableComponent("info.befriendmobs.gui_health")
-				.append(new TextComponent(": " + hp + " / " + maxHp));
-		Component atkcomp = new TranslatableComponent("info.befriendmobs.gui_atk")
-				.append(new TextComponent(": " + atk));
-		Component defcomp = new TranslatableComponent("info.befriendmobs.gui_armor")
-				.append(new TextComponent(": " + def));
+		Component hpcomp = MutableComponent.create(new TranslatableContents("info.befriendmobs.gui_health"))
+				.append(MutableComponent.create(new LiteralContents(": " + hp + " / " + maxHp)));
+		Component atkcomp = MutableComponent.create(new TranslatableContents("info.befriendmobs.gui_atk"))
+				.append(MutableComponent.create(new LiteralContents(": " + atk)));
+		Component defcomp = MutableComponent.create(new TranslatableContents("info.befriendmobs.gui_armor"))
+				.append(MutableComponent.create(new LiteralContents(": " + def)));
 		font.draw(poseStack, hpcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
 		font.draw(poseStack, atkcomp, pos.x, pos.y, color);

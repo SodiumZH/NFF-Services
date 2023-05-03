@@ -49,7 +49,7 @@ public abstract class BefriendingHandler
 		IBefriendedMob newBefMob = (IBefriendedMob)newMob;
 		newBefMob.init(player.getUUID(), target);
 		newBefMob.setInventoryFromMob();
-		Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player, target);
+		Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
 		newBefMob.setInit();
 		return newBefMob;
 	}

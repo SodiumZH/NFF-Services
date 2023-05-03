@@ -3,7 +3,6 @@ package net.sodiumstudio.befriendmobs.entity.ai;
 import java.util.function.Function;
 
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.sodiumstudio.befriendmobs.util.InfoHelper;
 import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
 
@@ -63,10 +62,8 @@ public enum BefriendedAIState {
 		{
 			return InfoHelper.createTrans("info.befriendmobs.mob_wander");
 		}
-		default:
-			throw new UnimplementedException("Befriended AI State display info not implemented.");
 		}
-		
+		throw new UnimplementedException("Befriended AI State display info not implemented.");
 	}
 	
 	// Change this function if any additional states are added

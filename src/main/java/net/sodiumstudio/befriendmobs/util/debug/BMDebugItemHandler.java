@@ -40,7 +40,7 @@ public class BMDebugItemHandler
 				else
 				{
 					target.addEffect(new MobEffectInstance(effect, 9999999));
-					target.setCustomName(new TextComponent("Debug Target"));
+					target.setCustomName(MutableComponent.create(new LiteralContents("Debug Target")));
 				}
 			}
 		}

@@ -14,6 +14,7 @@ import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
 import net.sodiumstudio.befriendmobs.util.NbtHelper;

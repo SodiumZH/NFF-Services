@@ -293,7 +293,7 @@ public interface IBefriendedMob extends ContainerListener  {
 		return (Mob)this;
 	}
 	
-	public default IBefriendedMob self()
+	public default IBefriendedMob get()
 	{
 		return this;
 	}

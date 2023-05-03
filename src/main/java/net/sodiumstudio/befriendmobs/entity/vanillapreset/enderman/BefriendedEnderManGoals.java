@@ -5,6 +5,10 @@ import java.util.Random;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -27,7 +31,7 @@ public class BefriendedEnderManGoals
 		public LeaveBlockGoal(AbstractBefriendedEnderMan enderman)
 		{
 			super(enderman);
-			this.mob = enderman.self();
+			this.mob = (IBefriendedMob) enderman;
 			this.enderman = enderman;
 			this.allowState(WANDER);
 		}
@@ -60,7 +64,7 @@ public class BefriendedEnderManGoals
 		 */
 		@Override
 		public void tick() {
-			Random random = this.enderman.getRandom();
+			RandomSource random = this.enderman.getRandom();
 			Level level = this.enderman.level;
 			int i = Mth.floor(this.enderman.getX() - 1.0D + random.nextDouble() * 2.0D);
 			int j = Mth.floor(this.enderman.getY() + random.nextDouble() * 2.0D);
@@ -233,7 +237,7 @@ public class BefriendedEnderManGoals
 
 		@Override
 		public void tick() {
-			Random random = this.enderman.getRandom();
+			RandomSource random = this.enderman.getRandom();
 			Level level = this.enderman.level;
 			int i = Mth.floor(this.enderman.getX() - 2.0D + random.nextDouble() * 4.0D);
 			int j = Mth.floor(this.enderman.getY() + random.nextDouble() * 3.0D);

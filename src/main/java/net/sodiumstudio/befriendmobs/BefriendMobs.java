@@ -1,16 +1,16 @@
 package net.sodiumstudio.befriendmobs;
 
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 
 // This class will be the mod main class of future Befriending Mob API library.
 
-@Mod(BefriendMobs.MOD_ID)
+//@Mod(....)
 public class BefriendMobs {
 
 	public static final String MOD_ID = "befriendmobs";
+	//public static final String MOD_ID = "befriendmobs";
 	@Deprecated
 	public static String modDomain()
 	{
@@ -29,6 +29,6 @@ public class BefriendMobs {
 	}	
 	
 	// On debug set it true. On publication set it false to block verbose debug output.
-    public static final boolean IS_DEBUG_MODE = false;
+    public static final boolean IS_DEBUG_MODE = true;
 	
 }

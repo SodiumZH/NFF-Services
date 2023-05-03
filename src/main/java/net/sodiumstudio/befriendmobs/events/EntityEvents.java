@@ -17,7 +17,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
@@ -53,7 +53,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onEntityInteract(EntityInteract event) {
 		Entity target = event.getTarget();
-		Player player = event.getPlayer();
+		Player player = event.getEntity();
 		Wrapped<InteractionResult> result = new Wrapped<InteractionResult>(InteractionResult.PASS);
 		boolean isClientSide = event.getSide() == LogicalSide.CLIENT;
 		boolean isMainHand = event.getHand() == InteractionHand.MAIN_HAND;
@@ -329,7 +329,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onLivingHurt(LivingHurtEvent event)
 	{
-		LivingEntity living = event.getEntityLiving();
+		LivingEntity living = event.getEntity();
 		LivingEntity source = (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof LivingEntity) ?
 				(LivingEntity)(event.getSource().getEntity()) : null;
 		if (!living.level.isClientSide)
@@ -379,7 +379,7 @@ public class EntityEvents
 
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
-	public static void onLivingUpdate(LivingUpdateEvent event)
+	public static void onLivingUpdate(LivingTickEvent event)
 	{
 		if (!event.getEntity().level.isClientSide)
 		{
@@ -440,7 +440,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onItemExpire(ItemExpireEvent event)
 	{
-		event.getEntityItem().getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> {
+		event.getEntity().getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> {
 			if (c.isNoExpire())
 			{
 				event.setCanceled(true);
