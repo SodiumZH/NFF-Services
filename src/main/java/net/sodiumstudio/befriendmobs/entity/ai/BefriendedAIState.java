@@ -63,8 +63,10 @@ public enum BefriendedAIState {
 		{
 			return InfoHelper.createTrans("info.befriendmobs.mob_wander");
 		}
+		default:
+			throw new UnimplementedException("Befriended AI State display info not implemented.");
 		}
-		throw new UnimplementedException("Befriended AI State display info not implemented.");
+		
 	}
 	
 	// Change this function if any additional states are added

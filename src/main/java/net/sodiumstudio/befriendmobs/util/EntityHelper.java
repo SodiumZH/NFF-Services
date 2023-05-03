@@ -10,7 +10,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-//import net.sodiumstudio.dwmg.dwmgcontent.effects.EnderProtectionTeleportEvent;
+//import net.sodiumstudio.dwmg.effects.EnderProtectionTeleportEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
