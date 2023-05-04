@@ -90,7 +90,7 @@ The implementation of Healing Handler is defined in `CHealingHandler` capability
 
 ### Respawner
 
-Mob Respawner is a Spawn-Egg-like item containing all the mob's data. By default Befriended Mobs drop respawner on death. The dropped respawner entities are invulnerable (unless to creative players and /kill command) and not expiring. To close respawner features, simply override `shouldDropRespawner` to false.
+Mob Respawner is an item similar to Spawn Eggs containing all the mob's data. By default Befriended Mobs drop respawner on death. The dropped respawner entities are invulnerable (unless to creative players and /kill command), not expiring, and will be lifted up on dropping into the void. To close respawner features, simply override `shouldDropRespawner` to false. To disable the protection features of item entities, override the corresponding method.
 
 ## How to configure a befriendable mob
 
@@ -100,9 +100,16 @@ Mob Respawner is a Spawn-Egg-like item containing all the mob's data. By default
 
    `BefriendingTypeRegistry.register(YourBefriendableMob.getType(), YourBefriendedMob.getType(), new YourBefriendingHandler());`
 
-   This action maps the type of the befriendable mob, the befriended mob and the befriending process handler types. 
+   This action maps the type of the befriendable mob, the befriended mob and the befriending process handler types (described below). 
 
-2)  Create a handler class inheriting `AbstractBefriendingHandler` and override methods in which you define all behaviors on interacting with mobs of a specific class (defined in step 1 with type mapping). In these overridden methods you can add very complex logic about befriending the mobs. Use `Befriend` in the handler class to finally befriend the mob. (By default it will instantly convert the mob to the corresponding Befriended Mob and do data sync.)
+2)  Create a handler class inheriting `BefriendingHandler` and override methods in which you define all behaviors on interacting with mobs of a specific class (defined in step 1 with type mapping). In these overridden methods you can add very complex logic about befriending the mobs. Use `Befriend` in the handler class to finally befriend the mob. (By default it will instantly convert the mob to the corresponding Befriended Mob and do data sync.) For application examples see *Days with Monster Girls* example project.
 
    Please note that if you have a "Debug Befriender" item on the main hand, the interaction method in the handler will NOT be executed, and the target mob will be instantly befriended. (i.e. directly call the `Befriend` method.)
 
+## AI Goals
+
+Docs under construction
+
+## Bauble System
+
+Docs under construction
