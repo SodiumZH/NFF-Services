@@ -26,7 +26,7 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class AbstractGuiBefriended extends AbstractContainerScreen<BefriendedInventoryMenu> {
+public abstract class BefriendedGuiScreen extends AbstractContainerScreen<BefriendedInventoryMenu> {
 
 	public IBefriendedMob mob;
 	protected float xMouse = 0;
@@ -35,12 +35,12 @@ public abstract class AbstractGuiBefriended extends AbstractContainerScreen<Befr
 
 	public abstract ResourceLocation getTextureLocation();
 	
-	public AbstractGuiBefriended(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
+	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob) {
 		this(pMenu, pPlayerInventory, mob, true);
 	}
 
-	public AbstractGuiBefriended(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
+	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob, boolean renderName)
 	{
 		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getDisplayName() : MutableComponent.create(new LiteralContents("")));

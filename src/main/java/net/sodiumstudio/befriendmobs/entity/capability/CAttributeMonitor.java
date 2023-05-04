@@ -10,12 +10,21 @@ import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 
+// A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor {
 
 	public LivingEntity getOwner();
 	
+	/**
+	 * Get the listened attribute list
+	 * Key: attribute register key
+	 * Value: current attribute value
+	 */
 	public HashMap<String, Double> getListenList();
 	
+	/** Add an attribute to the listen list.
+	 * It still works if the attribute isn't available yet (e.g. on capability attachment).
+	*/
 	public default CAttributeMonitor listen(Attribute attribute)
 	{
 		// Use NaN to label an attribute position before entity attributes creation
@@ -24,6 +33,7 @@ public interface CAttributeMonitor {
 		return this;
 	}
 	
+	// Update and detect change on tick
 	public default void update()
 	{
 		for (String key: getListenList().keySet())
@@ -46,7 +56,10 @@ public interface CAttributeMonitor {
 			getListenList().put(key, newVal);
 		}
 	}
-	
+	/**
+	* Add listened attribute to a living entity. 
+	* The living entity must have CAttributeMonitor capability attached.
+	*/
 	public static CAttributeMonitor listen(LivingEntity living, Attribute attr)
 	{
 		Wrapped<CAttributeMonitor> cap = new Wrapped<CAttributeMonitor>(null);

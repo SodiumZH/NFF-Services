@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.sodiumstudio.befriendmobs.client.gui.screens.AbstractGuiBefriended;
+import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreen;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
@@ -70,5 +70,5 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		this.container.stopOpen(pPlayer);
 	}
 
-	public abstract AbstractGuiBefriended makeGui();
+	public abstract BefriendedGuiScreen makeGui();
 }

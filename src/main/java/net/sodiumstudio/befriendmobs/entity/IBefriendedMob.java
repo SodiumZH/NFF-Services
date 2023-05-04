@@ -2,42 +2,37 @@ package net.sodiumstudio.befriendmobs.entity;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event.Result;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
-import net.sodiumstudio.befriendmobs.util.MiscUtil;
-import net.sodiumstudio.befriendmobs.util.NbtHelper;
-import net.sodiumstudio.befriendmobs.util.ReflectHelper;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
+import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
+import net.sodiumstudio.befriendmobs.util.annotation.NoManualCall;
 
 public interface IBefriendedMob extends ContainerListener  {
 
@@ -46,9 +41,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	/** Initialize a mob.
 	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
 	 * @param player Player who owns this mob.
-	 * @param from The source mob from which this mob was befriended or converted. 
-	 * E.g. a BefriendedZombie was befriended from a Zombie, or spawned from a Husk by water conversion.
-	 * WARNING: Only on creating mob this value is valid. On reading from data it's null !!!
+	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
 	 */
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
@@ -65,15 +58,44 @@ public interface IBefriendedMob extends ContainerListener  {
 		}
 	}
 
-	public boolean hasInit();
+	/**
+	 * Get whether this mob has finished initialization.
+	 * After finishing initialization the mob will start updating from its inventory.
+	 */
+	@DontOverride
+	public default boolean hasInit()
+	{
+		return this.getTempData().hasInit;
+	}
 	
-	// Call this to label a mob initialized after reading nbt, copying from other, etc.
-	public void setInit();
+	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
+	 * Only after labeled init, the mob will update from inventory.
+	 * After spawning and deserializing, call this.
+	 * Don't worry about if the presets in BefriendMobs API has already labeled init, 
+	 * as labeling again will not do anything if so.
+	 */
+	@DontOverride
+	public default void setInit()
+	{
+		this.getTempData().hasInit = true;
+	}
 
+	/** Label a mob not finished initialization.
+	 * Call this only when the presets has labeled init but you need some extra actions that needs to keep it not init.
+	 * Currently the init label affects only inventory updating.
+	 */
+	@DontOverride
+	public default void setNotInit()
+	{
+		this.getTempData().hasInit = false;
+	}
+	
 	/* Ownership */
 	
-	// Get owner as player mob.
-	// Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	/** Get owner as player entity.
+	* Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	*/
+	@DontOverride
 	public default Player getOwner() 
 	{
 		if (getOwnerUUID() != null)
@@ -82,59 +104,131 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	// Get owner as UUID.
 	// Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
-	public UUID getOwnerUUID();
+	@DontOverride
+	public default UUID getOwnerUUID()
+	{
+		return asMob().getEntityData().get(getOwnerUUIDAccessor()).get();
+	}
 	
 	// Set owner from player mob.
+	@DontOverride
 	public default void setOwner(@Nonnull Player owner)
 	{
 		setOwnerUUID(owner.getUUID());
 	}
 	
 	// Set owner from player UUID.
-	public void setOwnerUUID(@Nonnull UUID ownerUUID);
+	@DontOverride
+	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
+	{
+		asMob().getEntityData().set(getOwnerUUIDAccessor(), Optional.of(ownerUUID));
+	}
 	
+	/**
+	 * Get owner UUID as entity data accessor. Attach this to accessor defined in mob class.
+	 */
+	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor();
+	
+	/* -------------------------------------------------------- */
 	/* AI configs */
 	
-	public BefriendedAIState getAIState();
+	// Get the AI state as EntityDataAccessor defined in mob classes.
+	public EntityDataAccessor<Byte> getAIStateData();
 	
-	// Action when switching AI e.g. on right click/
+	// Get current AI state as enum.
+	@DontOverride
+	public default BefriendedAIState getAIState()
+	{
+		return BefriendedAIState.fromID(asMob().getEntityData().get(getAIStateData()));
+	}
+	
+	/** A preset action when switching AI e.g. on right click.
+	 * By default it cycles among Wait, Follow and Wander.
+	 * DO NOT override this. Override getNextAIState() instead.
+	 * @return The new AI state.
+	 */
+	@DontOverride
 	public default BefriendedAIState switchAIState()
 	{		
-		BefriendedAIState nextState = getAIState().defaultSwitch();
+		BefriendedAIState nextState = getNextAIState();
 		if (MinecraftForge.EVENT_BUS.post(new BefriendedChangeAiStateEvent(this, getAIState(), nextState)))
 			return getAIState();
-		setAIState(nextState);
-		MiscUtil.printToScreen(InfoHelper.createText("")
-				.append(this.asMob().getName())
-				.append(InfoHelper.createText(" "))
-				.append(BefriendedAIState.getDisplayInfo.apply(nextState)), getOwner());
+		setAIState(nextState, false);
 		return nextState;
 	}
 	
-	public void setAIState(BefriendedAIState state);
+	/**
+	 * Get the next AI State after a switching action e.g. right click.
+	 * Called in switchAIState() above.
+	 */
+	public default BefriendedAIState getNextAIState()
+	{
+		return getAIState().defaultSwitch();
+	}
 	
-	// Get if a target mob can be attacked by this mob.
+	@DontOverride
+	public default void setAIState(BefriendedAIState state, boolean postEvent)
+	{
+		if (state == getAIState())
+			return;
+		if (postEvent && MinecraftForge.EVENT_BUS.post(new BefriendedChangeAiStateEvent(this, getAIState(), state)))
+			return;
+		asMob().getEntityData().set(getAIStateData(), state.id());
+	}
+	
+	/** Get if a target mob can be attacked by this mob.
+	 * Called in target goals.
+	*/
+
 	public default boolean wantsToAttack(LivingEntity pTarget)
 	{
 		return BefriendedHelper.wantsToAttackDefault(this, pTarget);
 	}
 	
-	// Get the previous target before updating target.
-	// This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
-	public LivingEntity getPreviousTarget();
+	/** Get the previous target before updating target.
+	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
+	* TODO: move the entity reference into a capability so you don't need to manually override this in mob class
+	*/
+	@NoManualCall
+	public default LivingEntity getPreviousTarget()
+	{
+		return this.getTempData().previousTarget;
+	}
 	
-	// Get the previous target after updating target.
-	// This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
-	public void setPreviousTarget(LivingEntity target);
+	/** Get the previous target after updating target.
+	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
+	*/
+	@NoManualCall
+	public default void setPreviousTarget(LivingEntity target)
+	{
+		this.getTempData().previousTarget = target;
+	}
 	
-	// Get the anchor pos that the mob won't stroll to far from it
-	// Keep null == disable anchor
-	public default Vec3 getAnchorPos() {return null;}
+	/** Get the anchor pos that the mob won't stroll too far from it
+	* If you want to disable anchor, just override this method and return null
+	*/
+	@Nullable
+	public default Vec3 getAnchorPos() 
+	{
+		return this.getTempData().anchor;
+	}
 	
-	public default void setAnchorPos(Vec3 pos) {}
+	@DontOverride
+	public default void setAnchorPos(Vec3 pos) 
+	{
+		this.getTempData().anchor = pos;
+	}
 	
-	public default double getAnchoredStrollRadius()  {return 64.0d;}
+	public default double getAnchoredStrollRadius()  
+	{
+		return 64.0d;
+	}
 	
+	/**
+	 * Check if a position is further than the stroll radius to the anchor point.
+	 * Called in random stroll goals.
+	 */
+	@DontOverride
 	public default boolean isTooFarFromAnchor(Vec3 v)
 	{
 		Vec3 a = getAnchorPos();
@@ -145,17 +239,30 @@ public interface IBefriendedMob extends ContainerListener  {
 		return dx * dx + dz * dz > getAnchoredStrollRadius() * getAnchoredStrollRadius();		
 	}
 	
+	/**
+	 * Check if a position is further than the stroll radius to the anchor point.
+	 * Called in random stroll goals.
+	 */
+	@DontOverride
 	public default boolean isTooFarFromAnchor(BlockPos pos)
 	{
 		return 	isTooFarFromAnchor(new Vec3(pos.getX(), pos.getY(), pos.getZ()));
 	}
 	
+	/**
+	 * Update anchor point on tick. When the mob isn't waiting, the anchor will follow it;
+	 * when the mob enters waiting state, the anchor will stop and the mob gets anchored.
+	 * Called on world tick only. Don't call anywhere else.
+	 */
+	@NoManualCall
+	@DontOverride
 	public default void updateAnchor()
 	{
 		if (getAnchorPos() != null)
 			setAnchorPos(asMob().position());
 	}
 	
+	/* --------------------------------------------- */
 	/* Interaction */
 	
 	// Actions on player right click the mob
@@ -183,10 +290,11 @@ public interface IBefriendedMob extends ContainerListener  {
 	// Set mob data from befriendedInventory.
 	public void updateFromInventory();
 	
-	// Set befriendedInventory from mob data
+	// Set befriendedInventory from mob data, usually for initializing
 	public void setInventoryFromMob();
 	
 	// Get item stack from position in inventory tag
+	@DontOverride
 	public default ItemStack getInventoryItemStack(int pos)
 	{
 		if (pos < 0 || pos >= getInventorySize())
@@ -195,6 +303,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	// Get item (type) from position in inventory tag
+	@DontOverride
 	public default Item getInventoryItem(int pos)
 	{
 		return this.getInventoryItemStack(pos).getItem();
@@ -205,6 +314,7 @@ public interface IBefriendedMob extends ContainerListener  {
 
 	/* ContainerListener interface */
 	// DO NOT override this. Override onInventoryChanged instead.
+	@DontOverride
 	@Override
 	public default void containerChanged(Container pContainer) 
 	{
@@ -222,11 +332,15 @@ public interface IBefriendedMob extends ContainerListener  {
 
 	/* Healing related */	
 
+	/**
+	 * Get the implementation type of healing handler.
+	 */
 	public default Class<? extends CHealingHandlerImpl> healingHandlerClass()
 	{
 		return CHealingHandlerImplDefault.class;
 	}
 
+	@DontOverride
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume)
 	{
 		Wrapped.Boolean succeeded = new Wrapped.Boolean(false);		
@@ -237,47 +351,64 @@ public interface IBefriendedMob extends ContainerListener  {
 		return succeeded.get();
 	}
 	
+	/* Add all usable items here, including non-consuming items. Value is HP it can heal. */
 	public default HashMap<Item, Float> getHealingItems()
 	{
 		return new HashMap<Item, Float>();
 	}
 	
+	// Specify which items in the map above don't consume after usage
 	public default HashSet<Item> getNonconsumingHealingItems()
 	{	
 		return new HashSet<Item>();
 	}
 	
+	@DontOverride
 	public default InteractionResult tryApplyHealingItems(ItemStack stack)
 	{
 		if (stack.isEmpty())
 			return InteractionResult.PASS;
 		if (getHealingItems().containsKey(stack.getItem()))
 		{
-			return applyHealingItem(stack, getHealingItems().get(stack.getItem()), true) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			if (getNonconsumingHealingItems().contains(stack.getItem()))
+			{
+				return applyHealingItem(stack, getHealingItems().get(stack.getItem()), false) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			}
+			else return applyHealingItem(stack, getHealingItems().get(stack.getItem()), true) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 		}
-		else if (getNonconsumingHealingItems().contains(stack.getItem()))
-		{
-			return applyHealingItem(stack, getHealingItems().get(stack.getItem()), false) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-		}
+		
 		return InteractionResult.PASS;
 	}
 	
 	/* Respawn */
+	
+	/**
+	 * If true, the mob will drop a respawner on death.
+	 */
 	public default boolean shouldDropRespawner()
 	{
 		return true;
 	}
 	
+	/**
+	 * If true, the respawner will be invulnerable (except creative players, /kill commands and the void)
+	 */
 	public default boolean isRespawnerInvulnerable()
 	{
 		return true;
 	}
 	
+	/**
+	 * If true, the respawner will be lifted up on drop into the void
+	 */
 	public default boolean shouldRespawnerRecoverOnDropInVoid()
 	{
 		return true;
 	}
 	
+	/**
+	 * If true, the respawner will never expire 
+	 */
 	public default boolean respawnerNoExpire()
 	{
 		return true;
@@ -288,16 +419,39 @@ public interface IBefriendedMob extends ContainerListener  {
 	@Deprecated	// Update in tick() or in bauble handler
 	public default void updateAttributes() {};
 
+	/**
+	 * Get this as Mob.
+	 */
+	@DontOverride
 	public default Mob asMob()
 	{
 		return (Mob)this;
 	}
 	
+	/**
+	 * Get this as IBefriendedMob.
+	 */
+	@DontOverride
 	public default IBefriendedMob get()
 	{
 		return this;
 	}
 
+	/**
+	 * Specify the mod ID this mob belongs to.
+	 */
 	public String getModId();
+	
+	public default CBefriendedMobTempData.Values getTempData()
+	{
+		Wrapped<CBefriendedMobTempData> res = new Wrapped<CBefriendedMobTempData>(null);
+		asMob().getCapability(BefMobCapabilities.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		{
+			res.set(cap);
+		});
+		if (res.get() == null)
+			throw new IllegalStateException("Befriended mob " + asMob().getName().getString() + "missing temp data capability.");
+		return res.get().values();
+	}
 	
 }

@@ -28,6 +28,8 @@ public class BefriendedHelper
 
 	/* AI */
 
+	/** Default settings of what the mob will attack.
+	 */
 	public static boolean wantsToAttackDefault(IBefriendedMob mob, LivingEntity target) {
 		// Don't attack creeper or ghast
 		if ((target instanceof Creeper) || (target instanceof Ghast))
@@ -91,19 +93,25 @@ public class BefriendedHelper
 		readBefriendedCommonSaveData(mob, nbt);
 	}
 	
+	/**
+	 * Read mob's Mod Id, owner, AI state and additional inventory information.
+	 */
+	
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
 		String modid = null;
+		// 
 		if (nbt.contains("befriended_mod_id", NbtHelper.TagType.TAG_STRING.getID()))
 		{
 			modid = nbt.getString("befriended_mod_id");
 		}		
 		
-		else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7
+		else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7. Later it will be "befriendmobs".
 		
 		String ownerKey = modid + ":befriended_owner";
 		String aiStateKey = modid + ":befriended_ai_state";
 		String inventoryKey = modid + ":befriended_additional_inventory";
 		// TEMP FIX
+		// Snapshot compatibility will be removed next version
 		NbtHelper.shiftNbtTag(nbt, "owner", ownerKey);
 		NbtHelper.shiftNbtTag(nbt, "ai_state", aiStateKey);
 		NbtHelper.shiftNbtTag(nbt, "inventory_tag", inventoryKey);
@@ -122,7 +130,7 @@ public class BefriendedHelper
 		}
 		mob.setOwnerUUID(uuid);
 		mob.init(mob.getOwnerUUID(), null);
-		mob.setAIState(BefriendedAIState.fromID(nbt.getByte(aiStateKey)));
+		mob.setAIState(BefriendedAIState.fromID(nbt.getByte(aiStateKey)), false);
 		mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
 	}
 
@@ -140,7 +148,7 @@ public class BefriendedHelper
 			throw new UnsupportedOperationException("BefriendedHelper::convertToOtherBefriendedType additional inventory must have same size before and after conversion.");
 		newMob.getAdditionalInventory().readFromTag(inventoryTag);
 		// Do other settings
-		newMob.setAIState(target.getAIState());
+		newMob.setAIState(target.getAIState(), false);
 		newMob.init(target.getOwnerUUID(), target.asMob());
 		newMob.updateFromInventory();
 		// setInit() needs to call manually
@@ -149,8 +157,12 @@ public class BefriendedHelper
 	
 	/* Inventory */
 
-	public static void openBefriendedInventory(Player player, IBefriendedMob target) {
-		LivingEntity living = (LivingEntity) target;
+	/**
+	 * Open the inventory of the mob.
+	 * Warning: DO NOT call this if makeMenu() method returns null, otherwise it will crash the game.
+	 */
+	public static void openBefriendedInventory(Player player, IBefriendedMob mob) {
+		LivingEntity living = (LivingEntity) mob;
 		if (!player.level.isClientSide && player instanceof ServerPlayer sp
 				&& (!living.isVehicle() || living.hasPassenger(player)))
 		{
@@ -162,8 +174,8 @@ public class BefriendedHelper
 
 			sp.nextContainerCounter();
 			ClientboundBefriendedGuiOpenPacket packet = new ClientboundBefriendedGuiOpenPacket(sp.containerCounter,
-					target.getAdditionalInventory().getContainerSize(), living.getId());
-			sp.containerMenu = target.makeMenu(sp.containerCounter, sp.getInventory(), target.getAdditionalInventory());
+					mob.getAdditionalInventory().getContainerSize(), living.getId());
+			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
 			if (sp.containerMenu == null)
 				return;
 			sp.connection.send(packet);
@@ -173,4 +185,12 @@ public class BefriendedHelper
 		}
 	}
 
+	/**
+	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
+	 */
+	public String getModIdFromNbt(CompoundTag nbt)
+	{
+		return nbt.contains("befriended_mod_id", NbtHelper.TagType.TAG_STRING.getID()) ?
+				nbt.getString("befriended_mod_id") : null;
+	}
 }

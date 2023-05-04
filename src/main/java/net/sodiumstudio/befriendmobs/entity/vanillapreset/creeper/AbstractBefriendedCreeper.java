@@ -65,8 +65,17 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
 	protected static final EntityDataAccessor<Integer> DATA_SWELL_LAST_TICK= SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
-	public String modId;
 
+	@Override
+	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
+		return DATA_OWNERUUID;
+	}
+
+	@Override
+	public EntityDataAccessor<Byte> getAIStateData() {
+		return DATA_AISTATE;
+	}
+	
 	public int maxSwell = 30;
 
 	protected int explosionRadius = 3;
@@ -167,7 +176,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		tag.putInt("current_ignition_cooldown", currentIgnitionCooldown);
 		tag.putInt("ignition_cooldown", ignitionCooldownTicks);
 		
-		BefriendedHelper.addBefriendedCommonSaveData(this, tag, this.modId);
+		BefriendedHelper.addBefriendedCommonSaveData(this, tag);
 	}
 
 	/**
@@ -196,7 +205,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		if (tag.contains("current_ignition_cooldown"))
 			this.currentIgnitionCooldown = tag.getInt("current_ignition_cooldown");
 		
-		BefriendedHelper.readBefriendedCommonSaveData(this, tag, this.modId);
+		BefriendedHelper.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
 	}
@@ -576,11 +585,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	@Override
 	public BefriendedAIState getAIState() {
 		return BefriendedAIState.fromID(entityData.get(DATA_AISTATE));
-	}
-
-	@Override
-	public void setAIState(BefriendedAIState state) {
-		entityData.set(DATA_AISTATE, state.id());
 	}
 
 	protected LivingEntity PreviousTarget = null;
