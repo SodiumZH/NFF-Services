@@ -4,13 +4,11 @@ import java.util.EnumSet;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.BowItem;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
-import net.sodiumstudio.befriendmobs.util.TagHelper;
 
 public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 {
@@ -45,6 +43,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * Returns whether execution should begin. You can also read and cache any state
 	 * necessary for execution in this method as well.
 	 */
+	@Override
 	public boolean canUse() {
 		if (isDisabled())
 			return false;
@@ -58,6 +57,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	/**
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean canContinueToUse() {
 		return (this.canUse() || !this.mob.asMob().getNavigation().isDone()) && this.isHoldingBow();
 	}
@@ -65,6 +65,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void start() {
 		super.start();
 		this.mob.asMob().setAggressive(true);
@@ -74,6 +75,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * Reset the task's internal state. Called when this task is interrupted by
 	 * another one
 	 */
+	@Override
 	public void stop() {
 		super.stop();
 		this.mob.asMob().setAggressive(false);
@@ -82,6 +84,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 		this.mob.asMob().stopUsingItem();
 	}
 
+	@Override
 	public boolean requiresUpdateEveryTick() {
 		return true;
 	}
@@ -89,6 +92,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	/**
 	 * Keep ticking a continuous task that has already been started
 	 */
+	@Override
 	public void tick() {
 		LivingEntity livingentity = this.mob.asMob().getTarget();
 		if (livingentity != null)
@@ -109,7 +113,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 				--this.seeTime;
 			}
 
-			if (!(d0 > (double) this.attackRadiusSqr) && this.seeTime >= 20)
+			if (!(d0 > this.attackRadiusSqr) && this.seeTime >= 20)
 			{
 				this.mob.asMob().getNavigation().stop();
 				++this.strafingTime;
@@ -121,12 +125,12 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 
 			if (this.strafingTime >= 20)
 			{
-				if ((double) this.mob.asMob().getRandom().nextFloat() < 0.3D)
+				if (this.mob.asMob().getRandom().nextFloat() < 0.3D)
 				{
 					this.strafingClockwise = !this.strafingClockwise;
 				}
 
-				if ((double) this.mob.asMob().getRandom().nextFloat() < 0.3D)
+				if (this.mob.asMob().getRandom().nextFloat() < 0.3D)
 				{
 					this.strafingBackwards = !this.strafingBackwards;
 				}
@@ -136,10 +140,10 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 
 			if (this.strafingTime > -1)
 			{
-				if (d0 > (double) (this.attackRadiusSqr * 0.75F))
+				if (d0 > this.attackRadiusSqr * 0.75F)
 				{
 					this.strafingBackwards = false;
-				} else if (d0 < (double) (this.attackRadiusSqr * 0.25F))
+				} else if (d0 < this.attackRadiusSqr * 0.25F)
 				{
 					this.strafingBackwards = true;
 				}

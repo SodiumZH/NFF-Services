@@ -16,6 +16,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendableMob
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.LivingSetupAttributeMonitorEvent;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
@@ -57,9 +58,13 @@ public class BefMobCapabilityAttachment {
 				}
 			}
 		}
-		// CHealingHandler
+
 		if (event.getObject() instanceof IBefriendedMob bef)
 		{
+			// Temp data (CBefriendedMobTempData)
+			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_mob_temp_data"),
+					new CBefriendedMobTempData.Prvd(bef));
+			// CHealingHandler
 			if (bef.healingHandlerClass() != null)
 			{
 				try

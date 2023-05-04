@@ -27,11 +27,42 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryWithEquipment;
 import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
 
-// This is a template for befriended mob class.
-// You may copy-paste the code below to your class and modify at places labeled by /*...*/.
+/** This is a template for befriended mob class.
+* You may copy-paste the code below to your class and modify at labeled places.
+* For more preset see {@code TemplateBefriendedMobPreset}.
+*/
 public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /* Your mob superclass */ implements IBefriendedMob
 {
 	
+	// Data sync 
+
+	// By default owner uuid and ai state need to sync
+	// It's recommended to always keep these two values as synched data
+	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
+			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Byte> DATA_AISTATE = SynchedEntityData
+			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.BYTE);
+	/* More data to sync... */
+
+	@Override
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		entityData.define(DATA_OWNERUUID, Optional.empty());
+		entityData.define(DATA_AISTATE, (byte) 0);
+		/* More data to sync */
+	}
+
+	@Override
+	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
+		return DATA_OWNERUUID;
+	}
+
+	@Override
+	public EntityDataAccessor<Byte> getAIStateData() {
+		return DATA_AISTATE;
+	}
+
+
 	// Initialization
 	
 	public TemplateBefriendedMob/* Your mob class */ (EntityType<? extends PathfinderMob /* Your mob class */ > pEntityType, Level pLevel) {
@@ -68,7 +99,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	// Inventory related
 	// Generally no need to modify unless noted
 	
-	BefriendedInventory befriendedInventory = new BefriendedInventoryWithEquipment(getInventorySize());
+	protected BefriendedInventory befriendedInventory = new BefriendedInventory(getInventorySize());
 
 	@Override
 	public BefriendedInventory getAdditionalInventory()
@@ -80,7 +111,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	public int getInventorySize()
 	{
 		/* Change to your size */
-		return 8;
+		return 0;
 	}
 
 	@Override
@@ -109,38 +140,20 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	@Override
 	public void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
-		// Change modid to your modid
-		BefriendedHelper.addBefriendedCommonSaveData(this, nbt, BefriendMobs.MOD_ID);
+		BefriendedHelper.addBefriendedCommonSaveData(this, nbt);
 		/* Add more save data... */
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
-		// Change modid to your modid
-		BefriendedHelper.readBefriendedCommonSaveData(this, nbt, BefriendMobs.MOD_ID);
+		BefriendedHelper.readBefriendedCommonSaveData(this, nbt);
 		/* Add more save data... */
 		this.setInit();
 	}
 
-	// Data sync 
 
-	// By default owner uuid and ai state need to sync
-	// It's recommended to always keep these two values as synched data
-	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
-			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Byte> DATA_AISTATE = SynchedEntityData
-			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.BYTE);
-	/* More data to sync... */
-
-	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		entityData.define(DATA_OWNERUUID, Optional.empty());
-		entityData.define(DATA_AISTATE, (byte) 0);
-		/* More data to sync */
-	}
-
+	
 	// Data sync end 
 	
 	// Misc
@@ -156,72 +169,6 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	// ==================================================================== //
 	// ========================= General Settings ========================= //
 	// Generally these can be copy-pasted to other IBefriendedMob classes //
-
-	// ------------------ IBefriendedMob interface ------------------ //
-
-	protected boolean initialized = false;
-	
-	@Override
-	public boolean hasInit()
-	{
-		return initialized;
-	}
-	
-	@Override
-	public void setInit()
-	{
-		initialized = true;
-	}
-		
-	@Override
-	public Player getOwner() {
-		return getOwnerUUID() != null ? level.getPlayerByUUID(getOwnerUUID()) : null;
-	}
-
-	@Override
-	public void setOwner(Player owner) {
-		entityData.set(DATA_OWNERUUID, Optional.of(owner.getUUID()));
-	}
-
-	@Override
-	public UUID getOwnerUUID() {
-		return entityData.get(DATA_OWNERUUID).orElse(null);
-	}
-
-	@Override
-	public void setOwnerUUID(UUID ownerUUID) {
-		entityData.set(DATA_OWNERUUID, Optional.of(ownerUUID));
-	}
-
-	// AI related
-	
-	@Override
-	public BefriendedAIState getAIState() {
-		return BefriendedAIState.fromID(entityData.get(DATA_AISTATE));
-	}
-
-	@Override
-	public void setAIState(BefriendedAIState state) {
-		entityData.set(DATA_AISTATE, state.id());
-	}
-
-	protected LivingEntity PreviousTarget = null;
-
-	@Override
-	public LivingEntity getPreviousTarget() {
-		return PreviousTarget;
-	}
-
-	@Override
-	public void setPreviousTarget(LivingEntity target) {
-		PreviousTarget = target;
-	}
-	
-	/* Inventory */
-
-	// ------------------ IBefriendedMob interface end ------------------ //
-
-	// ------------------ Misc ------------------ //
 
 	@Override
 	public boolean isPersistenceRequired() {

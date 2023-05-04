@@ -33,6 +33,9 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryWithEquipment;
 import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
 
+/**
+ * This is a template with more preset
+ */
 public class TemplateBefriendedMobPreset extends Monster implements IBefriendedMob {
 
 	/* Data sync */
@@ -49,6 +52,16 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 		entityData.define(DATA_AISTATE, (byte) 0);
 	}
 	
+	@Override
+	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
+		return DATA_OWNERUUID;
+	}
+
+	@Override
+	public EntityDataAccessor<Byte> getAIStateData() {
+		return DATA_AISTATE;
+	}
+
 	/* Initialization */
 
 	public TemplateBefriendedMobPreset(EntityType<? extends TemplateBefriendedMobPreset> pEntityType, Level pLevel) {
@@ -67,7 +80,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	@Override
 	protected void registerGoals() {
 		// Add goals here
-		// Generally target goals can be preset below. Change it if needs to modify.
+		// Generally target goals can be preset below. Change if it needs to modify.
 		targetSelector.addGoal(1, new BefriendedOwnerHurtByTargetGoal(this));
 		targetSelector.addGoal(2, new BefriendedHurtByTargetGoal(this));
 		targetSelector.addGoal(3, new BefriendedOwnerHurtTargetGoal(this));
@@ -91,7 +104,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	public HashSet<Item> getNonconsumingHealingItems()
 	{
 		HashSet<Item> set = new HashSet<Item>();
-		// set.put(YOUR_ITEM_TYPE);
+		// set.add(YOUR_ITEM_TYPE);
 		return set;
 	}
 	
@@ -173,6 +186,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	@Override
 	public BefriendedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container) {
 		return null; // new YourInventoryMenuClass(containerId, playerInventory, container, this);
+		// You can keep it null, but in this case never call openBefriendedInventory() or it will crash.
 	}
 
 	/* Save and Load */
@@ -180,14 +194,14 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	@Override
 	public void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
-		BefriendedHelper.addBefriendedCommonSaveData(this, nbt, BefriendMobs.MOD_ID);
+		BefriendedHelper.addBefriendedCommonSaveData(this, nbt);
 		// Add other data to save here
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
-		BefriendedHelper.readBefriendedCommonSaveData(this, nbt, BefriendMobs.MOD_ID);
+		BefriendedHelper.readBefriendedCommonSaveData(this, nbt);
 		// Add other data reading here
 		setInit();
 	}
@@ -203,76 +217,6 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	// ==================================================================== //
 	// ========================= General Settings ========================= //
 	// Generally these can be copy-pasted to other IBefriendedMob classes //
-
-	// ------------------ IBefriendedMob interface ------------------ //
-
-	/* Init */
-	
-	protected boolean initialized = false;
-	
-	@Override
-	public boolean hasInit()
-	{
-		return initialized;
-	}
-	
-	@Override
-	public void setInit()
-	{
-		initialized = true;
-	}
-	
-	/* Ownership */
-	
-	@Override
-	public Player getOwner() {
-		return getOwnerUUID() != null ? level.getPlayerByUUID(getOwnerUUID()) : null;
-	}
-
-	@Override
-	public void setOwner(Player owner) {
-		entityData.set(DATA_OWNERUUID, Optional.of(owner.getUUID()));
-	}
-
-	@Override
-	public UUID getOwnerUUID() {
-		return entityData.get(DATA_OWNERUUID).orElse(null);
-	}
-
-	@Override
-	public void setOwnerUUID(UUID ownerUUID) {
-		entityData.set(DATA_OWNERUUID, Optional.of(ownerUUID));
-	}
-
-	/* AI */
-	
-	@Override
-	public BefriendedAIState getAIState() {
-		return BefriendedAIState.fromID(entityData.get(DATA_AISTATE));
-	}
-
-	@Override
-	public void setAIState(BefriendedAIState state) {
-		entityData.set(DATA_AISTATE, state.id());
-	}
-
-	protected LivingEntity PreviousTarget = null;
-
-	@Override
-	public LivingEntity getPreviousTarget() {
-		return PreviousTarget;
-	}
-
-	@Override
-	public void setPreviousTarget(LivingEntity target) {
-		PreviousTarget = target;
-	}
-
-	/* Inventory */
-	
-	// ------------------ IBefriendedMob interface end ------------------ //
-
-	// ------------------ Misc ------------------ //
 
 	@Override
 	public boolean isPersistenceRequired() {

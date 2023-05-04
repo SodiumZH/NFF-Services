@@ -108,7 +108,17 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.OPTIONAL_UUID);
 	protected static final EntityDataAccessor<Byte> DATA_AISTATE = SynchedEntityData
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BYTE);	
-	
+
+	@Override
+	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
+		return DATA_OWNERUUID;
+	}
+
+	@Override
+	public EntityDataAccessor<Byte> getAIStateData() {
+		return DATA_AISTATE;
+	}
+
 	@SuppressWarnings("deprecation")
 	public AbstractBefriendedEnderMan(EntityType<? extends AbstractBefriendedEnderMan> pEntityType, Level pLevel)
 	{
@@ -232,7 +242,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		}
 
 		this.addPersistentAngerSaveData(tag);
-		BefriendedHelper.addBefriendedCommonSaveData(this, tag, BefriendMobs.MOD_ID);
+		BefriendedHelper.addBefriendedCommonSaveData(this, tag);
 	}
 
 	/**
@@ -253,7 +263,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 		this.setCarriedBlock(blockstate);
 		this.readPersistentAngerSaveData(this.level, tag);
-		BefriendedHelper.readBefriendedCommonSaveData(this, tag, BefriendMobs.MOD_ID);
+		BefriendedHelper.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
 	}
