@@ -2,11 +2,11 @@
 
 ## Overview
 
-Befriend Mobs API is intended to help modders easily create features of befriending (or say taming) mobs and friendly mobs despite their type hierarchy.
+BefriendMobs API is intended to help modders easily create features of befriending (or say taming) mobs and friendly mobs despite their type hierarchy.
 
 For example, vanilla tamable mobs (e.g. wolf) inherit `TamableMob` class (except horse and variants). If you want to make hostile mobs (e.g. `Zombie`) friendly or tamed, only using vanilla API it may become complex. 
 
-You can easily create a subclass of `Zombie` (or anything else extends `Mob`) with Befriended Mobs API without using any vanilla `TamableMob` interfaces, and without considering about the type hierarchy of the existing mobs.
+You can easily create a subclass of `Zombie` (or anything else extends `Mob`) with BefriendMobs API without using any vanilla `TamableMob` interfaces, and without considering about the type hierarchy of the existing mobs.
 
 The tutorial below is a minimal description. For more examples of application, see my depending project *Days with Monster Girls* .
 
@@ -104,7 +104,7 @@ Mob Respawner is an item similar to Spawn Eggs containing all the mob's data. By
 
 2)  Create a handler class inheriting `BefriendingHandler` and override methods in which you define all behaviors on interacting with mobs of a specific class (defined in step 1 with type mapping). In these overridden methods you can add very complex logic about befriending the mobs. Use `Befriend` in the handler class to finally befriend the mob. (By default it will instantly convert the mob to the corresponding Befriended Mob and do data sync.) For application examples see *Days with Monster Girls* example project.
 
-   Please note that if you have a "Debug Befriender" item on the main hand, the interaction method in the handler will NOT be executed, and the target mob will be instantly befriended. (i.e. directly call the `Befriend` method.)
+   Please note that if you have a "Debug Befriender" item (`befriendmobs:debug_befriender`) on the main hand, the interaction method in the handler will NOT be executed, and the target mob will be instantly befriended. (i.e. directly call the `Befriend` method.)
 
 ## AI Goals
 
