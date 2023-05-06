@@ -29,7 +29,9 @@ import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
+import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
 import net.sodiumstudio.befriendmobs.util.annotation.NoManualCall;
@@ -309,7 +311,6 @@ public interface IBefriendedMob extends ContainerListener  {
 		return this.getInventoryItemStack(pos).getItem();
 	}
 
-
 	public BefriendedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
 
 	/* ContainerListener interface */
@@ -330,6 +331,11 @@ public interface IBefriendedMob extends ContainerListener  {
 	{
 	}
 
+	public default boolean dropInventoryOnDeath()
+	{
+		return true;
+	}
+	
 	/* Healing related */	
 
 	/**
@@ -388,6 +394,14 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default boolean shouldDropRespawner()
 	{
 		return true;
+	}
+	
+	/**
+	 * Get the type (subclass) of respawner it will drop.
+	 */
+	public default ItemMobRespawner getRespawnerType()
+	{
+		return (ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get();
 	}
 	
 	/**

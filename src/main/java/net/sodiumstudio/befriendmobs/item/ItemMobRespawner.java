@@ -24,11 +24,11 @@ public class ItemMobRespawner extends Item
 		super(pProperties);
 	}
 
-	public static ItemStack fromMob(Mob mob)
+	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob)
 	{
 		if (mob.level.isClientSide)
 			return ItemStack.EMPTY;
-		ItemStack stack = new ItemStack(BefMobItems.MOB_RESPAWNER.get(), 1);
+		ItemStack stack = new ItemStack(itemType, 1);
 		stack.getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> 
 		{
 			c.initFromMob(mob);
@@ -36,6 +36,12 @@ public class ItemMobRespawner extends Item
 		
 		//stack.setHoverName(new TranslatableComponent(stack.getHoverName().getString() + " - " + mob.getName().getString()));
 		return stack;
+	}
+	
+	@Deprecated
+	public static ItemStack fromMob(Mob mob)
+	{
+		return fromMob((ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get(), mob);
 	}
 
 	public static Mob respawn(ItemStack stack, Player player, BlockPos pos, Direction direction)

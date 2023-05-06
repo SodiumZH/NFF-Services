@@ -4,7 +4,7 @@ license="LGPL-3.0"
 issueTrackerURL="https://github.com/SodiumZH/Days-with-Monster-Girls"
 [[mods]] #mandatory
 modId="befriendmobs" #mandatory
-version="0.0.1-alpha" #mandatory
+version="0.0.2-alpha" #mandatory
 displayName="BefriendMobs API" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 #displayURL="https://www.curseforge.com/minecraft/mc-mods/befriendmobs-days-with-monster-girls" 
@@ -13,16 +13,19 @@ credits="SodiumZH" #optional
 authors="SodiumZH" #optional
 description='''A toolkit for taming and friendly mobs.'''
 
-[[dependencies.dwmg]] #optional
+[[dependencies.befriendmobs]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
     versionRange="[40,)" #mandatory
     ordering="NONE"
     side="BOTH"
     
-[[dependencies.dwmg]]
+[[dependencies.befriendmobs]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"
+
+    
+    

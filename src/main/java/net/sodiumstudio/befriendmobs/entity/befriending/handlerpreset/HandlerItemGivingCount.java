@@ -75,8 +75,10 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 							"already_given");
 					int alreadyGiven = alreadyGivenTag == null ? 0 : alreadyGivenTag.getAsInt();
 					// Give cake
-					if (!player.isCreative())
+					if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
+					{
 						player.getMainHandItem().shrink(1);
+					}
 					alreadyGiven++;
 					MiscUtil.printToScreen(
 							"Item(s) given: " + Integer.toString(alreadyGiven) + " / " + Integer.toString(overallAmount),
