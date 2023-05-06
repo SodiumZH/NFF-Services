@@ -75,7 +75,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 					else
 					{
 						procValue += getProcValueToAdd(mainhand);
-						if (!player.isCreative())
+						if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
 							player.getMainHandItem().shrink(1);
 						NbtHelper.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
 					}

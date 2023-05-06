@@ -24,6 +24,19 @@ public abstract class HandlerItemGiving extends BefriendingHandler
 		return isItemAcceptable(itemstack.getItem());
 	}
 	
+	/**
+	 * If true, the item should consume after using
+	 */ 
+	public boolean shouldItemConsume(Item item) 
+	{
+		return true;
+	}
+	
+	public boolean shouldItemConsume(ItemStack itemstack)
+	{
+		return shouldItemConsume(itemstack.getItem());
+	}
+	
 	// Additional conditions when giving items
 	public abstract boolean additionalConditions(Player player, Mob mob);
 	

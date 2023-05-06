@@ -242,16 +242,22 @@ public class EntityEvents
 				if (!event.getEntity().level.isClientSide)
 				{
 					// Drop all items in inventory if no vanishing curse
-					BefriendedInventory container = bef.getAdditionalInventory();
-					for (int i = 0; i < container.getContainerSize(); ++i)
+					if (bef.dropInventoryOnDeath())
 					{
-						if (container.getItem(i) != ItemStack.EMPTY
-								&& !EnchantmentHelper.hasVanishingCurse(container.getItem(i)))
+						BefriendedInventory container = bef.getAdditionalInventory();
+						for (int i = 0; i < container.getContainerSize(); ++i)
 						{
-							event.getEntity().spawnAtLocation(container.getItem(i));
+							if (container.getItem(i) != ItemStack.EMPTY)
+							{
+								if (!EnchantmentHelper.hasVanishingCurse(container.getItem(i)))
+								{
+									event.getEntity().spawnAtLocation(container.getItem(i));
+								}
+								container.getItem(i).setCount(0);
+								bef.updateFromInventory();
+							}
 						}
 					}
-					
 					// If drop respawner, drop and initialize
 					if (bef.shouldDropRespawner())
 					{

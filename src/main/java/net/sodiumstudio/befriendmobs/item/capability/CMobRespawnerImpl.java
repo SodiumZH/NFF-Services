@@ -132,10 +132,12 @@ public class CMobRespawnerImpl implements CMobRespawner
 	
 	@Override
 	public void initFromMob(Mob mob) {
-		tag.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(mob.getType()).toString());	
+		MinecraftForge.EVENT_BUS.post(new RespawnerConstructEvent.Before(mob, this));
+		tag.putString("mob_type", ForgeRegistries.ENTITIES.getKey(mob.getType()).toString());
 		CompoundTag nbt = new CompoundTag();
 		mob.save(nbt);
 		tag.put("mob_nbt", nbt);
+		MinecraftForge.EVENT_BUS.post(new RespawnerConstructEvent.After(mob, this, stack));
 		MinecraftForge.EVENT_BUS.post(new RespawnerAddedEvent(mob, this, stack));
 	}
 
@@ -172,7 +174,6 @@ public class CMobRespawnerImpl implements CMobRespawner
 			mob.setHealth(mob.getMaxHealth());
 			if (mob instanceof IBefriendedMob b)
 			{
-				b.getAdditionalInventory().clearContent();
 				b.updateAnchor();
 				b.setInit();
 			}
