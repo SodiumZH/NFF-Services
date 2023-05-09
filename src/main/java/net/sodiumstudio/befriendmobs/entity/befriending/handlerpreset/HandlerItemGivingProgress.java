@@ -92,6 +92,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 						sendParticlesOnItemReceived(target);
 						sendProgressHeart(target, lastProcValue, procValue, deltaProcPerHeart());
 						l.setPlayerTimer(player, "item_cooldown", this.getItemGivingCooldownTicks()); // Set cooldown
+						this.afterItemGiven(player, target, player.getMainHandItem());
 						result.setHandled();
 					}
 				}

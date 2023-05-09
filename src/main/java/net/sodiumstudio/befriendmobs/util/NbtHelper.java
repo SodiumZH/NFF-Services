@@ -21,6 +21,21 @@ import net.minecraft.world.phys.Vec3;
 
 public class NbtHelper {
 
+	public static final int TAG_BYTE_ID = 1;
+	public static final int TAG_SHORT_ID = 2;
+	public static final int TAG_INT_ID = 3;
+	public static final int TAG_LONG_ID = 4;
+	public static final int TAG_FLOAT_ID = 5;
+	public static final int TAG_DOUBLE_ID = 6;
+	public static final int TAG_BYTE_ARRAY_ID = 7;
+	public static final int TAG_STRING_ID = 8;
+	public static final int TAG_LIST_ID = 9;
+	public static final int TAG_COMPOUND_ID = 10;
+	public static final int TAG_INT_ARRAY_ID = 11;
+	public static final int TAG_LONG_ARRAY_ID = 12;
+	public static final int TAG_ANY_NUMERIC_ID = 99;
+	
+	
 	// Generate a unique key from the base key in a compound tag
 	public static String getUniqueKey(String baseKey, CompoundTag cpd)
 	{
@@ -64,7 +79,8 @@ public class NbtHelper {
 	{
 		// Fix unknown crash on player die
 		if (player == null) return false;
-		return inTag.contains(player.getStringUUID()) && (inTag.get(player.getStringUUID()) instanceof CompoundTag);
+		return inTag.contains(player.getStringUUID()) 
+				&& (inTag.get(player.getStringUUID()) instanceof CompoundTag);
 	}
 	
 	// Check if a compound tag contains a player's string uuid as subtag, and a tag with given key under it
@@ -73,7 +89,7 @@ public class NbtHelper {
 		return containsPlayer(inTag, player) && inTag.getCompound(player.getStringUUID()).contains(key);
 	}
 	
-	public static HashSet<Player> getAllPlayersContaining(CompoundTag inTag, Entity levelContext)
+	public static HashSet<Player> getAllValidPlayersContaining(CompoundTag inTag, Entity levelContext)
 	{
 		HashSet<Player> res = new HashSet<Player>();
 		for (Player player: levelContext.level.players())
@@ -93,8 +109,16 @@ public class NbtHelper {
 	
 	public static void putPlayerData(Tag inTag, CompoundTag putTo, Player player, String key)
 	{
+		// If missing player data, add
 		if (!containsPlayer(putTo, player))
 			putTo.put(player.getStringUUID(), new CompoundTag());
+		/**
+		 * If missing player data string label, put it
+		 * This value is ONLY used on iteration of the parent cmpd tag to find potential player data without player in level
+		 */
+		if (!putTo.getCompound(player.getStringUUID()).contains("player_uuid_string", TAG_STRING_ID))
+			putTo.getCompound(player.getStringUUID()).putString("player_uuid_string", player.getStringUUID());
+		// Finally put
 		putTo.getCompound(player.getStringUUID()).put(key, inTag);
 	}
 	
@@ -153,6 +177,7 @@ public class NbtHelper {
 		toMob.setItemSlot(EquipmentSlot.OFFHAND, readItemStack(inTag, "nbt_helper_equipment_item_off_hand"));
 	}
 	
+	@Deprecated // Use NbtHelper.TAG_XXX_ID constants instead
 	public static enum TagType
 	{
 		   TAG_BYTE(1),

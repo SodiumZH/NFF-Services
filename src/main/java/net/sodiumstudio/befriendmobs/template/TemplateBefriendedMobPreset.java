@@ -125,7 +125,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 					else */if (this.tryApplyHealingItems(player.getItemInHand(hand)) != InteractionResult.PASS)
 						return InteractionResult.sidedSuccess(player.level.isClientSide);
 					// The function above returns PASS when the items are not correct. So when not PASS it should stop here
-					else if (hand == InteractionHand.OFF_HAND)
+					else if (hand == InteractionHand.MAIN_HAND)
 					{
 						switchAIState();
 					}

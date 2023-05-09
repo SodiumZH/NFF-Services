@@ -95,6 +95,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 						NbtHelper.putPlayerData(IntTag.valueOf(alreadyGiven), l.getPlayerDataNbt(), player,
 								"already_given");
 						l.setPlayerTimer(player, "item_cooldown", this.getItemGivingCooldownTicks()); // Set 10s cooldown
+						this.afterItemGiven(player, target, player.getMainHandItem());
 						result.setHandled();
 					}
 				}
@@ -127,6 +128,11 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 	public void serverTick(Mob mob)
 	{
 		mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
+			for (String key: l.getNbt().getAllKeys())
+			{
+
+			}
+			
 			if (!shouldIgnoreHatred())
 			{
 				for (UUID uuid: l.getHatred())

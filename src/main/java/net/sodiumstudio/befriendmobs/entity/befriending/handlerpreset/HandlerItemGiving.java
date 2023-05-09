@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.entity.befriending.handlerpreset;
 
 import java.util.Random;
+import java.util.UUID;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -11,6 +12,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractA
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
+import net.sodiumstudio.befriendmobs.util.NbtHelper;
 
 public abstract class HandlerItemGiving extends BefriendingHandler
 {
@@ -63,5 +65,11 @@ public abstract class HandlerItemGiving extends BefriendingHandler
 	{
 		return true;
 	}
+	
+	/**
+	 * Executed after item is given.
+	 * Not executed when the condition is satisfied after giving. Handle this case in finalActions().
+	 */
+	public void afterItemGiven(Player player, Mob mob, ItemStack item) {}
 	
 }

@@ -56,7 +56,11 @@ public abstract class BefriendingHandler
 	
 	public abstract BefriendableMobInteractionResult handleInteract(BefriendableMobInteractArguments args);
 	
-	public void serverTick(Mob mob){}
+	/**
+	 * Invoked on mob tick in server.
+	 */
+	public void serverTick(Mob mob)
+	{}
 	
 	public abstract void interrupt(Player player, Mob mob, boolean isQuiet);
 	
