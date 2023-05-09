@@ -7,8 +7,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreen;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.item.baublesystem.BaubleHandler;
 import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
 public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
@@ -34,6 +36,20 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 	}
 
 	protected abstract void addMenuSlots();
+	
+	protected void addBaubleSlot(int slot, IntVec2 pos)
+	{
+		addSlot(new Slot(container, slot, pos.x, pos.y) {			
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return BaubleHandler.shouldBaubleSlotAccept(stack, this, mob);
+			}			
+			@Override
+			public int getMaxStackSize() {
+	            return 1;
+	        }			
+		});
+	}
 	
 	protected boolean doAddPlayerInventory()
 	{
