@@ -2,18 +2,15 @@ package net.sodiumstudio.befriendmobs.item.baublesystem;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.ContainerHelper;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 
 public interface IBaubleHolder {
@@ -24,12 +21,12 @@ public interface IBaubleHolder {
 	
 	/* Bauble existance & counting */
 		
-	public default boolean isBauble(Item item){
-		return getBaubleHandler().isAccepted(item);
+	public default boolean isBauble(Item item, String key){
+		return getBaubleHandler().isAccepted(item, key);
 	}
 	
-	public default boolean isBauble(ItemStack stack){
-		return getBaubleHandler().isAccepted(stack);
+	public default boolean isBauble(ItemStack stack, String key){
+		return getBaubleHandler().isAccepted(stack, key);
 	}
 
 	/* Apply effects */
