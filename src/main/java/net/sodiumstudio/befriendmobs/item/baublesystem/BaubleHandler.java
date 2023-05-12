@@ -7,6 +7,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
 
 public abstract class BaubleHandler {
 
@@ -14,23 +15,35 @@ public abstract class BaubleHandler {
 	//public boolean shouldPopOutIfItemNotAccepted = true;
 	
 	/* Item types */
+	/**
+	 * Get item types the bauble slot should accept.
+	 * If whether a slot should accept an item cannot be indicated as a set, override isAccepted() instead.
+	 * @param key String key of the bauble slot.
+	 * @return Item set the slot accepts.
+	 */
 	public abstract HashSet<Item> getItemsAccepted(String key);
 	
-	// Check if an item can be added as a bauble
+	/**
+	 *  Check if an item can be added as a bauble.
+	 *  By default it checks if the item is contained in getItemAccepted() return.
+	 */
 	public boolean isAccepted(Item item, String key)
 	{
 		return getItemsAccepted(key).contains(item);
 	}
 	
-	// Check if an item can be added as a bauble (stack version)
+	// Check if an item can be added as a bauble (stack-sensitive version)
+	@DontOverride
 	public boolean isAccepted(ItemStack itemstack, String key)
 	{
 		return itemstack.isEmpty() ? false : isAccepted(itemstack.getItem(), key);
 	}
 	
-	// Executed every tick
-	// This is automatically ticked in events.EntityEvents and 
-	// do not call it anywhere else unless you know what you're doing.
+	/** Executed every tick
+	* This is automatically ticked in events.EntityEvents and 
+	* do not call it anywhere else unless you know what you're doing.
+	*/
+	@DontOverride
 	public void tick(IBaubleHolder holder)
 	{
 		LivingEntity living = holder.getLiving();

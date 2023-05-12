@@ -51,6 +51,11 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		});
 	}
 	
+	protected void addBaubleSlot(int slot, IntVec2 pos)
+	{
+		addBaubleSlot(slot, pos, "null");
+	}
+	
 	protected boolean doAddPlayerInventory()
 	{
 		return true;
