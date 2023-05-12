@@ -37,12 +37,12 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 
 	protected abstract void addMenuSlots();
 	
-	protected void addBaubleSlot(int slot, IntVec2 pos)
+	protected void addBaubleSlot(int slot, IntVec2 pos, String key)
 	{
 		addSlot(new Slot(container, slot, pos.x, pos.y) {			
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return BaubleHandler.shouldBaubleSlotAccept(stack, this, mob);
+				return BaubleHandler.shouldBaubleSlotAccept(stack, this, mob, key);
 			}			
 			@Override
 			public int getMaxStackSize() {

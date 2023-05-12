@@ -14,18 +14,18 @@ public abstract class BaubleHandler {
 	//public boolean shouldPopOutIfItemNotAccepted = true;
 	
 	/* Item types */
-	public abstract HashSet<Item> getItemsAccepted();
+	public abstract HashSet<Item> getItemsAccepted(String key);
 	
 	// Check if an item can be added as a bauble
-	public boolean isAccepted(Item item)
+	public boolean isAccepted(Item item, String key)
 	{
-		return getItemsAccepted().contains(item);
+		return getItemsAccepted(key).contains(item);
 	}
 	
 	// Check if an item can be added as a bauble (stack version)
-	public boolean isAccepted(ItemStack itemstack)
+	public boolean isAccepted(ItemStack itemstack, String key)
 	{
-		return itemstack.isEmpty() ? false : isAccepted(itemstack.getItem());
+		return itemstack.isEmpty() ? false : isAccepted(itemstack.getItem(), key);
 	}
 	
 	// Executed every tick
@@ -43,7 +43,7 @@ public abstract class BaubleHandler {
 				if (this.shouldAlwaysRefresh(key, holder) || holder.hasSlotChanged(key))
 				{
 					// Not empty
-					if (isAccepted(holder.getBaubleSlots().get(key).getItem()))
+					if (isAccepted(holder.getBaubleSlots().get(key).getItem(), key))
 					{
 						holder.removeBaubleModifiers(key);
 						this.clearBaubleEffect(key, holder);
@@ -85,37 +85,55 @@ public abstract class BaubleHandler {
 	public void postTick(IBaubleHolder owner) {}
 
 	/* Util */
-	public static boolean isBaubleFor(ItemStack stack, IBaubleHolder holder)
+	public static boolean isBaubleFor(ItemStack stack, IBaubleHolder holder, String key)
 	{
-		return holder.getBaubleHandler().isAccepted(stack);
+		return holder.getBaubleHandler().isAccepted(stack, key);
 	}
 	
 	/* IBefriendedMob inventory menu util */
 	
-	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, IBaubleHolder slotOwner)
+	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, IBaubleHolder slotOwner, String key)
 	{
 		if (slotOwner != null)
 		{
-			return !slot.hasItem() && isBaubleFor(stack, slotOwner);
+			return !slot.hasItem() && isBaubleFor(stack, slotOwner, key);
 		}
 		else return false;
+	}
+	
+
+	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, LivingEntity slotOwner, String key)
+	{
+		if (slotOwner != null && slotOwner instanceof IBaubleHolder holder)
+		{
+			return shouldBaubleSlotAccept(stack, slot, holder, key);
+		}
+		else return false;
+	}
+	
+	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, IBefriendedMob slotOwner, String key)
+	{
+		if (slotOwner != null && slotOwner instanceof IBaubleHolder holder)
+		{
+			return shouldBaubleSlotAccept(stack, slot, holder, key);
+		}
+		else return false;
+	}
+	
+	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, IBaubleHolder slotOwner)
+	{
+		return shouldBaubleSlotAccept(stack, slot, slotOwner, "null");
 	}
 	
 	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, LivingEntity slotOwner)
 	{
-		if (slotOwner != null && slotOwner instanceof IBaubleHolder holder)
-		{
-			return shouldBaubleSlotAccept(stack, slot, holder);
-		}
-		else return false;
+		return shouldBaubleSlotAccept(stack, slot, slotOwner, "null");
 	}
 	
 	public static boolean shouldBaubleSlotAccept(ItemStack stack, Slot slot, IBefriendedMob slotOwner)
 	{
-		if (slotOwner != null && slotOwner instanceof IBaubleHolder holder)
-		{
-			return shouldBaubleSlotAccept(stack, slot, holder);
-		}
-		else return false;
+		return shouldBaubleSlotAccept(stack, slot, slotOwner, "null");
 	}
+	
+	
 }
