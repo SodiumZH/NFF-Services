@@ -10,6 +10,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandler;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
+import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.capability.CMobRespawner;
 
 public class BefMobCapabilities {
@@ -19,6 +20,7 @@ public class BefMobCapabilities {
 	public static Capability<CHealingHandler> CAP_HEALING_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
 	public static Capability<CMobRespawner> CAP_MOB_RESPAWNER = CapabilityManager.get(new CapabilityToken<>(){});
 	public static Capability<CAttributeMonitor> CAP_ATTRIBUTE_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
+	public static Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// Caps for temp data storage only
 	public static Capability<CBaubleDataCache> CAP_BAUBLE_DATA_CACHE = CapabilityManager.get(new CapabilityToken<>(){});
@@ -34,5 +36,6 @@ public class BefMobCapabilities {
 		event.register(CAttributeMonitor.class);
 		event.register(CBaubleDataCache.class);
 		event.register(CBefriendedMobTempData.class);
+		event.register(CItemStackMonitor.class);
 	}
 }

@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -35,9 +36,11 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractA
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
+import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
+import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 import net.sodiumstudio.befriendmobs.util.TagHelper;
@@ -452,5 +455,21 @@ public class EntityEvents
 				event.setCanceled(true);
 			}
 		});
+	}
+	
+	@SubscribeEvent
+	public static void onEntityJoinWorld(EntityJoinWorldEvent event)
+	{
+		if (event.getEntity() instanceof LivingEntity living)
+		{
+			event.getEntity().getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
+			{
+				MinecraftForge.EVENT_BUS.post(new CAttributeMonitor.SetupEvent(living, cap));
+			});
+			event.getEntity().getCapability(BefMobCapabilities.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
+			{
+				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
+			});
+		}
 	}
 }

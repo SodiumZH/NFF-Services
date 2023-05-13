@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 
@@ -71,5 +72,21 @@ public interface CAttributeMonitor {
 		if (cap.get() != null)
 			return cap.get();
 		else throw new IllegalStateException("Living entity missing attribute monitor capability.");
+	}
+	
+	public static class SetupEvent extends Event
+	{
+		public final LivingEntity living;
+		public final CAttributeMonitor monitor;
+		public SetupEvent(LivingEntity living, CAttributeMonitor cap)
+		{
+			this.living = living;
+			this.monitor = cap;
+		}
+		
+		public void addListen(Attribute attr)
+		{
+			monitor.listen(attr);
+		}	
 	}
 }
