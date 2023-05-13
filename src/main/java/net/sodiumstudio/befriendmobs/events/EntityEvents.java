@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
@@ -464,7 +464,7 @@ public class EntityEvents
 	}
 	
 	@SubscribeEvent
-	public static void onEntityJoinWorld(EntityJoinWorldEvent event)
+	public static void onEntityJoinWorld(EntityJoinLevelEvent event)
 	{
 		if (event.getEntity() instanceof LivingEntity living)
 		{

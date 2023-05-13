@@ -133,7 +133,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 	@Override
 	public void initFromMob(Mob mob) {
 		MinecraftForge.EVENT_BUS.post(new RespawnerConstructEvent.Before(mob, this));
-		tag.putString("mob_type", ForgeRegistries.ENTITIES.getKey(mob.getType()).toString());
+		tag.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(mob.getType()).toString());
 		CompoundTag nbt = new CompoundTag();
 		mob.save(nbt);
 		tag.put("mob_nbt", nbt);
