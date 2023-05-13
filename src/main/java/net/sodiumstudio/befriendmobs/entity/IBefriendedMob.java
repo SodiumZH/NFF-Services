@@ -22,6 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
@@ -98,6 +99,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	* Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	*/
 	@DontOverride
+	@Nullable
 	public default Player getOwner() 
 	{
 		if (getOwnerUUID() != null)
@@ -107,8 +109,14 @@ public interface IBefriendedMob extends ContainerListener  {
 	// Get owner as UUID.
 	// Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	@DontOverride
+	@Nullable
 	public default UUID getOwnerUUID()
 	{
+		if (!asMob().getEntityData().get(getOwnerUUIDAccessor()).isPresent())
+		{
+			BefriendMobs.LOGGER.error("Befriended mob \"" + this.asMob().getName().getString() + "\" missing owner. If this happens not on initialization phase, maybe IBefriendedMob#init() wasn't called on init.");
+			return null;
+		}
 		return asMob().getEntityData().get(getOwnerUUIDAccessor()).get();
 	}
 	
