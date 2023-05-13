@@ -35,7 +35,7 @@ public interface CAttributeMonitor {
 	}
 	
 	// Update and detect change on tick
-	public default void update()
+	public default void tick()
 	{
 		for (String key: getListenList().keySet())
 		{
@@ -52,6 +52,8 @@ public interface CAttributeMonitor {
 				&& (oldVal - newVal > 0.0000001 || oldVal - newVal < -0.0000001))
 			{
 				MinecraftForge.EVENT_BUS.post(new LivingAttributeValueChangeEvent(
+						getOwner(), attr, oldVal, newVal));
+				MinecraftForge.EVENT_BUS.post(new ChangeEvent(
 						getOwner(), attr, oldVal, newVal));
 			}
 			getListenList().put(key, newVal);
@@ -88,5 +90,23 @@ public interface CAttributeMonitor {
 		{
 			monitor.listen(attr);
 		}	
+	}
+	
+	public class ChangeEvent extends Event {
+
+		public final LivingEntity entity;
+		public final Attribute attribute;
+		public final double oldValue;
+		public final double newValue;
+		
+		public ChangeEvent(LivingEntity entity, Attribute attribute,
+				double oldValue, double newValue)
+		{
+			this.entity = entity;
+			this.attribute = attribute;
+			this.oldValue = oldValue;
+			this.newValue = newValue;
+		}
+		
 	}
 }
