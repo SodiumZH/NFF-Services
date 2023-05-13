@@ -6,7 +6,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -18,10 +17,10 @@ import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
-import net.sodiumstudio.befriendmobs.entity.capability.LivingSetupAttributeMonitorEvent;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
+import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.capability.CMobRespawnerProvider;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -31,14 +30,19 @@ public class BefMobCapabilityAttachment {
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public static void attachLivingEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-		// Attribute change monitor
+	
 		if (event.getObject() instanceof LivingEntity living)
 		{
+			// Attribute change monitor
 			CAttributeMonitorProvider prvd = new CAttributeMonitorProvider(living);
-			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID)
-					, prvd);
-			MinecraftForge.EVENT_BUS.post(new LivingSetupAttributeMonitorEvent(living, prvd));
+			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_attribute_monitor")
+					, prvd);		
+			// Item Stack monitor
+			CItemStackMonitor.Prvd prvd1 = new CItemStackMonitor.Prvd(living);
+			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_item_stack_monitor"), prvd1);
 		}			
+		
+		
 		// CBefriendableMob
 		if (event.getObject() instanceof Mob mob) {
 			if (BefriendingTypeRegistry.contains((EntityType<? extends Mob>) mob.getType())
