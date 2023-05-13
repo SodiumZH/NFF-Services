@@ -4,6 +4,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.eventbus.api.Event;
 
+/**
+ * Use CAttributeMonitor.ChangeEvent instead
+ */
+@Deprecated 
 public class LivingAttributeValueChangeEvent extends Event {
 
 	public final LivingEntity entity;

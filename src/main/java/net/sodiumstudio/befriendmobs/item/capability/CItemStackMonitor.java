@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.item.capability;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 import com.google.common.base.Supplier;
 
@@ -19,9 +20,12 @@ public interface CItemStackMonitor {
 
 	public LivingEntity getLiving();
 	
-	public HashMap<String, Supplier<ItemStack>> getListenedStacks();
+	/**
+	 * Get a map 
+	 */
+	public HashMap<String, Function<LivingEntity, ItemStack>> getListenedStacks();
 	
-	public void listen(String key, Supplier<ItemStack> getItem);
+	public void listen(String key, Function<LivingEntity, ItemStack> getItem);
 	
 	@DontOverride
 	public default void onChanged(String key, ItemStack from, ItemStack to)
@@ -54,7 +58,7 @@ public interface CItemStackMonitor {
 	{
 
 		protected final LivingEntity living;
-		protected HashMap<String, Supplier<ItemStack>> listened = new HashMap<String, Supplier<ItemStack>>();
+		protected HashMap<String, Function<LivingEntity, ItemStack>> listened = new HashMap<String, Function<LivingEntity, ItemStack>>();
 		protected HashMap<String, ItemStack> stacksLastTick = new HashMap<String, ItemStack>();
 		
 		public Impl(LivingEntity living)
@@ -68,14 +72,14 @@ public interface CItemStackMonitor {
 		}
 
 		@Override
-		public HashMap<String, Supplier<ItemStack>> getListenedStacks() {
+		public HashMap<String, Function<LivingEntity, ItemStack>> getListenedStacks() {
 			return listened;
 		}
 
 		@Override
-		public void listen(String key, Supplier<ItemStack> getItem) {
+		public void listen(String key, Function<LivingEntity, ItemStack> getItem) {
 			listened.put(key, getItem);
-			ItemStack current = getItem.get();
+			ItemStack current = getItem.apply(living);
 			stacksLastTick.put(key, current == null ? ItemStack.EMPTY : current);
 		}
 
@@ -83,13 +87,13 @@ public interface CItemStackMonitor {
 		public void tick() {	
 			for (String key: listened.keySet())
 			{
-				ItemStack newStack = listened.get(key).get();
+				ItemStack newStack = listened.get(key).apply(living);
 				if (newStack == null)
 					newStack = ItemStack.EMPTY;
 				if (!newStack.equals(stacksLastTick.get(key), false))
 				{
 					onChanged(key, stacksLastTick.get(key), newStack);
-					stacksLastTick.put(key, newStack);
+					stacksLastTick.put(key, newStack.copy());
 				}
 			}
 		}

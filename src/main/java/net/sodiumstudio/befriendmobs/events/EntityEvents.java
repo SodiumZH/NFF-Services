@@ -392,9 +392,15 @@ public class EntityEvents
 	{
 		if (!event.getEntity().level.isClientSide)
 		{
+			// Tick attribute monitor
 			event.getEntity().getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
-				cap.update();
+				cap.tick();
+			});
+			// Tick item stack monitor
+			event.getEntity().getCapability(BefMobCapabilities.CAP_ITEM_STACK_MONITOR).ifPresent((cap) ->
+			{
+				cap.tick();
 			});
 			if (event.getEntity() instanceof Mob mob)
 			{
