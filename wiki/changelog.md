@@ -4,7 +4,7 @@
 
 ### 0.0.2-alpha
 
-Made most methods in BaubleSystem string-key-sensitive in order to enable different types of Bauble slots in a single mob.
+Made most methods in BaubleSystem key-sensitive in order to enable different types of Bauble slots in a single mob.
 
 Added `CItemStackMonitor`capability, intended to detect change of given item slots of Living Entities.
 
