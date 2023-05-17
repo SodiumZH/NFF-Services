@@ -145,7 +145,9 @@ public interface IBefriendedMob extends ContainerListener  {
 	// Get the AI state as EntityDataAccessor defined in mob classes.
 	public EntityDataAccessor<Byte> getAIStateData();
 	
-	// Get current AI state as enum.
+	/** 
+	 * Get current AI state as enum.
+	 */
 	@DontOverride
 	public default BefriendedAIState getAIState()
 	{
@@ -197,8 +199,8 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/** Get the previous target before updating target.
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
-	* TODO: move the entity reference into a capability so you don't need to manually override this in mob class
 	*/
+	@DontOverride
 	@NoManualCall
 	public default LivingEntity getPreviousTarget()
 	{
@@ -208,6 +210,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	/** Get the previous target after updating target.
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/
+	@DontOverride
 	@NoManualCall
 	public default void setPreviousTarget(LivingEntity target)
 	{
