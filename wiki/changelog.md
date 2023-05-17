@@ -8,7 +8,7 @@ Versions above will no longer use "alpha" as postfix. All versions with prefix 0
 
 Adjusted `getItemsAccepted` and `isAccepted` checks mob-sensitive in BaubleSystem. Method `getItemsAccepted` now uses a HashMap with `Predicate<IBaubleHolder>` as value, and if this predicate is non-null, the mob will fulfill this additional check to accept the given item.
 
-Remade `IBefriendedUndeadMob`. Now it uses rules (`Predicate<IBefriendedMob>`) to dynamically check if the mob should be sun-immune. For details see source files.
+Implemented `IBefriendedUndeadMob`. Now it uses rules (`Predicate<IBefriendedMob>`) to dynamically check if the mob should be sun-immune. For details see source file.
 
 ### 0.0.2-alpha
 

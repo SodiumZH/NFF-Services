@@ -31,6 +31,7 @@ import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
+import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedUndeadMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
@@ -468,14 +469,21 @@ public class EntityEvents
 	{
 		if (event.getEntity() instanceof LivingEntity living)
 		{
+			// Setup attribute monitor cap
 			event.getEntity().getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CAttributeMonitor.SetupEvent(living, cap));
 			});
+			// Setup item stack monitor cap
 			event.getEntity().getCapability(BefMobCapabilities.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
 			});
+		}
+		if (event.getEntity() instanceof IBefriendedUndeadMob um)
+		{
+			// Setup befriended undead sun-immunity rules
+			um.setupSunImmunityRules();
 		}
 	}
 }
