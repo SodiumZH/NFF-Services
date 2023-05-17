@@ -1,11 +1,14 @@
 package net.sodiumstudio.befriendmobs.item.baublesystem;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
 
@@ -16,27 +19,70 @@ public abstract class BaubleHandler {
 	
 	/* Item types */
 	/**
-	 * Get item types the bauble slot should accept.
-	 * If whether a slot should accept an item cannot be indicated as a set, override isAccepted() instead.
-	 * @param key String key of the bauble slot.
-	 * @return Item set the slot accepts.
+	 * @deprecated use mob-sensitive version instead.
 	 */
-	public abstract HashSet<Item> getItemsAccepted(String key);
+	@Deprecated
+	@DontOverride
+	public HashSet<Item> getItemsAccepted(String key)
+	{
+		return new HashSet<Item>();
+	}
+	
+	/**
+	 * Get item types the bauble slot should accept. 
+	 * The predicate as value is the additional condition for accepting the item. Use {@code null} for always true.
+	 * If whether a slot should accept an item cannot be indicated as a map, override isAccepted() instead.
+	 */
+	public abstract HashMap<Item, Predicate<IBaubleHolder>> getItemsAccepted(String key, IBaubleHolder mob);
+		/*HashMap<Item, Predicate<IBaubleHolder>> map = new HashMap<Item, Predicate<IBaubleHolder>>();
+		// TODO: remove
+		for (Item item: getItemsAccepted(key))
+		{
+			map.put(item, null);
+		}
+		
+		*/
+
+	/**
+	 * @deprecated use mob sensitive version instead.
+	 */
+	@Deprecated
+	public boolean isAccepted(Item item, String key)
+	{
+		BefriendMobs.LOGGER.error("BaubleHandler::isAccpeted(Item, String) is deprecated. Use mob sensitive version instead.");
+		return getItemsAccepted(key).contains(item) // TODO: remove
+				|| getItemsAccepted(key, null).keySet().contains(item);
+	}
 	
 	/**
 	 *  Check if an item can be added as a bauble.
 	 *  By default it checks if the item is contained in getItemAccepted() return.
 	 */
-	public boolean isAccepted(Item item, String key)
+	public boolean isAccepted(Item item, String key, IBaubleHolder mob)
 	{
-		return getItemsAccepted(key).contains(item);
+		return getItemsAccepted(key).contains(item) || // TODO: remove 
+				(getItemsAccepted(key, mob).keySet().contains(item) 
+				&& (getItemsAccepted(key, mob).get(item) == null || getItemsAccepted(key, mob).get(item).test(mob)));
+		
 	}
 	
-	// Check if an item can be added as a bauble (stack-sensitive version)
+	/** Check if an item can be added as a bauble (stack-sensitive version)
+	 * @deprecated use mob-sensitive version instead
+	 */
+	@Deprecated
 	@DontOverride
 	public boolean isAccepted(ItemStack itemstack, String key)
 	{
 		return itemstack.isEmpty() ? false : isAccepted(itemstack.getItem(), key);
+	}
+	
+	/** 
+	 * Check if an item can be added as a bauble (stack-sensitive version)
+	 */
+	@DontOverride
+	public boolean isAccepted(ItemStack itemstack, String key, IBaubleHolder mob)
+	{
+		return itemstack.isEmpty() ? false : isAccepted(itemstack.getItem(), key, mob);
 	}
 	
 	/** Executed every tick
@@ -56,7 +102,7 @@ public abstract class BaubleHandler {
 				if (this.shouldAlwaysRefresh(key, holder) || holder.hasSlotChanged(key))
 				{
 					// Not empty
-					if (isAccepted(holder.getBaubleSlots().get(key).getItem(), key))
+					if (isAccepted(holder.getBaubleSlots().get(key).getItem(), key, holder))
 					{
 						holder.removeBaubleModifiers(key);
 						this.clearBaubleEffect(key, holder);

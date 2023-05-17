@@ -70,12 +70,6 @@ public class BefriendedHelper
 		String ownerKey = modId + ":befriended_owner";
 		String aiStateKey = modId + ":befriended_ai_state";
 		String inventoryKey = modId + ":befriended_additional_inventory";
-		// TEMP FIX
-		NbtHelper.shiftNbtTag(nbt, "owner", ownerKey);
-		NbtHelper.shiftNbtTag(nbt, "ai_state", aiStateKey);
-		NbtHelper.shiftNbtTag(nbt, "inventory_tag", inventoryKey);
-		NbtHelper.shiftNbtTag(nbt, "dwmgbefriended_additional_inventory", inventoryKey);	// 1.18.2-snapshot-7 & 1.19.2-snapshot-8 bug: missing colon in key
-		// FIX END
 		// Mod ID
 		nbt.putString("befriended_mod_id", modId);
 		// Owner UUID
@@ -100,7 +94,7 @@ public class BefriendedHelper
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
 		String modid = null;
 		// 
-		if (nbt.contains("befriended_mod_id", NbtHelper.TagType.TAG_STRING.getID()))
+		if (nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID))
 		{
 			modid = nbt.getString("befriended_mod_id");
 		}		
@@ -110,13 +104,6 @@ public class BefriendedHelper
 		String ownerKey = modid + ":befriended_owner";
 		String aiStateKey = modid + ":befriended_ai_state";
 		String inventoryKey = modid + ":befriended_additional_inventory";
-		// TEMP FIX
-		// Snapshot compatibility will be removed next version
-		NbtHelper.shiftNbtTag(nbt, "owner", ownerKey);
-		NbtHelper.shiftNbtTag(nbt, "ai_state", aiStateKey);
-		NbtHelper.shiftNbtTag(nbt, "inventory_tag", inventoryKey);
-		NbtHelper.shiftNbtTag(nbt, "dwmgbefriended_additional_inventory", inventoryKey);
-		// FIX END
 		UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
 		try {
 		if (uuid == null)
@@ -190,7 +177,7 @@ public class BefriendedHelper
 	 */
 	public String getModIdFromNbt(CompoundTag nbt)
 	{
-		return nbt.contains("befriended_mod_id", NbtHelper.TagType.TAG_STRING.getID()) ?
+		return nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID) ?
 				nbt.getString("befriended_mod_id") : null;
 	}
 }

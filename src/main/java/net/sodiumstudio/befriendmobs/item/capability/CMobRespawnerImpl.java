@@ -38,7 +38,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 	@Override
 	public boolean isNoExpire()
 	{
-		if (tag.contains("no_expire", NbtHelper.TagType.TAG_BYTE.getID()))
+		if (tag.contains("no_expire", NbtHelper.TAG_BYTE_ID))
 		{
 			return tag.getBoolean("no_expire");
 		}
@@ -57,7 +57,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 	@Override
 	public boolean recoverInVoid()
 	{
-		if (tag.contains("recover_in_void", NbtHelper.TagType.TAG_BYTE.getID()))
+		if (tag.contains("recover_in_void", NbtHelper.TAG_BYTE_ID))
 		{
 			return tag.getBoolean("recover_in_void");
 		}
@@ -76,7 +76,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 	@Override
 	public boolean isInvulnerable()
 	{
-		if (tag.contains("invulnerable", NbtHelper.TagType.TAG_BYTE.getID()))
+		if (tag.contains("invulnerable", NbtHelper.TAG_BYTE_ID))
 		{
 			return tag.getBoolean("invulnerable");
 		}
@@ -161,7 +161,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 				getType(),
 				(ServerLevel)(player.level),
 				null,
-				tag.contains("mob_custom_name", NbtHelper.TagType.TAG_STRING.getID()) ? MutableComponent.create(new LiteralContents(tag.getString("mob_custom_name"))) : null,
+				tag.contains("mob_custom_name", NbtHelper.TAG_STRING_ID) ? InfoHelper.createText(tag.getString("mob_custom_name")) : null,)
 				player,
 				pos1,
 				true,

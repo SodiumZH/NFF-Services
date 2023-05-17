@@ -421,15 +421,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 
 	/* BefriendedMob setup */
 
-	// Attributes
-
-	@Override
-	public void updateAttributes() {
-		/* Update attributes here */
-		/* It will auto-called on initialization and container update. */
-
-	}
-
 	// Interaction
 
 	public boolean playerIgniteDefault(Player player, InteractionHand hand)
