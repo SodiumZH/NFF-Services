@@ -1,5 +1,8 @@
 package net.sodiumstudio.befriendmobs.entity.capability;
 
+import java.util.HashMap;
+import java.util.function.Predicate;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -31,6 +34,10 @@ public interface CBefriendedMobTempData {
 		public boolean hasInit = false;
 		public LivingEntity previousTarget = null;
 		public Vec3 anchor;
+		
+		// BefriendedUndeadMob data
+		public HashMap<String, Predicate<IBefriendedMob>> sunImmuneConditions = new HashMap<String, Predicate<IBefriendedMob>>();
+		public HashMap<String, Predicate<IBefriendedMob>> sunImmuneNecessaryConditions = new HashMap<String, Predicate<IBefriendedMob>>();
 	}
 	
 	public class Prvd implements ICapabilityProvider

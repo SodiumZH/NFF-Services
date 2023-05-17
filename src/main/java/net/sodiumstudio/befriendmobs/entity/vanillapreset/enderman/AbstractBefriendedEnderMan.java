@@ -25,6 +25,7 @@ import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -571,43 +572,36 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 	// Initialization end
 
-	// Attributes
-
-	@Override
-	public void updateAttributes() {
-		/* Update attributes here */
-		/* It will auto-called on initialization and container update. */
-
-	}
-
 	// Interaction
 
 	@Override
-	public boolean onInteraction(Player player, InteractionHand hand) {
-
-		if (player.getUUID().equals(getOwnerUUID()))
+	public InteractionResult mobInteract(Player player, InteractionHand hand)
+	{
+		if (!player.isShiftKeyDown())
 		{
-			if (!player.level.isClientSide())
+			if (player.getUUID().equals(getOwnerUUID()))
 			{
-				switchAIState();
+				if (!player.level.isClientSide())
+				{
+					switchAIState();
+				}
+				return InteractionResult.sidedSuccess(player.level.isClientSide());
 			}
-			return true;
+			/* Other actions */
+			return InteractionResult.PASS;
 		}
-		/* Other actions */
-		return false;
-	}
-
-	@Override
-	public boolean onInteractionShift(Player player, InteractionHand hand) {
-		if (player.getUUID().equals(getOwnerUUID()))
+		else
 		{
+			if (player.getUUID().equals(getOwnerUUID()))
+			{
 
-			if (hand.equals(InteractionHand.MAIN_HAND))
-				BefriendedHelper.openBefriendedInventory(player, this);
-			return true;
+				if (hand.equals(InteractionHand.MAIN_HAND))
+					BefriendedHelper.openBefriendedInventory(player, this);
+				return InteractionResult.sidedSuccess(player.level.isClientSide());
+			}
+			/* Other actions... */
+			return InteractionResult.PASS;
 		}
-		/* Other actions... */
-		return false;
 	}
 
 	// Interaction end

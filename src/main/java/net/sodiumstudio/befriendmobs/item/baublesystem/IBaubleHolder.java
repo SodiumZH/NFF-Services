@@ -22,11 +22,11 @@ public interface IBaubleHolder {
 	/* Bauble existance & counting */
 		
 	public default boolean isBauble(Item item, String key){
-		return getBaubleHandler().isAccepted(item, key);
+		return getBaubleHandler().isAccepted(item, key, this);
 	}
 	
 	public default boolean isBauble(ItemStack stack, String key){
-		return getBaubleHandler().isAccepted(stack, key);
+		return getBaubleHandler().isAccepted(stack, key, this);
 	}
 
 	/* Apply effects */
