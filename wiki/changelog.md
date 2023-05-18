@@ -12,6 +12,8 @@ Reimplemented `IBefriendedUndeadMob`. Now it uses rules (`Supplier<Boolean>`) to
 
 Added `CHealingHandler.ApplyHealingItemEvent` and `CHealingHandler.HealingFailedEvent` for healing handler. Now simple adjustment of healing actions and particle sending needn't rewrite capability implementation.
 
+Fixed befriended mob unable to drop inventory on death.
+
 ### 0.0.2-alpha
 
 Made most methods in BaubleSystem key-sensitive in order to enable different types of Bauble slots in a single mob.
