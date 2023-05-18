@@ -43,8 +43,13 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/** Initialize a mob.
 	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
-	 * @param player Player who owns this mob.
+	 * @param playerUUID Player UUID who owns this mob.
 	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
+	 * <p>========
+	 * <p>初始化生物。
+	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此其实现必须处理null的情况。
+	 * @param playerUUID 拥有此生物的玩家UUID。
+	 * @param from友好化或转化为该生物的来源生物。可以为null！
 	 */
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
@@ -63,7 +68,9 @@ public interface IBefriendedMob extends ContainerListener  {
 
 	/**
 	 * Get whether this mob has finished initialization.
-	 * After finishing initialization the mob will start updating from its inventory.
+	 * <p>After finishing initialization the mob will start updating from its inventory.
+	 * <p>获取是否该生物已经完成初始化。
+	 * <p>在完成初始化后，生物将开始基于附加道具栏更新。
 	 */
 	@DontOverride
 	public default boolean hasInit()
@@ -72,10 +79,13 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
-	 * Only after labeled init, the mob will update from inventory.
-	 * After spawning and deserializing, call this.
-	 * Don't worry about if the presets in BefriendMobs API has already labeled init, 
+	 * <p>Only after labeled init, the mob will update from inventory.
+	 * <p>After spawning and deserializing, call this.
+	 * <p>Don't worry about if the presets in BefriendMobs API has already labeled init, 
 	 * as labeling again will not do anything if so.
+	 * <p>标记一个生物为已初始化，在进行读取NBT、从其他对象复制等操作之后。
+	 * <p>在生成和读档之后调用此函数。
+	 * <p>无需考虑BefriendMobs API的预设中是否已经标记了已初始化。重复标记不会做任何事情。
 	 */
 	@DontOverride
 	public default void setInit()
@@ -84,8 +94,11 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 
 	/** Label a mob not finished initialization.
-	 * Call this only when the presets has labeled init but you need some extra actions that needs to keep it not init.
-	 * Currently the init label affects only inventory updating.
+	 * <p>Call this only when the presets has labeled init but you need some extra actions that needs to keep it not init.
+	 * <p>Currently the init label affects only inventory updating.
+	 * <p>标记一个生物为未完成初始化。
+	 * <p>当预设已经标记为了已初始化，但需要进行的额外操作要求保持未初始化时，调用此函数。
+	 * <p>目前已初始化标记仅用于附加道具栏更新。
 	 */
 	@DontOverride
 	public default void setNotInit()
@@ -95,8 +108,11 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/* Ownership */
 	
-	/** Get owner as player entity.
-	* Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	/** 
+	 * Get owner as player entity.
+	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	* <p>获取拥有者的玩家实体。
+	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
 	*/
 	@DontOverride
 	@Nullable
@@ -106,8 +122,13 @@ public interface IBefriendedMob extends ContainerListener  {
 			return asMob().level.getPlayerByUUID(getOwnerUUID());
 		else return null;
 	}
-	// Get owner as UUID.
-	// Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	
+	/** 
+	 * Get owner as UUID.
+	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
+	* <p>获取拥有者的UUID。
+	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
+	*/
 	@DontOverride
 	@Nullable
 	public default UUID getOwnerUUID()
@@ -120,14 +141,19 @@ public interface IBefriendedMob extends ContainerListener  {
 		return asMob().getEntityData().get(getOwnerUUIDAccessor()).get();
 	}
 	
-	// Set owner from player mob.
+	/** Set owner from player entity.
+	 * <p>从玩家实体设置拥有者。
+	 */
 	@DontOverride
 	public default void setOwner(@Nonnull Player owner)
 	{
 		setOwnerUUID(owner.getUUID());
 	}
 	
-	// Set owner from player UUID.
+	/**
+	* Set owner from player UUID.
+	* <p>从玩家UUID设置拥有者。
+	*/
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
@@ -136,6 +162,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/**
 	 * Get owner UUID as entity data accessor. Attach this to accessor defined in mob class.
+	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取拥有者UUID。在生物类中将该方法关联到相应访问器上。
 	 */
 	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor();
 	
@@ -147,6 +174,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/** 
 	 * Get current AI state as enum.
+	 * <p>以枚举类的形式获取当前AI状态。
 	 */
 	@DontOverride
 	public default BefriendedAIState getAIState()
@@ -156,8 +184,12 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/** A preset action when switching AI e.g. on right click.
 	 * By default it cycles among Wait, Follow and Wander.
-	 * DO NOT override this. Override getNextAIState() instead.
+	 * <p>DO NOT override this. Override {@code getNextAIState()} instead.
 	 * @return The new AI state.
+	 * <p>========
+	 * <p>切换AI的操作预设，如右键等。默认情况下会在等待、跟随和游荡之间循环切换。
+	 * <p>不要重载这个函数。如有需要请重载{@code getNextAIState()}。
+	 * @return 新的AI状态。
 	 */
 	@DontOverride
 	public default BefriendedAIState switchAIState()
@@ -171,13 +203,23 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/**
 	 * Get the next AI State after a switching action e.g. right click.
-	 * Called in switchAIState() above.
+	 * <p>Called in {@code switchAIState()} above.
+	 * <p>获取切换后的AI状态。
+	 * <p>在上面的{@code switchAIState()}中调用。
 	 */
+	@NoManualCall
 	public default BefriendedAIState getNextAIState()
 	{
 		return getAIState().defaultSwitch();
 	}
 	
+	/**
+	 * Set the AI state.
+	 * @param postEvent Whether it should post a {@link BefriendedChangeAiStateEvent}.
+	 * <p>========
+	 * <p>设置AI状态。
+	 * @param postEvent 是否需要发射{@link BefriendedChangeAiStateEvent}事件。
+	 */
 	@DontOverride
 	public default void setAIState(BefriendedAIState state, boolean postEvent)
 	{
@@ -278,16 +320,19 @@ public interface IBefriendedMob extends ContainerListener  {
 	/* --------------------------------------------- */
 	/* Interaction */
 	
-	// Actions on player right click the mob
-	// Deprecated, use mobInteraction() instead
+	/**
+	 *  Actions on player right click the mob
+	 * @deprecated use mobInteraction() instead
+	 * */
 	@Deprecated
 	public default boolean onInteraction(Player player, InteractionHand hand)
 	{
 		return false;
 	}
 	
-	// Actions on player shift + rightmouse click
-	// Deprecated, use mobInteraction() instead
+	/** Actions on player shift + rightmouse click
+	 * @deprecated use mobInteraction() instead
+	 */
 	@Deprecated
 	public default boolean onInteractionShift(Player player, InteractionHand hand)
 	{
@@ -325,7 +370,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public BefriendedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
 
 	/* ContainerListener interface */
-	// DO NOT override this. Override onInventoryChanged instead.
+	/** DO NOT override this. Override onInventoryChanged instead. */
 	@DontOverride
 	@Override
 	public default void containerChanged(Container pContainer) 
@@ -368,7 +413,7 @@ public interface IBefriendedMob extends ContainerListener  {
 		return succeeded.get();
 	}
 	
-	/* Add all usable items here, including non-consuming items. Value is HP it can heal. */
+	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
 	public default HashMap<Item, Float> getHealingItems()
 	{
 		return new HashMap<Item, Float>();

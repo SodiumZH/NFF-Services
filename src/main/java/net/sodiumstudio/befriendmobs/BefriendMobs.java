@@ -16,7 +16,10 @@ public class BefriendMobs {
 
 	public static final String MOD_ID = "befriendmobs";
 	public static final Logger LOGGER = LogUtils.getLogger();
-
+	
+	/**
+	 * @deprecated use {@code MOD_ID} instead
+	 */
 	@Deprecated
 	public static String modDomain()
 	{

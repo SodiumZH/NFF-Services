@@ -28,7 +28,9 @@ public class BefriendedHelper
 
 	/* AI */
 
-	/** Default settings of what the mob will attack.
+	/**
+	 *  Default settings of the rule of what the mob can attack.
+	 *  <p>判断生物是否可以攻击对象的规则的默认预设。
 	 */
 	public static boolean wantsToAttackDefault(IBefriendedMob mob, LivingEntity target) {
 		// Don't attack creeper or ghast
@@ -59,11 +61,10 @@ public class BefriendedHelper
 		addBefriendedCommonSaveData(mob, nbt);
 	}
 
-	// This will read owner, AI state and additional inventory
-	// TEMPORARY: FIX NBT FOR KEY CHANGES
-	// "owner -> "$modid:befriended_owner"
-	// "ai_state" -> "$modid:befriended_ai_state"
-	// "inventory_tag" -> "$modid:befriended_additional_inventory"
+	/**
+	 *  This will read owner, AI state and additional inventory
+	 *  <p>读取拥有者信息、AI状态及附加道具栏
+	*/
 	public static void addBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt)
 	{
 		String modId = mob.getModId();
@@ -89,6 +90,7 @@ public class BefriendedHelper
 	
 	/**
 	 * Read mob's Mod Id, owner, AI state and additional inventory information.
+	 * <p>读取生物所属的Mod ID、拥有者信息、AI状态及附加道具栏
 	 */
 	
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
@@ -121,6 +123,17 @@ public class BefriendedHelper
 		mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
 	}
 
+	/**
+	 * Convert a befriended mob to other type. This action will keep its data.
+	 * @param target The mob to convert.
+	 * @param newType The type converting to, must implementing {@code IBefriendedMob} interface.
+	 * @return The new mob reference.
+	 * <p>========
+	 * <p>将一个友好化生物转化为其他类型。这个操作会保持其数据。
+	 * @param target 转化前的生物。
+	 * @param newType 转化为的类型。其必须实现{@code IBefriendedMob}接口。
+	 * @return The new mob reference. 新生物的引用。
+	 */
 	public static IBefriendedMob convertToOtherBefriendedType(IBefriendedMob target, EntityType<? extends Mob> newType)
 	{
 		// Additional inventory will be invalidated upon convertion, so backup as a tag
@@ -145,8 +158,10 @@ public class BefriendedHelper
 	/* Inventory */
 
 	/**
-	 * Open the inventory of the mob.
-	 * Warning: DO NOT call this if makeMenu() method returns null, otherwise it will crash the game.
+	 * Open the inventory GUI of the mob.
+	 * <p>Warning: DO NOT call this if {@link IBefriendedMob#makeMenu()} method returns null, otherwise it will crash the game.
+	 * <p>打开生物的道具栏GUI。
+	 * <p>警告：如果{@link IBefriendedMob#makeMenu()}函数返回null则不要调用这个函数，否则游戏会崩溃。
 	 */
 	public static void openBefriendedInventory(Player player, IBefriendedMob mob) {
 		LivingEntity living = (LivingEntity) mob;
@@ -174,6 +189,7 @@ public class BefriendedHelper
 
 	/**
 	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
+	 * <p>使用一个用于读档的NBT标签，在未实际生成生物前获取生物所属的MOD ID
 	 */
 	public String getModIdFromNbt(CompoundTag nbt)
 	{
