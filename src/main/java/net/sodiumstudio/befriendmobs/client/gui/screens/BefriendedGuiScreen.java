@@ -29,7 +29,10 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	protected float xMouse = 0;
 	protected float yMouse = 0;
 
-
+	/**
+	 * Specifies the texture image it uses.
+	 * <p>指定所用的贴图。
+	 */
 	public abstract ResourceLocation getTextureLocation();
 	
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
@@ -52,7 +55,10 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		RenderSystem.setShaderTexture(0, getTextureLocation());
 	}
 	
-	// Background, mouse XY and tooltip are rendered here. Do not render them again in subclasses.
+	/** 
+	 * Background, mouse XY and tooltip are rendered here. Do not render them again in subclasses.
+	 * <p>背景、鼠标XY位置及窗口名已经在这里渲染过了。子类中不要重复渲染。
+	 */
 	@Override
 	public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
 		this.renderBackground(pPoseStack);
@@ -62,11 +68,27 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		this.renderTooltip(pPoseStack, pMouseX, pMouseY);
 	}
 	
+	/**
+	 * IntVec2 version of blit
+	 */
 	public void blit(PoseStack poseStack, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
 		blit(poseStack, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
 	}
 	
+	/**
+	 * Add an item slot in the GUI.
+	 * @param slotIndex The slot index in inventory menu. <p>在道具栏菜单中的栏位序号。
+	 * @param xy Position on the screen. <p>该GUI在屏幕上的位置。
+	 * @param uvEmpty Position of the slot image on the texture image when the slot is empty. <p>当道具为空时的栏位贴图背景。
+	 * @param uvFilled Position of the slot image on the texture image when the slot is filled. <p>当道具非空时的栏位贴图背景。
+	 * <p>========
+	 * <p>加入一个道具槽。
+	 * @param slotIndex 在道具栏菜单中的栏位序号。
+	 * @param xy 该GUI在屏幕上的位置。
+	 * @param uvEmpty 当道具为空时的栏位贴图背景，在整张贴图中的位置坐标。
+	 * @param uvFilled 当道具非空时的栏位贴图背景，在整张贴图中的位置坐标。
+	 */
 	public void addSlotBg(PoseStack poseStack, int slotIndex, IntVec2 xy, @Nullable IntVec2 uvEmpty, @Nullable IntVec2 uvFilled)
 	{
 		if (!menu.slots.get(slotIndex).hasItem() && uvEmpty != null)
@@ -90,7 +112,10 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		addHealthInfo(poseStack, position, 0x404040);
 	}
 	
-	// Add mob attribute info, including HP/MaxHP, ATK, armor
+	/** 
+	 * (Preset) Add mob attribute info, including HP/MaxHP, ATK, armor
+	 * <p>（预设） 添加生物属性信息，包括HP/MaxHP、攻击力、护甲
+	 */
 	public void addAttributeInfo(PoseStack poseStack, IntVec2 position, int color, int textRowWidth)
 	{
 		IntVec2 pos = position.copy();
@@ -112,6 +137,10 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		font.draw(poseStack, defcomp, pos.x, pos.y, color);
 	}
 	
+	/**
+	 * Add attribute info using default font
+	 * <p>添加生物属性信息，使用默认字体
+	 */
 	public void addAttributeInfo(PoseStack poseStack, IntVec2 position)
 	{
 		addAttributeInfo(poseStack, position, 0x404040, 11);
