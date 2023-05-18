@@ -255,7 +255,7 @@ public class EntityEvents
 							{
 								if (!EnchantmentHelper.hasVanishingCurse(container.getItem(i)))
 								{
-									event.getEntity().spawnAtLocation(container.getItem(i));
+									event.getEntity().spawnAtLocation(container.getItem(i).copy());
 								}
 								container.getItem(i).setCount(0);
 								bef.updateFromInventory();
