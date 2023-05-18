@@ -1,10 +1,12 @@
 package net.sodiumstudio.befriendmobs.entity.capability;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
 import net.sodiumstudio.befriendmobs.util.ItemHelper;
 
@@ -32,20 +34,27 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 	{
 		if (getOwner().getHealth() < getOwner().getMaxHealth() && getCooldown() == 0)
 		{
-			if (consume)
+			ApplyHealingItemEvent event = new ApplyHealingItemEvent(getOwner(), stack, value, getHealingCooldownTicks());
+			boolean canceled = MinecraftForge.EVENT_BUS.post(event);
+			if (!canceled)
 			{
-				ItemHelper.consumeOne(stack);
+				if (consume)
+				{
+					ItemHelper.consumeOne(stack);
+				}
+				getOwner().heal(event.healValue);
+				if (event.sendDefaultParticles)
+					sendParticlesOnSuccess();
+				setCooldown(event.cooldown);
+				return true;
 			}
-			getOwner().heal(value);
-			sendParticlesOnSuccess();
-			setCooldown(getHealingCooldownTicks());
-			return true;
 		}
-		else
-		{
+		HealingFailedEvent event = new HealingFailedEvent(getOwner(), stack);
+		MinecraftForge.EVENT_BUS.post(event);
+		if (event.sendDefaultParticles)
 			sendParticlesOnFailure();
-			return false;
-		}
+		return false;
+
 	}
 	
 	public default void sendParticlesOnSuccess()
@@ -72,4 +81,45 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 			setCooldown(getCooldown() - 1);
 	}
 
+	@Cancelable
+	public static class ApplyHealingItemEvent extends Event
+	{
+		/** Target living entity. */
+		public final LivingEntity living;
+		/** Item stack to apply. */
+		public final ItemStack stack;
+		/** HP value to heal. Settable. */
+		public float healValue;
+		/** Whether it should send default particles (glint). Settable. */
+		public boolean sendDefaultParticles = true;
+		/** Cooldown ticks. Settable. */
+		public int cooldown;
+		
+		public ApplyHealingItemEvent(LivingEntity living, ItemStack stack, float healValue, int cooldown)
+		{
+			this.living = living;
+			this.stack = stack;
+			this.healValue = healValue;
+			this.cooldown = cooldown;
+		}
+	}
+		
+	/**
+	 * Fired when applying healing item to living failed, including because of cancellation of {@link CHealingHandler.ApplyHealingItemEvent}.
+	 */
+	public static class HealingFailedEvent extends Event
+	{
+		/** Target living entity. */
+		public final LivingEntity living;
+		/** Item stack to apply. */
+		public final ItemStack stack;
+		/** Whether it should send default particles (smoke). Settable. */
+		public boolean sendDefaultParticles = true;
+		
+		public HealingFailedEvent(LivingEntity living, ItemStack stack)
+		{
+			this.living = living;
+			this.stack = stack;
+		}
+	}
 }

@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
  * <p>表明该方法不建议手动调用。
  */
 @Target(METHOD)
-public @interface NoManualCall {
+public @interface DontCallManually {
 
 }
