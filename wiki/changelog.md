@@ -6,9 +6,11 @@
 
 Versions above will no longer use "alpha" as postfix. All versions with prefix 0 are alpha.
 
-Adjusted `getItemsAccepted` and `isAccepted` checks mob-sensitive in BaubleSystem. Method `getItemsAccepted` now uses a HashMap with `Predicate<IBaubleHolder>` as value, and if this predicate is non-null, the mob will fulfill this additional check to accept the given item.
+Adjusted `getItemsAccepted` and `isAccepted` checks mob-sensitive in BaubleSystem. Method `getItemsAccepted` now uses a HashMap with `Predicate<IBaubleHolder>` as value, and if this predicate is non-null, the mob will need to fulfill this additional check to accept the given item.
 
-Implemented `IBefriendedUndeadMob`. Now it uses rules (`Predicate<IBefriendedMob>`) to dynamically check if the mob should be sun-immune. For details see source file.
+Reimplemented `IBefriendedUndeadMob`. Now it uses rules (`Supplier<Boolean>`) to dynamically check if the mob should be sun-immune. For details see source file. 
+
+Added `CHealingHandler.ApplyHealingItemEvent` and `CHealingHandler.HealingFailedEvent` for healing handler. Now simple adjustment of healing actions and particle sending needn't rewrite capability implementation.
 
 ### 0.0.2-alpha
 

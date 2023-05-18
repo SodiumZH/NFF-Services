@@ -10,6 +10,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
+import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
+import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
 
 // A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor {
@@ -26,6 +28,7 @@ public interface CAttributeMonitor {
 	/** Add an attribute to the listen list.
 	 * It still works if the attribute isn't available yet (e.g. on capability attachment).
 	*/
+	@SuppressWarnings("deprecation")
 	public default CAttributeMonitor listen(Attribute attribute)
 	{
 		// Use NaN to label an attribute position before entity attributes creation
@@ -35,6 +38,9 @@ public interface CAttributeMonitor {
 	}
 	
 	// Update and detect change on tick
+	@SuppressWarnings("deprecation")
+	@DontOverride
+	@DontCallManually
 	public default void tick()
 	{
 		for (String key: getListenList().keySet())
@@ -50,7 +56,7 @@ public interface CAttributeMonitor {
 			if (!Double.isNaN(oldVal)
 				&& !Double.isNaN(newVal)
 				&& (oldVal - newVal > 0.0000001 || oldVal - newVal < -0.0000001))
-			{
+			{			
 				MinecraftForge.EVENT_BUS.post(new LivingAttributeValueChangeEvent(
 						getOwner(), attr, oldVal, newVal));
 				MinecraftForge.EVENT_BUS.post(new ChangeEvent(
@@ -59,10 +65,12 @@ public interface CAttributeMonitor {
 			getListenList().put(key, newVal);
 		}
 	}
+	
 	/**
 	* Add listened attribute to a living entity. 
 	* The living entity must have CAttributeMonitor capability attached.
 	*/
+	@DontOverride
 	public static CAttributeMonitor listen(LivingEntity living, Attribute attr)
 	{
 		Wrapped<CAttributeMonitor> cap = new Wrapped<CAttributeMonitor>(null);

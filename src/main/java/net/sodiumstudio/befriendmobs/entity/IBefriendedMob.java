@@ -35,7 +35,7 @@ import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
-import net.sodiumstudio.befriendmobs.util.annotation.NoManualCall;
+import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
 
 public interface IBefriendedMob extends ContainerListener  {
 
@@ -207,7 +207,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * <p>获取切换后的AI状态。
 	 * <p>在上面的{@code switchAIState()}中调用。
 	 */
-	@NoManualCall
+	@DontCallManually
 	public default BefriendedAIState getNextAIState()
 	{
 		return getAIState().defaultSwitch();
@@ -243,7 +243,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/
 	@DontOverride
-	@NoManualCall
+	@DontCallManually
 	public default LivingEntity getPreviousTarget()
 	{
 		return this.getTempData().previousTarget;
@@ -253,7 +253,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/
 	@DontOverride
-	@NoManualCall
+	@DontCallManually
 	public default void setPreviousTarget(LivingEntity target)
 	{
 		this.getTempData().previousTarget = target;
@@ -309,7 +309,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * when the mob enters waiting state, the anchor will stop and the mob gets anchored.
 	 * Called on world tick only. Don't call anywhere else.
 	 */
-	@NoManualCall
+	@DontCallManually
 	@DontOverride
 	public default void updateAnchor()
 	{

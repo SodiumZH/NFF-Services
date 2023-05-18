@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
-import net.sodiumstudio.befriendmobs.util.annotation.NoManualCall;
+import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
 
 /**
  * This is an interface handling sun immunity for undead mobs.
@@ -73,7 +73,6 @@ public interface IBefriendedUndeadMob
 	@DontOverride
 	public default boolean isSunImmune()
 	{
-		IBefriendedMob bm = this.asBefriended();
 		for (String key: sunImmuneNecessaryConditions().keySet())
 		{
 			if (!sunImmuneNecessaryConditions().get(key).get())
@@ -91,7 +90,7 @@ public interface IBefriendedUndeadMob
 	 * Setup rules for sun immunity.
 	 * Called in EntityJoinWorldEvent only
 	 */
-	@NoManualCall
+	@DontCallManually
 	public void setupSunImmunityRules();
 	
 }
