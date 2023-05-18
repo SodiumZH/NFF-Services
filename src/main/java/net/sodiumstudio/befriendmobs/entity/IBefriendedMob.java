@@ -520,7 +520,8 @@ public interface IBefriendedMob extends ContainerListener  {
 			res.set(cap);
 		});
 		if (res.get() == null)
-			throw new IllegalStateException("Befriended mob " + asMob().getName().getString() + "missing temp data capability.");
+			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
+			return new CBefriendedMobTempData.Values(this);	
 		return res.get().values();
 	}
 	
