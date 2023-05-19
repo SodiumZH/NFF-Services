@@ -7,7 +7,7 @@ public enum BefriendableAddHatredReason
 	ATTACKED(0), // The befriendable mob is attack by player
 	ATTACKING(1), // The befriendable mob attacked the player
 	SET_TARGET(2), // The befriendable mob set target to player
-	PROVOKED(3), // Fired when an enderman get angry being looked at
+	PROVOKED(3), // Unused
 	CUSTOM_1(99), 
 	CUSTOM_2(98),
 	CUSTOM_3(97),

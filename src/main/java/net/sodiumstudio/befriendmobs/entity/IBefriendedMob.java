@@ -47,9 +47,9 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
 	 * <p>========
 	 * <p>初始化生物。
-	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此其实现必须处理null的情况。
+	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此实现必须处理null的情况。
 	 * @param playerUUID 拥有此生物的玩家UUID。
-	 * @param from友好化或转化为该生物的来源生物。可以为null！
+	 * @param from 友好化或转化为该生物的来源生物。可以为null！
 	 */
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
@@ -161,7 +161,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/**
-	 * Get owner UUID as entity data accessor. Attach this to accessor defined in mob class.
+	 * Get owner UUID as {@link EntityDataAccessor}. Attach this to accessor defined in mob class.
 	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取拥有者UUID。在生物类中将该方法关联到相应访问器上。
 	 */
 	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor();
@@ -169,7 +169,10 @@ public interface IBefriendedMob extends ContainerListener  {
 	/* -------------------------------------------------------- */
 	/* AI configs */
 	
-	// Get the AI state as EntityDataAccessor defined in mob classes.
+	/** 
+	 * Get the AI state as {@link EntityDataAccessor}. Attach this to accessor defined in mob class.
+	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取AI状态。在生物类中将该方法关联到相应访问器上。
+	*/
 	public EntityDataAccessor<Byte> getAIStateData();
 	
 	/** 
@@ -187,7 +190,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * <p>DO NOT override this. Override {@code getNextAIState()} instead.
 	 * @return The new AI state.
 	 * <p>========
-	 * <p>切换AI的操作预设，如右键等。默认情况下会在等待、跟随和游荡之间循环切换。
+	 * <p>切换AI的操作预设，例如按下右键时。默认会在等待、跟随和游荡之间循环切换。
 	 * <p>不要重载这个函数。如有需要请重载{@code getNextAIState()}。
 	 * @return 新的AI状态。
 	 */

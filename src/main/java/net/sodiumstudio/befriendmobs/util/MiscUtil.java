@@ -40,7 +40,7 @@ public class MiscUtil {
 	
 	public static void printToScreen(String text, Player receiver)
 	{
-		receiver.sendSystemMessage(MutableComponent.create(new LiteralContents(text)));
+		MiscUtil.printToScreen(InfoHelper.createText(text), receiver, receiver);
 	}
 	
 	public static <T> boolean sameObject(T a, T b)
