@@ -29,7 +29,7 @@ public class MiscUtil {
 	
 	public static void printToScreen(String text, Player receiver, Entity sender)
 	{
-		receiver.sendMessage(new TextComponent(text), sender.getUUID());
+		receiver.sendMessage(InfoHelper.createText(text), sender.getUUID());
 	}
 	
 	public static void printToScreen(Component text, Player receiver)
@@ -39,7 +39,7 @@ public class MiscUtil {
 	
 	public static void printToScreen(String text, Player receiver)
 	{
-		MiscUtil.printToScreen(new TextComponent(text), receiver, receiver);
+		MiscUtil.printToScreen(InfoHelper.createText(text), receiver, receiver);
 	}
 	
 	public static <T> boolean sameObject(T a, T b)

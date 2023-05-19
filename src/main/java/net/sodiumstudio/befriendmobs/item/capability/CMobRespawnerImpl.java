@@ -23,6 +23,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
+import net.sodiumstudio.befriendmobs.util.InfoHelper;
 import net.sodiumstudio.befriendmobs.util.NbtHelper;
 import net.sodiumstudio.befriendmobs.util.ReflectHelper;
 
@@ -163,7 +164,7 @@ public class CMobRespawnerImpl implements CMobRespawner
 				getType(),
 				(ServerLevel)(player.level),
 				null,
-				tag.contains("mob_custom_name", NbtHelper.TAG_STRING_ID) ? new TextComponent(tag.getString("mob_custom_name")) : null,
+				tag.contains("mob_custom_name", NbtHelper.TAG_STRING_ID) ? InfoHelper.createText(tag.getString("mob_custom_name")) : null,
 				player,
 				pos1,
 				true,

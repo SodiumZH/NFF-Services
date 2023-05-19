@@ -1,7 +1,5 @@
 package net.sodiumstudio.befriendmobs.client.gui.screens;
 
-import java.text.DecimalFormat;
-
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,8 +8,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -20,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
+import net.sodiumstudio.befriendmobs.util.InfoHelper;
 import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
 @OnlyIn(Dist.CLIENT)
@@ -43,7 +40,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob, boolean renderName)
 	{
-		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getName() : new TextComponent(""));
+		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getName() : InfoHelper.createText(""));
 		this.mob = mob;
 		this.passEvents = false;
 	}
@@ -102,7 +99,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
-		Component info = new TextComponent("HP: " + hp + " / " + maxHp);
+		Component info = InfoHelper.createText("HP: " + hp + " / " + maxHp);
 		font.draw(poseStack, info, position.x, position.y, color);
 	}
 	
@@ -114,22 +111,21 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	
 	/** 
 	 * (Preset) Add mob attribute info, including HP/MaxHP, ATK, armor
-	 * <p>（预设） 添加生物属性信息，包括HP/MaxHP、攻击力、护甲
+	 * <p>（预设）添加生物属性信息，包括HP/MaxHP、攻击力、护甲
 	 */
 	public void addAttributeInfo(PoseStack poseStack, IntVec2 position, int color, int textRowWidth)
 	{
 		IntVec2 pos = position.copy();
-		DecimalFormat df = new DecimalFormat("##.##");
-		String hp = df.format(mob.asMob().getHealth());
-		String maxHp = df.format(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH));
-		String atk = df.format(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE));
-		String def = df.format(mob.asMob().getAttributeValue(Attributes.ARMOR));
-		Component hpcomp = new TranslatableComponent("info.befriendmobs.gui_health")
-				.append(new TextComponent(": " + hp + " / " + maxHp));
-		Component atkcomp = new TranslatableComponent("info.befriendmobs.gui_atk")
-				.append(new TextComponent(": " + atk));
-		Component defcomp = new TranslatableComponent("info.befriendmobs.gui_armor")
-				.append(new TextComponent(": " + def));
+		String hp = Integer.toString(Math.round(mob.asMob().getHealth()));
+		String maxHp = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH)));
+		String atk = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE)));
+		String def = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ARMOR)));
+		Component hpcomp = InfoHelper.createTrans("info.befriendmobs.gui_health")
+				.append(InfoHelper.createText(": " + hp + " / " + maxHp));
+		Component atkcomp = InfoHelper.createTrans("info.befriendmobs.gui_atk")
+				.append(InfoHelper.createText(": " + atk));
+		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
+				.append(InfoHelper.createText(": " + def));
 		font.draw(poseStack, hpcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
 		font.draw(poseStack, atkcomp, pos.x, pos.y, color);

@@ -34,7 +34,7 @@ public class ItemMobRespawner extends Item
 			c.initFromMob(mob);
 		});
 		
-		//stack.setHoverName(new TranslatableComponent(stack.getHoverName().getString() + " - " + mob.getName().getString()));
+		//stack.setHoverName(InfoHelper.createTrans(stack.getHoverName().getString() + " - " + mob.getName().getString()));
 		return stack;
 	}
 	
