@@ -14,6 +14,8 @@ Added `CHealingHandler.ApplyHealingItemEvent` and `CHealingHandler.HealingFailed
 
 Rounded-off the default mob attribute values displayed in `BefriendedGuiScreen` to integer.
 
+Added support for non-standard texture size in `BefriendedGuiScreen`.
+
 Fixed befriended mob unable to drop inventory on death.
 
 ### 0.0.2-alpha
