@@ -32,6 +32,14 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 */
 	public abstract ResourceLocation getTextureLocation();
 	
+	/**
+	 * If the texture is not a standard 256x256 image, override this value
+	 */
+	public IntVec2 getTextureSize() 
+	{
+		return new IntVec2(256, 256);
+	}
+	
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob) {
 		this(pMenu, pPlayerInventory, mob, true);
@@ -71,6 +79,16 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	public void blit(PoseStack poseStack, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
 		blit(poseStack, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
+	}
+	
+	/**
+	 * For adapting non-standard texture size
+	 */
+	@Override
+	public void blit(PoseStack pPoseStack, int pX, int pY, int pUOffset, int pVOffset, int pUWidth, int pVHeight) 
+	{
+		blit(pPoseStack, pX, pY, this.getBlitOffset(), (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
+				getTextureSize().x, getTextureSize().y);
 	}
 	
 	/**

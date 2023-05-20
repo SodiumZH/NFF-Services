@@ -51,6 +51,10 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		});
 	}
 	
+	/**
+	 * Use key-sensitive version
+	 */
+	@Deprecated
 	protected void addBaubleSlot(int slot, IntVec2 pos)
 	{
 		addBaubleSlot(slot, pos, "null");
