@@ -4,7 +4,10 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Event;
 
-@Deprecated	// Use RespawnerConstructEvent.After instead
+/**
+ * @deprecated Use RespawnerConstructEvent.After instead
+ */
+@Deprecated
 public class RespawnerAddedEvent extends Event
 {
 	protected Mob mob;

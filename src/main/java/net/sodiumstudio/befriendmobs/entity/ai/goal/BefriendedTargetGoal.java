@@ -54,7 +54,7 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	}
 
 	public BefriendedTargetGoal allowAllStates() {
-		for (BefriendedAIState state : BefriendedAIState.values())
+		for (BefriendedAIState state : BefriendedAIState.getAllStates())
 			allowedStates.add(state);
 		return this;
 	}
