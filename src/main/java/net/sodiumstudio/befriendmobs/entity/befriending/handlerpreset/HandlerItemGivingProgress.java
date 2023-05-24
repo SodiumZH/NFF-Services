@@ -39,7 +39,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 				if (l.isInHatred(player) && !shouldIgnoreHatred()) {
 					sendParticlesOnHatred(target);
 					Debug.printToScreen("Hatred cooldown: " + Integer.toString(args.asCap().getHatredDuration(player) / 20) + " s."
-							, player, target);
+							, player);
 					result.setHandled();
 
 				}
@@ -47,7 +47,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 				else if (l.getPlayerTimer(player, "item_cooldown") > 0) {
 					Debug.printToScreen(
 							"Action cooldown " + Integer.toString(l.getPlayerTimer(player, "item_cooldown") / 20) + " s.",
-							player, target);
+							player);
 					sendParticlesOnActionCooldown(target);
 					// result.setHandled();
 				} 
@@ -79,7 +79,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 							player.getMainHandItem().shrink(1);
 						NbtHelper.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
 					}
-					Debug.printToScreen("Progress Value: " + Double.toString(procValue), player, target);
+					Debug.printToScreen("Progress Value: " + Double.toString(procValue), player);
 					if (procValue >= 0.9999999999d)
 					{	// 1.0 actually, avoiding potential float errors
 						// Satisfied

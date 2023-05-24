@@ -46,7 +46,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 				if (l.isInHatred(player) && !shouldIgnoreHatred())
 				{
 					sendParticlesOnHatred(target);
-					Debug.printToScreen("Unable to befriend: in hatred list.", player, target);
+					Debug.printToScreen("Unable to befriend: in hatred list.", player);
 					result.setHandled();
 
 				}
@@ -55,7 +55,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 				{
 					Debug.printToScreen(
 							"Action cooldown " + Integer.toString(l.getPlayerTimer(player, "item_cooldown") / 20) + " s.",
-							player, target);
+							player);
 					sendParticlesOnActionCooldown(target);
 				} else
 				{
@@ -82,7 +82,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 					alreadyGiven++;
 					MiscUtil.printToScreen(
 							"Item(s) given: " + Integer.toString(alreadyGiven) + " / " + Integer.toString(overallAmount),
-							player, target);
+							player);
 					if (alreadyGiven == overallAmount)
 					{
 						// Satisfied

@@ -173,7 +173,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * Get the AI state as {@link EntityDataAccessor}. Attach this to accessor defined in mob class.
 	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取AI状态。在生物类中将该方法关联到相应访问器上。
 	*/
-	public EntityDataAccessor<Byte> getAIStateData();
+	public EntityDataAccessor<Integer> getAIStateData();
 	
 	/** 
 	 * Get current AI state as enum.
@@ -213,7 +213,12 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontCallManually
 	public default BefriendedAIState getNextAIState()
 	{
-		return getAIState().defaultSwitch();
+		BefriendedAIState state = getAIState();
+		if (BefriendedAIState.fromID(state.id + 1) != null)
+		{
+			return BefriendedAIState.fromID(state.id + 1);
+		}
+		else return BefriendedAIState.fromID(0);
 	}
 	
 	/**
@@ -230,7 +235,7 @@ public interface IBefriendedMob extends ContainerListener  {
 			return;
 		if (postEvent && MinecraftForge.EVENT_BUS.post(new BefriendedChangeAiStateEvent(this, getAIState(), state)))
 			return;
-		asMob().getEntityData().set(getAIStateData(), state.id());
+		asMob().getEntityData().set(getAIStateData(), state.id);
 	}
 	
 	/** Get if a target mob can be attacked by this mob.

@@ -78,7 +78,7 @@ public class BefriendedHelper
 			nbt.putUUID(ownerKey, mob.getOwnerUUID());
 		else
 			nbt.putUUID(ownerKey, new UUID(0, 0));
-		nbt.putByte(aiStateKey, mob.getAIState().id());
+		nbt.putInt(aiStateKey, mob.getAIState().id);
 		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
 	}
 	
@@ -119,7 +119,7 @@ public class BefriendedHelper
 		}
 		mob.setOwnerUUID(uuid);
 		mob.init(mob.getOwnerUUID(), null);
-		mob.setAIState(BefriendedAIState.fromID(nbt.getByte(aiStateKey)), false);
+		mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
 		mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
 	}
 

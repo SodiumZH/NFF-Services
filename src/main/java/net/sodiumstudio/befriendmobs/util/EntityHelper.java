@@ -27,6 +27,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.EnderMan;
@@ -492,4 +494,46 @@ public class EntityHelper
 	{
 		addEffectIfNotHaving(living, effectInst, false);
 	}
+	
+	/**
+	 * Check if a mob is natually hostile to another mob.
+	 * @param test Mob to test.
+	 * @param isHostileTo The mob which this check to be hostile to.
+	 */
+	public static boolean isMobHostileTo(Mob test, LivingEntity isHostileTo)
+	{
+		// Check if the mob has a NearestAttackableTargetGoal<isHostileTo.class> goal
+		 for(WrappedGoal goal: test.targetSelector.getAvailableGoals())
+		 {
+			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
+			 {
+				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetConditions");
+				 if (targetType == isHostileTo.getClass())
+				 {
+					 return true;
+				 }
+			 }
+		 }
+		 return false;
+	}
+	/**
+	 * Check if a mob is natually hostile to player.
+	 */
+	public static boolean isMobHostileToPlayer(Mob test)
+	{
+		// Check if the mob has a NearestAttackableTargetGoal<Player> goal
+		 for(WrappedGoal goal: test.targetSelector.getAvailableGoals())
+		 {
+			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
+			 {
+				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetConditions");
+				 if (targetType == Player.class)
+				 {
+					 return true;
+				 }
+			 }
+		 }
+		 return false;
+	}
+
 }
