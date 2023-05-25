@@ -532,5 +532,5 @@ public interface IBefriendedMob extends ContainerListener  {
 			return new CBefriendedMobTempData.Values(this);	
 		return res.get().values();
 	}
-	
+
 }

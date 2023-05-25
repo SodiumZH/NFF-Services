@@ -67,7 +67,7 @@ public class AiHelper
 	{
 		if (getAttackPlayerGoalPriority(mob) >= 0)
 		{
-			mob.targetSelector.addGoal(getAttackPlayerGoalPriority(mob), new NearestAttackableTargetGoal<T>(mob, type, true));
+			mob.targetSelector.addGoal(getAttackPlayerGoalPriority(mob), new NearestAttackableTargetGoal<T>(mob, type, true, condition));
 		}
 		else
 			mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<T>(mob, type, true, condition));

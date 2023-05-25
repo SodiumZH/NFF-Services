@@ -25,6 +25,7 @@ public class BefriendedOwnerHurtTargetGoal extends BefriendedTargetGoal {
 	 * Returns whether execution should begin. You can also read and cache any state
 	 * necessary for execution in this handler as well.
 	 */
+	@Override
 	public boolean canUse() {
 		if (isDisabled())
 			return false;
@@ -46,8 +47,9 @@ public class BefriendedOwnerHurtTargetGoal extends BefriendedTargetGoal {
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void start() {
-		getPathfinder().setTarget(this.ownerLastHurt);
+		mob.asMob().setTarget(this.ownerLastHurt);
 		LivingEntity livingentity = mob.getOwner();
 		if (livingentity != null) {
 			this.timestamp = livingentity.getLastHurtMobTimestamp();
