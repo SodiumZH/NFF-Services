@@ -15,9 +15,9 @@ import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
 public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 
-	protected final Container container;
-	protected final IBefriendedMob mob;
-	protected final Inventory playerInventory;
+	public final Container container;
+	public final IBefriendedMob mob;
+	public final Inventory playerInventory;
 	// Overall offset that will be applied to all slots
 	
 	protected BefriendedInventoryMenu(int containerId, Inventory playerInventory, Container container,
@@ -95,5 +95,10 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		this.container.stopOpen(pPlayer);
 	}
 
-	public abstract BefriendedGuiScreen makeGui();
+	/** 
+	 * @deprecated This method is not compatible to and will not work on dedicated server.
+	 * <p> Use {@code BefriendedGuiScreenMaker::put()} in {@code FMLCommonSetupEvent} instead to define GUI construction method. 
+	 */
+	@Deprecated
+	public BefriendedGuiScreen makeGui() {return null;}
 }

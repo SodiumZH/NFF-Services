@@ -8,11 +8,9 @@ For example, vanilla tamable mobs (e.g. wolf) inherit `TamableMob` class (except
 
 You can easily create a subclass of `Zombie` (or anything else extends `Mob`) with BefriendMobs API without using any vanilla `TamableMob` interfaces, and without considering about the type hierarchy of the existing mobs.
 
-The tutorial below is a minimal description. For more examples of application, see my depending project *Days with Monster Girls* .
+The tutorial below is a minimal description. For more examples of application, see my depending project *Days with Monster Girls* (GitHub: https://github.com/SodiumZH/Days-with-Monster-Girls).
 
-GitHub: https://github.com/SodiumZH/Days-with-Monster-Girls
-
-
+**WARNING: This lib is still in development. Version updates will make it incompatible to the old versions. It's recommended to specify the lib version in mod.toml instead of providing a version range.** 
 
 ## Key terms
 
@@ -42,23 +40,29 @@ A procedure to befriend a mob, i.e. convert a befriendable mob into the correspo
 
 1. Create a mob class (anything extends `LivingEntity`; `Monster` or `Animal` recommended) and **implement `IBefriendedMob` interface**. Register its entity type, client renderer, attributes, etc. (Similar as creating any other mob classes.)
 
-2. Copy-paste the code in a template class in `net.sodiumstudio.template`. The comments in the template code will tell you how to implement the methods as minimal.
+2. Copy-paste the code in a template class in `net.sodiumstudio.befriendmobs.template`. The comments in the template code will tell you how to implement the methods as minimal.
 
 3. (Optional if you need GUI) Create the inventory menu. Inventory menu is for adding the mob's inventory into the GUI. Inventory menu for befriended mob **inherits `BefriendInventoryMenu` class**. In this class you need to override `addMenuSlots` method for the inventory of your mob. 
 
    By default, after running `addMenuSlots`, the player inventory will be automatically added just like in the vanilla inventory screen, at the position specified by `getPlayerInventoryPosition` method which you need to override. If player inventory is not needed, override `doAddPlayerInventory` to false.
 
-   Then, override `makeGui` method to generate GUI screen from this menu. It must return a new GUI screen instance. For how to make, see below.
-
    Finally, override `IBefriendedMob#makeMenu` method to supply the inventory menu on opening inventory. The syntax is provided in templates.
 
 4. Configure GUI. The GUI screen class for Befriended Mobs **inherit `BefriendedGuiScreen` class**. You must override `getTextureLocation` method to specify the texture resource location, and override `renderBg` to make the GUI background. Generally `render`method doesn't need to be overridden, but if you need some features other than the inventory and mob rendering (e.g. buttons), you need to manually implement them (including pack sending).
 
-   Go back to the inventory menu class and construct a new GUI instance in `makeGui` method.
-
    Don't forget to ensure inventory menu and GUI are well aligned.
 
 5. Add opening GUI action. Go back to the mob class and use `BefriendedHelper.openBefriendedInventory` to open the GUI. Please note that this method is only executed on SERVER and send pack to client to execute GUI opening. Also, ensure the `makeMenu` method doesn't return null, or the game will crash.
+
+6. Map inventory menu and GUI. Listen to `FMLCommonSetupEvent` and use `BefriendedGuiScreenMaker.put()` method to register GUI constructing method. This function receives 2 parameters, the first is the class of the menu class, and the latter is a function from the menu instance to a new GUI instance. Like this: 
+
+   ```java
+   BefriendedGuiMaker.put(MyInventoryMenu.class, menu -> new MyGui(...));
+   ```
+
+   
+
+Warning: GUI isn't available on dedicated server before (not including) 1.18.2-0.0.4 and 1.19.2-0.1.4 due to a bug. The legacy method of adding GUI is removed and please use 1.18.2-0.0.4 & 1.19.2-0.1.4 or above instead. 
 
 ## Additional module presets in `IBefriendedMob`
 

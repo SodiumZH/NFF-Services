@@ -38,7 +38,6 @@ public class ItemMobRespawner extends Item
 		return stack;
 	}
 	
-	@Deprecated
 	public static ItemStack fromMob(Mob mob)
 	{
 		return fromMob((ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get(), mob);
