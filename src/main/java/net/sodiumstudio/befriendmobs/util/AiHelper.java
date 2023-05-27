@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.entity.ai.util;
+package net.sodiumstudio.befriendmobs.util;
 
 import java.util.function.Predicate;
 
@@ -8,7 +8,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
-import net.sodiumstudio.befriendmobs.util.ReflectHelper;
 
 public class AiHelper
 {
@@ -63,19 +62,51 @@ public class AiHelper
 		 return false;
 	}
 	
-	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition)
+	/**
+	 * Set a mob hostile to an entity type.
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 */
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition, boolean noSubclass)
 	{
 		if (getAttackPlayerGoalPriority(mob) >= 0)
 		{
-			mob.targetSelector.addGoal(getAttackPlayerGoalPriority(mob), new NearestAttackableTargetGoal<T>(mob, type, true, condition));
+			mob.targetSelector.addGoal(getAttackPlayerGoalPriority(mob), new NearestAttackableTargetGoal<T>(mob, type, true, condition.and((l) -> !noSubclass || l.getClass() == type)));
 		}
 		else
-			mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<T>(mob, type, true, condition));
+			mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<T>(mob, type, true, condition.and((l) -> !noSubclass || l.getClass() == type)));
 	}
 	
+	/**
+	 * Set a mob hostile to an entity type, including sub type.
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 */
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition)
+	{
+		setHostileTo(mob, type, condition, false);
+	}
+	
+	/**
+	 * Set a mob hostile to an entity type without additional condition.
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 */
 	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type)
 	{
 		setHostileTo(mob, type, (l) -> true);
+	}
+	
+	/**
+	 * Set a mob not hostile to an entity type.
+	 */
+	public static <T extends LivingEntity> void setNotHostileTo(Mob mob, Class<T> type)
+	{
+		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
+			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
+			{
+				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType");
+				if (goalType == type)
+					mob.targetSelector.getAvailableGoals().remove(goal);
+			}
+		}
 	}
 	
 }

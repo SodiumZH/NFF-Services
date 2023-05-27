@@ -1,6 +1,5 @@
 package net.sodiumstudio.befriendmobs.client.gui.screens;
 
-import java.text.DecimalFormat;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -9,22 +8,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.util.InfoHelper;
 import net.sodiumstudio.befriendmobs.util.math.IntVec2;
 
-@OnlyIn(Dist.CLIENT)
 public abstract class BefriendedGuiScreen extends AbstractContainerScreen<BefriendedInventoryMenu> {
 
 	public IBefriendedMob mob;
