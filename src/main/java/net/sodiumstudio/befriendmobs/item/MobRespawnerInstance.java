@@ -123,7 +123,7 @@ public class MobRespawnerInstance
 
 	@SuppressWarnings("unchecked")
 	public EntityType<? extends Mob> getType() {
-		return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES
+		return (EntityType<? extends Mob>) ForgeRegistries.ENTITIES
 				.getValue(new ResourceLocation(getCapTag().getString("mob_type")));
 	}
 
@@ -138,7 +138,7 @@ public class MobRespawnerInstance
 
 	public void initFromMob(Mob mob) {
 		MinecraftForge.EVENT_BUS.post(new RespawnerConstructEvent.Before(mob, this));
-		getCapTag().putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(mob.getType()).toString());
+		getCapTag().putString("mob_type", ForgeRegistries.ENTITIES.getKey(mob.getType()).toString());
 		CompoundTag nbt = new CompoundTag();
 		mob.save(nbt);
 		getCapTag().put("mob_nbt", nbt);

@@ -457,7 +457,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onItemExpire(ItemExpireEvent event)
 	{
-		MobRespawnerInstance ins = MobRespawnerInstance.create(event.getEntity().getItem());
+		MobRespawnerInstance ins = MobRespawnerInstance.create(event.getEntityItem().getItem());
 		if (ins != null && ins.isNoExpire())
 		{
 			event.setCanceled(true);	
