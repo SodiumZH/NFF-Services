@@ -6,6 +6,12 @@
 
 Refactored `BefriendedAIState` from enum to class.
 
+Removed `BefriendedInventoryMenu::makeGui` because it doesn't work on dedicated server. To register a method of GUI construction, listen to `FMLClientSetup` event and use `BefriendedGuiScreenMaker::put` to map inventory menu and GUI construction method.
+
+Refactored `ItemMobRespawner`. The `CMobRespawner` capability was removed, and now `ItemStack` of `ItemMobRespawner` uses a wrapper class `MobRespawnerInstance` which provides the same methods to previous `CMobRespawner`. This change is intended to solve the incompatibility on dedicated server. Use `MobRespawnerInstance::create` to cast `ItemStack` to `MobRespawnerInstance`. If the `ItemStack` isn't a valid `ItemMobRespawner` it will return `null`, and use null check in place of previous capability `LazyOptional::ifPresent` check. 
+
+WARNING: the change makes `ItemMobRespawner` save data incompatible to old versions.
+
 ### 0.1.3
 
 Versions above will no longer use "alpha" as postfix. All versions with prefix 0 are alpha.
@@ -39,6 +45,12 @@ Separated from DWMG mod.
 ### 0.0.4
 
 Refactored `BefriendedAIState` from enum to class.
+
+Removed `BefriendedInventoryMenu::makeGui` because it doesn't work on dedicated server. To register a method of GUI construction, listen to `FMLClientSetup` event and use `BefriendedGuiScreenMaker::put` to map inventory menu and GUI construction method.
+
+Refactored `ItemMobRespawner`. The `CMobRespawner` capability was removed, and now `ItemStack` of `ItemMobRespawner` uses a wrapper class `MobRespawnerInstance` which provides the same methods to previous `CMobRespawner`. This change is intended to solve the incompatibility on dedicated server. Use `MobRespawnerInstance::create` to cast `ItemStack` to `MobRespawnerInstance`. If the `ItemStack` isn't a valid `ItemMobRespawner` it will return `null`, and use null check in place of previous capability `LazyOptional::ifPresent` check. 
+
+WARNING: the change makes `ItemMobRespawner` save data incompatible to old versions.
 
 ### 0.0.3
 
