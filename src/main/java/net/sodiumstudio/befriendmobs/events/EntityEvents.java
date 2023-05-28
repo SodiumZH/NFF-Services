@@ -40,6 +40,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingType
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
@@ -266,16 +267,16 @@ public class EntityEvents
 					if (bef.shouldDropRespawner())
 					{
 						ItemEntity resp = event.getEntity().spawnAtLocation(ItemMobRespawner.fromMob(bef.asMob()));
-						resp.getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) ->
-						{	
+						MobRespawnerInstance ins = MobRespawnerInstance.create(resp.getItem());
+						if (ins != null)
+						{
 							if (bef.isRespawnerInvulnerable())
 							{					
-								resp.setInvulnerable(true);
-								c.setInvulnerable(true);
+								ins.setInvulnerable(true);
 							}
-							c.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
-							c.setNoExpire(bef.respawnerNoExpire());
-						});
+							ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
+							ins.setNoExpire(bef.respawnerNoExpire());
+						}
 					}
 				}
 			}
@@ -456,12 +457,11 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onItemExpire(ItemExpireEvent event)
 	{
-		event.getEntity().getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> {
-			if (c.isNoExpire())
-			{
-				event.setCanceled(true);
-			}
-		});
+		MobRespawnerInstance ins = MobRespawnerInstance.create(event.getEntity().getItem());
+		if (ins != null && ins.isNoExpire())
+		{
+			event.setCanceled(true);	
+		}
 	}
 	
 	@SubscribeEvent

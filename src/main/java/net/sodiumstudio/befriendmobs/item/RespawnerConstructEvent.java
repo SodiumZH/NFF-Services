@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.item.capability;
+package net.sodiumstudio.befriendmobs.item;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -7,14 +7,14 @@ import net.minecraftforge.eventbus.api.Event;
 public class RespawnerConstructEvent extends Event
 {
 	protected Mob mob;
-	protected CMobRespawner respawner;
+	protected MobRespawnerInstance respawner;
 	//protected ItemStack stack;
 	
 	public Mob getMob() {return mob;};
-	public CMobRespawner getRespawner() {return respawner;};
+	public MobRespawnerInstance getRespawner() {return respawner;};
 	//public ItemStack getStack() {return stack;}
 	
-	public RespawnerConstructEvent(Mob mob, CMobRespawner respawner)
+	public RespawnerConstructEvent(Mob mob, MobRespawnerInstance respawner)
 	{
 		this.mob = mob;
 		this.respawner = respawner;
@@ -23,7 +23,7 @@ public class RespawnerConstructEvent extends Event
 	
 	public static class Before extends RespawnerConstructEvent
 	{
-		public Before(Mob mob, CMobRespawner respawner)
+		public Before(Mob mob, MobRespawnerInstance respawner)
 		{
 			super(mob, respawner);
 		}
@@ -31,12 +31,10 @@ public class RespawnerConstructEvent extends Event
 	
 	public static class After extends RespawnerConstructEvent
 	{
-		public final ItemStack stackConstructed;
 		
-		public After(Mob mob, CMobRespawner respawner, ItemStack stackConstructed)
+		public After(Mob mob, MobRespawnerInstance respawner)
 		{
 			super(mob, respawner);
-			this.stackConstructed = stackConstructed;
 		}
 	}
 }

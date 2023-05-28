@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.events;
 
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -8,6 +9,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
@@ -24,11 +26,11 @@ public class ItemEvents
 		// Initialize mob respawner invulnerable
 		if (event.getEntity() instanceof ItemEntity ie)
 		{
-			ie.getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) ->
+			MobRespawnerInstance ins = MobRespawnerInstance.create(ie.getItem());
+			if (ins != null && ins.isInvulnerable())
 			{
-				if (c.isInvulnerable())
-					ie.setInvulnerable(true);
-			});			
+				ie.setInvulnerable(true);
+			}	
 		}
 	}
 	
@@ -41,12 +43,8 @@ public class ItemEvents
 			// Handle respawner item entity falling into void
 			if (itementity.getY() < (double)(itementity.level.getMinBuildHeight() - 1))
 			{
-				Wrapped<Boolean> recover = new Wrapped<Boolean>(false);
-				itementity.getItem().getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) ->
-				{
-					recover.set(c.recoverInVoid());
-				});
-				if (recover.get())
+				MobRespawnerInstance ins = MobRespawnerInstance.create(itementity.getItem());
+				if (ins != null && ins.recoverInVoid())
 				{
 					// Lift onto y=64
 					itementity.setPos(new Vec3(itementity.getX(), 64d, itementity.getZ()));
