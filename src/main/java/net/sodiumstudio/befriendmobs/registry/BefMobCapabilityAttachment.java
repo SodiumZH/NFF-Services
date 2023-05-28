@@ -17,11 +17,9 @@ import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
-import net.sodiumstudio.befriendmobs.item.capability.CMobRespawnerProvider;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BefMobCapabilityAttachment {
@@ -99,11 +97,5 @@ public class BefMobCapabilityAttachment {
 	@SubscribeEvent
 	public static void attachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event)
 	{
-		ItemStack stack = event.getObject();
-		if (stack.getItem() != null && stack.getItem() instanceof ItemMobRespawner)
-		{
-			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_respwner"),
-					new CMobRespawnerProvider(stack));
-		}
 	}
 }

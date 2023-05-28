@@ -11,10 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
 
 public class ItemMobRespawner extends Item
 {
@@ -24,67 +22,61 @@ public class ItemMobRespawner extends Item
 		super(pProperties);
 	}
 
-	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob)
-	{
+	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob) {
 		if (mob.level.isClientSide)
 			return ItemStack.EMPTY;
-		ItemStack stack = new ItemStack(itemType, 1);
-		stack.getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> 
-		{
-			c.initFromMob(mob);
-		});
-		
-		//stack.setHoverName(InfoHelper.createTrans(stack.getHoverName().getString() + " - " + mob.getName().getString()));
-		return stack;
+		MobRespawnerInstance ins = MobRespawnerInstance.create(new ItemStack(itemType, 1));
+		ins.initFromMob(mob);
+
+		// stack.setHoverName(InfoHelper.createTrans(stack.getHoverName().getString() +
+		// " - " + mob.getName().getString()));
+		// Check NBT correctly added
+		if (ins.getCapTag().isEmpty())
+			throw new IllegalStateException("Respawner missing NBT");
+
+		return ins.get();
 	}
-	
-	public static ItemStack fromMob(Mob mob)
-	{
+
+	public static ItemStack fromMob(Mob mob) {
 		return fromMob((ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get(), mob);
 	}
 
-	public static Mob respawn(ItemStack stack, Player player, BlockPos pos, Direction direction)
-	{
-		Wrapped<Mob> mob = new Wrapped<Mob>(null);
-		stack.getCapability(BefMobCapabilities.CAP_MOB_RESPAWNER).ifPresent((c) -> 
-		{
-			mob.set(c.respawn(player, pos, direction));
-		});
-		return mob.get();
+	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {
+		MobRespawnerInstance ins = MobRespawnerInstance.create(stack);
+		// Check NBT correctly added
+		if (ins.getCapTag().isEmpty())
+			throw new IllegalStateException("Respawner missing NBT");
+		return ins.respawn(player, pos, direction);
 	}
-	
-	 @SuppressWarnings("resource")
+
+	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-	      Level level = context.getLevel();
-	      if (!(level instanceof ServerLevel)) {
-	         return InteractionResult.SUCCESS;
-	      } 
-	      else 
-	      {
-	    	  Mob mob = respawn(
-	 		         context.getItemInHand(),
-			         context.getPlayer(),
-			         context.getClickedPos(),
-			         context.getClickedFace());
-		      if (mob != null)
-		      {
-		    	 
-		    	 context.getItemInHand().shrink(1);
-		         if (mob instanceof IBefriendedMob bef)
-		         {
-		        	 bef.init(bef.getOwnerUUID(), null);
-		        	 if (!bef.getAdditionalInventory().isEmpty())
-		        		 bef.getAdditionalInventory().clearContent();
-		        	 bef.updateFromInventory();
-		        	 EntityHelper.removeAllEquipment(bef.asMob());
-		        	 bef.setInit();
-		         }
-		    	 return InteractionResult.CONSUME;
-		      }
-		      else return InteractionResult.PASS;
-	      }
-	   }
-	 
-	 
+		Level level = context.getLevel();
+		if (!(level instanceof ServerLevel))
+		{
+			return InteractionResult.SUCCESS;
+		} else
+		{
+			Mob mob = doRespawn(context.getItemInHand(), context.getPlayer(), context.getClickedPos(),
+					context.getClickedFace());
+			if (mob != null)
+			{
+
+				context.getItemInHand().shrink(1);
+				if (mob instanceof IBefriendedMob bef)
+				{
+					bef.init(bef.getOwnerUUID(), null);
+					if (!bef.getAdditionalInventory().isEmpty())
+						bef.getAdditionalInventory().clearContent();
+					bef.updateFromInventory();
+					EntityHelper.removeAllEquipment(bef.asMob());
+					bef.setInit();
+				}
+				return InteractionResult.CONSUME;
+			} else
+				return InteractionResult.PASS;
+		}
+	}
+
 }
