@@ -20,7 +20,7 @@ public class AiHelper
 		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
 			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
 			{
-				Class<?> type = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType");
+				Class<?> type = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
 				if (type == Player.class || type == ServerPlayer.class)
 					return goal.getPriority();
 			}
@@ -35,7 +35,7 @@ public class AiHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetConditions");
+				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetConditions", true);
 				 if (targetType == isHostileTo.getClass())
 				 {
 					 return true;
@@ -52,7 +52,7 @@ public class AiHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetType");
+				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetType", true);
 				 if (targetType == Player.class)
 				 {
 					 return true;
@@ -102,7 +102,7 @@ public class AiHelper
 		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
 			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
 			{
-				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType");
+				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
 				if (goalType == type)
 					mob.targetSelector.getAvailableGoals().remove(goal);
 			}
