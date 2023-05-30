@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.util.NbtHelper;
 
@@ -101,8 +102,10 @@ public class BefriendedInventory extends SimpleContainer
 		if (!tag.contains("size"))
 			throw new IllegalArgumentException("BefriendedInventory: reading from illegal tag.");
 		if (tag.getInt("size") != this.getContainerSize())
-			throw new IllegalStateException("BefriendedInventory reading from NBT: size not matching: this size: " 
+		{
+			BefriendMobs.LOGGER.warn("BefriendedInventory reading from NBT: size not matching: this size: " 
 					+ this.getContainerSize() + ", nbt size: " + tag.getInt("size"));
+		}
 		
 		for (int i = 0; i < getContainerSize(); ++i)
 		{

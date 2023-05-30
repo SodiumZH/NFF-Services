@@ -10,6 +10,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 
@@ -153,7 +154,8 @@ public interface IBaubleHolder {
 			cache.set(cap);
 		});
 		if (cache.get() == null)
-			throw new IllegalStateException("IBaubleHolder missing capability CBaubleDataCache.");
+			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
+			return new CBaubleDataCache.Impl(this);	
 		return cache.get();
 	}
 	

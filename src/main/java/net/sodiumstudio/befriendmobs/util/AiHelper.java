@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 
 public class AiHelper
@@ -109,4 +110,22 @@ public class AiHelper
 		}
 	}
 	
+	/**
+	 * Get the goal for targeting player of a mob, or null if not having one. 
+	 * It returns {@link WrappedGoal}, which contains a {@code NearestAttackableTargetGoal<Player>} or {@code NearestAttackableTargetGoal<ServerPlayer>.} 
+	 */
+	public static WrappedGoal getTargetPlayerGoal(Mob mob)
+	{
+		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
+			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
+			{
+				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
+				if (goalType == Player.class || goalType == ServerPlayer.class)
+				{
+					return goal;
+				}				
+			}
+		}
+		return null;
+	}	
 }
