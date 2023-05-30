@@ -24,6 +24,7 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -57,6 +58,8 @@ public class EntityEvents
 
 	@SubscribeEvent
 	public static void onEntityInteract(EntityInteract event) {
+		if (event.isCanceled())
+			return;
 		Entity target = event.getTarget();
 		Player player = event.getPlayer();
 		Wrapped<InteractionResult> result = new Wrapped<InteractionResult>(InteractionResult.PASS);
@@ -146,15 +149,6 @@ public class EntityEvents
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
-	        // Handle befriendable mobs //
-	        if (target instanceof Player player && mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
-	        {
-	        	mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
-	        	{
-	    			cap.addHatredWithReason(player, BefriendableAddHatredReason.SET_TARGET);	   
-	        	});
-	        }
-	        // Handle befriendable mobs end //
 	        // Handle befriended mobs //	        
 	        if (mob instanceof IBefriendedMob bef)
 	        {
@@ -211,8 +205,31 @@ public class EntityEvents
 		// Handle mobs end //
 	}	
 	
+	/**
+	 * Final action after handling all setting target events.
+	 */
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onFinalizeSetTarget(LivingSetAttackTargetEvent event)
+	{
+		@SuppressWarnings("deprecation")
+		LivingEntity target = event.getTarget();
+        // Handle befriendable mobs //
+        if (event.getEntity() instanceof Mob mob && target instanceof Player player)
+        {
+        	mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
+        	{
+        		// Add hatred only when 
+        		if (mob.getTarget() == player)
+        			cap.addHatredWithReason(player, BefriendableAddHatredReason.SET_TARGET);	   
+        	});
+        }
+        // Handle befriendable mobs end //
+	}
+	
 	@SubscribeEvent
 	public static void onLivingDeath(LivingDeathEvent event) {
+		if (event.isCanceled())
+			return;
 		if (!event.getEntity().level.isClientSide)
 		{
 			if (event.getEntity() instanceof IBefriendedMob bef)
@@ -340,7 +357,9 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onLivingHurt(LivingHurtEvent event)
 	{
-		LivingEntity living = event.getEntityLiving();
+		if (event.isCanceled())
+			return;
+		LivingEntity living = event.getEntity();
 		LivingEntity source = (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof LivingEntity) ?
 				(LivingEntity)(event.getSource().getEntity()) : null;
 		if (!living.level.isClientSide)
