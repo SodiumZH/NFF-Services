@@ -119,15 +119,27 @@ public class ReflectHelper
 	 * @param declaredClass Class in which the method is defined. (Not always equals to {@code obj.class}!)
 	 * @param noStackTrace If true, it will not print stack trace if exception thrown.
 	 * @param methodName Method to run.
-	 * @param params Method parameters.
+	 * @param paramTypesThenValues Parameter names followed by values. For example, if a method is foo(String, int), then use : String.class, Integer.class, "str", 0
+	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
+	 * <p>{@code forceInvoke(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static void forceInvoke(Object obj, Class<?> declaredClass, boolean noStackTrace, String methodName, Object... params)
+	public static void forceInvoke(Object obj, Class<?> declaredClass, boolean noStackTrace, String methodName, Object... paramTypesThenValues)
 	{
 		try
 		{
-		Method method = declaredClass.getDeclaredMethod(methodName);
+		// Parse varargs
+		int paramCount = paramTypesThenValues.length / 2;
+		Class<?>[] types = new Class<?>[paramCount];
+		Object[] vals = new Object[paramCount];
+		for (int i = 0; i < paramCount; ++i)
+		{
+			types[i] = (Class<?>) paramTypesThenValues[i];
+			vals[i] = paramTypesThenValues[i + paramCount];
+		}			
+		// Invoke
+		Method method = declaredClass.getDeclaredMethod(methodName, types);
 		method.setAccessible(true);
-		method.invoke(obj, params);
+		method.invoke(obj, vals);
 		method.setAccessible(false);
 		}
 		catch(Exception e)
@@ -141,12 +153,15 @@ public class ReflectHelper
 	 * Force invoke a non-public method without return value.
 	 * @param obj Target object.
 	 * @param declaredClass Class in which the method is defined. (Not always equals to {@code obj.class}!)
+	 * @param noStackTrace If true, it will not print stack trace if exception thrown.
 	 * @param methodName Method to run.
-	 * @param params Method parameters.
+	 * @param paramTypesThenValues Parameter names followed by values. For example, if a method is foo(String, int), then use : String.class, Integer.class, "str", 0
+	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
+	 * <p>{@code forceInvoke(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static void forceInvoke(Object obj, Class<?> declaredClass, String methodName, Object... params)
+	public static void forceInvoke(Object obj, Class<?> declaredClass, String methodName, Object... paramTypesThenValues)
 	{
-		forceInvoke(obj, declaredClass, false, methodName, params);
+		forceInvoke(obj, declaredClass, false, methodName, paramTypesThenValues);
 	}
 	
 	/**
@@ -154,19 +169,31 @@ public class ReflectHelper
 	 * @param obj Target object.
 	 * @param declaredClass Class in which the method is defined. (Not always equals to {@code obj.class}!)
 	 * @param noStackTrace If true, it will not print stack trace if exception thrown.
-	 * @param fieldName Field to set.
-	 * @param params Method parameters.
+	 * @param methodName Method to run.
+	 * @param paramTypesThenValues Parameter names followed by values. For example, if a method is foo(String, int), then use : String.class, Integer.class, "str", 0
 	 * @return Returned value.
+	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
+	 * <p>{@code forceInvokeRetVal(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static Object forceInvokeRetVal(Object obj, Class<?> declaredClass, boolean noStackTrace, String methodName, Object... params)
+	public static Object forceInvokeRetVal(Object obj, Class<?> declaredClass, boolean noStackTrace, String methodName, Object... paramTypesThenValues)
 	{
 		Object result = null;
 		try
 		{
-		Method method = declaredClass.getDeclaredMethod(methodName);
-		method.setAccessible(true);
-		result = method.invoke(obj, params);
-		method.setAccessible(false);
+			// Parse varargs
+			int paramCount = paramTypesThenValues.length / 2;
+			Class<?>[] types = new Class<?>[paramCount];
+			Object[] vals = new Object[paramCount];
+			for (int i = 0; i < paramCount; ++i)
+			{
+				types[i] = (Class<?>) paramTypesThenValues[i];
+				vals[i] = paramTypesThenValues[i + paramCount];
+			}			
+			// Invoke
+			Method method = declaredClass.getDeclaredMethod(methodName, types);
+			method.setAccessible(true);
+			result = method.invoke(obj, vals);
+			method.setAccessible(false);
 		}
 		catch(Exception e)
 		{
@@ -181,12 +208,15 @@ public class ReflectHelper
 	 * Force invoke a non-public method with return value.
 	 * @param obj Target object.
 	 * @param declaredClass Class in which the method is defined. (Not always equals to {@code obj.class}!)
-	 * @param fieldName Field to set.
+	 * @param methodName Method to run.
 	 * @param params Method parameters.
+	 * @param paramTypesThenValues Parameter names followed by values. For example, if a method is foo(String, int), then use : String.class, Integer.class, "str", 0
 	 * @return Returned value.
+	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
+	 * <p>{@code forceInvokeRetVal(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static Object forceInvokeRetVal(Object obj, Class<?> declaredClass, String methodName, Object... params)
+	public static Object forceInvokeRetVal(Object obj, Class<?> declaredClass, String methodName, Object... paramTypesThenValues)
 	{
-		return forceInvokeRetVal(obj, declaredClass, false, methodName, params);
+		return forceInvokeRetVal(obj, declaredClass, false, methodName, paramTypesThenValues);
 	}
 }

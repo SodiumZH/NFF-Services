@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.5
+
+Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The previous versions are TOTALLY WRONG. Now the varargs need firstly parameter classes followed by parameter values. 
+
+Some internal changes to adapt to DWMG 0.1.5.
+
 ### 0.1.4
 
 Refactored `BefriendedAIState` from enum to class.

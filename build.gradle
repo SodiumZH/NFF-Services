@@ -18,7 +18,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '0.0.4'
+version = '0.0.5'
 group = 'net.sodiumstudio.befriendmobs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'befriendmobs-1.18.2'
 
@@ -73,7 +73,8 @@ minecraft {
             }
         }
 
-        server {
+        server {       
+        
             workingDirectory project.file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
@@ -94,6 +95,7 @@ minecraft {
         // By default, the server will crash when no gametests are provided.
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
+               
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
