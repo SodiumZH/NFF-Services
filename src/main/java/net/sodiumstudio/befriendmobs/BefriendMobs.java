@@ -38,6 +38,10 @@ public class BefriendMobs {
 	}	
 	
 	// On debug set it true. On publication set it false to block verbose debug output.
-    public static final boolean IS_DEBUG_MODE = false;
+    public static boolean IS_DEBUG_MODE = false;
 	
+    public static void setDebugMode(boolean value)
+    {
+    	IS_DEBUG_MODE = value;
+    }
 }
