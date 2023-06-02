@@ -2,6 +2,7 @@ package net.sodiumstudio.befriendmobs.entity.befriending;
 
 import java.util.HashSet;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -87,10 +88,10 @@ public abstract class BefriendingHandler
 		return false;
 	}
 	
-	// Indicates if the player is in befriending process of the mob.
+	/** Indicates if the player is in befriending process of the mob. */
 	public abstract boolean isInProcess(Player player, Mob mob);
 	
-	// Indecated if any player is in befriending process.
+	/** Indecated if any player is in befriending process. */
 	public boolean isInProcess(Mob mob)
 	{
 		if (mob.level.isClientSide)
@@ -114,17 +115,19 @@ public abstract class BefriendingHandler
 	{
 	}
 	
-	// Execute when the mob is attacked by the player in befriending process with it
-	// Fired in EntityEvents and no need to manually invoke
-	// This function doesn't check if player is in hatred
-	// By default no action. Usually it will interrupt because of hatred
+	/** Execute when the mob is attacked by the player in befriending process with it
+	* Fired in EntityEvents and no need to manually invoke
+	* This function doesn't check if player is in hatred
+	* By default no action. Usually it will interrupt because of hatred
+	* */
 	public void onAttackedByProcessingPlayer(Mob mob, Player player, boolean damageGiven)
 	{
 	}
 	
-	// Execute when the mob added player into hatred list
-	// Fired in CBefriendableMob::addHatredWithReason and no need to manually invoke
-	// Interrupt by default
+	/** Execute when the mob added player into hatred list
+	* Fired in CBefriendableMob::addHatredWithReason and no need to manually invoke
+	* Interrupt by default
+	* */
 	public void onAddingHatred(Mob mob, Player player, BefriendableAddHatredReason reason)
 	{
 		if (isInProcess(player, mob))
@@ -143,6 +146,11 @@ public abstract class BefriendingHandler
 	}
 	
 	/* Util */
+	/**
+	 * Do an action for all players in process.
+	 * @deprecated use consumer version instead
+	 */
+	@Deprecated
 	public void forAllPlayersInProcess(Mob mob, BiConsumer<Player, Mob> todo)
 	{
 		for (Player player: mob.level.players())
@@ -152,5 +160,16 @@ public abstract class BefriendingHandler
 		}
 	}
 
+	/**
+	 * Do an action for all players in process.
+	 */
+	public void forAllPlayersInProcess(Mob mob, Consumer<Player> todo)
+	{
+		for (Player player: mob.level.players())
+		{
+			if (isInProcess(player, mob))
+				todo.accept(player);
+		}
+	}
 
 }

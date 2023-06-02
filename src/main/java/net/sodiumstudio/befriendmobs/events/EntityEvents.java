@@ -469,7 +469,8 @@ public class EntityEvents
 		if (event.getStateBefore().equals(BefriendedAIState.WAIT))
 		{
 			event.getMob().asMob().setTarget(null);
-			event.getMob().getOwner().setLastHurtMob(null);
+			if (event.getMob().isOwnerPresent())
+				event.getMob().getOwner().setLastHurtMob(null);
 		}
 	}
 	

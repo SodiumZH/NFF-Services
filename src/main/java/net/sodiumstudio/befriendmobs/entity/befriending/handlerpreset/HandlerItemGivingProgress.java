@@ -174,6 +174,31 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 			&& ((DoubleTag) (NbtHelper.getPlayerData(l.getPlayerDataNbt(), player, "proc_value"))).getAsDouble() > 0;
 	}
 	
+	/**
+	 * Get progress value for a player.
+	 * @return Progress value, or -1 if player is not in process.
+	 */
+	public double getProgressValue(Mob mob, Player player)
+	{
+		if (!isInProcess(player, mob))
+			return -1;
+		else return ((DoubleTag) (NbtHelper.getPlayerData(CBefriendableMob.getCap(mob).getPlayerDataNbt(), player, "proc_value"))).getAsDouble();
+	}
+
+	/**
+	 * Add a delta value to a progress value.
+	 * WARNING: this method will do nothing if the player is not in process.
+	 * WARNING: this method will not handle interruption or befriending even if the progress reaches 0 or 1.
+	 */
+	public void addProgressValue(Mob mob, Player player, double deltaValue)
+	{
+		double oldValue = getProgressValue(mob, player);
+		NbtHelper.putPlayerData(DoubleTag.valueOf(oldValue + deltaValue), 
+				CBefriendableMob.getCap(mob).getPlayerDataNbt(), player, "proc_value");
+	}
+	
+	
+	
 	public void sendParticlesOnHatred(Mob target)
 	{
 		EntityHelper.sendAngryParticlesToLivingDefault(target);

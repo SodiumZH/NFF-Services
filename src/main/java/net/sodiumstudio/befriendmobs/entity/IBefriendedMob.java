@@ -110,8 +110,10 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/** 
 	 * Get owner as player entity.
+	 * @return Owner as entity, or null if the owner is absent in the level.
 	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	* <p>获取拥有者的玩家实体。
+	* <p>拥有者实体，若拥有者不在世界中时返回null。
 	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
 	*/
 	@DontOverride
@@ -165,6 +167,16 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取拥有者UUID。在生物类中将该方法关联到相应访问器上。
 	 */
 	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor();
+	
+	/**
+	 * Check if owner is in the level.
+	 * <p>检查拥有者是否在同一世界中。
+	 */
+	@DontOverride
+	public default boolean isOwnerPresent()
+	{
+		return getOwner() != null;
+	}
 	
 	/* -------------------------------------------------------- */
 	/* AI configs */
