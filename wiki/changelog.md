@@ -8,6 +8,8 @@ Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The p
 
 Fixed crashes related to `IBefriendedMob::getOwner` returning null when owner isn't in the same level to the mob.
 
+Added `BMDebugItemHandler.UseEvent` for custom debug items.
+
 Some internal changes to adapt to DWMG 0.1.5.
 
 ### 0.1.4

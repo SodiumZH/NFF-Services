@@ -4,6 +4,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
@@ -68,6 +70,7 @@ public class BMDebugItemHandler
 				});
 			}
 		}
+
 /*
 		else if (item.equals(BefMobItems.DEBUG_ARMOR_GIVER.get()) && target.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
 		{
@@ -98,5 +101,20 @@ public class BMDebugItemHandler
 			Debug.printToScreen("Base: " + Double.toString(target.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)), player);
 			Debug.printToScreen("Applied: " + Double.toString(target.getAttributeValue(Attributes.ATTACK_DAMAGE)), player);
 		}*/
+		else MinecraftForge.EVENT_BUS.post(new UseEvent(player, target, item));
+	}
+	
+	public static class UseEvent extends Event
+	{
+		public final Player player;
+		public final Mob target;
+		public final Item debugItem;
+		
+		public UseEvent(Player player, Mob mob, Item item)
+		{
+			this.player = player;
+			this.target = mob;
+			this.debugItem = item;
+		}
 	}
 }
