@@ -35,12 +35,14 @@ public class MiscUtil {
 	
 	public static void printToScreen(Component text, Player receiver)
 	{
+		if (receiver == null)
+			return;
 		receiver.sendSystemMessage(text);
 	}
 	
 	public static void printToScreen(String text, Player receiver)
 	{
-		MiscUtil.printToScreen(InfoHelper.createText(text), receiver, receiver);
+		MiscUtil.printToScreen(InfoHelper.createText(text), receiver);
 	}
 	
 	public static <T> boolean sameObject(T a, T b)

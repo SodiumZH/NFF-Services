@@ -66,7 +66,10 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	public boolean canContinueToUse() {
 		if (this.getPathfinder().getNavigation().isDone()) {
 			return false;
-		} else {
+		}
+		if (!mob.isOwnerPresent())
+			return false;
+		else {
  			return mob.asMob().distanceToSqr(mob.getOwner()) > (double) (this.stopDistance * this.stopDistance);
 		}
 	}
@@ -90,6 +93,8 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	 */
 	@Override
 	public void tick() {
+		if (!mob.isOwnerPresent())
+			return;
 		getPathfinder().getLookControl().setLookAt(mob.getOwner(), 10.0F, (float) getPathfinder().getMaxHeadXRot());
 		if (--this.timeToRecalcPath <= 0) {
 			this.timeToRecalcPath = this.adjustedTickDelay(10);
@@ -108,8 +113,9 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	}
 
 	protected void teleportToOwner() {
+		if (!mob.isOwnerPresent())
+			return;
 		BlockPos blockpos = mob.getOwner().blockPosition();
-
 		for (int i = 0; i < 20; ++i) {
 			int j = this.randomIntInclusive(-3, 3);
 			int k = this.randomIntInclusive(-1, 1);

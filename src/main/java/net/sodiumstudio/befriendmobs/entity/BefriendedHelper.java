@@ -40,14 +40,14 @@ public class BefriendedHelper
 			return false;
 		// For tamable mobs: attack untamed or (others' mobs if pvp allowed)
 		else if (target instanceof TamableAnimal tamable)
-			return !tamable.isTame() || (tamable.getOwner() != mob.getOwner()
+			return !tamable.isTame() || (mob.isOwnerPresent() && tamable.getOwner() != mob.getOwner()
 					&& (mob.getOwner()).canHarmPlayer((Player) (tamable.getOwner())));
 		// For players: attack if pvp allowed
 		else if (target instanceof Player targetPlayer)
-			return mob.getOwner().canHarmPlayer(targetPlayer);
+			return mob.isOwnerPresent() && mob.getOwner().canHarmPlayer(targetPlayer);
 		// For IBefriendedMob: similar to tamable mobs
 		else if (target instanceof IBefriendedMob bef)
-			return bef.getOwner() != mob.getOwner() && (mob.getOwner()).canHarmPlayer(bef.getOwner());
+			return mob.isOwnerPresent() && bef.getOwner() != mob.getOwner() && (mob.getOwner()).canHarmPlayer(bef.getOwner());
 		// For horses: attack untamed only
 		else if (target instanceof AbstractHorse && ((AbstractHorse) target).isTamed())
 			return false;
