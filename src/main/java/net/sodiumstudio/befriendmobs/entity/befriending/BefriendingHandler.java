@@ -10,8 +10,11 @@ import net.minecraft.world.entity.player.Player;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
+import net.sodiumstudio.befriendmobs.network.BMChannels;
+import net.sodiumstudio.befriendmobs.network.ClientboundBefriendingInitPacket;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
+import net.sodiumstudio.befriendmobs.util.NetworkHelper;
 import net.sodiumstudio.befriendmobs.util.debug.Debug;
 
 public abstract class BefriendingHandler 
@@ -44,6 +47,11 @@ public abstract class BefriendingHandler
 		EntityType<? extends Mob> newType = BefriendingTypeRegistry.getConvertTo((EntityType<? extends Mob>) target.getType());
 		if (newType == null)
 			throw new RuntimeException("Befriending: Entity type after befriending is not valid. Check if the befriendable mob has been registered to BefriendingTypeRegistry.");
+		
+		// Record the old mob's some properties for initializing new mob on client UNIMPLEMENTED
+		//ClientboundBefriendingInitPacket packet = new ClientboundBefriendingInitPacket(target);
+		
+		// Do conversion
 		Mob newMob = EntityHelper.replaceMob(newType, target);
 		if(!(newMob instanceof IBefriendedMob))
 			throw new RuntimeException("Befriending: Entity type after befriending not implementing IBefriendedMob interface.");
@@ -52,6 +60,8 @@ public abstract class BefriendingHandler
 		newBefMob.setInventoryFromMob();
 		Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
 		newBefMob.setInit();
+		// Sync the recorded properties UNIMPLEMENTED
+		//NetworkHelper.sendToAllPlayers(newBefMob.asMob().level, BMChannels.BM_CHANNEL, packet);
 		return newBefMob;
 	}
 	

@@ -105,6 +105,10 @@ public class EntityHelper
 		newMob.setBaby(from.isBaby());
 		newMob.setCustomName(from.getCustomName());
 		newMob.setCustomNameVisible(from.isCustomNameVisible());
+		newMob.setXRot(from.getXRot());
+		newMob.setYRot(from.getYRot());
+		newMob.setYBodyRot(from.yBodyRot);
+		newMob.setYHeadRot(from.getYHeadRot());		
 		return newMob;
 	}
 

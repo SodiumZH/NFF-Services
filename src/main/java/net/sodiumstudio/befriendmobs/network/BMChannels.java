@@ -20,12 +20,11 @@ public class BMChannels {
         return ID++;
     }
 
-    @SuppressWarnings("resource")
-	public static void registerMessage() {
+    public static void registerMessage() {
     	
     	BM_CHANNEL = NetworkHelper.newChannel(BefriendMobs.MOD_ID, "bm_channel", VERSION);
-    	NetworkHelper.registerDefaultPacket(nextID(), BM_CHANNEL, ClientboundBefriendedGuiOpenPacket.class);
-    	
+    	NetworkHelper.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendedGuiOpenPacket.class);
+    	NetworkHelper.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendingInitPacket.class);
     	/*BM_CHANNEL = NetworkRegistry.newSimpleChannel(
                 new ResourceLocation(BefriendMobs.MOD_ID, "bm_channel"),
                 () -> {
