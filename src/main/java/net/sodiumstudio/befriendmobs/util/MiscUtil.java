@@ -36,7 +36,7 @@ public class MiscUtil {
 	{
 		if (receiver == null)
 			return;
-		receiver.sendSystemMessage(text);
+		receiver.sendMessage(text, receiver.getUUID());
 	}
 	
 	public static void printToScreen(String text, Player receiver)

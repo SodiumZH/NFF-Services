@@ -359,7 +359,7 @@ public class EntityEvents
 	{
 		if (event.isCanceled())
 			return;
-		LivingEntity living = event.getEntity();
+		LivingEntity living = event.getEntityLiving();
 		LivingEntity source = (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof LivingEntity) ?
 				(LivingEntity)(event.getSource().getEntity()) : null;
 		if (!living.level.isClientSide)
