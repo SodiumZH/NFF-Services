@@ -38,7 +38,6 @@ public class ClientboundBefriendedGuiOpenPacket implements Packet<ClientGamePack
 		pBuffer.writeInt(this.entityId);
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public void handle(ClientGamePacketListener handler) {
 		BMClientGamePacketHandler.handleBefriendedGuiOpen(this, handler);

@@ -5,6 +5,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreenMaker;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
@@ -31,4 +32,18 @@ public class BMClientGamePacketHandler
 		}
 	}
 	
+	public static void handleBefriendingInit(ClientboundBefriendingInitPacket packet, ClientGamePacketListener listener)
+	{
+		@SuppressWarnings("resource")
+		Minecraft mc = Minecraft.getInstance();
+		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
+		Entity entity = mc.level.getEntity(packet.entityId);
+		entity.setXRot(packet.xRot);
+		entity.setYRot(packet.yRot);
+		if (entity instanceof Mob mob)
+		{
+			mob.setYBodyRot(packet.yBodyRot);
+			mob.setYHeadRot(packet.yHeadRot);
+		}
+	}
 }

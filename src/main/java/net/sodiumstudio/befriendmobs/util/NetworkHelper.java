@@ -1,13 +1,18 @@
 package net.sodiumstudio.befriendmobs.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
@@ -37,7 +42,7 @@ public class NetworkHelper
 	
 	@SuppressWarnings("resource")
 	public static <T extends Packet<ClientGamePacketListener>>
-			void registerDefaultPacket(int id, SimpleChannel channel, Class<T> packetClass)
+			void registerDefaultClientGamePacket(int id, SimpleChannel channel, Class<T> packetClass)
 	{
 		channel.registerMessage(
                 id,
@@ -65,4 +70,19 @@ public class NetworkHelper
         );
 	}
 	
+	/**
+	 * Send packet from server to all players in a level.
+	 */
+	public static <MSG extends Packet<?>> void sendToAllPlayers(Level level, SimpleChannel channel, MSG message)
+	{
+		if (level.isClientSide)
+			return;
+		for (Player player: level.players())
+		{
+			if (player instanceof ServerPlayer sp)
+			{
+				channel.send(PacketDistributor.PLAYER.with(() -> sp), message);
+			}
+		}
+	}
 }
