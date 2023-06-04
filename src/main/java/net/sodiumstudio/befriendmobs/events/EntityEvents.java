@@ -81,6 +81,7 @@ public class EntityEvents
 			{
 				if (!isClientSide && isMainHand)
 					BMDebugItemHandler.onDebugItemUsed(player, (Mob)target, player.getMainHandItem().getItem());
+				event.setCanceled(true);
 				event.setCancellationResult(InteractionResult.sidedSuccess(isClientSide));			
 				return;		
 			}
