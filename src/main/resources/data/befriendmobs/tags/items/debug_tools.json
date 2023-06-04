@@ -1,6 +1,7 @@
 {
   "replace" : false,
   "values" : [ 
-  	"befriendmobs:debug_befriender"
+  	"befriendmobs:debug_befriender",
+  	"befriendmobs:debug_ai_switch"
   ]
 }
