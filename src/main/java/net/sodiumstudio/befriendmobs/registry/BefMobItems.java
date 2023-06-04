@@ -12,6 +12,7 @@ public class BefMobItems {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BefriendMobs.MOD_ID);
 	
 	public static final RegistryObject<Item> DEBUG_BEFRIENDER = ITEMS.register("debug_befriender", () -> new Item(new Item.Properties().stacksTo(1)));
+	public static final RegistryObject<Item> DEBUG_AI_SWITCH = ITEMS.register("debug_ai_switch", () -> new Item(new Item.Properties().stacksTo(1)));
 	//public static final RegistryObject<Item> EXAMPLE_ZOMBIE_BEFRIENDING_ITEM = ITEMS.register("example_zombie_befriending_item", () -> new Item(new Item.Properties()));
 	//public static final RegistryObject<Item> DEBUG_ARMOR_GIVER = ITEMS.register("debug_armor_giver", () -> new Item(new Item.Properties().stacksTo(1)));
 	//public static final RegistryObject<Item> DEBUG_TARGET_SETTER = ITEMS.register("debug_target_setter", () -> new Item(new Item.Properties().stacksTo(1)));

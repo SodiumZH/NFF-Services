@@ -1,10 +1,13 @@
 {
   "item.befriendmobs.debug_befriender": "友好化工具(调试用)",
+  "item.befriendmobs.debug_ai_switch": "AI开关工具(调试用)",
   "item.befriendmobs.mob_respawner": "重生刷怪蛋",
   "info.befriendmobs.gui_health": "生命",
   "info.befriendmobs.gui_atk": "攻击",
   "info.befriendmobs.gui_armor": "护甲" ,
   "info.befriendmobs.mob_wait": "正在待机",
   "info.befriendmobs.mob_follow": "正在跟随",
-  "info.befriendmobs.mob_wander": "正在游荡" 
+  "info.befriendmobs.mob_wander": "正在游荡" ,
+  "info.befriendmobs.debug_ai_switch_on": "生物 %1$s AI已启用",
+  "info.befriendmobs.debug_ai_switch_off": "生物 %1$s AI已禁用"
 }

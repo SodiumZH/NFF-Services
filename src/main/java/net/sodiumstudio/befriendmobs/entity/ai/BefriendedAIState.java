@@ -73,8 +73,7 @@ public class BefriendedAIState {
 	@Nullable
 	public static BefriendedAIState fromID(int id)
 	{
-		return STATES.get(id);
-		
+		return STATES.get(id);		
 	}
 	
 	@Deprecated
