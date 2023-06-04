@@ -1,7 +1,7 @@
 package net.sodiumstudio.befriendmobs.util.debug;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +13,6 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingType
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
 import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
 import net.sodiumstudio.befriendmobs.util.MiscUtil;
 import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
 
@@ -79,7 +78,7 @@ public class BMDebugItemHandler
 		{
 			target.setNoAi(!target.isNoAi());
 			String key = target.isNoAi() ? "info.befriendmobs.debug_ai_switch_off" : "info.befriendmobs.debug_ai_switch_on";		
-			MutableComponent info = Component.translatable(key, target.getName().getString());
+			MutableComponent info = new TranslatableComponent(key, target.getName().getString());
 			MiscUtil.printToScreen(info, player);
 		}
 
