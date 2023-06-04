@@ -8,6 +8,8 @@ Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The p
 
 Fixed crashes related to `IBefriendedMob::getOwner` returning null when owner isn't in the same level to the mob.
 
+Added Debug AI Switch for simplification of `setNoAi()` operation.
+
 Added `BMDebugItemHandler.UseEvent` for custom debug items.
 
 Some internal changes to adapt to DWMG 0.1.5.
@@ -51,6 +53,18 @@ Some minor API changes.
 Separated from DWMG mod.
 
 ## 1.18.2
+
+### 0.0.5
+
+Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The previous versions are TOTALLY WRONG. Now the varargs need firstly parameter classes followed by parameter values. 
+
+Fixed crashes related to `IBefriendedMob::getOwner` returning null when owner isn't in the same level to the mob.
+
+Added Debug AI Switch for simplification of `setNoAi()` operation.
+
+Added `BMDebugItemHandler.UseEvent` for custom debug items.
+
+Some internal changes to adapt to DWMG 0.1.5.
 
 ### 0.0.4
 
