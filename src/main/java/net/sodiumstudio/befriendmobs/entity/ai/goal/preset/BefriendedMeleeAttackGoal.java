@@ -43,7 +43,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	 * necessary for execution in this handler as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		long i = getPathfinder().level.getGameTime();
@@ -100,7 +100,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-	public boolean canContinueToUse() {
+	public boolean checkCanContinueToUse() {
 		LivingEntity livingentity = getPathfinder().getTarget();
 		// Check target is valid
 		if (livingentity == null)

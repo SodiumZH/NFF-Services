@@ -47,7 +47,7 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	}
 
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
  		if (isDisabled())
 			return false;
 		LivingEntity livingentity = mob.getOwner();
@@ -63,7 +63,7 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	}
 
 	@Override
-	public boolean canContinueToUse() {
+	public boolean checkCanContinueToUse() {
 		if (this.getPathfinder().getNavigation().isDone()) {
 			return false;
 		}

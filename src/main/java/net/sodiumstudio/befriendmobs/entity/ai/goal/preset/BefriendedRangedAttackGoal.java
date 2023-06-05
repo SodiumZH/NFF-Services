@@ -51,7 +51,7 @@ public class BefriendedRangedAttackGoal extends BefriendedGoal {
 	 * necessary for execution in this method as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		LivingEntity livingentity = this.mob.asMob().getTarget();
@@ -67,8 +67,8 @@ public class BefriendedRangedAttackGoal extends BefriendedGoal {
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-	public boolean canContinueToUse() {
-		return this.canUse() || !this.mob.asMob().getNavigation().isDone();
+	public boolean checkCanContinueToUse() {
+		return this.checkCanUse() || !this.mob.asMob().getNavigation().isDone();
 	}
 
 	/**

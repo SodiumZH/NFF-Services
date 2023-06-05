@@ -24,7 +24,7 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 	 * necessary for execution in this handler as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		LivingEntity livingentity = mob.getOwner();

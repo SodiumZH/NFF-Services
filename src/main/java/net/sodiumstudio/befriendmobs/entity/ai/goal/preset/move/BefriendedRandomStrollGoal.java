@@ -43,7 +43,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	 * necessary for execution in this handler as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		if (getPathfinder().isVehicle()) {
@@ -97,7 +97,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-	public boolean canContinueToUse() {
+	public boolean checkCanContinueToUse() {
 		return !getPathfinder().getNavigation().isDone() && !getPathfinder().isVehicle();
 	}
 
