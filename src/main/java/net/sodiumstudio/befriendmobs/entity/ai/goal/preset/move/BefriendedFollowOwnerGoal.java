@@ -25,7 +25,9 @@ import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
 import net.sodiumstudio.befriendmobs.util.LevelHelper;
 import net.sodiumstudio.befriendmobs.util.exceptions.MissingInterfaceException;
 
-/* Adjusted from vanilla FollowOwnerGoal for TameableAnimal */
+/** Adjusted from vanilla FollowOwnerGoal for TameableAnimal.
+ * <p>This goal is for non-flying mobs.
+ */
 public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 
 	protected final LevelReader level;
