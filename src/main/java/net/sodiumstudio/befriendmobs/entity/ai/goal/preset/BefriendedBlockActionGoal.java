@@ -13,13 +13,13 @@ public abstract class BefriendedBlockActionGoal extends BefriendedGoal
 	}
 	
 	@Override
-	public boolean canUse()
+	public boolean checkCanUse()
 	{
 		return blockCondition();
 	}
 	
 	@Override
-	public boolean canContinueToUse()
+	public boolean checkCanContinueToUse()
 	{
 		return blockCondition();
 	}

@@ -44,7 +44,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * necessary for execution in this method as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		return this.mob.asMob().getTarget() == null ? false : this.isHoldingBow();
@@ -58,8 +58,8 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-	public boolean canContinueToUse() {
-		return (this.canUse() || !this.mob.asMob().getNavigation().isDone()) && this.isHoldingBow();
+	public boolean checkCanContinueToUse() {
+		return (this.checkCanUse() || !this.mob.asMob().getNavigation().isDone()) && this.isHoldingBow();
 	}
 
 	/**

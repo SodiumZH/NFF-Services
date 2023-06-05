@@ -19,7 +19,7 @@ public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
 	}
 
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		else if (!getPathfinder().level.isDay())

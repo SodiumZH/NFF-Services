@@ -41,7 +41,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * necessary for execution in this method as well.
 		 */
 		@Override
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			if (isDisabled())
 				return false;
 			if (!this.level.isDay())
@@ -66,7 +66,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
 		@Override
-		public boolean canContinueToUse() {
+		public boolean checkCanContinueToUse() {
 			return !this.mob.asMob().getNavigation().isDone();
 		}
 
@@ -174,7 +174,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * necessary for execution in this method as well.
 		 */
 		@Override
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			return !this.isDisabled()
 					&& this.getPathfinder().isInWater();
 		}
@@ -183,8 +183,8 @@ public abstract class BefriendedAmphibiousGoals {
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
 		@Override
-		public boolean canContinueToUse() {
-			return this.canUse() && !this.stuck;
+		public boolean checkCanContinueToUse() {
+			return this.checkCanUse() && !this.stuck;
 		}
 
 		@Override

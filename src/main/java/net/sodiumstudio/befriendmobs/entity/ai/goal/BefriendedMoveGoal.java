@@ -6,10 +6,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedAmphibious;
 
-// Superclass of all befriended goals about "pathfinding move to somewhere".
+/**
+ * The base class of all befriended mob goals for moving to somewhere,
+ * including pathfinding for PathfinderMob, flying for FlyMob, etc.
+ */
 public abstract class BefriendedMoveGoal extends BefriendedGoal
 {
 	
+	public boolean isPathfinding = true;
 	public Predicate<IBefriendedMob> shouldAvoidSun = (mob -> false);
 	public boolean isAmphibious = false;
 	public double speedModifier = 1.0d;
@@ -46,8 +50,9 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 	}
 	
 	
-	// Set this goal should support amphibious mobs i.e. both water and ground navigations.
-	// If amphibious, the mob must implement IBefriendedAmphibious interface.
+	/** Set this goal should support amphibious mobs (having both water and ground navigations).
+	* If amphibious, the mob must implement IBefriendedAmphibious interface.
+	 */
 	public BefriendedMoveGoal amphibious()
 	{
 		canSwim = true;
@@ -55,6 +60,9 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 		return this;
 	}
 	
+	/**
+	 * Set 
+	 */
 	public BefriendedMoveGoal waterOnly()
 	{
 		canWalk = false;

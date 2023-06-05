@@ -26,7 +26,7 @@ public class BefriendedOwnerHurtTargetGoal extends BefriendedTargetGoal {
 	 * necessary for execution in this handler as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		Player owner = mob.getOwner();

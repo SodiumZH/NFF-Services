@@ -44,7 +44,7 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
       this.allowAllStatesExceptWait();
    }
 
-   public boolean canUse() {
+   public boolean checkCanUse() {
 	  if (isDisabled())
 		  return false;
       if (this.randomInterval > 0 && this.mob.asMob().getRandom().nextInt(this.randomInterval) != 0) {

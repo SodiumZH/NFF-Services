@@ -35,7 +35,7 @@ public class BefriendedFleeSunGoal extends BefriendedMoveGoal {
 	 * necessary for execution in this handler as well.
 	 */
 	@Override
-	public boolean canUse() 
+	public boolean checkCanUse() 
 	{
 		if (!this.level.isDay())
 			return false;
@@ -66,7 +66,7 @@ public class BefriendedFleeSunGoal extends BefriendedMoveGoal {
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-	public boolean canContinueToUse() {
+	public boolean checkCanContinueToUse() {
 		return !getPathfinder().getNavigation().isDone();
 	}
 

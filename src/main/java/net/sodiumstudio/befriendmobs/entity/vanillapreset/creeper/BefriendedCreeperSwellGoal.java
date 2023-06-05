@@ -52,7 +52,7 @@ public class BefriendedCreeperSwellGoal extends BefriendedGoal
 	 * necessary for execution in this method as well.
 	 */
 	@Override
-	public boolean canUse() {
+	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
 		else if (this.creeper.getSwell() == 0)

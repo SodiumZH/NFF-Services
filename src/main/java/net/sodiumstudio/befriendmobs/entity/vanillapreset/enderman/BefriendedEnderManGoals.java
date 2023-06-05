@@ -37,7 +37,7 @@ public class BefriendedEnderManGoals
 		 * necessary for execution in this method as well.
 		 */
 		@Override
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			if (isDisabled())
 				return false;
 			if (!enderman.canAutoPlaceBlocks)
@@ -124,7 +124,7 @@ public class BefriendedEnderManGoals
 		}
 
 
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			this.pendingTarget = this.enderman.level.getNearestPlayer(this.startAggroTargetConditions,
 					this.enderman);
 			return this.pendingTarget != null;
@@ -141,7 +141,7 @@ public class BefriendedEnderManGoals
 			super.stop();
 		}
 
-		public boolean canContinueToUse() {
+		public boolean checkCanContinueToUse() {
 			if (this.pendingTarget != null)
 			{
 				if (!this.enderman.isLookingAtMe(this.pendingTarget))
@@ -156,7 +156,7 @@ public class BefriendedEnderManGoals
 			{
 				return this.target != null
 						&& this.continueAggroTargetConditions.test(this.enderman, this.target) ? true
-								: super.canContinueToUse();
+								: super.checkCanContinueToUse();
 			}
 		}
 
@@ -213,7 +213,7 @@ public class BefriendedEnderManGoals
 		}
 
 		@Override
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			if (isDisabled())
 				return false;
 			if (!enderman.canAutoTakeBlocks)
@@ -270,7 +270,7 @@ public class BefriendedEnderManGoals
 			this.allowState(WANDER);
 		}
 
-		public boolean canUse() {
+		public boolean checkCanUse() {
 			if (isDisabled())
 				return false;
 			this.target = this.enderman.getTarget();
