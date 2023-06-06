@@ -111,6 +111,10 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	@Override
 	public final boolean canUse() 
 	{
+		// Detect if checkCanUse() calling canUse() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanUse"))
+			throw new RuntimeException("Illegal method call: checkCanUse() method cannot call canUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanUse().");
 		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
 		BefriendedGoalCheckCanUseEvent event = new BefriendedGoalCheckCanUseEvent(this, BefriendedGoalCheckCanUseEvent.Phase.CAN_USE);
@@ -135,6 +139,10 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	@Override
 	public final boolean canContinueToUse()
 	{
+		// Detect if checkCanContinueToUse() calling canContinueToUse() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanContinueToUse"))
+			throw new RuntimeException("Illegal method call: checkCanContinueToUse() method cannot call canContinueToUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanContinueToUse().");
 		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
 		BefriendedGoalCheckCanUseEvent event = new BefriendedGoalCheckCanUseEvent(this, BefriendedGoalCheckCanUseEvent.Phase.CAN_CONTINUE_TO_USE);

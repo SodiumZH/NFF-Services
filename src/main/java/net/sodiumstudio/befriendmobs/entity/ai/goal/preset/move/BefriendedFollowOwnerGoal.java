@@ -131,7 +131,6 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 				return;
 			}
 		}
-
 	}
 
 	protected boolean tryTeleportTo(int pX, int pY, int pZ) {
