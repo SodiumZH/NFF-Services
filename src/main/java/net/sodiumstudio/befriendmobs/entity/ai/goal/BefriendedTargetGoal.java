@@ -7,10 +7,12 @@ import javax.annotation.Nullable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.util.ReflectHelper;
 
 public abstract class BefriendedTargetGoal extends TargetGoal
 {
@@ -123,6 +125,8 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 			return event.getManualSetValue().get();
 		if (isDisabled())
 			return false;
+		if (isTooFar())
+			return false;
 		return checkCanUse();
 	}
 	
@@ -151,6 +155,11 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 			return event.getManualSetValue().get();
 		if (isDisabled())
 			return false;
+		if (isTooFar())
+		{
+			removeTarget();
+			return false;
+		}
 		return checkCanContinueToUse();
 	}
 	
@@ -163,4 +172,55 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 		return this.checkCanUse();
 	}
 
+	/** Return if the mob hasn't seen the target for set time. */
+	public boolean isUnseenTimeout()
+	{
+		if (!this.mustSee)
+			return false;
+		else return (Integer)ReflectHelper.forceGet(this, TargetGoal.class, "unseenTicks") > reducedTickDelay(this.unseenMemoryTicks);
+	}
+	
+	/**
+	 * Return if the mob is too far from its target.
+	 * @return If it's too far, or false if target is invalid.
+	 */
+	public boolean isTooFar()
+	{
+		if (mob.asMob().getTarget() == null || !mob.asMob().getTarget().isAlive())
+			return false;
+		else return this.mob.asMob().distanceToSqr(this.mob.asMob().getTarget()) > this.getFollowDistance() *  this.getFollowDistance();
+	}
+	
+	/** Remove the mob's current target. */
+	public void removeTarget()
+	{
+		LivingEntity previousTarget = this.mob.asMob().getTarget();
+		if (previousTarget == null) return;	// As it may execute on tick, filter to prevent calling reflect too many times
+		this.mob.asMob().setTarget(null);
+		// Remove all TargetGoals' target, since we've made target nullization unnecessary on stop, which may leave some TargetGoals' targetMob param not synced
+		for (WrappedGoal goal: this.mob.asMob().targetSelector.getAvailableGoals())
+		{
+			if (goal.getGoal() instanceof TargetGoal tg)
+			{
+				if (ReflectHelper.forceGet(tg, TargetGoal.class, "targetMob") == previousTarget)			
+					ReflectHelper.forceSet(tg, TargetGoal.class, "targetMob", null);
+			}
+		}
+	}
+	
+	/**
+	 * By default befriended mobs will not remove target immediately on target goal change.
+	 * They remove target only when target is invalid, distance is too far or unseen.
+	 */
+	@Override
+	public void stop() {
+		if (this.mob.asMob().getTarget() == null // Target is already nullized
+			|| !this.mob.asMob().getTarget().isAlive() // Target is invalid
+			|| isDisabled() // Blocked by BM mechanism
+			|| isTooFar()	// Too far away
+			|| isUnseenTimeout() && !this.mob.asMob().hasLineOfSight(this.mob.asMob().getTarget()))	// Unseen
+		{
+			removeTarget();
+		}
+	}
 }
