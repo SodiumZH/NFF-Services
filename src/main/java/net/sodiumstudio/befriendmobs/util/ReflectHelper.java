@@ -219,5 +219,4 @@ public class ReflectHelper
 	{
 		return forceInvokeRetVal(obj, declaredClass, false, methodName, paramTypesThenValues);
 	}
-	
 }

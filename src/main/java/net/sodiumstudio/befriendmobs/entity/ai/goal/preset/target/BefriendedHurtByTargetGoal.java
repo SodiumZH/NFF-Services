@@ -132,5 +132,4 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	protected void alertOther(Mob pMob, LivingEntity pTarget) {
 		pMob.setTarget(pTarget);
 	}
-
 }
