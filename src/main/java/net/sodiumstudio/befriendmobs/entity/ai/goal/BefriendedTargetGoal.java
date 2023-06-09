@@ -194,18 +194,18 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	/** Remove the mob's current target. */
 	public void removeTarget()
 	{
-		LivingEntity previousTarget = this.mob.asMob().getTarget();
-		if (previousTarget == null) return;	// As it may execute on tick, filter to prevent calling reflect too many times
+		//LivingEntity previousTarget = this.mob.asMob().getTarget();
+		//if (previousTarget == null) return;	// As it may execute on tick, filter to prevent calling reflect too many times
 		this.mob.asMob().setTarget(null);
 		// Remove all TargetGoals' target, since we've made target nullization unnecessary on stop, which may leave some TargetGoals' targetMob param not synced
-		for (WrappedGoal goal: this.mob.asMob().targetSelector.getAvailableGoals())
+		/*for (WrappedGoal goal: this.mob.asMob().targetSelector.getAvailableGoals())
 		{
 			if (goal.getGoal() instanceof TargetGoal tg)
 			{
 				if (ReflectHelper.forceGet(tg, TargetGoal.class, "targetMob") == previousTarget)			
 					ReflectHelper.forceSet(tg, TargetGoal.class, "targetMob", null);
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -214,13 +214,14 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	 */
 	@Override
 	public void stop() {
-		if (this.mob.asMob().getTarget() == null // Target is already nullized
+		/*if (this.mob.asMob().getTarget() == null // Target is already nullized
 			|| !this.mob.asMob().getTarget().isAlive() // Target is invalid
+			|| this.mob.asMob().getTarget().getHealth() <= 0	// Target is dead
 			|| isDisabled() // Blocked by BM mechanism
 			|| isTooFar()	// Too far away
 			|| isUnseenTimeout() && !this.mob.asMob().hasLineOfSight(this.mob.asMob().getTarget()))	// Unseen
-		{
+		{*/
 			removeTarget();
-		}
+		//}
 	}
 }
