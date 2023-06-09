@@ -1,7 +1,7 @@
 package net.sodiumstudio.befriendmobs.util.annotation;
 
 /**
- * A label for methods are costly on resource and possible to cause performance down if called too frequently.
+ * A label for methods costly on resource and possible to cause performance down if called too frequently.
  * <p> Such methods may include level object iteration, multi-dimensional iteration, large amount of reflect calls or other code that may be costly for performance.
  * <p> 表明该方法资源占用较大，如果过于频繁调用可能导致游戏性能下降。
  * <p> 这些方法可能包含：迭代世界中所有某类对象，多维迭代，大量使用的反射或其他可能占用大量资源的代码。
