@@ -139,22 +139,25 @@ public class BefriendedHelper
 	public static IBefriendedMob convertToOtherBefriendedType(IBefriendedMob target, EntityType<? extends Mob> newType)
 	{
 		// Additional inventory will be invalidated upon convertion, so backup as a tag
-		CompoundTag inventoryTag = target.getAdditionalInventory().toTag();
+		CompoundTag mobTag = new CompoundTag();
+		target.asMob().saveWithoutId(mobTag);
 		// Do convertion
-		Mob newMobRaw = EntityHelper.replaceMob(newType, target.asMob());
-		if (!(newMobRaw instanceof IBefriendedMob))
+		
+		Mob newMob = EntityHelper.replaceMob(newType, target.asMob());
+		if (!(newMob instanceof IBefriendedMob))
 			throw new UnsupportedOperationException("BefriendedHelper::convertToOtherBefriendedType supports mobs implementing IBefriendedMob.");
-		IBefriendedMob newMob = (IBefriendedMob) newMobRaw;
+		newMob.load(mobTag);
 		// Write the inventory back
-		if(inventoryTag.getInt("size") != newMob.getAdditionalInventory().getContainerSize())
+		/*if(inventoryTag.getInt("size") != newMob.getAdditionalInventory().getContainerSize())
 			throw new UnsupportedOperationException("BefriendedHelper::convertToOtherBefriendedType additional inventory must have same size before and after conversion.");
 		newMob.getAdditionalInventory().readFromTag(inventoryTag);
 		// Do other settings
 		newMob.setAIState(target.getAIState(), false);
 		newMob.init(target.getOwnerUUID(), target.asMob());
-		newMob.updateFromInventory();
+		newMob.updateFromInventory();*/
 		// setInit() needs to call manually
-		return newMob;
+		
+		return (IBefriendedMob)newMob;
 	}
 	
 	/* Inventory */

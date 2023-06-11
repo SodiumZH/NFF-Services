@@ -2,6 +2,7 @@
   "item.befriendmobs.debug_befriender": "Debug Befriender",
   "item.befriendmobs.debug_ai_switch": "Debug AI Switch",
   "item.befriendmobs.mob_respawner": "Respawner",
+  "item.befriendmobs.dummy_item": "Dummy Item (IF YOU SEE THIS WITHOUT USING /give, PLEASE REPORT BUGS.)",
   "info.befriendmobs.gui_health": "HP",
   "info.befriendmobs.gui_atk": "ATK",
   "info.befriendmobs.gui_armor": "Armor" ,

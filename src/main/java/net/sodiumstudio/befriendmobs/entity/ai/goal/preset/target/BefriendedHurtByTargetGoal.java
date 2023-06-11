@@ -46,8 +46,6 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	 */
 	@Override
 	public boolean checkCanUse() {
-		if (isDisabled())
-			return false;
 		LivingEntity lastHurt = mob.asMob().getLastHurtByMob();
 		if (mob.asMob().getLastHurtByMobTimestamp() != this.timestamp && lastHurt != null) 
 		{
@@ -84,13 +82,13 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 		this.targetMob = mob.asMob().getTarget();
 		this.timestamp = mob.asMob().getLastHurtByMobTimestamp();
 		this.unseenMemoryTicks = 300;
-		if (this.alertSameType) {
+	/*	if (this.alertSameType) {
 			this.alertOthers();
-		}
+		}*/
 
 		super.start();
 	}
-
+/*
 	protected void alertOthers() {
 		double d0 = this.getFollowDistance();
 		AABB aabb = AABB.unitCubeFromLowerCorner(mob.asMob().position()).inflate(d0, 10.0D, d0);
@@ -131,5 +129,5 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 
 	protected void alertOther(Mob pMob, LivingEntity pTarget) {
 		pMob.setTarget(pTarget);
-	}
+	}*/
 }
