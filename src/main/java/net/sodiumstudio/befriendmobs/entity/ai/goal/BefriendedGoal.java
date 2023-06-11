@@ -11,7 +11,7 @@ import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
 
-public abstract class BefriendedGoal extends Goal {
+public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 
 	// for simplification
 	protected static final BefriendedAIState WAIT = BefriendedAIState.WAIT;
@@ -36,11 +36,13 @@ public abstract class BefriendedGoal extends Goal {
 		this.mob = mob;
 	}
 	
+	@Override
 	public boolean isStateAllowed()
 	{
 		return allowedStates.contains(mob.getAIState());
 	}
 	
+	@Override
 	public BefriendedGoal allowState(BefriendedAIState state)
 	{
 		if (!allowedStates.contains(state))
@@ -48,6 +50,7 @@ public abstract class BefriendedGoal extends Goal {
 		return this;
 	}
 	
+	@Override
 	public BefriendedGoal excludeState(BefriendedAIState state)
 	{
 		if (allowedStates.contains(state))
@@ -55,6 +58,7 @@ public abstract class BefriendedGoal extends Goal {
 		return this;
 	}
 	
+	@Override
 	public BefriendedGoal allowAllStates()
 	{
 		for (BefriendedAIState state : BefriendedAIState.getAllStates())
@@ -62,6 +66,7 @@ public abstract class BefriendedGoal extends Goal {
 		return this;
 	}
 	
+	@Override
 	public BefriendedGoal allowAllStatesExceptWait()
 	{
 		allowAllStates();
@@ -69,28 +74,33 @@ public abstract class BefriendedGoal extends Goal {
 		return this;
 	}
 	
+	@Override
 	public void disallowAllStates()
 	{
 		allowedStates.clear();
 	}
 	
+	@Override
 	public BefriendedGoal block()
 	{
 		isBlocked = true;
 		return this;
 	}
 	
+	@Override
 	public BefriendedGoal unblock()
 	{
 		isBlocked = false;
 		return this;
 	}
 	
+	@Override
 	public boolean isDisabled()
 	{
 		return mob.getOwner() == null || isBlocked || !allowedStates.contains(mob.getAIState());
 	}
 	
+	@Override
 	public IBefriendedMob getMob()
 	{
 		return mob;
@@ -108,7 +118,7 @@ public abstract class BefriendedGoal extends Goal {
 	
 	/**
 	 * Fixed here because some common checks are needed here.
-	 * In subclasses, override {@link checkCanUse} instead.
+	 * In subclasses, override {@link IBefriendedGoal#checkCanUse} instead.
 	 */
 	@Override
 	public final boolean canUse() 
@@ -129,14 +139,8 @@ public abstract class BefriendedGoal extends Goal {
 	}
 	
 	/**
-	 * The alternate of {@code canUse} method for befriend goals.
-	 * Override this for {@code canUse} check instead in subclasses. 
-	 */
-	public abstract boolean checkCanUse();
-	
-	/**
 	 * Fixed here because some common checks are needed here.
-	 * In subclasses, override {@link checkCanContinueToUse} instead.
+	 * In subclasses, override {@link IBefriendedGoal#checkCanContinueToUse} instead.
 	 */
 	@Override
 	public final boolean canContinueToUse()
@@ -155,14 +159,5 @@ public abstract class BefriendedGoal extends Goal {
 			return false;
 		return checkCanContinueToUse();
 	}
-	
-	/**
-	 * The alternate of {@code canContinueToUse} method for befriend goals.
-	 * Override this for {@code canContinueToUse} check instead in subclasses. 
-	 */
-	public boolean checkCanContinueToUse()
-	{
-		return this.checkCanUse();
-	}
-	
+
 }

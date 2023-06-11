@@ -12,7 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 
-public abstract class BefriendedTargetGoal extends TargetGoal
+public abstract class BefriendedTargetGoal extends TargetGoal implements IBefriendedGoal
 {
 
 	// for simplification
@@ -44,43 +44,57 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 		return allowedStates;
 	}
 	
+	@Override
 	public boolean isStateAllowed() {
 		return allowedStates.contains(mob.getAIState());
 	}
 
-	public BefriendedTargetGoal allowState(BefriendedAIState state) {
+	@Override
+	public IBefriendedGoal allowState(BefriendedAIState state) {
 		if (!allowedStates.contains(state))
 			allowedStates.add(state);
 		return this;
 	}
 
-	public BefriendedTargetGoal excludeState(BefriendedAIState state) {
+	@Override
+	public IBefriendedGoal excludeState(BefriendedAIState state) {
 		if (allowedStates.contains(state))
 			allowedStates.remove(state);
 		return this;
 	}
 
-	public BefriendedTargetGoal allowAllStates() {
+	@Override
+	public IBefriendedGoal allowAllStates() {
 		for (BefriendedAIState state : BefriendedAIState.getAllStates())
 			allowedStates.add(state);
 		return this;
 	}
 
-	public BefriendedTargetGoal allowAllStatesExceptWait() {
+	@Override
+	public IBefriendedGoal allowAllStatesExceptWait() {
 		allowAllStates();
 		excludeState(WAIT);
 		return this;
 	}
 
-	// Disable this goal
-	public void blockGoal() {
+	@Override
+	public void disallowAllStates() {
+		allowedStates.clear();
+	}
+
+	@Override
+	public IBefriendedGoal block() {
 		isBlocked = true;
+		return this;
 	}
 
-	public void resumeGoal() {
+	@Override
+	public IBefriendedGoal unblock() {
 		isBlocked = false;
+		return this;
 	}
 
+	@Override
 	public boolean isDisabled() {
 		return isBlocked || !isStateAllowed();
 	}
@@ -89,6 +103,7 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 		return (LivingEntity) mob;
 	}
 
+	@Override
 	public IBefriendedMob getMob() {
 		return mob;
 	}
@@ -106,7 +121,7 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	
 	/**
 	 * Fixed here because some common checks are needed here.
-	 * In subclasses, override {@link checkCanUse} instead.
+	 * In subclasses, override {@link IBefriendedGoal#checkCanUse} instead.
 	 */
 	@Override
 	public final boolean canUse() 
@@ -127,14 +142,8 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 	}
 	
 	/**
-	 * The alternate of {@code canUse} method for befriend goals.
-	 * Override this for {@code canUse} check instead in subclasses. 
-	 */
-	public abstract boolean checkCanUse();
-	
-	/**
 	 * Fixed here because some common checks are needed here.
-	 * In subclasses, override {@link checkCanContinueToUse} instead.
+	 * In subclasses, override {@link IBefriendedGoal#checkCanContinueToUse} instead.
 	 */
 	@Override
 	public final boolean canContinueToUse()
@@ -151,16 +160,12 @@ public abstract class BefriendedTargetGoal extends TargetGoal
 			return event.getManualSetValue().get();
 		if (isDisabled())
 			return false;
-		return checkCanContinueToUse();
+		return checkCanContinueToUse() && super.canContinueToUse();
 	}
 	
-	/**
-	 * The alternate of {@code canContinueToUse} method for befriend goals.
-	 * Override this for {@code canContinueToUse} check instead in subclasses. 
-	 */
+	@Override
 	public boolean checkCanContinueToUse()
 	{
-		return this.checkCanUse();
+		return true;
 	}
-
 }

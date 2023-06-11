@@ -2,6 +2,7 @@
   "item.befriendmobs.debug_befriender": "友好化工具(调试用)",
   "item.befriendmobs.debug_ai_switch": "AI开关工具(调试用)",
   "item.befriendmobs.mob_respawner": "重生刷怪蛋",
+  "item.befriendmobs.dummy_item": "占位道具（如果未使用/give时见到此道具，请报bug）",
   "info.befriendmobs.gui_health": "生命",
   "info.befriendmobs.gui_atk": "攻击",
   "info.befriendmobs.gui_armor": "护甲" ,

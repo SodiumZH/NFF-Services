@@ -19,7 +19,6 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 	/** Only for Pathfinder. If true, the mob should have both ground and water navigation, and must implement {@link IBefriendedAmphibious} interface. */
 	public boolean isAmphibious = false;
 	public double speedModifier = 1.0d;
-	/** True if the mob is */
 	public boolean canFly = false;
 	public boolean canSwim = false;
 	public boolean canWalk = true;
