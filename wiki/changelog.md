@@ -8,6 +8,8 @@ Added `IBefriendedGoal` interface to combine the common methods of `BefriendedGo
 
 Set `BefriendedGoal#canUse` , `BefriendedGoal#canContinueToUse`, `BefriendedTargetGoal#canUse`, `BefriendedTargetGoal#canContinueToUse` as final and included some necessary checks inside. In subclasses, override `IBefriendedGoal#checkCanUse` and `IBefriendedGoal#checkCanContinueToUse` instead.
 
+Now GUI will be automatically closed when the mob is removed from level.
+
 ### 0.1.5
 
 Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The previous versions are TOTALLY WRONG. Now the varargs need firstly parameter classes followed by parameter values. 
