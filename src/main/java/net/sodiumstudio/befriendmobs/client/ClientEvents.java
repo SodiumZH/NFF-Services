@@ -13,14 +13,15 @@ public class ClientEvents
 {
 
 	@SubscribeEvent
-	public static void onLevelTick(TickEvent.LevelTickEvent event) {
+	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		
 		if (event.side == LogicalSide.CLIENT)
 		{
+			@SuppressWarnings("resource")
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.screen != null && mc.screen instanceof BefriendedGuiScreen bgs)
 			{
-				if (!bgs.mob.asMob().isAlive())
+				if (!bgs.mob.asMob().isAlive() || !bgs.mob.asMob().isAddedToWorld())
 				{
 					mc.setScreen(null);
 				}
