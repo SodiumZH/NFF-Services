@@ -196,9 +196,17 @@ public class BefriendedHelper
 	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
 	 * <p>使用一个用于读档的NBT标签，在未实际生成生物前获取生物所属的MOD ID
 	 */
-	public String getModIdFromNbt(CompoundTag nbt)
+	public static String getModIdFromNbt(CompoundTag nbt)
 	{
 		return nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID) ?
 				nbt.getString("befriended_mod_id") : null;
+	}
+	
+	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
+	{
+		String modid = getModIdFromNbt(nbt);
+		if (modid == null)
+			return null;
+		return nbt.contains(modid + ":befriended_owner", NbtHelper.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
 	}
 }

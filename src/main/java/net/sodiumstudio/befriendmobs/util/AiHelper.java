@@ -53,8 +53,9 @@ public class AiHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
+				 // Force get a private field by reflection
 				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetType", true);
-				 if (targetType == Player.class)
+				 if (targetType == Player.class || targetType == ServerPlayer.class)
 				 {
 					 return true;
 				 }
