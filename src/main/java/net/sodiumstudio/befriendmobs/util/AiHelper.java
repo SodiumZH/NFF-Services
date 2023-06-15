@@ -46,6 +46,7 @@ public class AiHelper
 		 return false;
 	}
 	
+	// Something is wrong with this function, it works correctly in IDE but not in game
 	public static boolean isMobHostileToPlayer(Mob test)
 	{
 		// Check if the mob has a NearestAttackableTargetGoal<Player> goal
