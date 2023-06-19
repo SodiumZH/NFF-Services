@@ -476,27 +476,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		}
 		return false;
 	}
-	
-	
-	@Deprecated
-	@Override
-	public boolean onInteraction(Player player, InteractionHand hand) {
-
-		if (player.getUUID().equals(getOwnerUUID())) {
-			return true;
-		}
-		return false;
-	}
-
-	@Deprecated
-	@Override
-	public boolean onInteractionShift(Player player, InteractionHand hand) 
-	{
-		if (player.getUUID().equals(getOwnerUUID())) {
-			return true;
-		}
-		return false;
-	}
 
 	// Interaction end
 
