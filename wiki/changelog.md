@@ -2,6 +2,10 @@
 
 ## 1.19.2
 
+### 0.1.7
+
+Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.
+
 ### 0.1.6
 
 Added `IBefriendedGoal` interface to combine the common methods of `BefriendedGoal` and `BefriendedTargetGoal` . Use `asGoal()` to cast this to `Goal`.
@@ -63,6 +67,20 @@ Some minor API changes.
 Separated from DWMG mod.
 
 ## 1.18.2
+
+### 0.0.7
+
+Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.
+
+### 0.0.6
+
+Added `IBefriendedGoal` interface to combine the common methods of `BefriendedGoal` and `BefriendedTargetGoal` . Use `asGoal()` to cast this to `Goal`.
+
+Set `BefriendedGoal#canUse` , `BefriendedGoal#canContinueToUse`, `BefriendedTargetGoal#canUse`, `BefriendedTargetGoal#canContinueToUse` as final and included some necessary checks inside. In subclasses, override `IBefriendedGoal#checkCanUse` and `IBefriendedGoal#checkCanContinueToUse` instead.
+
+Added `Map<String, Object> tempObjects` to `CBefriendedMobTempData` for temporary storage of objects.
+
+Now GUI will be automatically closed when the mob is removed from level.
 
 ### 0.0.5
 
