@@ -2,6 +2,10 @@
 
 ## 1.19.2
 
+### 0.1.7
+
+Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.
+
 ### 0.1.6
 
 Added `IBefriendedGoal` interface to combine the common methods of `BefriendedGoal` and `BefriendedTargetGoal` . Use `asGoal()` to cast this to `Goal`.
@@ -17,6 +21,8 @@ Now GUI will be automatically closed when the mob is removed from level.
 Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The previous versions are TOTALLY WRONG. Now the varargs need firstly parameter classes followed by parameter values. 
 
 Fixed crashes related to `IBefriendedMob::getOwner` returning null when owner isn't in the same level to the mob.
+
+Added Debug AI Switch for simplification of `setNoAi()` operation.
 
 Added `BMDebugItemHandler.UseEvent` for custom debug items.
 
@@ -62,6 +68,32 @@ Separated from DWMG mod.
 
 ## 1.18.2
 
+### 0.0.7
+
+Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.
+
+### 0.0.6
+
+Added `IBefriendedGoal` interface to combine the common methods of `BefriendedGoal` and `BefriendedTargetGoal` . Use `asGoal()` to cast this to `Goal`.
+
+Set `BefriendedGoal#canUse` , `BefriendedGoal#canContinueToUse`, `BefriendedTargetGoal#canUse`, `BefriendedTargetGoal#canContinueToUse` as final and included some necessary checks inside. In subclasses, override `IBefriendedGoal#checkCanUse` and `IBefriendedGoal#checkCanContinueToUse` instead.
+
+Added `Map<String, Object> tempObjects` to `CBefriendedMobTempData` for temporary storage of objects.
+
+Now GUI will be automatically closed when the mob is removed from level.
+
+### 0.0.5
+
+Fixed `ReflectHelper::forceInvoke` and `ReflectHelper::forceInvokeRetVal`. The previous versions are TOTALLY WRONG. Now the varargs need firstly parameter classes followed by parameter values. 
+
+Fixed crashes related to `IBefriendedMob::getOwner` returning null when owner isn't in the same level to the mob.
+
+Added Debug AI Switch for simplification of `setNoAi()` operation.
+
+Added `BMDebugItemHandler.UseEvent` for custom debug items.
+
+Some internal changes to adapt to DWMG 0.1.5.
+
 ### 0.0.4
 
 Refactored `BefriendedAIState` from enum to class.
@@ -99,5 +131,3 @@ Some minor API changes.
 ### 0.0.1-alpha
 
 Separated from DWMG mod.
-
-
