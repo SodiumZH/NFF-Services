@@ -6,11 +6,16 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
 import net.sodiumstudio.befriendmobs.entity.vanillapreset.enderman.AbstractBefriendedEnderMan;
 
@@ -23,19 +28,19 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
    /** This filter is applied to the Entity search. Only matching entities will be targeted. */
    protected TargetingConditions targetConditions;
 
-   public BefriendedNearestAttackableTargetGoal(AbstractBefriendedEnderMan mob, Class<T> targetType, boolean mustSee) {
+   public BefriendedNearestAttackableTargetGoal(IBefriendedMob mob, Class<T> targetType, boolean mustSee) {
       this(mob, targetType, 10, mustSee, false, (Predicate<LivingEntity>)null);
    }
 
-   public BefriendedNearestAttackableTargetGoal(AbstractBefriendedEnderMan mob, Class<T> targetType, boolean mustSee, Predicate<LivingEntity> targetPredicate) {
+   public BefriendedNearestAttackableTargetGoal(IBefriendedMob mob, Class<T> targetType, boolean mustSee, Predicate<LivingEntity> targetPredicate) {
       this(mob, targetType, 10, mustSee, false, targetPredicate);
    }
 
-   public BefriendedNearestAttackableTargetGoal(AbstractBefriendedEnderMan mob, Class<T> targetType, boolean mustSee, boolean mustReach) {
+   public BefriendedNearestAttackableTargetGoal(IBefriendedMob mob, Class<T> targetType, boolean mustSee, boolean mustReach) {
       this(mob, targetType, 10, mustSee, mustReach, (Predicate<LivingEntity>)null);
    }
 
-   public BefriendedNearestAttackableTargetGoal(AbstractBefriendedEnderMan mob, Class<T> targetType, int pRandomInterval, boolean mustSee, boolean mustReach, @Nullable Predicate<LivingEntity> targetPredicate) {
+   public BefriendedNearestAttackableTargetGoal(IBefriendedMob mob, Class<T> targetType, int pRandomInterval, boolean mustSee, boolean mustReach, @Nullable Predicate<LivingEntity> targetPredicate) {
       super(mob, mustSee, mustReach);
       this.targetType = targetType;
       this.randomInterval = reducedTickDelay(pRandomInterval);
@@ -44,7 +49,8 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
       this.allowAllStatesExceptWait();
    }
 
-   public boolean checkCanUse() {
+   @Override
+public boolean checkCanUse() {
 	  if (isDisabled())
 		  return false;
       if (this.randomInterval > 0 && this.mob.asMob().getRandom().nextInt(this.randomInterval) != 0) {
@@ -60,20 +66,25 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
    }
 
    protected void findTarget() {
-      if (this.targetType != Player.class && this.targetType != ServerPlayer.class) {
-         this.target = this.mob.asMob().level.getNearestEntity(this.mob.asMob().level.getEntitiesOfClass(this.targetType, this.getTargetSearchArea(this.getFollowDistance()), (t) -> {
-            return true;
-         }), this.targetConditions, this.mob.asMob(), this.mob.asMob().getX(), this.mob.asMob().getEyeY(), this.mob.asMob().getZ());
-      } else {
-         this.target = this.mob.asMob().level.getNearestPlayer(this.targetConditions, this.mob.asMob(), this.mob.asMob().getX(), this.mob.asMob().getEyeY(), this.mob.asMob().getZ());
-      }
-
+      double followDist = mob.asMob().getAttributeValue(Attributes.FOLLOW_RANGE);
+      AABB searchArea = new AABB(mob.asMob().position().subtract(new Vec3(followDist, followDist, followDist)), mob.asMob().position().add(new Vec3(followDist, followDist, followDist)));
+      mob.asMob().level.getEntities(mob.asMob(), searchArea, (Entity e) -> 
+      {
+    	  if (e instanceof Mob m)
+    	  {
+    		  return m.getTarget() == mob.asMob() 
+    			&& mob.asMob().hasLineOfSight(m)
+    			&& mob.asMob().distanceToSqr(m) <= followDist * followDist;
+    	  }
+    	  else return false;
+      });
    }
 
    /**
     * Execute a one shot task or start executing a continuous task
     */
-   public void start() {
+   @Override
+public void start() {
       this.mob.asMob().setTarget(this.target);
       super.start();
    }
