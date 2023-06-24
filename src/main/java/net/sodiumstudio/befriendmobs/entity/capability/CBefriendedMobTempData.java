@@ -8,10 +8,13 @@ import java.util.function.Supplier;
 import com.google.common.collect.Maps;
 
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
@@ -19,7 +22,7 @@ import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
  */
-public interface CBefriendedMobTempData {
+public interface CBefriendedMobTempData extends INBTSerializable<CompoundTag> {
 
 	public default Values values()
 	{
@@ -29,10 +32,12 @@ public interface CBefriendedMobTempData {
 	public class Values implements CBefriendedMobTempData
 	{
 		public IBefriendedMob mob;
+		public CompoundTag tag = new CompoundTag();
 		public Values(IBefriendedMob mob)
 		{
 			this.mob = mob;
 			this.anchor = mob.asMob().position();
+			this.tag = new CompoundTag();
 		}
 		
 		public boolean hasInit = false;
@@ -44,9 +49,19 @@ public interface CBefriendedMobTempData {
 		public HashMap<String, Supplier<Boolean>> sunImmuneNecessaryConditions = new HashMap<String, Supplier<Boolean>>();
 		
 		public Map<String, Object> tempObjects = Maps.newHashMap();
+		
+		@Override
+		public CompoundTag serializeNBT() {
+			return tag;
+		}
+
+		@Override
+		public void deserializeNBT(CompoundTag nbt) {
+			tag = nbt;
+		}		
 	}
 	
-	public class Prvd implements ICapabilityProvider
+	public class Prvd implements ICapabilitySerializable<CompoundTag>
 	{
 		
 		public CBefriendedMobTempData values;
@@ -61,6 +76,16 @@ public interface CBefriendedMobTempData {
 			if (cap == BefMobCapabilities.CAP_BEFRIENDED_MOB_TEMP_DATA)
 				return LazyOptional.of(() -> {return this.values;}).cast();
 			else return LazyOptional.empty();
+		}
+
+		@Override
+		public CompoundTag serializeNBT() {
+			return values.serializeNBT();
+		}
+
+		@Override
+		public void deserializeNBT(CompoundTag nbt) {
+			values.deserializeNBT(nbt);
 		}
 	}
 }
