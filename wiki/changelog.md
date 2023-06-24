@@ -4,6 +4,8 @@
 
 ### 0.1.8
 
+Added a serializable `CompoundTag` to `CBefriendedMobTempData`.
+
 Added `BaubleItem` of which the description text on hovering can be customized on registration.
 
 Some minor internal changes.
