@@ -16,8 +16,9 @@ public class InfoHelper
 
 	// Create a component with translatable content, equals to MutableComponent.create(TranslatableContents) in 1.19.2
 	// For keeping the API consistent between 1.18.2 and 1.19.2 and simplifying porting
-	public static MutableComponent createTrans(String key)
+	public static MutableComponent createTrans(String key, Object... params)
 	{
-		return new TranslatableComponent(key);
+		return new TranslatableComponent(key, params);
+
 	}
 }
