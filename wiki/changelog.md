@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.8
+
+Added `BaubleItem` of which the description text on hovering can be customized on registration.
+
+Some minor internal changes.
+
 ### 0.1.7
 
 Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.
