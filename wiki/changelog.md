@@ -10,6 +10,12 @@ Added `BaubleItem` of which the description text on hovering can be customized o
 
 Some minor internal changes.
 
+Adjusted befriendable mob hatred mechanism: 
+
+  -- Added `BefriendableAddHatredReason.HIT` reason, indicating that the player hit the mob but didn't cause damage.
+
+  -- If the damage player given to the mob is less than 0.1, the reason will be `HIT` instead of `ATTACKED`.
+
 ### 0.1.7
 
 Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.

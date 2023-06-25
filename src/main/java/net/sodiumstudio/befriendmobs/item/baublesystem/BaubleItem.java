@@ -1,11 +1,10 @@
 package net.sodiumstudio.befriendmobs.item.baublesystem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
-
-import org.apache.commons.compress.utils.Lists;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -19,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class BaubleItem extends Item
 {
 
-	protected List<MutableComponent> descriptions = Lists.newArrayList();
+	protected List<MutableComponent> descriptions = new ArrayList<MutableComponent>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	
 	public BaubleItem(Properties pProperties)

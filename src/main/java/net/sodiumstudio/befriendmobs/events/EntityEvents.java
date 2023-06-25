@@ -1,5 +1,8 @@
 package net.sodiumstudio.befriendmobs.events;
 
+import java.util.List;
+import java.util.UUID;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -8,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,6 +21,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -46,6 +51,7 @@ import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
+import net.sodiumstudio.befriendmobs.util.EntityHelper;
 import net.sodiumstudio.befriendmobs.util.TagHelper;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
 import net.sodiumstudio.befriendmobs.util.debug.BMDebugItemHandler;
@@ -141,12 +147,31 @@ public class EntityEvents
 		event.setCancellationResult(result.get());
 	}
 	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public static void onLivingChangeTarget_Highest(LivingChangeTargetEvent event)
+	{
+		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
+		if (!event.getEntity().level.isClientSide)
+		{
+			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
+			{
+				Mob mob = cap.getOwner();
+				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
+				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
+				if (target != null && target instanceof LivingEntity targetLiving)
+					event.setNewTarget(targetLiving);
+			});
+		}
+		
+	}
+	
+	
+	
 	@SubscribeEvent
-	public static void onLivingSetAttackTargetEvent(LivingSetAttackTargetEvent event)
+	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
 		LivingEntity target = event.getTarget();		
-		
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
@@ -205,6 +230,24 @@ public class EntityEvents
 		}
 		// Handle mobs end //
 	}	
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onLivingSetAttackTarget_Lowest(LivingSetAttackTargetEvent event)
+	{
+		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
+		if (!event.getEntity().level.isClientSide)
+		{
+			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
+			{
+				Mob mob = cap.getOwner();
+				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
+				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
+				if (target != null && target instanceof LivingEntity targetLiving)
+					mob.setTarget(targetLiving);
+			});
+		}
+		
+	}
 	
 	/**
 	 * Final action after handling all setting target events.
@@ -382,7 +425,9 @@ public class EntityEvents
 				}
 				living.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
 				{
-					cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKED);
+					if (event.getAmount() >= 0.1)	
+						cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKED);
+					else cap.addHatredWithReason(player, BefriendableAddHatredReason.HIT);
 				});
 			}
 			// On player attacked by befriendable mob

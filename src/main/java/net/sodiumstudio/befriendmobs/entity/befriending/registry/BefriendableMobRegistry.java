@@ -12,13 +12,17 @@ import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 
+/**
+ * A dynamic registry of all befriendable mobs in the level for searching mob from UUID and quick iteration.
+ * The mobs will be registered on attaching {link CBefriendableMob} capability, and will be removed if not alive on searching or iteration.
+ */
 public class BefriendableMobRegistry
 {
 
 	// A list to register all befriendable mobs in the whole game
 	private static BefriendableMobRegistry REGISTRY = new BefriendableMobRegistry();
 	
-	private HashMap<UUID, Mob> mobMap = new HashMap<UUID, Mob>();
+	private final HashMap<UUID, Mob> mobMap = new HashMap<UUID, Mob>();
 	
 	// If the registry is just cleaned.
 	// When cleaning set true, and when adding mob set false

@@ -2,6 +2,9 @@ package net.sodiumstudio.befriendmobs.entity.capability;
 
 import java.util.HashSet;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.HashSet;
 
 import net.minecraft.nbt.CompoundTag;
@@ -19,6 +22,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredRea
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.events.BefriendableAddHatredEvent;
+import net.sodiumstudio.befriendmobs.events.EntityEvents;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.util.NbtHelper;
 import net.sodiumstudio.befriendmobs.util.Wrapped;
@@ -168,4 +172,33 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 		return false;
 	}
 
+	// Presets
+	
+	/**
+	 * Set the mob is always hostile to a specified target once it's in the follow range, ignoring target goals.
+	 * If input is null, the previous always-hostile-to target will be removed and the mob will perform normally.
+	 * It's implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} 
+	 */
+	public default void setAlwaysHostileTo(@Nullable LivingEntity target)
+	{
+		if (target == null || !target.isAlive())
+		{
+			this.getNbt().remove("always_hostile_to");
+		}
+		else
+		{
+			this.getNbt().putUUID("always_hostile_to_uuid", target.getUUID());
+		}
+	}
+	
+	@Nullable
+	public default UUID getAlwaysHostileTo()
+	{
+		if (this.getNbt().contains("always_hostile_to", NbtHelper.TAG_INT_ARRAY_ID))
+		{
+			return this.getNbt().getUUID("always_hostile_to");		
+		}
+		else return null;
+	}
+	
 }

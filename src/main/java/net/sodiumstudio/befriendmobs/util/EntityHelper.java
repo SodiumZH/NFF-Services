@@ -1,8 +1,13 @@
 package net.sodiumstudio.befriendmobs.util;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import com.google.common.collect.Comparators;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,6 +32,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Fox;
@@ -540,4 +546,110 @@ public class EntityHelper
 		 return false;
 	}
 
+	/**
+	 * Get a bounding box centered by the given entity.
+	 * @param entity Entity as the center.
+	 * @param radius XYZ radius of the box. (Radius, not diameter!)
+	 * @return Bounding box.
+	 */
+	public static AABB getNeighboringArea(Entity entity, Vec3 radius)
+	{
+		return new AABB(entity.position().subtract(radius), entity.position().add(radius));
+	}
+	
+	/**
+	 * Get a bounding box centered by the given entity.
+	 * @param entity Entity as the center.
+	 * @param xRadius X radius of the box. (Radius, not diameter!)
+	 * @param yRadius Y radius of the box. (Radius, not diameter!)
+	 * @param zRadius Z radius of the box. (Radius, not diameter!)
+	 * @return Bounding box.
+	 */
+	public static AABB getNeighboringArea(Entity entity, double xRadius, double yRadius, double zRadius)
+	{
+		return getNeighboringArea(entity, new Vec3(xRadius, yRadius, zRadius));
+	}
+	
+	/**
+	 * Get a bounding box centered by the given entity.
+	 * @param entity Entity as the center.
+	 * @param xzRadius XZ radius of the box. (Radius, not diameter!)
+	 * @param yRadius Y radius of the box. (Radius, not diameter!)
+	 * @return Bounding box.
+	 */
+	public static AABB getNeighboringArea(Entity entity, double xzRadius, double yRadius)
+	{
+		return getNeighboringArea(entity, new Vec3(xzRadius, yRadius, xzRadius));
+	}
+	
+	/**
+	 * Get a bounding box centered by the given entity.
+	 * @param entity Entity as the center.
+	 * @param radius XYZ radius of the box. (Radius, not diameter!)
+	 * @return Bounding box.
+	 */
+	public static AABB getNeighboringArea(Entity entity, double radius)
+	{
+		return getNeighboringArea(entity, new Vec3(radius, radius, radius));
+	}
+	
+	/**
+	 * Sort an entity list with the distance to a given entity, from closest to far
+	 * @param entities Entity list.
+	 * @param distanceTo Given entity to compare the distance.
+	 * @return A sorted list. If the element entity isn't in the level, it will be removed.
+	 */
+	public static <T extends Entity> List<T> sortWithDistance(List<T> entities, Entity distanceTo)
+	{
+		return entities.stream()
+				.filter(e -> e.isAlive() && e.level == distanceTo.level)
+				.sorted(Comparator.comparingDouble(e -> e.distanceToSqr(distanceTo)))
+				.toList();
+	}
+	
+	/**
+	 * Get a target mob from UUID if it can be seen by the input mob. Otherwise return null.
+	 * @param targetUUID UUID of target mob.
+	 * @param mob Input mob to test if can see.
+	 * @return Target entity if can see, or null.
+	 */
+	@Nullable
+	public static Entity getIfCanSee(UUID targetUUID, Mob mob)
+	{
+		if (mob == null || !mob.isAlive())
+			return null;
+		Entity out = null;
+		if (targetUUID != null)
+		{
+			// Try finding player first because it's fast
+			out = mob.level.getPlayerByUUID(targetUUID);
+			// When player is not found, search around
+			if (out == null)
+			{
+				double radius = mob.getAttributeValue(Attributes.FOLLOW_RANGE);
+				List<Entity> targets = mob.level.getEntities(
+					mob, EntityHelper.getNeighboringArea(mob, radius), (Entity e) -> 
+					{
+						return e != null 
+								&& e.getUUID().equals(targetUUID)
+								&& e.isAlive();
+					});
+				if (targets.size() > 0)
+				{
+					out = (LivingEntity) targets.get(0);
+				}
+			}					
+		}
+		if (out != null)
+		{
+			double radius = mob.getAttributeValue(Attributes.FOLLOW_RANGE);
+			if (out.distanceToSqr(mob) > radius * radius
+				|| !mob.hasLineOfSight(out))
+			{
+				out = null;
+			}
+		}
+		return out;
+	}
+	
 }
