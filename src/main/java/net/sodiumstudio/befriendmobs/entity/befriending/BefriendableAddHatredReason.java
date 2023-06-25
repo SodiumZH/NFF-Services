@@ -2,12 +2,18 @@ package net.sodiumstudio.befriendmobs.entity.befriending;
 
 public enum BefriendableAddHatredReason
 {
-
-	NOT(-1), // Not in hatred
-	ATTACKED(0), // The befriendable mob is attack by player
-	ATTACKING(1), // The befriendable mob attacked the player
-	SET_TARGET(2), // The befriendable mob set target to player
-	PROVOKED(3), // Unused
+	/** Not in hatred */
+	NOT(-1), 
+	/** The befriendable mob is attack by player */
+	ATTACKED(0),
+	/** The befriendable mob attacked the player */
+	ATTACKING(1), 
+	/** The hostile befriendable mob set target to player */
+	SET_TARGET(2),
+	/** Unused */
+	PROVOKED(3), 
+	/** The mob is hit by the player, but not taking damage */
+	HIT(4), 
 	CUSTOM_1(99), 
 	CUSTOM_2(98),
 	CUSTOM_3(97),

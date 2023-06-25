@@ -1,7 +1,9 @@
 package net.sodiumstudio.befriendmobs.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -77,4 +79,31 @@ public class ContainerHelper
 		return out;
 	}
 	
+	/**
+	 * Transform an iterable to list (array list).
+	 * @param assumedSize Size assumption for list initial capacity.
+	 */
+	public static <T> List<T> iterableToList(Iterable<T> iterable, int assumedSize)
+	{
+		List<T> list = new ArrayList<T>(assumedSize * 2);
+		for (T obj: iterable)
+		{
+			list.add(obj);
+		}
+		return list;
+	}
+	
+	/**
+	 * Transform an iterable to list (array list).
+	 * @param assumedSize Size assumption for list initial capacity.
+	 */
+	public static <T> List<T> iterableToList(Iterable<T> iterable)
+	{
+		List<T> list = new ArrayList<T>();
+		for (T obj: iterable)
+		{
+			list.add(obj);
+		}
+		return list;
+	}
 }
