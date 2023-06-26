@@ -26,6 +26,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent.AllowDespawn;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -243,7 +244,7 @@ public class EntityEvents
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
 				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
 				if (target != null && target instanceof LivingEntity targetLiving)
-					mob.setTarget(targetLiving);
+					EntityHelper.forceSetTarget(mob, targetLiving);
 			});
 		}
 		
@@ -551,5 +552,15 @@ public class EntityEvents
 			// Setup befriended undead sun-immunity rules
 			um.setupSunImmunityRules();
 		}
+	}
+	
+	@SubscribeEvent
+	public static void onCheckDespawn(AllowDespawn event)
+	{
+		event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap ->
+		{
+			if (cap.isForcePersistent())
+				event.setResult(Result.DENY);
+		});
 	}
 }

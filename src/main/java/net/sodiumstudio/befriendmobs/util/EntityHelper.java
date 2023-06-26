@@ -652,4 +652,12 @@ public class EntityHelper
 		return out;
 	}
 	
+	/**
+	 * Set mob target without posting events.
+	 */
+	public static void forceSetTarget(Mob mob, LivingEntity newTarget)
+	{
+		ReflectHelper.forceSet(mob, Mob.class, "target", newTarget);
+	}
+	
 }

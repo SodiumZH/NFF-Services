@@ -8,6 +8,12 @@ Added a serializable `CompoundTag` to `CBefriendedMobTempData`.
 
 Added `BaubleItem` of which the description text on hovering can be customized on registration.
 
+Added preset features in `CBefriendableMob`:	(For details see source file)
+
+​	-- `getAlwaysHostileTo` and `setAlwaysHostileTo` 
+
+​	-- `isForcePersistent` and `setForcePersistent`  
+
 Some minor internal changes.
 
 Adjusted befriendable mob hatred mechanism: 

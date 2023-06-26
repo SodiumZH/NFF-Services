@@ -152,7 +152,7 @@ public abstract class BefriendingHandler
 	// -1 means permanent
 	public int getHatredDurationTicks(BefriendableAddHatredReason reason)
 	{
-		return 18000;
+		return 300 * 20;
 	}
 	
 	/* Util */
