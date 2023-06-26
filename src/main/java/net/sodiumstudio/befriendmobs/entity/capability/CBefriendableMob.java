@@ -177,7 +177,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	/**
 	 * Set the mob is always hostile to a specified target once it's in the follow range, ignoring target goals.
 	 * If input is null, the previous always-hostile-to target will be removed and the mob will perform normally.
-	 * It's implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} 
+	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
 	 */
 	public default void setAlwaysHostileTo(@Nullable LivingEntity target)
 	{
@@ -187,10 +187,15 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 		}
 		else
 		{
-			this.getNbt().putUUID("always_hostile_to_uuid", target.getUUID());
+			this.getNbt().putUUID("always_hostile_to", target.getUUID());
 		}
 	}
 	
+	/**
+	 * get the target the mob is always hostile to.
+	 * If the mob isn't set always hostile to anything, it will return null, no matter if the mob has a target.
+	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
+	 */
 	@Nullable
 	public default UUID getAlwaysHostileTo()
 	{
@@ -199,6 +204,27 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 			return this.getNbt().getUUID("always_hostile_to");		
 		}
 		else return null;
+	}
+	
+	/**
+	 * Set if the mob is forced not despawning despite the return of {@link Mob#isPersistenceRequired}
+	 * Its implementation is in {@link EntityEvents#onCheckDespawn}
+	 * @param value True to keep it persistance. False to apply {@link Mob#isPersistenceRequired} on check.
+	 */
+	public default void setForcePersistent(boolean value)
+	{
+		this.getNbt().putBoolean("force_persistent", value);
+	}
+	
+	/**
+	 * Get if the mob forced not despawning despite the return of {@link Mob#isPersistenceRequired}
+	 * @return True if the mob is forced not despawning in {@link CBefriendableMob}. False to apply {@link Mob#isPersistenceRequired} on check.
+	 */
+	public default boolean isForcePersistent()
+	{
+		if (this.getNbt().contains("force_persistent", NbtHelper.TAG_BYTE_ID))
+			return this.getNbt().getBoolean("force_persistent");
+		else return false;
 	}
 	
 }
