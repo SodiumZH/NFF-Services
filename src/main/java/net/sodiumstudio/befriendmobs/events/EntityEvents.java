@@ -317,6 +317,7 @@ public class EntityEvents
 							if (bef.isRespawnerInvulnerable())
 							{					
 								ins.setInvulnerable(true);
+								resp.setInvulnerable(true);
 							}
 							ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
 							ins.setNoExpire(bef.respawnerNoExpire());
