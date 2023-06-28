@@ -1,6 +1,8 @@
 package net.sodiumstudio.befriendmobs.entity.befriending.registry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -153,4 +155,24 @@ public class BefriendingTypeRegistry {
 		}
 		throw new IllegalArgumentException("Type " + befriendedType.getDescriptionId() + "is not a befriended mob.");
 	}	
+	
+	public static Set<EntityType<?>> getAllBefriendableTypes()
+	{
+		Set<EntityType<?>> types = new HashSet<EntityType<?>>();
+		for (Entry entry: REGISTRY.map)
+		{
+			types.add(entry.fromType);
+		}
+		return types;
+	}
+	
+	public static Set<EntityType<?>> getAllBefriendedTypes()
+	{
+		Set<EntityType<?>> types = new HashSet<EntityType<?>>();
+		for (Entry entry: REGISTRY.map)
+		{
+			types.add(entry.convertToType);
+		}
+		return types;
+	}
 }
