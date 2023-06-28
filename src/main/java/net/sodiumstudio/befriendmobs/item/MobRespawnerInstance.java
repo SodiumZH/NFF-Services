@@ -2,6 +2,8 @@ package net.sodiumstudio.befriendmobs.item;
 
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -58,6 +60,7 @@ public class MobRespawnerInstance
 	 * Transform ItemStack to MobRespawnerInstance.
 	 * If empty or type mismatching, return null.
 	 */
+	@Nullable
 	public static MobRespawnerInstance create(ItemStack stack)
 	{
 		if (!stack.isEmpty() && stack.getItem() instanceof ItemMobRespawner)

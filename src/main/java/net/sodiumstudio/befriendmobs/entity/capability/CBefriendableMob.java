@@ -177,7 +177,8 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	/**
 	 * Set the mob is always hostile to a specified target once it's in the follow range, ignoring target goals.
 	 * If input is null, the previous always-hostile-to target will be removed and the mob will perform normally.
-	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
+	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Lowest},
+	 * {@link EntityEvents#onLivingSetAttackTarget_Lowest} and 
 	 */
 	public default void setAlwaysHostileTo(@Nullable LivingEntity target)
 	{
@@ -194,7 +195,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	/**
 	 * get the target the mob is always hostile to.
 	 * If the mob isn't set always hostile to anything, it will return null, no matter if the mob has a target.
-	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Highest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
+	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Lowest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
 	 */
 	@Nullable
 	public default UUID getAlwaysHostileTo()

@@ -1,6 +1,5 @@
 package net.sodiumstudio.befriendmobs.events;
 
-import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.server.level.ServerLevel;
@@ -11,7 +10,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -148,8 +146,8 @@ public class EntityEvents
 		event.setCancellationResult(result.get());
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public static void onLivingChangeTarget_Highest(LivingChangeTargetEvent event)
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onLivingChangeTarget_Lowest(LivingChangeTargetEvent event)
 	{
 		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
 		if (!event.getEntity().level.isClientSide)
@@ -159,14 +157,13 @@ public class EntityEvents
 				Mob mob = cap.getOwner();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
 				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
-				if (target != null && target instanceof LivingEntity targetLiving)
-					event.setNewTarget(targetLiving);
+				if (target != null 
+						&& target instanceof LivingEntity targetLiving
+						&& event.getNewTarget() != target)
+					event.setCanceled(true);
 			});
 		}
-		
 	}
-	
-	
 	
 	@SubscribeEvent
 	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
@@ -235,42 +232,27 @@ public class EntityEvents
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingSetAttackTarget_Lowest(LivingSetAttackTargetEvent event)
 	{
-		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
+		
 		if (!event.getEntity().level.isClientSide)
 		{
+			// Handle befriendable mobs //
 			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
 			{
+				/** Handle {@link CBefriendableMob} AlwaysHostile feature */
 				Mob mob = cap.getOwner();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
 				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
 				if (target != null && target instanceof LivingEntity targetLiving)
 					EntityHelper.forceSetTarget(mob, targetLiving);
+				
+        		// Add hatred only when settring to player
+        		if (mob.getTarget() instanceof Player player)
+        			cap.addHatredWithReason(player, BefriendableAddHatredReason.SET_TARGET);	   
 			});
 		}
 		
 	}
-	
-	/**
-	 * Final action after handling all setting target events.
-	 */
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onFinalizeSetTarget(LivingSetAttackTargetEvent event)
-	{
-		@SuppressWarnings("deprecation")
-		LivingEntity target = event.getTarget();
-        // Handle befriendable mobs //
-        if (event.getEntity() instanceof Mob mob && target instanceof Player player)
-        {
-        	mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
-        	{
-        		// Add hatred only when 
-        		if (mob.getTarget() == player)
-        			cap.addHatredWithReason(player, BefriendableAddHatredReason.SET_TARGET);	   
-        	});
-        }
-        // Handle befriendable mobs end //
-	}
-	
+
 	@SubscribeEvent
 	public static void onLivingDeath(LivingDeathEvent event) {
 		if (event.isCanceled())
@@ -472,12 +454,21 @@ public class EntityEvents
 			});
 			if (event.getEntity() instanceof Mob mob)
 			{
-				// update befriendable mob timers
+				// update befriendable mobs
 				if (!(mob instanceof IBefriendedMob))
 				{
 					mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
 					{
+						// Timers
 						l.updateTimers();
+						// AlwaysHostile feature
+						if (l.getAlwaysHostileTo() != null)
+						{
+							Entity target = EntityHelper.getIfCanSee(l.getAlwaysHostileTo(), mob);
+							if (target != null && target instanceof LivingEntity targetLiving)
+								mob.setTarget(targetLiving);
+						}
+						// Befriending handler tick
 						BefriendingTypeRegistry.getHandler((EntityType<Mob>) (mob.getType())).serverTick(mob);
 					});
 				}
