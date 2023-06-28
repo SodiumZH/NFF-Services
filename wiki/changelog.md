@@ -14,13 +14,13 @@ Added preset features in `CBefriendableMob`:	(For details see source file)
 
 ​	-- `isForcePersistent` and `setForcePersistent`  
 
-Some minor internal changes.
-
 Adjusted befriendable mob hatred mechanism: 
 
   -- Added `BefriendableAddHatredReason.HIT` reason, indicating that the player hit the mob but didn't cause damage.
 
   -- If the damage player given to the mob is less than 0.1, the reason will be `HIT` instead of `ATTACKED`.
+
+Fixed Mob Respawner item entities vanishing in fire and lava.
 
 ### 0.1.7
 
