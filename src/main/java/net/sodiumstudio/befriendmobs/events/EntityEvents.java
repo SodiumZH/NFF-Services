@@ -19,7 +19,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -146,11 +145,11 @@ public class EntityEvents
 		event.setCancellationResult(result.get());
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	/*@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingChangeTarget_Lowest(LivingChangeTargetEvent event)
 	{
 		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
-		if (!event.getEntity().level.isClientSide)
+		/*if (!event.getEntity().level.isClientSide)
 		{
 			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
 			{
@@ -163,7 +162,7 @@ public class EntityEvents
 					event.setCanceled(true);
 			});
 		}
-	}
+	}*/
 	
 	@SubscribeEvent
 	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)

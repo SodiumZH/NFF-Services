@@ -88,6 +88,26 @@ Separated from DWMG mod.
 
 ## 1.18.2
 
+### 0.0.8
+
+Added a serializable `CompoundTag` to `CBefriendedMobTempData`.
+
+Added `BaubleItem` of which the description text on hovering can be customized on registration.
+
+Added preset features in `CBefriendableMob`:	(For details see source file)
+
+​	-- `getAlwaysHostileTo` and `setAlwaysHostileTo` 
+
+​	-- `isForcePersistent` and `setForcePersistent`  
+
+Adjusted befriendable mob hatred mechanism: 
+
+  -- Added `BefriendableAddHatredReason.HIT` reason, indicating that the player hit the mob but didn't cause damage.
+
+  -- If the damage player given to the mob is less than 0.1, the reason will be `HIT` instead of `ATTACKED`.
+
+Fixed Mob Respawner item entities vanishing in fire and lava.
+
 ### 0.0.7
 
 Removed deprecated `onInteraction` and `onInteractionShift` override in `AbstractBefriendedCreeper` which blocks the ` mobInteract` method.

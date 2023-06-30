@@ -6,7 +6,6 @@ import java.util.HashMap;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.util.InfoHelper;
 
