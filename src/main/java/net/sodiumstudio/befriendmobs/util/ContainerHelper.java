@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import net.sodiumstudio.befriendmobs.util.containers.MapPair;
+
 public class ContainerHelper
 {
 	// Remove all elements fulfilling a condition from a set
@@ -105,5 +107,62 @@ public class ContainerHelper
 			list.add(obj);
 		}
 		return list;
+	}
+	
+	/**
+	 * Get a mutable list (ArrayList) of given values.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> listOf(T... values)
+	{
+		List<T> list = new ArrayList<T>(values.length * 2);
+		for (T t: values)
+		{
+			list.add(t);
+		}
+		return list;
+	}
+	
+	/**
+	 * Get a mutable set (HashSet) of given values.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Set<T> setOf(T... values)
+	{
+		Set<T> set = new HashSet<T>();
+		for (T t: values)
+		{
+			set.add(t);
+		}
+		return set;
+	}
+	
+	/**
+	 * Get a mutable map (HashMap) of given values.
+	 */
+	public static <T, U> Map<T, U> mapOf(List<T> keyList, List<U> valueList)
+	{
+		HashMap<T, U> map = new HashMap<T, U>();
+		if (keyList.size() != valueList.size())
+			throw new IllegalArgumentException("keyList and valueList length not same.");
+		for (int i = 0; i < keyList.size(); ++i)
+		{
+			map.put(keyList.get(i), valueList.get(i));
+		}
+		return map;
+	}
+	
+	/**
+	 * Get a mutable map (HashMap) of given values.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T, U> Map<T, U> mapOf(MapPair<T, U>... entries)
+	{
+		HashMap<T, U> map = new HashMap<T, U>();
+		for (MapPair<T, U> entry: entries)
+		{
+			map.put(entry.getK(), entry.getV());
+		}
+		return map;
 	}
 }

@@ -2,6 +2,8 @@ package net.sodiumstudio.befriendmobs.item.baublesystem;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -10,10 +12,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.util.ItemHelper;
+import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
 import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
 
 public abstract class BaubleHandler {
-
+	
+	public static final Predicate<IBaubleHolder> ALWAYS = (m) -> true;
+	
 	// NOT IMPLEMENTED
 	//public boolean shouldPopOutIfItemNotAccepted = true;
 	
@@ -23,7 +29,7 @@ public abstract class BaubleHandler {
 	 */
 	@Deprecated
 	@DontOverride
-	public HashSet<Item> getItemsAccepted(String key)
+	public Set<Item> getItemsAccepted(String key)
 	{
 		return new HashSet<Item>();
 	}
@@ -32,17 +38,38 @@ public abstract class BaubleHandler {
 	 * Get item types the bauble slot should accept. 
 	 * The predicate as value is the additional condition for accepting the item. Use {@code null} for always true.
 	 * If whether a slot should accept an item cannot be indicated as a map, override isAccepted() instead.
+	 * <p>WARNING: DO NOT override this method. Override {@link BaubleHandler#getItemKeysAccepted} instead for item declaration.
 	 */
-	public abstract HashMap<Item, Predicate<IBaubleHolder>> getItemsAccepted(String key, IBaubleHolder mob);
-		/*HashMap<Item, Predicate<IBaubleHolder>> map = new HashMap<Item, Predicate<IBaubleHolder>>();
-		// TODO: remove
-		for (Item item: getItemsAccepted(key))
+	@DontOverride
+	public Map<Item, Predicate<IBaubleHolder>> getItemsAccepted(String slotKey, IBaubleHolder mob)
+	{
+		HashMap<Item, Predicate<IBaubleHolder>> map = new HashMap<Item, Predicate<IBaubleHolder>>();
+		Map<String , Predicate<IBaubleHolder>> keyMap = getItemKeysAccepted(slotKey, mob);
+		for (String str: keyMap.keySet())
 		{
-			map.put(item, null);
+			Item item = ItemHelper.getItem(str);
+			if (item != null)
+			{
+				map.put(item, keyMap.get(str));
+			}
 		}
-		
-		*/
+		return map;
+	}
+	
 
+	/**
+	 * Get item types the bauble slot should accept. 
+	 * <p> The Strings as keys are the registry name of items, using "domain:name" format.
+	 * <p> The predicate as value is the additional condition for accepting the item. Use {@code null} for always true.
+	 * <p> If whether a slot should accept an item cannot be indicated as a map, override isAccepted() instead.
+	 * <p> WARNING: Don't call this manually because some keys may belong to other mods that may not be loaded. 
+	 * Call {@link BaubleHandler#getItemAccepted} instead which will automatically ignore invalid keys.
+	 * @param key The bauble slot key.
+	 * @return A HashMap with item registries as keys and mob predicates as values.
+	 */
+	@DontCallManually
+	public abstract Map<String , Predicate<IBaubleHolder>> getItemKeysAccepted(String slotKey, IBaubleHolder mob);
+	
 	/**
 	 * @deprecated use mob sensitive version instead.
 	 */
@@ -90,6 +117,7 @@ public abstract class BaubleHandler {
 	* do not call it anywhere else unless you know what you're doing.
 	*/
 	@DontOverride
+	@DontCallManually
 	public void tick(IBaubleHolder holder)
 	{
 		LivingEntity living = holder.getLiving();
@@ -123,7 +151,7 @@ public abstract class BaubleHandler {
 	}
 	
 	
-	// Return true if an item slot should be refreshed every tick
+	/** Whether an item slot should be refreshed every tick */
 	public boolean shouldAlwaysRefresh(String slotKey, IBaubleHolder holder)
 	{
 		return false;

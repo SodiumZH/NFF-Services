@@ -15,9 +15,10 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+// TODO: Bauble Registry
 public class BaubleItem extends Item
 {
-
+	
 	protected List<MutableComponent> descriptions = new ArrayList<MutableComponent>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	
@@ -62,4 +63,5 @@ public class BaubleItem extends Item
 			list.add(c);
 		}
 	}
+
 }
