@@ -6,7 +6,7 @@
 
 Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsAcceptable`, using item registry keys instead of objects. Previous `BaubleHandler#getItemsAcceptable` still works but are not recommended to override.
 
-
+Changed package path: `net.sodiumstudio.befriendmobs.util` => `net.sodiumstudio.nautils`.
 
 ### 0.1.8
 
