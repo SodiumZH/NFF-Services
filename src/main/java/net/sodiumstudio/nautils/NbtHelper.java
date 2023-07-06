@@ -1,7 +1,10 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -252,6 +255,79 @@ public class NbtHelper {
 			nbt.put(newKey, nbt.get(oldKey));
 			nbt.remove(oldKey);
 		}
+	}
+	
+	/**
+	 * Save a map into a compound tag.
+	 * The map key must be serialized into string.
+	 * @param <K> Map key type.
+	 * @param <V> Map value type.
+	 * @param keySerializer Function casting keys to string.
+	 * @param valueSerializer Function casting values to tag.
+	 * @return Result compound tag.
+	 */
+	public static <K, V> CompoundTag saveMap(Map<K, V> map, Function<K, String> keySerializer, Function<V, Tag> valueSerializer)
+	{
+		CompoundTag out = new CompoundTag();
+		for (K k: map.keySet())
+		{
+			out.put(keySerializer.apply(k), valueSerializer.apply(map.get(k)));
+		}
+		return out;
+	}
+	
+	/**
+	 * Read a map from a compound tag in which the keys are sub-tag keys and values are sub-tags.
+	 * @param <K> Map key type.
+	 * @param <V> Map value type.
+	 * @param readInto Map that the values will be read into. It will be cleared before reading.
+	 * @param keyDeserializer Function casting sub-tag key string to map key object.
+	 * @param valueDeserializer Function casting sub-tag to map value object.
+	 * @param keyNonnull If true, the entry will be ignored if the casted map key is null.
+	 * @param valueNonnull If true, the entry will be ignored if the casted map value is null.
+	 * @return Result map. (HashMap)
+	 */
+	public static <K, V> void readMap(CompoundTag tag, Map<K, V> readInto, Function<String, K> keyDeserializer, Function<Tag, V> valueDeserializer, boolean keyNonnull, boolean valueNonnull)
+	{
+		readInto.clear();
+		for (String str: tag.getAllKeys())
+		{
+			K key = keyDeserializer.apply(str);
+			V value = valueDeserializer.apply(tag.get(str));
+			if ((!keyNonnull || key != null) && (!valueNonnull || value != null))
+				readInto.put(key, value);
+		}
+	}
+
+	/**
+	 * Read a map from a compound tag in which the keys are sub-tag keys and values are sub-tags.
+	 * @param <K> Map key type.
+	 * @param <V> Map value type.
+	 * @param keyDeserializer Function casting sub-tag key string to map key object.
+	 * @param valueDeserializer Function casting sub-tag to map value object.
+	 * @param keyNonnull If true, the entry will be ignored if the casted map key is null.
+	 * @param valueNonnull If true, the entry will be ignored if the casted map value is null.
+	 * @return Result map. (HashMap)
+	 */
+	public static <K, V> Map<K, V> readMap(CompoundTag tag, Function<String, K> keyDeserializer, Function<Tag, V> valueDeserializer, boolean keyNonnull, boolean valueNonnull)
+	{
+		Map<K, V> map = new HashMap<K, V>();
+		readMap(tag, map, keyDeserializer, valueDeserializer, keyNonnull, valueNonnull);
+		return map;
+	}
+	
+	/**
+	 * Read a map from a compound tag in which the keys are sub-tag keys and values are sub-tags.
+	 * If casted map key is null, the entry will be ignored. Values don't perform null check.
+	 * @param <K> Map key type.
+	 * @param <V> Map value type.
+	 * @param keyDeserializer Function casting sub-tag key string to map key object.
+	 * @param valueDeserializer Function casting sub-tag to map value object.
+	 * @return Result map. (HashMap)
+	 */
+	public static <K, V> Map<K, V> readMap(CompoundTag tag, Function<String, K> keyDeserializer, Function<Tag, V> valueDeserializer)
+	{
+		return readMap(tag, keyDeserializer, valueDeserializer, true, false);
 	}
 	
 }

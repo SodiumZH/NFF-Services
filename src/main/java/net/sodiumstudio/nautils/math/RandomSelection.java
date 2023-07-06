@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.math;
+package net.sodiumstudio.nautils.math;
 
 import java.util.ArrayList;
 import java.util.Random;

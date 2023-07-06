@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 
 /**

@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;

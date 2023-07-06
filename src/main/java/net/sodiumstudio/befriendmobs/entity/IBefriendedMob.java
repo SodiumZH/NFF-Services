@@ -33,9 +33,9 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
-import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
-import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
+import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 public interface IBefriendedMob extends ContainerListener  {
 

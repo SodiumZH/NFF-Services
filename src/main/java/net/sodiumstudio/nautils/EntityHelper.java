@@ -1,14 +1,18 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Comparators;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -42,6 +46,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -660,4 +665,19 @@ public class EntityHelper
 		ReflectHelper.forceSet(mob, Mob.class, "target", newTarget);
 	}
 	
+	@Nullable
+	public static Entity getEntityByUUID(Level level, UUID uuid)
+	{
+		if (level.getPlayerByUUID(uuid) != null)
+			return level.getPlayerByUUID(uuid);
+		@SuppressWarnings("unchecked")
+		Iterable<Entity> entities = ((LevelEntityGetter<Entity>) ReflectHelper.forceInvokeRetVal(level, Level.class, "getEntities")).getAll();
+		for (Entity e: entities)
+		{
+			if (e.getUUID().equals(uuid))
+				return e;
+		}
+		return null;
+	}
+
 }

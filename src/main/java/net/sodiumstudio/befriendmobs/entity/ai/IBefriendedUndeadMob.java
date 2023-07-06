@@ -6,8 +6,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
-import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 /**
  * This is an interface handling sun immunity for undead mobs.

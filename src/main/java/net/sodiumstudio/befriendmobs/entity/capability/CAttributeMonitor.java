@@ -9,9 +9,9 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
-import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
-import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
+import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 // A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor {

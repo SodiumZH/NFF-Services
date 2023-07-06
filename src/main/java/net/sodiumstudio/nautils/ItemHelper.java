@@ -1,9 +1,10 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemHelper
@@ -102,20 +103,36 @@ public class ItemHelper
 	}
 	
 	/**
-	 * Check if an ItemStack is instance of k given item, from item's registry key.
+	 * Check if an ItemStack is instance of a given item, from item's registry key.
 	 */
 	public static boolean is(ItemStack stack, ResourceLocation registryKey)
 	{
 		return stack.is(ForgeRegistries.ITEMS.getValue(registryKey));
 	}
 	
+	/**
+	 * Check if an ItemStack is instance of a given item, from item's registry key string with "domain:name" format.
+	 */
 	public static boolean is(ItemStack stack, String registryKey)
 	{
 		return is(stack, new ResourceLocation(registryKey));
 	}
+	
+	/**
+	 * Check if an ItemStack is instance of a given item, from item's registry key, domain and name.
+	 */
 	public static boolean is(ItemStack stack, String domain, String name)
 	{
 		return is(stack, new ResourceLocation(domain, name));
+	}
+	
+	/**
+	 * Get item stack enchantment level.
+	 * For syncing API among different MC versions
+	 */
+	public static int getItemEnchantmentLevel(ItemStack stack, Enchantment enchantment)
+	{
+		return stack.getEnchantmentLevel(enchantment);
 	}
 	
 }

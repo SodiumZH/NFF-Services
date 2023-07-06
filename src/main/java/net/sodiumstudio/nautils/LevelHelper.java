@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
