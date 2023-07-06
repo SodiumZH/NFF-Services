@@ -22,8 +22,8 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedAmphibious;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
-import net.sodiumstudio.befriendmobs.util.LevelHelper;
-import net.sodiumstudio.befriendmobs.util.exceptions.MissingInterfaceException;
+import net.sodiumstudio.nautils.LevelHelper;
+import net.sodiumstudio.nautils.exceptions.MissingInterfaceException;
 
 /** Adjusted from vanilla FollowOwnerGoal for TameableAnimal.
  * <p>This goal is for non-flying mobs.

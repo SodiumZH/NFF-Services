@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
-import net.sodiumstudio.befriendmobs.util.MiscUtil;
+import net.sodiumstudio.nautils.MiscUtil;
 
 @Cancelable
 public class BefriendableAddHatredEvent extends Event

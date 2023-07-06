@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.exceptions;
+package net.sodiumstudio.nautils.exceptions;
 
 public class AssertionFailedException extends Exception
 {

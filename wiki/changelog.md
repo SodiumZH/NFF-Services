@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.9
+
+Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsAcceptable`, using item registry keys instead of objects. Previous `BaubleHandler#getItemsAcceptable` still works but are not recommended to override.
+
+
+
 ### 0.1.8
 
 Added a serializable `CompoundTag` to `CBefriendedMobTempData`.

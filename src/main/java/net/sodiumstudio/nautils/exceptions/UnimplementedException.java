@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.exceptions;
+package net.sodiumstudio.nautils.exceptions;
 
 // Exception thrown on calling unimplemented code.
 public class UnimplementedException extends RuntimeException {

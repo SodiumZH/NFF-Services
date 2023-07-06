@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;

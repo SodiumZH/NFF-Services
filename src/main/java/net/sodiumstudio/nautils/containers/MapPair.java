@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.containers;
+package net.sodiumstudio.nautils.containers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

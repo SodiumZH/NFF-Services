@@ -9,7 +9,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
+import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
 public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 

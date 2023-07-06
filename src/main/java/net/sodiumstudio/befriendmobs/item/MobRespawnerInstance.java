@@ -18,9 +18,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
-import net.sodiumstudio.befriendmobs.util.NbtHelper;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.InfoHelper;
+import net.sodiumstudio.nautils.NbtHelper;
 
 /**
  * Wrapper of item stack of mob respawner

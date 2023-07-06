@@ -24,8 +24,8 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingType
 import net.sodiumstudio.befriendmobs.events.BefriendableAddHatredEvent;
 import net.sodiumstudio.befriendmobs.events.EntityEvents;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.NbtHelper;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
+import net.sodiumstudio.nautils.NbtHelper;
+import net.sodiumstudio.nautils.Wrapped;
 
 public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 

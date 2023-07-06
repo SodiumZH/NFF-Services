@@ -1,12 +1,11 @@
-package net.sodiumstudio.befriendmobs.util.debug;
+package net.sodiumstudio.nautils.debug;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
-import net.sodiumstudio.befriendmobs.util.MiscUtil;
-import net.sodiumstudio.befriendmobs.util.exceptions.AssertionFailedException;
+import net.sodiumstudio.nautils.InfoHelper;
+import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.exceptions.AssertionFailedException;
 
 // All debug output should work only in development.
 public class Debug {

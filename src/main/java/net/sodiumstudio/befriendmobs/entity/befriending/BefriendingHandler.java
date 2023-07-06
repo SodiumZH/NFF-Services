@@ -13,9 +13,9 @@ import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendingInitPacket;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.NetworkHelper;
-import net.sodiumstudio.befriendmobs.util.debug.Debug;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.NetworkHelper;
+import net.sodiumstudio.nautils.debug.Debug;
 
 public abstract class BefriendingHandler 
 {

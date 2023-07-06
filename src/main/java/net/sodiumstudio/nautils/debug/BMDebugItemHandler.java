@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.debug;
+package net.sodiumstudio.nautils.debug;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,10 +12,10 @@ import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
-import net.sodiumstudio.befriendmobs.util.MiscUtil;
-import net.sodiumstudio.befriendmobs.util.exceptions.UnimplementedException;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.InfoHelper;
+import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
 public class BMDebugItemHandler
 {

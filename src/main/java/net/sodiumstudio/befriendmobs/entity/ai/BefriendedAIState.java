@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.MutableComponent;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
+import net.sodiumstudio.nautils.InfoHelper;
 
 public class BefriendedAIState {
 	

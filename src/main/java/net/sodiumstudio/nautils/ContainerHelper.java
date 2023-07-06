@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util;
+package net.sodiumstudio.nautils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-import net.sodiumstudio.befriendmobs.util.containers.MapPair;
+import net.sodiumstudio.nautils.containers.MapPair;
 
 public class ContainerHelper
 {
@@ -164,5 +165,29 @@ public class ContainerHelper
 			map.put(entry.getK(), entry.getV());
 		}
 		return map;
+	}
+	
+	
+	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull, boolean valueNonnull)
+	{
+		Map<k, v> newMap = new HashMap<k, v>();
+		for (K oldKey: map.keySet())
+		{
+			k newKey = keyCast.apply(oldKey);
+			v newVal = valueCast.apply(map.get(oldKey));
+			if ((newKey != null || !keyNonnull) && (newVal != null || !valueNonnull))
+				newMap.put(keyCast.apply(oldKey), valueCast.apply(null));
+		}
+		return newMap;
+	}
+	
+	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull)
+	{
+		return castMap(map, keyCast, valueCast, keyNonnull, false);
+	}
+			
+	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast)
+	{
+		return castMap(map, keyCast, valueCast, true);
 	}
 }

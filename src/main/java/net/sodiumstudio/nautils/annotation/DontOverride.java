@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.annotation;
+package net.sodiumstudio.nautils.annotation;
 
 import static java.lang.annotation.ElementType.METHOD;
 

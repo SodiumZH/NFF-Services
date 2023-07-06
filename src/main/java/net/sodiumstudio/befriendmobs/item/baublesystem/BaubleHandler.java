@@ -12,9 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.util.ItemHelper;
-import net.sodiumstudio.befriendmobs.util.annotation.DontCallManually;
-import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
+import net.sodiumstudio.nautils.ItemHelper;
+import net.sodiumstudio.nautils.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 public abstract class BaubleHandler {
 	

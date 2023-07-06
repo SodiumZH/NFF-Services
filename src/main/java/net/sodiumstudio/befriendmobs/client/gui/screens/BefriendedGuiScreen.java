@@ -14,8 +14,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
-import net.sodiumstudio.befriendmobs.util.InfoHelper;
-import net.sodiumstudio.befriendmobs.util.math.IntVec2;
+import net.sodiumstudio.nautils.InfoHelper;
+import net.sodiumstudio.nautils.math.IntVec2;
 
 public abstract class BefriendedGuiScreen extends AbstractContainerScreen<BefriendedInventoryMenu> {
 

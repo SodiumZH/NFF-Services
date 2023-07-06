@@ -3,7 +3,7 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.util.annotation.DontOverride;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 public interface IBefriendedGoal
 {

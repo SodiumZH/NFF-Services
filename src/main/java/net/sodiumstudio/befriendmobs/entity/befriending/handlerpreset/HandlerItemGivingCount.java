@@ -9,10 +9,10 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractA
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.MiscUtil;
-import net.sodiumstudio.befriendmobs.util.NbtHelper;
-import net.sodiumstudio.befriendmobs.util.debug.Debug;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.NbtHelper;
+import net.sodiumstudio.nautils.debug.Debug;
 
 /**
  * @author SodiumZH

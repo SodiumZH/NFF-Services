@@ -11,8 +11,8 @@ import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.Wrapped;
 
 // Handle Item, Item Stack and Item Entity events
 @SuppressWarnings("removal")

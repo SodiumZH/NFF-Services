@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.util.math;
+package net.sodiumstudio.nautils.math;
 
 public class IntVec2 
 {

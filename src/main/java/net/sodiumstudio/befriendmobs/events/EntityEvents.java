@@ -50,10 +50,10 @@ import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.befriendmobs.registry.BefMobItems;
-import net.sodiumstudio.befriendmobs.util.EntityHelper;
-import net.sodiumstudio.befriendmobs.util.TagHelper;
-import net.sodiumstudio.befriendmobs.util.Wrapped;
-import net.sodiumstudio.befriendmobs.util.debug.BMDebugItemHandler;
+import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.TagHelper;
+import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.debug.BMDebugItemHandler;
 
 // TODO: change modid after isolation
 @SuppressWarnings("removal")
