@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 
 public class CBefriendableMobProvider implements ICapabilitySerializable<CompoundTag> {
@@ -15,6 +16,7 @@ public class CBefriendableMobProvider implements ICapabilitySerializable<Compoun
 	public CBefriendableMobProvider(Mob owner)
 	{
 		((CBefriendableMobImpl)capability).setOwner(owner);
+		BefriendingTypeRegistry.getHandler(owner).initCap(capability);
 	}
 	
 	@Override

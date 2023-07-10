@@ -1,9 +1,13 @@
 package net.sodiumstudio.befriendmobs.entity.befriending;
 
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -16,6 +20,8 @@ import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NetworkHelper;
 import net.sodiumstudio.nautils.debug.Debug;
+import net.sodiumstudio.nautils.math.RandomSelection;
+import net.sodiumstudio.nautils.math.RndUtil;
 
 public abstract class BefriendingHandler 
 {
@@ -182,4 +188,37 @@ public abstract class BefriendingHandler
 		}
 	}
 
+	// Utilities
+
+	public static final double rndDouble(double min, double max)
+	{
+		return RndUtil.rndRangedDouble(min, max);
+	}
+	
+	public static final float rndFloat(float min, float max)
+	{
+		return RndUtil.rndRangedFloat(min, max);
+	}
+	
+	public static final Supplier<Double> rndDoubleSupplier(double min, double max)
+	{
+		return () -> rndDouble(min, max);
+	}
+	
+	public static final Supplier<Float> rndFloatSupplier(float min, float max)
+	{
+		return () -> rndFloat(min, max);
+	}
+	
+	public static final <T> T getFromProbabilityTable(Map<T, Double> probabilityTable, T defaultValue)
+	{
+		RandomSelection<T> rs = RandomSelection.create(defaultValue);
+		for (T t: probabilityTable.keySet())
+		{
+			rs.add(t, probabilityTable.get(t));
+		}
+		return rs.getValue();
+	}
+	
+	
 }

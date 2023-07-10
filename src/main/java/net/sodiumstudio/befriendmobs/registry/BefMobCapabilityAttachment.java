@@ -54,7 +54,6 @@ public class BefMobCapabilityAttachment {
 					// Initialize capability (defined in handlers)
 					mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
 					{
-						BefriendingTypeRegistry.getHandler((EntityType<? extends Mob>) mob.getType()).initCap(l);
 						BefriendableMobRegistry.put(mob);
 					});
 				}

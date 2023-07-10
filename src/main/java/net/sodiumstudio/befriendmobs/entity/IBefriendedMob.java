@@ -2,7 +2,9 @@ package net.sodiumstudio.befriendmobs.entity;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -434,13 +436,13 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
-	public default HashMap<Item, Float> getHealingItems()
+	public default Map<Item, Float> getHealingItems()
 	{
 		return new HashMap<Item, Float>();
 	}
 	
 	// Specify which items in the map above don't consume after usage
-	public default HashSet<Item> getNonconsumingHealingItems()
+	public default Set<Item> getNonconsumingHealingItems()
 	{	
 		return new HashSet<Item>();
 	}

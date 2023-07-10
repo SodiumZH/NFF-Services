@@ -3,6 +3,10 @@ package net.sodiumstudio.nautils.containers;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * A key-value pair for maps.
+ * It's similar to {#link java.util.Map#Entry} but supporting null values.
+ */
 public class MapPair <K, V>
 {
 	@Nonnull
