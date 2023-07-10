@@ -8,6 +8,8 @@ Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsA
 
 Changed package path: `net.sodiumstudio.befriendmobs.util` => `net.sodiumstudio.nautils`.
 
+Fixed `BefriendingHandler#initCap` not working.
+
 ### 0.1.8
 
 Added a serializable `CompoundTag` to `CBefriendedMobTempData`.

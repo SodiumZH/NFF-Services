@@ -1,12 +1,15 @@
 package net.sodiumstudio.nautils;
 
+import java.util.HashSet;
 import java.util.function.Predicate;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 
@@ -129,5 +132,98 @@ public class AiHelper
 			}
 		}
 		return null;
-	}	
+	}
+	
+	/**
+	 * Add a targeting condition to a hostile target goal.
+	 * The target will be required to fulfill BOTH the old and new conditions.
+	 */
+	public static void addAndTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
+	{
+		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
+		@SuppressWarnings("unchecked")
+		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
+		if (oldCond != null)
+			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.and(condition));
+		else
+			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", condition);
+	}
+	
+	/**
+	 * Add a targeting condition to a hostile target goal.
+	 * The target will be required to fulfill EITHER the old or new condition.
+	 * Warning: if there isn't a previously existing check, it will not work because the old condition is always true.
+	 */
+	public static void addOrTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
+	{
+		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
+		@SuppressWarnings("unchecked")
+		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
+		if (oldCond != null)
+			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.or(condition));
+	}
+	
+	/**
+	 * Insert a goal at given priority, and postpone all goals at the same or lower priority. 
+	 * <p> Note: this is for {@code goalSelector}. For {@code targetSelector}, use {@link AiHelper#insertTargetGoal}.
+	 * <p> Note: this method is more costly than {@link GoalSelector#addGoal}. 
+	 * If you're sure there's no colliding priority, use {@code mob.goalSelector.addGoal()} instead.
+	 */
+	public static void insertGoal(Mob mob, Goal goal, int priority)
+	{
+		boolean needsPostpone = false;
+		HashSet<WrappedGoal> toPostpone = new HashSet<WrappedGoal>();
+		for (WrappedGoal wg: mob.goalSelector.getAvailableGoals())
+		{
+			if (wg.getPriority() == priority)
+			{
+				needsPostpone = true;
+			}
+			if (wg.getPriority() >= priority)
+			{
+				toPostpone.add(wg);
+			}
+		}
+		mob.goalSelector.addGoal(priority, goal);
+		if (!needsPostpone)
+			return;
+		for (WrappedGoal wg: toPostpone)
+		{
+			int oldPriority = wg.getPriority();
+			mob.goalSelector.removeGoal(wg.getGoal());
+			mob.goalSelector.addGoal(oldPriority + 1, wg.getGoal());
+		}
+	}
+	
+	/**
+	 * Insert a target goal at given priority, and if needed, postpone all goals at the same or lower priority. 
+	 * <p> Note: this is for {@code targetSelector}. For {@code goalSelector}, use {@link AiHelper#insertGoal}.
+	 * <p> Note: this method is more costly than {@link GoalSelector#addGoal}. 
+	 * If you're sure there's no colliding priority, use {@code mob.targetSelector.addGoal()} instead.
+	 */
+	public static void insertTargetGoal(Mob mob, TargetGoal goal, int priority)
+	{
+		boolean needsPostpone = false;
+		HashSet<WrappedGoal> toPostpone = new HashSet<WrappedGoal>();
+		for (WrappedGoal wg: mob.targetSelector.getAvailableGoals())
+		{
+			if (wg.getPriority() == priority)
+			{
+				needsPostpone = true;
+			}
+			if (wg.getPriority() >= priority)
+			{
+				toPostpone.add(wg);
+			}
+		}
+		mob.targetSelector.addGoal(priority, goal);
+		if (!needsPostpone)
+			return;
+		for (WrappedGoal wg: toPostpone)
+		{
+			int oldPriority = wg.getPriority();
+			mob.targetSelector.removeGoal(wg.getGoal());
+			mob.targetSelector.addGoal(oldPriority + 1, wg.getGoal());
+		}
+	}
 }

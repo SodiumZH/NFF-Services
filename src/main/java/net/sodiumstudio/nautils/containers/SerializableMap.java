@@ -1,6 +1,7 @@
 package net.sodiumstudio.nautils.containers;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import net.minecraft.nbt.CompoundTag;
@@ -31,6 +32,16 @@ public class SerializableMap<K, V> extends HashMap<K, V> implements INBTSerializ
 		this.valueSerializer = valueSerializer;
 		this.keyDeserializer = keyDeserializer;
 		this.valueDeserializer = valueDeserializer;
+	}
+	
+	public SerializableMap<K, V> copyFrom(Map<K, V> other)
+	{
+		this.clear();
+		for(K k: other.keySet())
+		{
+			this.put(k, other.get(k));
+		}
+		return this;
 	}
 	
 	public SerializableMap<K, V> add(K key, V value)

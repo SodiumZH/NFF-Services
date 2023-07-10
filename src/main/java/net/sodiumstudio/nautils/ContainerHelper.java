@@ -1,18 +1,26 @@
 package net.sodiumstudio.nautils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import net.sodiumstudio.nautils.containers.MapPair;
 
+/**
+ * Utility static methods for containers (List, Set, Map, etc).
+ */
 public class ContainerHelper
 {
+	
+	protected static Random rnd = new Random();
+	
 	// Remove all elements fulfilling a condition from a set
 	public static <T> void removeFromSet(Set<T> set, Predicate<T> condition)
 	{
@@ -86,9 +94,9 @@ public class ContainerHelper
 	 * Transform an iterable to list (array list).
 	 * @param assumedSize Size assumption for list initial capacity.
 	 */
-	public static <T> List<T> iterableToList(Iterable<T> iterable, int assumedSize)
+	public static <T> ArrayList<T> iterableToList(Iterable<T> iterable, int assumedSize)
 	{
-		List<T> list = new ArrayList<T>(assumedSize * 2);
+		ArrayList<T> list = new ArrayList<T>(assumedSize * 2);
 		for (T obj: iterable)
 		{
 			list.add(obj);
@@ -100,9 +108,9 @@ public class ContainerHelper
 	 * Transform an iterable to list (array list).
 	 * @param assumedSize Size assumption for list initial capacity.
 	 */
-	public static <T> List<T> iterableToList(Iterable<T> iterable)
+	public static <T> ArrayList<T> iterableToList(Iterable<T> iterable)
 	{
-		List<T> list = new ArrayList<T>();
+		ArrayList<T> list = new ArrayList<T>();
 		for (T obj: iterable)
 		{
 			list.add(obj);
@@ -114,9 +122,9 @@ public class ContainerHelper
 	 * Get a mutable list (ArrayList) of given values.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listOf(T... values)
+	public static <T> ArrayList<T> listOf(T... values)
 	{
-		List<T> list = new ArrayList<T>(values.length * 2);
+		ArrayList<T> list = new ArrayList<T>(values.length * 2);
 		for (T t: values)
 		{
 			list.add(t);
@@ -128,9 +136,9 @@ public class ContainerHelper
 	 * Get a mutable set (HashSet) of given values.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Set<T> setOf(T... values)
+	public static <T> HashSet<T> setOf(T... values)
 	{
-		Set<T> set = new HashSet<T>();
+		HashSet<T> set = new HashSet<T>();
 		for (T t: values)
 		{
 			set.add(t);
@@ -141,7 +149,7 @@ public class ContainerHelper
 	/**
 	 * Get a mutable map (HashMap) of given values.
 	 */
-	public static <T, U> Map<T, U> mapOf(List<T> keyList, List<U> valueList)
+	public static <T, U> HashMap<T, U> mapOf(List<T> keyList, List<U> valueList)
 	{
 		HashMap<T, U> map = new HashMap<T, U>();
 		if (keyList.size() != valueList.size())
@@ -157,7 +165,7 @@ public class ContainerHelper
 	 * Get a mutable map (HashMap) of given values.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, U> Map<T, U> mapOf(MapPair<T, U>... entries)
+	public static <T, U> HashMap<T, U> mapOf(MapPair<T, U>... entries)
 	{
 		HashMap<T, U> map = new HashMap<T, U>();
 		for (MapPair<T, U> entry: entries)
@@ -167,10 +175,22 @@ public class ContainerHelper
 		return map;
 	}
 	
-	
-	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull, boolean valueNonnull)
+	/**
+	 * Cast all element pairs from a map to another.
+	 * @param <K> Key type of old map.
+	 * @param <V> Value type of old map.
+	 * @param <k> Key type of new map.
+	 * @param <v> Value type of new map.
+	 * @param map Old map.
+	 * @param keyCast Function casting map keys.
+	 * @param valueCast Function casting map values.
+	 * @param keyNonnull If true, the new map will ignore a pair if its key is null.
+	 * @param valueNonnull If true, the new map will ignore a pair if its value is null.
+	 * @return Casted new map.
+	 */
+	public static <K, V, k, v> HashMap<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull, boolean valueNonnull)
 	{
-		Map<k, v> newMap = new HashMap<k, v>();
+		HashMap<k, v> newMap = new HashMap<k, v>();
 		for (K oldKey: map.keySet())
 		{
 			k newKey = keyCast.apply(oldKey);
@@ -190,4 +210,30 @@ public class ContainerHelper
 	{
 		return castMap(map, keyCast, valueCast, true);
 	}
+	
+	/**
+	 * Randomly pick an element in a collection
+	 */
+	public static <T> T randomPick(Collection<T> collection)
+	{
+		int r = rnd.nextInt(collection.size());
+		int i = 0;
+		for (T t: collection)
+		{
+			if (i == r)
+				return t;
+			else ++i;
+		}
+		throw new RuntimeException();
+	}
+	
+	/**
+	 * Randomly pick a key-value pair in a map
+	 */
+	public static <K, V> MapPair<K, V> randomPick(Map<K, V> map)
+	{
+		K k = randomPick(map.keySet());
+		return MapPair.of(k, map.get(k));
+	}
+	
 }
