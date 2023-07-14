@@ -1,6 +1,8 @@
 package net.sodiumstudio.nautils;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import net.minecraft.server.level.ServerPlayer;
@@ -225,5 +227,25 @@ public class AiHelper
 			mob.targetSelector.removeGoal(wg.getGoal());
 			mob.targetSelector.addGoal(oldPriority + 1, wg.getGoal());
 		}
+	}
+	
+	public static HashMap<Goal, Integer> getGoalsAndPriorities(Mob mob)
+	{
+		HashMap<Goal, Integer> map = new HashMap<Goal, Integer>();
+		for (WrappedGoal wg: mob.goalSelector.getAvailableGoals())
+		{
+			map.put(wg.getGoal(), wg.getPriority());
+		}
+		return map;
+	}
+	
+	public static HashMap<Goal, Integer> getTargetGoalsAndPriorities(Mob mob)
+	{
+		HashMap<Goal, Integer> map = new HashMap<Goal, Integer>();
+		for (WrappedGoal wg: mob.targetSelector.getAvailableGoals())
+		{
+			map.put(wg.getGoal(), wg.getPriority());
+		}
+		return map;
 	}
 }

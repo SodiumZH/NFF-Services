@@ -119,6 +119,20 @@ public class ContainerHelper
 	}
 	
 	/**
+	 * Transform an iterable to set (HashSet).
+	 * @param assumedSize Size assumption for list initial capacity.
+	 */
+	public static <T> HashSet<T> iterableToSet(Iterable<T> iterable)
+	{
+		HashSet<T> set = new HashSet<T>();
+		for (T obj: iterable)
+		{
+			set.add(obj);
+		}
+		return set;
+	}
+	
+	/**
 	 * Get a mutable list (ArrayList) of given values.
 	 */
 	@SuppressWarnings("unchecked")
