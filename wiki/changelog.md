@@ -8,6 +8,10 @@ Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsA
 
 Changed package path: `net.sodiumstudio.befriendmobs.util` => `net.sodiumstudio.nautils`.
 
+Added some utility functions, mainly in `ContainerHelper` and `TagHelper` .
+
+Added `SerializableMap` and related util functions in `NbtHelper`. 
+
 Fixed `BefriendingHandler#initCap` not working.
 
 ### 0.1.8

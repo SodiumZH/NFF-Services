@@ -1,9 +1,13 @@
 package net.sodiumstudio.nautils;
 
+import java.util.ArrayList;
+import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class LevelHelper
@@ -89,5 +93,16 @@ public class LevelHelper
 	public static int getHeightToGround(Vec3 v, Entity context)
 	{
 		return getHeightToGround(new BlockPos(v), context);
+	}
+	
+	public ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
+	{
+		Wrapped<ArrayList<BlockPos>> wrapped = new Wrapped<>(new ArrayList<>());
+		BlockPos.betweenClosedStream(area).forEach((BlockPos b) -> 
+		{
+			if (filter == null || filter.test(b))
+				wrapped.get().add(new BlockPos(b.getX(), b.getY(), b.getZ()));
+		});
+		return wrapped.get();
 	}
 }
