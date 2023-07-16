@@ -14,7 +14,11 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.sodiumstudio.befriendmobs.BefriendMobs;
 
+/**
+ * Utilities related to mob AI operation.
+ */
 public class AiHelper
 {
 	/**
@@ -51,7 +55,8 @@ public class AiHelper
 		 return false;
 	}
 	
-	// Something is wrong with this function, it works correctly in IDE but not in game
+	/** @deprecated Something is wrong with this function, it works correctly in IDE but not in game */
+	@Deprecated
 	public static boolean isMobHostileToPlayer(Mob test)
 	{
 		// Check if the mob has a NearestAttackableTargetGoal<Player> goal
@@ -140,10 +145,16 @@ public class AiHelper
 	 * Add a targeting condition to a hostile target goal.
 	 * The target will be required to fulfill BOTH the old and new conditions.
 	 */
+	@SuppressWarnings("unchecked")
 	public static void addAndTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
 	{
 		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
-		@SuppressWarnings("unchecked")
+		if (goalCond == null)
+		{
+			Mob mob = (Mob)ReflectHelper.forceGet(goal, TargetGoal.class, "mob", true);
+			NaUtils.LOGGER.error("AiHelper#addAndTargetingCondition: failed to load target conditions. Mob: " + (mob != null ? mob.getName().getString() : "(UNKNOWN)"));
+			return;
+		}	
 		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
 		if (oldCond != null)
 			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.and(condition));
@@ -156,10 +167,16 @@ public class AiHelper
 	 * The target will be required to fulfill EITHER the old or new condition.
 	 * Warning: if there isn't a previously existing check, it will not work because the old condition is always true.
 	 */
+	@SuppressWarnings("unchecked")
 	public static void addOrTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
 	{
 		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
-		@SuppressWarnings("unchecked")
+		if (goalCond == null)
+		{
+			Mob mob = (Mob)ReflectHelper.forceGet(goal, TargetGoal.class, "mob", true);
+			NaUtils.LOGGER.error("AiHelper#addOrTargetingCondition: failed to load target conditions. Mob: " + (mob != null ? mob.getName().getString() : "(UNKNOWN)"));
+			return;
+		}	
 		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
 		if (oldCond != null)
 			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.or(condition));
