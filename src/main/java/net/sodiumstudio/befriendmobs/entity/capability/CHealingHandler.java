@@ -40,7 +40,7 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 			{
 				if (consume)
 				{
-					ItemHelper.consumeOne(stack);
+					stack.shrink(1);
 				}
 				getOwner().heal(event.healValue);
 				if (event.sendDefaultParticles)

@@ -12,7 +12,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandler;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 
-public class BefMobCapabilities {
+public class BMCaps {
 
 	// Functional caps
 	public static Capability<CBefriendableMob> CAP_BEFRIENDABLE_MOB = CapabilityManager.get(new CapabilityToken<>(){});

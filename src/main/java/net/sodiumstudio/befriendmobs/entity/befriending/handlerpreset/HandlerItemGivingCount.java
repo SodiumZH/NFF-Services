@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.MiscUtil;
 import net.sodiumstudio.nautils.NbtHelper;
@@ -127,7 +127,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 	@Override
 	public void serverTick(Mob mob)
 	{
-		mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
+		mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
 			/*for (String key: l.getNbt().getAllKeys())
 			{
 
@@ -146,7 +146,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 	
 	@Override
 	public void interrupt(Player player, Mob mob, boolean isQuiet) {
-		mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
+		mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
 		{
 			if (l.hasPlayerData(player, "already_given") 
 					&& l.getPlayerDataInt(player, "already_given") > 0

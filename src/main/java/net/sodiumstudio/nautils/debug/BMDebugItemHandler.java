@@ -10,8 +10,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.registry.BefMobItems;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.InfoHelper;
 import net.sodiumstudio.nautils.MiscUtil;
@@ -23,7 +23,7 @@ public class BMDebugItemHandler
 	@SuppressWarnings("unchecked")
 	public static void onDebugItemUsed(Player player, Mob target, Item item) {
 /*
-		if (item.equals(BefMobItems.DEBUG_TARGET_SETTER.get()))
+		if (item.equals(BMItems.DEBUG_TARGET_SETTER.get()))
 		{
 			MobEffect effect = target.getMobType().equals(MobType.UNDEAD) ? MobEffects.HARM : MobEffects.HEAL;
 			if (target instanceof IBefriendedMob)
@@ -51,7 +51,7 @@ public class BMDebugItemHandler
 			}
 		}
 
-		else */if (item.equals(BefMobItems.DEBUG_BEFRIENDER.get()) && player.isCreative())
+		else */if (item.equals(BMItems.DEBUG_BEFRIENDER.get()) && player.isCreative())
 		{
 			if (target instanceof IBefriendedMob bef)
 			{
@@ -60,7 +60,7 @@ public class BMDebugItemHandler
 			}
 			else 
 			{
-				target.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
+				target.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
 				{
 					IBefriendedMob bef = BefriendingTypeRegistry.getHandler((EntityType<Mob>)target.getType()).befriend(player, target);
 					if (bef != null)
@@ -75,7 +75,7 @@ public class BMDebugItemHandler
 			}
 		}
 		
-		else if (item == BefMobItems.DEBUG_AI_SWITCH.get())
+		else if (item == BMItems.DEBUG_AI_SWITCH.get())
 		{
 			target.setNoAi(!target.isNoAi());
 			String key = target.isNoAi() ? "info.befriendmobs.debug_ai_switch_off" : "info.befriendmobs.debug_ai_switch_on";		
@@ -84,7 +84,7 @@ public class BMDebugItemHandler
 		}
 
 /*
-		else if (item.equals(BefMobItems.DEBUG_ARMOR_GIVER.get()) && target.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
+		else if (item.equals(BMItems.DEBUG_ARMOR_GIVER.get()) && target.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent())
 		{
 			if (target.getItemBySlot(EquipmentSlot.HEAD).isEmpty())
 				target.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET.asItem()));
@@ -96,7 +96,7 @@ public class BMDebugItemHandler
 				target.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.DIAMOND_BOOTS.asItem()));
 		}
 		
-		else if (item.equals(BefMobItems.DEBUG_MOB_CONVERTER.get()))
+		else if (item.equals(BMItems.DEBUG_MOB_CONVERTER.get()))
 		{
 			if (target instanceof EntityBefriendedHuskGirl e)
 			{
@@ -108,7 +108,7 @@ public class BMDebugItemHandler
 			}
 		}
 		
-		else if (item.equals(BefMobItems.DEBUG_ATTRIBUTE_CHECKER.get()))
+		else if (item.equals(BMItems.DEBUG_ATTRIBUTE_CHECKER.get()))
 		{
 			Debug.printToScreen("Base: " + Double.toString(target.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)), player);
 			Debug.printToScreen("Applied: " + Double.toString(target.getAttributeValue(Attributes.ATTACK_DAMAGE)), player);

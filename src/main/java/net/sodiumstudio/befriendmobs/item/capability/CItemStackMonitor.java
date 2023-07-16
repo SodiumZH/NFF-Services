@@ -13,7 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 
 public interface CItemStackMonitor {
@@ -112,7 +112,7 @@ public interface CItemStackMonitor {
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap == BefMobCapabilities.CAP_ITEM_STACK_MONITOR)
+			if(cap == BMCaps.CAP_ITEM_STACK_MONITOR)
 				return LazyOptional.of(() -> {return this.monitor;}).cast();
 			else
 				return LazyOptional.empty();

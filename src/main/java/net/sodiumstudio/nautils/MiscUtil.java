@@ -44,6 +44,8 @@ public class MiscUtil {
 		MiscUtil.printToScreen(InfoHelper.createText(text), receiver);
 	}
 	
+	/** @deprecated Useless function */
+	@Deprecated
 	public static <T> boolean sameObject(T a, T b)
 	{
 		return a != null && a == b;
@@ -70,6 +72,8 @@ public class MiscUtil {
 		return isIn(test, set);
 	}
 	
+	/** @deprecated Useless function */
+	@Deprecated
 	public static <T> boolean isIn(T test, HashSet<T> set)
 	{
 		for (T elem: set)
@@ -82,6 +86,8 @@ public class MiscUtil {
 		return false;
 	}
 	
+	/** @deprecated Useless function */
+	@Deprecated
 	public static <T> boolean isIn(T test, HashSet<T> set, T nullObj)
 	{
 		if (test == null || test.equals(nullObj))

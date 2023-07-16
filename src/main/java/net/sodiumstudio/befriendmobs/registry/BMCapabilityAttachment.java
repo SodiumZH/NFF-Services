@@ -22,7 +22,7 @@ import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class BefMobCapabilityAttachment {
+public class BMCapabilityAttachment {
 
 	// Attach capabilities
 	@SuppressWarnings("unchecked")
@@ -52,7 +52,7 @@ public class BefMobCapabilityAttachment {
 						&& BefriendingTypeRegistry.getHandler((EntityType<? extends Mob>) mob.getType()) != null)
 				{
 					// Initialize capability (defined in handlers)
-					mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
+					mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
 					{
 						BefriendableMobRegistry.put(mob);
 					});

@@ -7,7 +7,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 public class CBefriendableMobProvider implements ICapabilitySerializable<CompoundTag> {
 
@@ -34,7 +34,7 @@ public class CBefriendableMobProvider implements ICapabilitySerializable<Compoun
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
 	{
-		if(cap == BefMobCapabilities.CAP_BEFRIENDABLE_MOB)
+		if(cap == BMCaps.CAP_BEFRIENDABLE_MOB)
 			return LazyOptional.of(() -> {return this.capability;}).cast();
 		else
 			return LazyOptional.empty();

@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 /**
  * A dynamic registry of all befriendable mobs in the level for searching mob from UUID and quick iteration.
@@ -31,7 +31,7 @@ public class BefriendableMobRegistry
 	
 	public static void put(Mob mob)
 	{
-		if (!mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
+		if (!mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent())
 			throw new IllegalArgumentException("Mob put into BefriendableMobRegistry must have CBefriendableMob capability.");
 		if (!mob.isAlive())
 			return;

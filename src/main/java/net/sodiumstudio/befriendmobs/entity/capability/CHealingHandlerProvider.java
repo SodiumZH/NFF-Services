@@ -7,7 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 public class CHealingHandlerProvider implements ICapabilitySerializable<IntTag>
 {
@@ -28,7 +28,7 @@ public class CHealingHandlerProvider implements ICapabilitySerializable<IntTag>
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
 	{
-		if(cap == BefMobCapabilities.CAP_HEALING_HANDLER && handler != null)
+		if(cap == BMCaps.CAP_HEALING_HANDLER && handler != null)
 			return LazyOptional.of(() -> {return this.handler;}).cast();
 		else
 			return LazyOptional.empty();

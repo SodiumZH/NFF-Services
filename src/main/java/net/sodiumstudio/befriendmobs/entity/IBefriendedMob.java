@@ -33,8 +33,8 @@ import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefaul
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.registry.BefMobItems;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
@@ -339,28 +339,6 @@ public interface IBefriendedMob extends ContainerListener  {
 			setAnchorPos(asMob().position());
 	}
 	
-	/* --------------------------------------------- */
-	/* Interaction */
-	
-	/**
-	 *  Actions on player right click the mob
-	 * @deprecated use mobInteraction() instead
-	 * */
-	@Deprecated
-	public default boolean onInteraction(Player player, InteractionHand hand)
-	{
-		return false;
-	}
-	
-	/** Actions on player shift + rightmouse click
-	 * @deprecated use mobInteraction() instead
-	 */
-	@Deprecated
-	public default boolean onInteractionShift(Player player, InteractionHand hand)
-	{
-		return false;
-	}
-	
 	/* Inventory */
 	
 	public BefriendedInventory getAdditionalInventory();
@@ -428,7 +406,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume)
 	{
 		Wrapped.Boolean succeeded = new Wrapped.Boolean(false);		
-		this.asMob().getCapability(BefMobCapabilities.CAP_HEALING_HANDLER).ifPresent((l) ->
+		this.asMob().getCapability(BMCaps.CAP_HEALING_HANDLER).ifPresent((l) ->
 		{
 			succeeded.set(l.applyHealingItem(stack, value, consume));
 		});		
@@ -467,20 +445,11 @@ public interface IBefriendedMob extends ContainerListener  {
 	/* Respawn */
 	
 	/**
-	 * If true, the mob will drop a respawner on death.
-	 */
-	public default boolean shouldDropRespawner()
-	{
-		return true;
-	}
-	
-	/**
 	 * Get the type (subclass) of respawner it will drop.
+	 * Return null to disable respawner dropping.
 	 */
-	public default ItemMobRespawner getRespawnerType()
-	{
-		return (ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get();
-	}
+	@Nullable
+	public ItemMobRespawner getRespawnerType();
 	
 	/**
 	 * If true, the respawner will be invulnerable (except creative players, /kill commands and the void)
@@ -537,7 +506,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default CBefriendedMobTempData.Values getTempData()
 	{
 		Wrapped<CBefriendedMobTempData> res = new Wrapped<CBefriendedMobTempData>(null);
-		asMob().getCapability(BefMobCapabilities.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
 		{
 			res.set(cap);
 		});

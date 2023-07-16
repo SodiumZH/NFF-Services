@@ -6,7 +6,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 public class CAttributeMonitorProvider implements ICapabilityProvider {
 
@@ -19,7 +19,7 @@ public class CAttributeMonitorProvider implements ICapabilityProvider {
 	
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if(cap == BefMobCapabilities.CAP_ATTRIBUTE_MONITOR)
+		if(cap == BMCaps.CAP_ATTRIBUTE_MONITOR)
 			return LazyOptional.of(() -> {return this.cap;}).cast();
 		else
 			return LazyOptional.empty();

@@ -8,9 +8,23 @@ Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsA
 
 Changed package path: `net.sodiumstudio.befriendmobs.util` => `net.sodiumstudio.nautils`.
 
+Classes renamed for simplification:
+
+ -- `BefMobCapabilities` => `BMCaps`
+
+ -- `BefMobCapabilityAttachment` => `BMCapabilityAttachment`
+
+ -- `BefMobItems` => `BMItems`
+
+Deprecated `BMItems#MOB_RESPAWNER` default instance. Now mob respawners should be defined in dependents. Also removed all methods related to this default instance. **WARNING: This may be incompatible to existing item stacks of default Mob Respawner in the game!**
+
+Removed `IBefriendedMob#getRespawnerType` default implementation. Also it now controls whether the mob will drop respawners, non-null for enabled and null for disabled. Removed `IBefriendedMob#shouldDropRespawner`.
+
 Added some utility functions, mainly in `ContainerHelper` and `TagHelper` .
 
 Added `SerializableMap` and related util functions in `NbtHelper`. 
+
+Removed `IBefriendedMob#onInteraction` and `IBefriendedMob#onInteractionShift`. Use vanilla `Mob#mobInteract` instead.
 
 Fixed `BefriendingHandler#initCap` not working.
 

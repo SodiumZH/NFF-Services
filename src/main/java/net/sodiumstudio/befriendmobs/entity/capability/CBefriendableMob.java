@@ -23,7 +23,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.events.BefriendableAddHatredEvent;
 import net.sodiumstudio.befriendmobs.events.EntityEvents;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.Wrapped;
 
@@ -133,7 +133,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	public static CBefriendableMob getCap(Mob mob)
 	{
 		Wrapped<CBefriendableMob> cap = new Wrapped<CBefriendableMob>(null);
-		mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
+		mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
 			cap.set(l);
 		});
 		return cap.get();
@@ -142,7 +142,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	public static CompoundTag getCapNbt(Mob mob)
 	{
 		Wrapped<CompoundTag> tag = new Wrapped<CompoundTag>(null);
-		mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
+		mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
 			tag.set(l.getNbt());
 		});
 		return tag.get();
