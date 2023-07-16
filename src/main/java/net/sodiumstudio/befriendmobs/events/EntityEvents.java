@@ -48,8 +48,8 @@ import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
-import net.sodiumstudio.befriendmobs.registry.BefMobItems;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
@@ -92,9 +92,9 @@ public class EntityEvents
 			}
 			
 			// Handle befriendable mob start //
-			else if (mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent()
+			else if (mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()
 					&& !(mob instanceof IBefriendedMob)) {
-				mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
+				mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
 				{
 
 					BefriendableMobInteractionResult res = BefriendingTypeRegistry.getHandler(type).handleInteract(
@@ -119,18 +119,10 @@ public class EntityEvents
 			{
 				// if (!isClientSide && isMainHand)
 
-				if (player.isShiftKeyDown() && player.getMainHandItem().getItem() == BefMobItems.DEBUG_BEFRIENDER.get()) {
+				if (player.isShiftKeyDown() && player.getMainHandItem().getItem() == BMItems.DEBUG_BEFRIENDER.get()) {
 					bef.init(player.getUUID(), null);
 					// Debug.printToScreen("Befriended mob initialized", player, living);
 					result.set(InteractionResult.sidedSuccess(isClientSide));
-				}
-				
-				// Pass if holding a valid name tag
-				else if (!player.getMainHandItem().is(Items.NAME_TAG) || !player.getMainHandItem().hasCustomHoverName())
-				{
-					result.set((player.isShiftKeyDown() ? bef.onInteractionShift(player, event.getHand())
-							: bef.onInteraction(player, event.getHand())) ? InteractionResult.sidedSuccess(isClientSide)
-									: result.get());
 				}
 			}
 			// Handle befriended mob end //
@@ -152,7 +144,7 @@ public class EntityEvents
 		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
 		if (!event.getEntity().level.isClientSide)
 		{
-			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
+			event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
 			{
 				Mob mob = cap.getOwner();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
@@ -236,7 +228,7 @@ public class EntityEvents
 		if (!event.getEntity().level.isClientSide)
 		{
 			// Handle befriendable mobs //
-			event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
+			event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
 			{
 				/** Handle {@link CBefriendableMob} AlwaysHostile feature */
 				Mob mob = cap.getOwner();
@@ -308,9 +300,9 @@ public class EntityEvents
 						}
 					}
 					// If drop respawner, drop and initialize
-					if (bef.shouldDropRespawner())
+					if (bef.getRespawnerType() != null)
 					{
-						ItemEntity resp = event.getEntity().spawnAtLocation(ItemMobRespawner.fromMob(bef.asMob()));
+						ItemEntity resp = event.getEntity().spawnAtLocation(ItemMobRespawner.fromMob(bef.getRespawnerType(), bef.asMob()));
 						MobRespawnerInstance ins = MobRespawnerInstance.create(resp.getItem());
 						if (ins != null)
 						{
@@ -344,7 +336,7 @@ public class EntityEvents
 			{
 				for (Entity en: ((ServerLevel)(player.level)).getAllEntities())
 				{
-					if (en instanceof Mob mob && mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent()) 
+					if (en instanceof Mob mob && mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()) 
 					{
 						if (!BefriendingTypeRegistry.getHandler(mob).dontInterruptOnPlayerDie() 
 								&& BefriendingTypeRegistry.getHandler(mob).isInProcess(player, mob))
@@ -396,7 +388,7 @@ public class EntityEvents
 			// The events are handled in handler classes, not a forge event
 			// On befriendable mob attacked by player
 			if (living instanceof Mob 
-				&& living.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent()
+				&& living.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()
 				&& source != null
 				&& source instanceof Player)
 			{
@@ -407,7 +399,7 @@ public class EntityEvents
 				{
 					handler.onAttackedByProcessingPlayer(mob, player, event.getAmount() > 0.000001);
 				}
-				living.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
+				living.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
 				{
 					if (event.getAmount() >= 0.1)	
 						cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKED);
@@ -418,7 +410,7 @@ public class EntityEvents
 			else if (living instanceof Player 
 				&& source != null 
 				&& (source instanceof Mob)
-				&& source.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
+				&& source.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent())
 			{
 				Player player = (Player)living;
 				Mob mob = (Mob)source;
@@ -427,7 +419,7 @@ public class EntityEvents
 				{
 					handler.onAttackProcessingPlayer(mob, player, event.getAmount() > 0.000001);
 				}
-				mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
+				mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
 				{
 					if (event.getAmount() > 0)
 						cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKING);
@@ -444,12 +436,12 @@ public class EntityEvents
 		if (!event.getEntity().level.isClientSide)
 		{
 			// Tick attribute monitor
-			event.getEntity().getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
+			event.getEntity().getCapability(BMCaps.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
 				cap.tick();
 			});
 			// Tick item stack monitor
-			event.getEntity().getCapability(BefMobCapabilities.CAP_ITEM_STACK_MONITOR).ifPresent((cap) ->
+			event.getEntity().getCapability(BMCaps.CAP_ITEM_STACK_MONITOR).ifPresent((cap) ->
 			{
 				cap.tick();
 			});
@@ -458,7 +450,7 @@ public class EntityEvents
 				// update befriendable mobs
 				if (!(mob instanceof IBefriendedMob))
 				{
-					mob.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
+					mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
 					{
 						// Timers
 						l.updateTimers();
@@ -474,7 +466,7 @@ public class EntityEvents
 					});
 				}
 				// update healing handler cooldown
-				mob.getCapability(BefMobCapabilities.CAP_HEALING_HANDLER).ifPresent((l) ->
+				mob.getCapability(BMCaps.CAP_HEALING_HANDLER).ifPresent((l) ->
 				{
 					l.updateCooldown();
 				});
@@ -529,12 +521,12 @@ public class EntityEvents
 		if (event.getEntity() instanceof LivingEntity living)
 		{
 			// Setup attribute monitor cap
-			event.getEntity().getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
+			event.getEntity().getCapability(BMCaps.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CAttributeMonitor.SetupEvent(living, cap));
 			});
 			// Setup item stack monitor cap
-			event.getEntity().getCapability(BefMobCapabilities.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
+			event.getEntity().getCapability(BMCaps.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
 			});
@@ -549,7 +541,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onCheckDespawn(AllowDespawn event)
 	{
-		event.getEntity().getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).ifPresent(cap ->
+		event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap ->
 		{
 			if (cap.isForcePersistent())
 				event.setResult(Result.DENY);

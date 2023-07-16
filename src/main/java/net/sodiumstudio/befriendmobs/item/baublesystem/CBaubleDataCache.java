@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 
 public interface CBaubleDataCache
@@ -97,7 +97,7 @@ public interface CBaubleDataCache
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if(cap == BefMobCapabilities.CAP_BAUBLE_DATA_CACHE)
+			if(cap == BMCaps.CAP_BAUBLE_DATA_CACHE)
 				return LazyOptional.of(() -> {return this.cap;}).cast();
 			else
 				return LazyOptional.empty();

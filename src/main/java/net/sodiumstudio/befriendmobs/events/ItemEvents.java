@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.Wrapped;
 

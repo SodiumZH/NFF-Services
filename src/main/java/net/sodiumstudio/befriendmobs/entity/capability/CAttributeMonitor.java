@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
@@ -74,7 +74,7 @@ public interface CAttributeMonitor {
 	public static CAttributeMonitor listen(LivingEntity living, Attribute attr)
 	{
 		Wrapped<CAttributeMonitor> cap = new Wrapped<CAttributeMonitor>(null);
-		living.getCapability(BefMobCapabilities.CAP_ATTRIBUTE_MONITOR).ifPresent((c) -> 
+		living.getCapability(BMCaps.CAP_ATTRIBUTE_MONITOR).ifPresent((c) -> 
 		{
 			cap.set(c);
 			c.listen(attr);

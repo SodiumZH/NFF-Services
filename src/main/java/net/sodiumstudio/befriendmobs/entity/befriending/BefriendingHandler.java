@@ -16,7 +16,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingType
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendingInitPacket;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NetworkHelper;
 import net.sodiumstudio.nautils.debug.Debug;
@@ -45,7 +45,7 @@ public abstract class BefriendingHandler
 			return null;		
 
 		// Check if befriendable capability is attached
-		if(!target.getCapability(BefMobCapabilities.CAP_BEFRIENDABLE_MOB).isPresent())
+		if(!target.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent())
 			throw new RuntimeException("Befriending: Target living mob not having CBefriendableMob capability attached.");
 		
 		// Get new type, and do check

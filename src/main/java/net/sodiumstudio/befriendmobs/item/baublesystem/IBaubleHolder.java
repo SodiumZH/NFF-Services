@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
-import net.sodiumstudio.befriendmobs.registry.BefMobCapabilities;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 
 public interface IBaubleHolder {
@@ -149,7 +149,7 @@ public interface IBaubleHolder {
 	public default CBaubleDataCache getDataCache()
 	{
 		Wrapped<CBaubleDataCache> cache = new Wrapped<CBaubleDataCache>(null);
-		getLiving().getCapability(BefMobCapabilities.CAP_BAUBLE_DATA_CACHE).ifPresent((cap) -> 
+		getLiving().getCapability(BMCaps.CAP_BAUBLE_DATA_CACHE).ifPresent((cap) -> 
 		{
 			cache.set(cap);
 		});

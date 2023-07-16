@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.registry.BefMobItems;
+import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 
 public class ItemMobRespawner extends Item
@@ -19,7 +19,7 @@ public class ItemMobRespawner extends Item
 
 	public ItemMobRespawner(Properties pProperties)
 	{
-		super(pProperties);
+		super(pProperties.stacksTo(1));
 	}
 
 	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob) {
@@ -36,11 +36,11 @@ public class ItemMobRespawner extends Item
 
 		return ins.get();
 	}
-
+/*
 	public static ItemStack fromMob(Mob mob) {
-		return fromMob((ItemMobRespawner) BefMobItems.MOB_RESPAWNER.get(), mob);
+		return fromMob((ItemMobRespawner) BMItems.MOB_RESPAWNER.get(), mob);
 	}
-
+*/
 	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {
 		MobRespawnerInstance ins = MobRespawnerInstance.create(stack);
 		// Check NBT correctly added
