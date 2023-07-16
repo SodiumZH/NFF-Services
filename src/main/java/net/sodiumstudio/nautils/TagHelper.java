@@ -63,8 +63,8 @@ public class TagHelper
 	
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(ResourceLocation tag)
 	{
-		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITY_TYPES.tags().createTagKey(tag);
-		return ContainerHelper.iterableToList(ForgeRegistries.ENTITY_TYPES.tags().getTag(tagKey));
+		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITIES.tags().createTagKey(tag);
+		return ContainerHelper.iterableToList(ForgeRegistries.ENTITIES.tags().getTag(tagKey));
 	}
 	
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(String tag)
