@@ -6,6 +6,8 @@
 
 Added `ItemMobCatcher`. This item converts mob to corresponding Respawner.
 
+Fixed befriended mobs' inventory always being cleared on respawning from respawner.  Added `retainBefriendedMobInventory` attribute to `ItemMobRespawner` which is default `true`. Use `ItemMobRespawner#setRetainBefriendedMobInventory` to set the value.
+
 ### 0.1.9
 
 Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsAcceptable`, using item registry keys instead of objects. Previous `BaubleHandler#getItemsAcceptable` still works but are not recommended to override.
