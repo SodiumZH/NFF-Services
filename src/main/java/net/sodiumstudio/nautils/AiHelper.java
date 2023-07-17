@@ -170,6 +170,7 @@ public class AiHelper
 	@SuppressWarnings("unchecked")
 	public static void addOrTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
 	{
+		if (goal == null) return;
 		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
 		if (goalCond == null)
 		{

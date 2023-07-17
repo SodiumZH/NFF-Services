@@ -76,7 +76,7 @@ public abstract class BaubleHandler {
 	@Deprecated
 	public boolean isAccepted(Item item, String key)
 	{
-		BefriendMobs.LOGGER.error("BaubleHandler::isAccpeted(Item, String) is deprecated. Use mob sensitive version instead.");
+		BefriendMobs.LOGGER.error("BaubleHandler::isAccepted(Item, String) is deprecated. Use mob sensitive version instead.");
 		return getItemsAccepted(key).contains(item) // TODO: remove
 				|| getItemsAccepted(key, null).keySet().contains(item);
 	}
@@ -174,7 +174,7 @@ public abstract class BaubleHandler {
 	/* Util */
 	public static boolean isBaubleFor(ItemStack stack, IBaubleHolder holder, String key)
 	{
-		return holder.getBaubleHandler().isAccepted(stack, key);
+		return holder.getBaubleHandler().isAccepted(stack, key, holder);
 	}
 	
 	/* IBefriendedMob inventory menu util */

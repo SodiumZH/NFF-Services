@@ -17,11 +17,19 @@ import net.sodiumstudio.nautils.EntityHelper;
 public class ItemMobRespawner extends Item
 {
 
+	protected boolean retainBefriendedMobInventory = true;
+	
 	public ItemMobRespawner(Properties pProperties)
 	{
 		super(pProperties.stacksTo(1));
 	}
 
+	public ItemMobRespawner setRetainBefriendedMobInventory(boolean value)
+	{
+		this.retainBefriendedMobInventory = value;
+		return this;
+	}
+	
 	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob) {
 		if (mob.level.isClientSide)
 			return ItemStack.EMPTY;
@@ -67,10 +75,13 @@ public class ItemMobRespawner extends Item
 				if (mob instanceof IBefriendedMob bef)
 				{
 					bef.init(bef.getOwnerUUID(), null);
-					if (!bef.getAdditionalInventory().isEmpty())
-						bef.getAdditionalInventory().clearContent();
-					bef.updateFromInventory();
-					EntityHelper.removeAllEquipment(bef.asMob());
+					if (!retainBefriendedMobInventory)
+					{
+						if (!bef.getAdditionalInventory().isEmpty())
+							bef.getAdditionalInventory().clearContent();
+						bef.updateFromInventory();
+						EntityHelper.removeAllEquipment(bef.asMob());
+					}
 					bef.setInit();
 				}
 				return InteractionResult.CONSUME;
