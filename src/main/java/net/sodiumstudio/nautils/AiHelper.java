@@ -2,40 +2,34 @@ package net.sodiumstudio.nautils;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.function.Predicate;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.sodiumstudio.befriendmobs.BefriendMobs;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 /**
  * Utilities related to mob AI operation.
  */
 public class AiHelper
 {
-	/**
-	 * Get the priority of NearestAttackTargetGoal<Player> of a hostile mob.
-	 * @return the priority, or -1 if not having one.
-	 */
-	public static int getAttackPlayerGoalPriority(Mob mob)
+	
+	@SuppressWarnings("unchecked")
+	public static Class<? extends LivingEntity> getTargetType(NearestAttackableTargetGoal<?> goal)
 	{
-		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
-			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
-			{
-				Class<?> type = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
-				if (type == Player.class || type == ServerPlayer.class)
-					return goal.getPriority();
-			}
-		}
-		return -1;
+		return (Class<? extends LivingEntity>) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "f_26048_");
+	}
+	
+	public static TargetingConditions getTargetConditions(NearestAttackableTargetGoal<?> goal)
+	{
+		return (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "f_26051_");
 	}
 	
 	public static boolean isMobHostileTo(Mob test, LivingEntity isHostileTo)
@@ -45,53 +39,66 @@ public class AiHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetConditions", true);
-				 if (targetType == isHostileTo.getClass())
+				 if (getTargetType(natg).isAssignableFrom(isHostileTo.getClass()))
 				 {
-					 return true;
+					 // If found, check if can attack
+					 if (getTargetConditions(natg).test(test, isHostileTo))
+						 return true;
 				 }
 			 }
 		 }
 		 return false;
 	}
-	
-	/** @deprecated Something is wrong with this function, it works correctly in IDE but not in game */
-	@Deprecated
-	public static boolean isMobHostileToPlayer(Mob test)
-	{
-		// Check if the mob has a NearestAttackableTargetGoal<Player> goal
-		 for (WrappedGoal goal: test.targetSelector.getAvailableGoals())
-		 {
-			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
-			 {
-				 // Force get a private field by reflection
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "targetType", true);
-				 if (targetType == Player.class || targetType == ServerPlayer.class)
-				 {
-					 return true;
-				 }
-			 }
-		 }
-		 return false;
-	}
-	
+
 	/**
 	 * Set a mob hostile to an entity type.
 	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
 	 */
-	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition, boolean noSubclass)
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, int priority, Predicate<LivingEntity> condition, boolean noSubclass)
 	{
-		if (getAttackPlayerGoalPriority(mob) >= 0)
-		{
-			mob.targetSelector.addGoal(getAttackPlayerGoalPriority(mob), new NearestAttackableTargetGoal<T>(mob, type, true, condition.and((l) -> !noSubclass || l.getClass() == type)));
-		}
-		else
-			mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<T>(mob, type, true, condition.and((l) -> !noSubclass || l.getClass() == type)));
+		Predicate<LivingEntity> cond = condition == null ? (l -> true) : condition;
+		mob.targetSelector.addGoal(priority, new NearestAttackableTargetGoal<T>(mob, type, true, cond.and((l) -> !noSubclass || l.getClass() == type)));
 	}
 	
 	/**
-	 * Set a mob hostile to an entity type, including sub type.
+	 * Set a mob hostile to an entity type. (Auto priority, not recommended)
 	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 * <p> Not recommended. Specify priority if possible because it doesn't use reflection and is much faster.
+	 */
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition, boolean noSubclass)
+	{
+		if (getTargetPlayerGoal(mob) != null)
+		{
+			setHostileTo(mob, type, getTargetPlayerGoal(mob).getPriority(), condition, noSubclass);
+		}
+		else
+		{
+			setHostileTo(mob, type, 3, condition, noSubclass);
+		}
+	}
+	
+	/**
+	 * Set a mob hostile to an entity type, allowing subclasses.
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 */
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, int priority, Predicate<LivingEntity> condition)
+	{
+		setHostileTo(mob, type, priority, condition, false);
+	}
+
+	/**
+	 * Set a mob hostile to an entity type, allowing subclasses.
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 */
+	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, int priority)
+	{
+		setHostileTo(mob, type, priority, null);
+	}
+	
+	/**
+	 * Set a mob hostile to an entity type, including sub type. (Auto priority, not recommended)
+	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 * <p> Not recommended. Specify priority if possible because it doesn't use reflection and is much faster.
 	 */
 	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type, Predicate<LivingEntity> condition)
 	{
@@ -99,8 +106,9 @@ public class AiHelper
 	}
 	
 	/**
-	 * Set a mob hostile to an entity type without additional condition.
+	 * Set a mob hostile to an entity type without additional condition. (Auto priority, not recommended)
 	 * The target goal priority will be the same as the mob targeting player. If the mob isn't hostile to player, the priority will be 3.
+	 * <p> Not recommended. Specify priority if possible because it doesn't use reflection and is much faster.
 	 */
 	public static <T extends LivingEntity> void setHostileTo(Mob mob, Class<T> type)
 	{
@@ -113,10 +121,9 @@ public class AiHelper
 	public static <T extends LivingEntity> void setNotHostileTo(Mob mob, Class<T> type)
 	{
 		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
-			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
+			if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
 			{
-				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
-				if (goalType == type)
+				if (getTargetType(tg) == type)
 					mob.targetSelector.getAvailableGoals().remove(goal);
 			}
 		}
@@ -131,8 +138,7 @@ public class AiHelper
 		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
 			if(goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
 			{
-				Class<?> goalType = (Class<?>) ReflectHelper.forceGet(tg, NearestAttackableTargetGoal.class, "targetType", true);
-				if (goalType == Player.class || goalType == ServerPlayer.class)
+				if (Player.class.isAssignableFrom(getTargetType(tg)))
 				{
 					return goal;
 				}				
@@ -148,18 +154,13 @@ public class AiHelper
 	@SuppressWarnings("unchecked")
 	public static void addAndTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
 	{
-		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
-		if (goalCond == null)
-		{
-			Mob mob = (Mob)ReflectHelper.forceGet(goal, TargetGoal.class, "mob", true);
-			NaUtils.LOGGER.error("AiHelper#addAndTargetingCondition: failed to load target conditions. Mob: " + (mob != null ? mob.getName().getString() : "(UNKNOWN)"));
-			return;
-		}	
-		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
+		TargetingConditions goalCond = getTargetConditions(goal);	// targetConditions
+		Predicate<LivingEntity> oldCond = 
+				ObfuscationReflectionHelper.getPrivateValue(TargetingConditions.class, goalCond, "f_26879_");	// "selector"
 		if (oldCond != null)
-			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.and(condition));
+			ObfuscationReflectionHelper.setPrivateValue(TargetingConditions.class, goalCond, oldCond.and(condition), "f_26879_");
 		else
-			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", condition);
+			ObfuscationReflectionHelper.setPrivateValue(TargetingConditions.class, goalCond, condition, "f_26879_");
 	}
 	
 	/**
@@ -170,17 +171,11 @@ public class AiHelper
 	@SuppressWarnings("unchecked")
 	public static void addOrTargetingCondition(NearestAttackableTargetGoal<?> goal, Predicate<LivingEntity> condition)
 	{
-		if (goal == null) return;
-		TargetingConditions goalCond = (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "targetConditions");
-		if (goalCond == null)
-		{
-			Mob mob = (Mob)ReflectHelper.forceGet(goal, TargetGoal.class, "mob", true);
-			NaUtils.LOGGER.error("AiHelper#addOrTargetingCondition: failed to load target conditions. Mob: " + (mob != null ? mob.getName().getString() : "(UNKNOWN)"));
-			return;
-		}	
-		Predicate<LivingEntity> oldCond = (Predicate<LivingEntity>) ReflectHelper.forceGet(goalCond, TargetingConditions.class, "selector");
+		TargetingConditions goalCond = getTargetConditions(goal);	// targetConditions
+		Predicate<LivingEntity> oldCond = 
+				ObfuscationReflectionHelper.getPrivateValue(TargetingConditions.class, goalCond, "f_26879_");	// "selector"
 		if (oldCond != null)
-			ReflectHelper.forceSet(goalCond, TargetingConditions.class, "selector", oldCond.or(condition));
+			ObfuscationReflectionHelper.setPrivateValue(TargetingConditions.class, goalCond, oldCond.or(condition), "f_26879_");
 	}
 	
 	/**
