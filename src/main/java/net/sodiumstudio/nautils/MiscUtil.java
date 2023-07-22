@@ -3,11 +3,17 @@ package net.sodiumstudio.nautils;
 import java.util.HashSet;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.common.util.LazyOptional;
+
 
 public class MiscUtil {
 	
@@ -94,5 +100,19 @@ public class MiscUtil {
 		if (test == null || test.equals(nullObj))
 			return false;
 		return isIn(test, set);
+	}
+	
+	/**
+	 * Get the value from a lazy optional.
+	 * If the value isn't present, return null.
+	 */
+	@Nullable
+	public static <T> T getValue(LazyOptional<T> optional)
+	{
+		Wrapped<T> wrp = new Wrapped<>(null);
+		optional.ifPresent(t -> {
+			wrp.set(t);
+		});
+		return wrp.get();
 	}
 }

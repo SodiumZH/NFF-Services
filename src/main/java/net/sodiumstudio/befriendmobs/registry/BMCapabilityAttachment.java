@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,6 +15,7 @@ import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendableMobRegistry;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayer;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
@@ -88,6 +90,13 @@ public class BMCapabilityAttachment {
 		{
 			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_bauble_data_cache"), 
 					new CBaubleDataCache.Prvd(b));
+		}
+		
+		// CBMPlayer
+		if (event.getObject() instanceof Player p)
+		{
+			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_bm_player"), 
+					new CBMPlayer.Prvd(p));
 		}
 		
 	}
