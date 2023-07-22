@@ -18,6 +18,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.item.event.MobRespawnerFinishRespawnEvent;
+import net.sodiumstudio.befriendmobs.item.event.MobRespawnerStartRespawnEvent;
+import net.sodiumstudio.befriendmobs.item.event.RespawnerConstructEvent;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.InfoHelper;
 import net.sodiumstudio.nautils.NbtHelper;
@@ -31,7 +34,7 @@ public class MobRespawnerInstance
 	
 	protected MobRespawnerInstance(ItemStack stack)
 	{
-		if (!(stack.getItem() instanceof ItemMobRespawner))
+		if (!(stack.getItem() instanceof MobRespawnerItem))
 		{
 			throw new IllegalArgumentException("MobRespawnerInstance: illegal itemstack type.");
 		}
@@ -42,7 +45,7 @@ public class MobRespawnerInstance
 	
 	public void set(ItemStack stack)
 	{
-		if (!(stack.getItem() instanceof ItemMobRespawner))
+		if (!(stack.getItem() instanceof MobRespawnerItem))
 		{
 			throw new IllegalArgumentException("MobRespawnerInstance: illegal itemstack type.");
 		}
@@ -63,7 +66,7 @@ public class MobRespawnerInstance
 	@Nullable
 	public static MobRespawnerInstance create(ItemStack stack)
 	{
-		if (!stack.isEmpty() && stack.getItem() instanceof ItemMobRespawner)
+		if (!stack.isEmpty() && stack.getItem() instanceof MobRespawnerItem)
 		{
 			return new MobRespawnerInstance(stack);
 		}

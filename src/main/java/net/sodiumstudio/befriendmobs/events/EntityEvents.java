@@ -43,7 +43,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
@@ -301,7 +301,7 @@ public class EntityEvents
 					// If drop respawner, drop and initialize
 					if (bef.getRespawnerType() != null)
 					{
-						ItemEntity resp = event.getEntity().spawnAtLocation(ItemMobRespawner.fromMob(bef.getRespawnerType(), bef.asMob()));
+						ItemEntity resp = event.getEntity().spawnAtLocation(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
 						MobRespawnerInstance ins = MobRespawnerInstance.create(resp.getItem());
 						if (ins != null)
 						{

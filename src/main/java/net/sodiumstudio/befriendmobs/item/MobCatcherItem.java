@@ -9,47 +9,49 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.sodiumstudio.befriendmobs.item.event.MobCatcherCatchMobEvent;
 
-public class ItemMobCatcher extends Item
+public class MobCatcherItem extends Item
 {
 
 	protected Predicate<Mob> canCatchCondition = null;
-	protected ItemMobRespawner respawnerType;
+	protected MobRespawnerItem respawnerType;
 	protected boolean respawnerNoExpire = true;
 	protected boolean respawnerRecoverInVoid = true;
 	protected boolean respawnerInvulnerable = true;
 	
-	public ItemMobCatcher(Properties pProperties, ItemMobRespawner respawnerType)
+	public MobCatcherItem(Properties pProperties, MobRespawnerItem respawnerType)
 	{
 		super(pProperties);
 		this.respawnerType = respawnerType;
 	}
 
-	public ItemMobCatcher canCatchCondition(Predicate<Mob> condition)
+	public MobCatcherItem canCatchCondition(Predicate<Mob> condition)
 	{
 		this.canCatchCondition = condition;
 		return this;
 	}
 	
-	public ItemMobCatcher setRespawnerNoExpire(boolean value)
+	public MobCatcherItem setRespawnerNoExpire(boolean value)
 	{
 		this.respawnerNoExpire = value;
 		return this;
 	}
 	
-	public ItemMobCatcher setRespawnerRecoverInVoid(boolean value)
+	public MobCatcherItem setRespawnerRecoverInVoid(boolean value)
 	{
 		this.respawnerRecoverInVoid = value;
 		return this;
 	}
 	
-	public ItemMobCatcher setRespawnerInvulnerable(boolean value)
+	public MobCatcherItem setRespawnerInvulnerable(boolean value)
 	{
 		this.respawnerInvulnerable = value;
 		return this;
 	}
 	
-	 @Override
+	@Override
 	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) 
 	 {
 		 if (!(interactionTarget instanceof Mob))
@@ -59,7 +61,11 @@ public class ItemMobCatcher extends Item
 		 {
 			 if (!player.level.isClientSide)
 			 {
-				 MobRespawnerInstance resp = MobRespawnerInstance.create(ItemMobRespawner.fromMob(respawnerType, mob));
+				 MobRespawnerInstance resp = MobRespawnerInstance.create(MobRespawnerItem.fromMob(respawnerType, mob));
+				 MobCatcherCatchMobEvent event = new MobCatcherCatchMobEvent(mob, player, resp);
+				 if (MinecraftForge.EVENT_BUS.post(event))
+					 return InteractionResult.PASS;
+				 resp = event.respawnerAfterCatching;
 				 if (resp != null && resp.get() != null && !resp.get().isEmpty())
 				 {
 					 resp.setNoExpire(respawnerNoExpire);

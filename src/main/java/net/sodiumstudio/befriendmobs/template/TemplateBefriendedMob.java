@@ -25,7 +25,7 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryWithEquipment;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
 /** This is a template for befriended mob class.
@@ -166,7 +166,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	}
 
 	@Override
-	public ItemMobRespawner getRespawnerType() {
+	public MobRespawnerItem getRespawnerType() {
 		/* If needed, set to your respawner type. Leave it null if you don't need respawner. */
 		return null;
 	}
