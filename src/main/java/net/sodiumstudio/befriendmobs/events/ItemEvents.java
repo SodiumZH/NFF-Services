@@ -8,7 +8,7 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
@@ -63,7 +63,7 @@ public class ItemEvents
 	@SubscribeEvent
 	public static void onItemEntityPickUp(EntityItemPickupEvent event)
 	{
-		if (event.getItem().getItem().getItem() instanceof ItemMobRespawner)
+		if (event.getItem().getItem().getItem() instanceof MobRespawnerItem)
 		{
 			/**  There was an unknown bug that player will still pick up item even if the inventory
 			 *   is full, causing item permanent loss

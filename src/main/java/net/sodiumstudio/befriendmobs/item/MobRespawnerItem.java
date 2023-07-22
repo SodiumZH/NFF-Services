@@ -14,23 +14,23 @@ import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 
-public class ItemMobRespawner extends Item
+public class MobRespawnerItem extends Item
 {
 
 	protected boolean retainBefriendedMobInventory = true;
 	
-	public ItemMobRespawner(Properties pProperties)
+	public MobRespawnerItem(Properties pProperties)
 	{
 		super(pProperties.stacksTo(1));
 	}
 
-	public ItemMobRespawner setRetainBefriendedMobInventory(boolean value)
+	public MobRespawnerItem setRetainBefriendedMobInventory(boolean value)
 	{
 		this.retainBefriendedMobInventory = value;
 		return this;
 	}
 	
-	public static ItemStack fromMob(ItemMobRespawner itemType, Mob mob) {
+	public static ItemStack fromMob(MobRespawnerItem itemType, Mob mob) {
 		if (mob.level.isClientSide)
 			return ItemStack.EMPTY;
 		MobRespawnerInstance ins = MobRespawnerInstance.create(new ItemStack(itemType, 1));
@@ -46,7 +46,7 @@ public class ItemMobRespawner extends Item
 	}
 /*
 	public static ItemStack fromMob(Mob mob) {
-		return fromMob((ItemMobRespawner) BMItems.MOB_RESPAWNER.get(), mob);
+		return fromMob((MobRespawnerItem) BMItems.MOB_RESPAWNER.get(), mob);
 	}
 */
 	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {

@@ -32,7 +32,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.Wrapped;
@@ -449,7 +449,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * Return null to disable respawner dropping.
 	 */
 	@Nullable
-	public ItemMobRespawner getRespawnerType();
+	public MobRespawnerItem getRespawnerType();
 	
 	/**
 	 * If true, the respawner will be invulnerable (except creative players, /kill commands and the void)

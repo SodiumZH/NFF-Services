@@ -5,7 +5,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.item.ItemMobRespawner;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 
 public class BMItems {
 
@@ -22,5 +22,5 @@ public class BMItems {
 	// A fake item for occupying a stack to enable/block something
 	public static final RegistryObject<Item> DUMMY_ITEM = ITEMS.register("dummy_item", () -> new Item(new Item.Properties()));
 	@Deprecated
-	public static final RegistryObject<Item> MOB_RESPAWNER = ITEMS.register("mob_respawner", () -> new ItemMobRespawner(new Item.Properties().stacksTo(1)));
+	public static final RegistryObject<Item> MOB_RESPAWNER = ITEMS.register("mob_respawner", () -> new MobRespawnerItem(new Item.Properties().stacksTo(1)));
 }
