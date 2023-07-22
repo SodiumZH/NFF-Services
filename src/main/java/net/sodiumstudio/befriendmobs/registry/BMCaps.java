@@ -6,6 +6,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayer;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandler;
@@ -20,9 +21,10 @@ public class BMCaps {
 	public static Capability<CAttributeMonitor> CAP_ATTRIBUTE_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	public static Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	
-	// Caps for temp data storage only
+	// Caps for data storage only
 	public static Capability<CBaubleDataCache> CAP_BAUBLE_DATA_CACHE = CapabilityManager.get(new CapabilityToken<>(){});
 	public static Capability<CBefriendedMobTempData> CAP_BEFRIENDED_MOB_TEMP_DATA = CapabilityManager.get(new CapabilityToken<>(){});
+	public static Capability<CBMPlayer> CAP_BM_PLAYER = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	@SubscribeEvent
 	public static void register(RegisterCapabilitiesEvent event)
@@ -34,5 +36,6 @@ public class BMCaps {
 		event.register(CBaubleDataCache.class);
 		event.register(CBefriendedMobTempData.class);
 		event.register(CItemStackMonitor.class);
+		event.register(CBMPlayer.class);
 	}
 }
