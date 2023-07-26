@@ -1,5 +1,6 @@
 package net.sodiumstudio.befriendmobs.item;
 
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import net.minecraft.world.InteractionHand;
@@ -14,8 +15,8 @@ import net.sodiumstudio.befriendmobs.item.event.MobCatcherCatchMobEvent;
 
 public class MobCatcherItem extends Item
 {
-
-	protected Predicate<Mob> canCatchCondition = null;
+	
+	protected BiPredicate<Mob, Player> canCatchCondition = null;
 	protected MobRespawnerItem respawnerType;
 	protected boolean respawnerNoExpire = true;
 	protected boolean respawnerRecoverInVoid = true;
@@ -27,7 +28,7 @@ public class MobCatcherItem extends Item
 		this.respawnerType = respawnerType;
 	}
 
-	public MobCatcherItem canCatchCondition(Predicate<Mob> condition)
+	public MobCatcherItem canCatchCondition(BiPredicate<Mob, Player> condition)
 	{
 		this.canCatchCondition = condition;
 		return this;
@@ -57,7 +58,7 @@ public class MobCatcherItem extends Item
 		 if (!(interactionTarget instanceof Mob))
 			 return InteractionResult.PASS;
 		 Mob mob = (Mob)interactionTarget;
-		 if (canCatchCondition == null || canCatchCondition.test(mob))
+		 if (canCatchCondition == null || canCatchCondition.test(mob, player))
 		 {
 			 if (!player.level.isClientSide)
 			 {

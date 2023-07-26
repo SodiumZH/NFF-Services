@@ -2,9 +2,19 @@
 
 ## 1.19.2
 
+### 0.1.11
+
+Added `CBMPlayer`, a data-storage capability attached on players.
+
+Added `MobOwnershipTransfererItem` which can change the owner of mobs.
+
+Changed `MobCatcherItem#canUsePredicate` from `Predicate<Mob>` to `BiPredicate<Mob, Player>`, involving the item user.  
+
 ### 0.1.10
 
-Added `ItemMobCatcher`. This item converts mob to corresponding Respawner.
+Added `MobCatcherItem`. This item converts mob to corresponding Respawner.
+
+Renamed `ItemMobRespawner` to `MobRespawnerItem`.
 
 Fixed befriended mobs' inventory always being cleared on respawning from respawner.  Added `retainBefriendedMobInventory` attribute to `ItemMobRespawner` which is default `true`. Use `ItemMobRespawner#setRetainBefriendedMobInventory` to set the value.
 
@@ -121,6 +131,42 @@ Some minor API changes.
 Separated from DWMG mod.
 
 ## 1.18.2
+
+### 0.0.10
+
+Added `MobCatcherItem`. This item converts mob to corresponding Respawner.
+
+Renamed `ItemMobRespawner` to `MobRespawnerItem`.
+
+Fixed befriended mobs' inventory always being cleared on respawning from respawner.  Added `retainBefriendedMobInventory` attribute to `ItemMobRespawner` which is default `true`. Use `ItemMobRespawner#setRetainBefriendedMobInventory` to set the value.
+
+Fixed `ReflectHelper` totally not working without IDE. Now `ReflectHelper` needs SRG field/method names.
+
+### 0.0.9
+
+Added `BaubleHanlder#getItemKeysAcceptable` in place of `BaubleHandler#getItemsAcceptable`, using item registry keys instead of objects. Previous `BaubleHandler#getItemsAcceptable` still works but are not recommended to override.
+
+Changed package path: `net.sodiumstudio.befriendmobs.util` => `net.sodiumstudio.nautils`.
+
+Classes renamed for simplification:
+
+ -- `BefMobCapabilities` => `BMCaps`
+
+ -- `BefMobCapabilityAttachment` => `BMCapabilityAttachment`
+
+ -- `BefMobItems` => `BMItems`
+
+Deprecated `BMItems#MOB_RESPAWNER` default instance. Now mob respawners should be defined in dependents. Also removed all methods related to this default instance. **WARNING: This may be incompatible to existing item stacks of default Mob Respawner in the game!**
+
+Removed `IBefriendedMob#getRespawnerType` default implementation. Also it now controls whether the mob will drop respawners, non-null for enabled and null for disabled. Removed `IBefriendedMob#shouldDropRespawner`.
+
+Added some utility functions, mainly in `ContainerHelper` and `TagHelper` .
+
+Added `SerializableMap` and related util functions in `NbtHelper`. 
+
+Removed `IBefriendedMob#onInteraction` and `IBefriendedMob#onInteractionShift`. Use vanilla `Mob#mobInteract` instead.
+
+Fixed `BefriendingHandler#initCap` not working.
 
 ### 0.0.8
 
