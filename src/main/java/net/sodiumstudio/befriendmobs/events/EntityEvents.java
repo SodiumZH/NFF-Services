@@ -400,9 +400,11 @@ public class EntityEvents
 				}
 				living.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((cap) ->
 				{
-					if (event.getAmount() >= 0.1)	
-						cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKED);
-					else cap.addHatredWithReason(player, BefriendableAddHatredReason.HIT);
+					if (event.getSource().getMsgId().equals("thorns") && event.getAmount() >= 0.1)
+						cap.addHatredWithReason(player, BefriendableAddHatredReason.THORNS);
+				    else if (event.getAmount() < 0.1)	
+						cap.addHatredWithReason(player, BefriendableAddHatredReason.HIT);
+					else cap.addHatredWithReason(player, BefriendableAddHatredReason.ATTACKED);
 				});
 			}
 			// On player attacked by befriendable mob
