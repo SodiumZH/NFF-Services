@@ -14,6 +14,8 @@ public enum BefriendableAddHatredReason
 	PROVOKED(3), 
 	/** The mob is hit by the player, but not taking damage */
 	HIT(4), 
+	/** The mob is damaged by the thorns enchantment of player */
+	THORNS(5),
 	CUSTOM_1(99), 
 	CUSTOM_2(98),
 	CUSTOM_3(97),
