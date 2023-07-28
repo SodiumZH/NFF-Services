@@ -98,7 +98,7 @@ public class MobOwnershipTransfererItem extends Item
 		// Locked
 		if (stack.getOrCreateTag().getBoolean("mot_locked"))
 			return InteractionResult.PASS;
-		mob.setOwnerUUID(stack.getOrCreateTag().getUUID("mot_owner_uuid"));
+		mob.setOwnerUUID(player.getUUID());
 		return InteractionResult.sidedSuccess(player.level.isClientSide);
 	}
 	
@@ -122,7 +122,7 @@ public class MobOwnershipTransfererItem extends Item
 	@Override
 	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity living, InteractionHand usedHand)
 	{
-		if (living instanceof IBefriendedMob bm)
+		if (!player.level.isClientSide && living instanceof IBefriendedMob bm)
 		{
 			if (isWritten(stack))
 			{
