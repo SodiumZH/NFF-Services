@@ -24,6 +24,8 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	protected double pathedTargetZ;
 	protected int ticksUntilNextPathRecalculation;
 	protected int ticksUntilNextAttack;
+	protected int ticksNoAttack;
+	protected int maxTicksNoAttack = -1;
 	protected final int attackInterval = 20;
 	protected long lastCanUseCheck;
 	protected static final long COOLDOWN_BETWEEN_CAN_USE_CHECKS = 20L;
@@ -40,6 +42,15 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 		this.followingTargetEvenIfNotSeen = pFollowingTargetEvenIfNotSeen;
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
 		allowAllStatesExceptWait();
+	}
+	
+	/** Max time without attacking action. The action will be interrupted if this time is reached without attacking.
+	 * Set -1 to disable.
+	 */
+	public BefriendedMeleeAttackGoal maxTicksNoAttack(int value)
+	{
+		this.maxTicksNoAttack = value;
+		return this;
 	}
 
 	/**
@@ -111,18 +122,27 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 		if (livingentity == null)
 		{
 			return false;
-		} else if (!livingentity.isAlive())
+		} 
+		else if (!livingentity.isAlive())
 		{
 			return false;
-		} else if (!this.followingTargetEvenIfNotSeen)
+		}
+		else if (!this.followingTargetEvenIfNotSeen)
 		{
 			// Force follow target, end only when nav ends
 			return !getPathfinder().getNavigation().isDone();
-		} else if (!getPathfinder().isWithinRestriction(livingentity.blockPosition()))
+		} 
+		else if (!getPathfinder().isWithinRestriction(livingentity.blockPosition()))
 		{
 			// Otherwise if cannot see, stop
 			return false;
-		} else
+		} 
+		else if (this.maxTicksNoAttack > 0 && this.ticksNoAttack >= this.maxTicksNoAttack)
+		{
+			mob.asMob().setTarget(null);
+			return false;
+		}
+		else
 		{
 			// don't attack creative/spectator player
 			return !(livingentity instanceof Player)
@@ -140,6 +160,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 		getPathfinder().setAggressive(true);
 		this.ticksUntilNextPathRecalculation = 0;
 		this.ticksUntilNextAttack = 0;
+		this.ticksNoAttack = 0;
 	}
 
 	/**
@@ -231,7 +252,9 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 			this.resetAttackCooldown();
 			getPathfinder().swing(InteractionHand.MAIN_HAND);
 			getPathfinder().doHurtTarget(pEnemy);
+			this.ticksNoAttack = 0;
 		}
+		else this.ticksNoAttack++;
 
 	}
 

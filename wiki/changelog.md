@@ -2,6 +2,10 @@
 
 ## 1.19.2
 
+### 0.1.12
+
+Fixed `ReflectHelper` callers not using SRG names.
+
 ### 0.1.11
 
 Added `CBMPlayer`, a data-storage capability attached on players.
@@ -9,6 +13,8 @@ Added `CBMPlayer`, a data-storage capability attached on players.
 Added `MobOwnershipTransfererItem` which can change the owner of mobs.
 
 Changed `MobCatcherItem#canUsePredicate` from `Predicate<Mob>` to `BiPredicate<Mob, Player>`, involving the item user.  
+
+Now `BefriendedMeleeAttakGoal#checkAndPerformAttack` distance check depends on the minimum distance from the attacker's border box to the target's border box. This fixes the issue that ordinary mobs (like Zombies) can't hit flying mobs (like Phantoms). 
 
 ### 0.1.10
 
@@ -131,6 +137,10 @@ Some minor API changes.
 Separated from DWMG mod.
 
 ## 1.18.2
+
+### 0.0.11
+
+Identical to 1.19.2-0.1.11.
 
 ### 0.0.10
 
