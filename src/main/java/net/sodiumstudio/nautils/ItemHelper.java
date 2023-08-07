@@ -135,4 +135,26 @@ public class ItemHelper
 		return stack.getEnchantmentLevel(enchantment);
 	}
 	
+	public static void giveOrDropDefault(Player player, Item item)
+	{
+		if (player.addItem(item.getDefaultInstance()))
+			player.spawnAtLocation(item.getDefaultInstance());
+	}
+	
+	public static void giveOrDrop(Player player, ItemStack stack)
+	{
+		while (!stack.isEmpty())
+		{
+			ItemStack stack1 = stack.copy();
+			stack1.setCount(1);
+			if (!player.addItem(stack1))
+				break;
+			else stack.shrink(1);
+		}
+		if (!stack.isEmpty())
+		{
+			player.spawnAtLocation(stack);
+		}
+	}
+	
 }

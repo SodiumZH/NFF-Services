@@ -1,12 +1,14 @@
 package net.sodiumstudio.befriendmobs.item;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumstudio.befriendmobs.entity.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerFinishRespawnEvent;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerStartRespawnEvent;
@@ -187,5 +190,20 @@ public class MobRespawnerInstance
 		return mob;
 	}
 
+	public UUID getOwnerUUID()
+	{
+		return BefriendedHelper.getOwnerUUIDFromNbt(getMobNbt());
+	}
+	
+	public String getModId()
+	{
+		return BefriendedHelper.getModIdFromNbt(getMobNbt());
+	}
+	
+	public MutableComponent getName()
+	{
+		return BefriendedHelper.getNameFromNbt(getMobNbt(), getType());
+	}
+	
 	
 }

@@ -107,7 +107,7 @@ public abstract class BefriendingHandler
 	/** Indicates if the player is in befriending process of the mob. */
 	public abstract boolean isInProcess(Player player, Mob mob);
 	
-	/** Indecated if any player is in befriending process. */
+	/** Indicates if any player is in befriending process. */
 	public boolean isInProcess(Mob mob)
 	{
 		if (mob.level.isClientSide)
@@ -142,11 +142,11 @@ public abstract class BefriendingHandler
 	
 	/** Execute when the mob added player into hatred list
 	* Fired in CBefriendableMob::addHatredWithReason and no need to manually invoke
-	* Interrupt by default
+	* Interrupt if attacked by default
 	* */
 	public void onAddingHatred(Mob mob, Player player, BefriendableAddHatredReason reason)
 	{
-		if (isInProcess(player, mob))
+		if (isInProcess(player, mob) && reason == BefriendableAddHatredReason.ATTACKED)
 			interrupt(player, mob, false);
 	}
 	

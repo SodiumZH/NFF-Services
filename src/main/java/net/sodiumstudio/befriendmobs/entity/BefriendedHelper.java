@@ -3,7 +3,10 @@ package net.sodiumstudio.befriendmobs.entity;
 import java.util.UUID;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -208,5 +211,17 @@ public class BefriendedHelper
 		if (modid == null)
 			return null;
 		return nbt.contains(modid + ":befriended_owner", NbtHelper.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
+	}
+	
+	public static MutableComponent getNameFromNbt(CompoundTag nbt, EntityType<?> type)
+	{
+		String modid = getModIdFromNbt(nbt);
+		if (modid == null)
+			return null;
+		if (nbt.contains("CustomName", 8)) {
+            String s = nbt.getString("CustomName");
+            return Component.Serializer.fromJson(s);
+        }
+		else return (MutableComponent)(type.getDescription());
 	}
 }

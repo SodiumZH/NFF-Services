@@ -19,6 +19,7 @@ import net.sodiumstudio.nautils.debug.Debug;
  * Do item giving process which requires to give a certain count of items.
  * In this preset item-giving process handler, mob receives a given count of items, and
  * after the count demand is satisfied, it does the final actions (customizable, befriend by default)
+ * <p> WARNING: this class is not well-tested and is probably not working well.
  * 
  * Related NBT tags:
  * (Player Data) overall_amount: the demanded count. It will not change for one player but varies for different players.

@@ -2,6 +2,18 @@
 
 ## 1.19.2
 
+### 0.1.13
+
+Added `LinearColor` as a representation of RGB colors, and added related utilities.
+
+Adjusted `HandlerItemGivingProgress` for flexibility:
+
+ -- Added `getReturnedItem` and `onItemGiven` hooks.
+
+ -- Changed `HandlerItemGiving#isItemAcceptable` and `HandlerItemGiving#shouldItemConsume` checks to `ItemStack` sensitive versions.
+
+ -- Changed `getProcValueToAdd` into player, mob and previous progress value sensitive version.
+
 ### 0.1.12
 
 Fixed `ReflectHelper` callers not using SRG names.

@@ -178,6 +178,7 @@ public class ContainerHelper
 	/**
 	 * Get a mutable map (HashMap) of given values.
 	 */
+	@SafeVarargs
 	@SuppressWarnings("unchecked")
 	public static <T, U> HashMap<T, U> mapOf(MapPair<T, U>... entries)
 	{
@@ -210,17 +211,17 @@ public class ContainerHelper
 			k newKey = keyCast.apply(oldKey);
 			v newVal = valueCast.apply(map.get(oldKey));
 			if ((newKey != null || !keyNonnull) && (newVal != null || !valueNonnull))
-				newMap.put(keyCast.apply(oldKey), valueCast.apply(null));
+				newMap.put(newKey, newVal);
 		}
 		return newMap;
 	}
 	
-	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull)
+	public static <K, V, k, v> HashMap<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast, boolean keyNonnull)
 	{
 		return castMap(map, keyCast, valueCast, keyNonnull, false);
 	}
 			
-	public static <K, V, k, v> Map<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast)
+	public static <K, V, k, v> HashMap<k, v> castMap(Map<K, V> map, Function<K, k> keyCast, Function<V, v> valueCast)
 	{
 		return castMap(map, keyCast, valueCast, true);
 	}
