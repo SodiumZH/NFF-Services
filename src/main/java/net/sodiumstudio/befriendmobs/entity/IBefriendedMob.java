@@ -27,7 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
-import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
@@ -53,6 +53,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 * @param playerUUID 拥有此生物的玩家UUID。
 	 * @param from 友好化或转化为该生物的来源生物。可以为null！
 	 */
+	@DontOverride
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
 		this.setOwnerUUID(playerUUID);
@@ -66,8 +67,24 @@ public interface IBefriendedMob extends ContainerListener  {
 		{
 			this.setAnchorPos(this.asMob().position());
 		}
+		this.onInit(playerUUID, from);
 	}
 
+	/**
+	 * Custom actions invoked after {@link IBefriendedMob#init(UUID, Mob)}.
+	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
+	 * @param playerUUID Player UUID who owns this mob.
+	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
+	 * <p>========
+	 * <p>在初始化{@link IBefriendedMob#init(UUID, Mob)}后执行的自定义操作。
+	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此实现必须处理null的情况。
+	 * @param playerUUID 拥有此生物的玩家UUID。
+	 * @param from 友好化或转化为该生物的来源生物。可以为null！
+	 */
+	@DontCallManually
+	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
+	
+	
 	/**
 	 * Get whether this mob has finished initialization.
 	 * <p>After finishing initialization the mob will start updating from its inventory.
@@ -503,16 +520,16 @@ public interface IBefriendedMob extends ContainerListener  {
 	 */
 	public String getModId();
 	
-	public default CBefriendedMobTempData.Values getTempData()
+	public default CBefriendedMobData.Values getTempData()
 	{
-		Wrapped<CBefriendedMobTempData> res = new Wrapped<CBefriendedMobTempData>(null);
+		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
 		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
 		{
 			res.set(cap);
 		});
 		if (res.get() == null)
 			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
-			return new CBefriendedMobTempData.Values(this);	
+			return new CBefriendedMobData.Values(this);	
 		return res.get().values();
 	}
 

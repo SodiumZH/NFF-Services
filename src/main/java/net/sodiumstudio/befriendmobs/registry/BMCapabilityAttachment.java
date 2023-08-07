@@ -17,7 +17,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingType
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayer;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
-import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
@@ -64,9 +64,9 @@ public class BMCapabilityAttachment {
 
 		if (event.getObject() instanceof IBefriendedMob bef)
 		{
-			// Temp data (CBefriendedMobTempData)
+			// Temp data (CBefriendedMobData)
 			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_mob_temp_data"),
-					new CBefriendedMobTempData.Prvd(bef));
+					new CBefriendedMobData.Prvd(bef));
 			// CHealingHandler
 			if (bef.healingHandlerClass() != null)
 			{

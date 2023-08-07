@@ -10,6 +10,11 @@ public class Wrapped<T> {
 	
 	private T value;
 	
+	public Wrapped()
+	{
+		this(null);
+	}
+	
 	public Wrapped(T value)
 	{
 		this.value = value;

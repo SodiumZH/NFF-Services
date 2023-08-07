@@ -111,4 +111,9 @@ public class MiscUtil {
 		});
 		return wrp.get();
 	}
+	
+	public static <T> T nullThen(T test, T forNull)
+	{
+		return test == null ? forNull : test;
+	}
 }

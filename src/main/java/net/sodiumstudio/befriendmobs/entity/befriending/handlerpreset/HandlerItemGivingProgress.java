@@ -14,7 +14,9 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteracti
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.ItemHelper;
 import net.sodiumstudio.nautils.NbtHelper;
+import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.debug.Debug;
 
 
@@ -54,6 +56,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 				else
 				{
 					ItemStack mainhand = player.getMainHandItem();
+					ItemStack givenCopy = mainhand.copy();
 					boolean isDebugStick = mainhand.is(Items.DEBUG_STICK);
 					// Put a zero data first, otherwise if fulfilled after giving only one item, something unexpected
 					// may happen due to missing proc_value tag
@@ -74,10 +77,15 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 					}
 					else
 					{
-						procValue += getProcValueToAdd(mainhand);
+						procValue += getProcValueToAdd(mainhand, player, target, lastProcValue);
+						if (procValue <= 0)
+							procValue = 0;
 						if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
 							player.getMainHandItem().shrink(1);
-						NbtHelper.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
+						ItemHelper.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
+						if (procValue > 0)
+							NbtHelper.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
+						else interrupt(player, target, true);
 					}
 					Debug.printToScreen("Progress Value: " + Double.toString(procValue), player);
 					if (procValue >= 0.9999999999d)
@@ -92,7 +100,8 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 						sendParticlesOnItemReceived(target);
 						sendProgressHeart(target, lastProcValue, procValue, deltaProcPerHeart());
 						l.setPlayerTimer(player, "item_cooldown", this.getItemGivingCooldownTicks()); // Set cooldown
-						this.afterItemGiven(player, target, player.getMainHandItem());
+						this.afterItemGiven(player, target, givenCopy);
+						this.onItemGiven(player, target, givenCopy, lastProcValue, procValue);
 						result.setHandled();
 					}
 				}
@@ -100,20 +109,20 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 		});
 
 		// ...................................
-		args.execClient((l) -> {
+		/*args.execClient((l) -> {
 			{
 				if (shouldIgnoreHatred() || !l.isInHatred(player)) {
-					if (!player.isShiftKeyDown() && isItemAcceptable(player.getMainHandItem().getItem())
+					if (!player.isShiftKeyDown() && isItemAcceptable(player.getMainHandItem())
 							&& args.isMainHand())
 					result.handled = true;
 				}
 			}
-		});
+		});*/
 		// ==============================
 		return result;
 	}
-
-	protected abstract double getProcValueToAdd(ItemStack item);
+	
+	protected abstract double getProcValueToAdd(ItemStack item, Player player, Mob mob, double oldProc);
 	
 	protected void sendProgressHeart(Mob target, double procBefore, double procAfter, double deltaProcPerHeart)
 	{
@@ -132,7 +141,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 	@Override
 	public void serverTick(Mob mob)
 	{
-		mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
+		/*mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
 			if (!shouldIgnoreHatred())
 			{
 				for (UUID uuid: l.getHatred())
@@ -142,7 +151,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 						this.interrupt(mob.level.getPlayerByUUID(uuid), mob, false);					
 				}
 			}
-		});
+		});*/
 	}
 	
 	@Override
@@ -224,4 +233,25 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 		EntityHelper.sendParticlesToEntity(target, ParticleTypes.HEART, target.getBbHeight() - 0.5, 0.2d, 1, 1d);
 	}
 
+	/**
+	 * Get the item stack that should be given to the player after giving an item.
+	 * No item by default.
+	 * @param itemGivenCopy ItemStack before giving.
+	 * @param procBefore Progress value before giving.
+	 * @param procAfter Progress value after giving.
+	 */
+	public ItemStack getReturnedItem(Player player, Mob mob, ItemStack itemGivenCopy, double procBefore, double procAfter)
+	{
+		return ItemStack.EMPTY;
+	}
+	
+	/**
+	 * Invoked after an item is given and after {@link HandlerItemGiving#afterItemGiven(Player, Mob, ItemStack)}.
+	 * Not executed when the condition is satisfied after giving. Handle this case in finalActions().
+	 * @param itemGivenCopy ItemStack before giving.
+	 * @param procBefore Progress value before giving.
+	 * @param procAfter Progress value after giving.
+	 */
+	public void onItemGiven(Player player, Mob mob, ItemStack itemGivenCopy, double procBefore, double procAfter) {}
+	
 }

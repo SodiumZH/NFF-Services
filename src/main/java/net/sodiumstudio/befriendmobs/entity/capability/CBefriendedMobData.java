@@ -22,14 +22,14 @@ import net.sodiumstudio.befriendmobs.registry.BMCaps;
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
  */
-public interface CBefriendedMobTempData extends INBTSerializable<CompoundTag> {
+public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 
 	public default Values values()
 	{
 		return (Values)this;
 	}
 	
-	public class Values implements CBefriendedMobTempData
+	public class Values implements CBefriendedMobData
 	{
 		public IBefriendedMob mob;
 		public CompoundTag tag = new CompoundTag();
@@ -64,7 +64,7 @@ public interface CBefriendedMobTempData extends INBTSerializable<CompoundTag> {
 	public class Prvd implements ICapabilitySerializable<CompoundTag>
 	{
 		
-		public CBefriendedMobTempData values;
+		public CBefriendedMobData values;
 		
 		public Prvd(IBefriendedMob mob)
 		{

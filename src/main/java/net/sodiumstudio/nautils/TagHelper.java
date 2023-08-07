@@ -7,6 +7,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -44,6 +45,24 @@ public class TagHelper
 		return hasTag(obj, new ResourceLocation(domain, tag));
 	}
 
+	public static boolean hasTag(ItemStack obj, ResourceLocation tag)
+	{
+		if (obj.isEmpty())
+			return false;
+		else return hasTag(obj.getItem(), tag);
+	}
+	
+	public static boolean hasTag(ItemStack obj, String tag)
+	{
+		return hasTag(obj, new ResourceLocation(tag));
+	}
+	
+	public static boolean hasTag(ItemStack obj, String domain, String tag)
+	{
+		return hasTag(obj, new ResourceLocation(domain, tag));
+	}
+	
+	
 	public static boolean hasTag(Block obj, ResourceLocation tag)
 	{
 		TagKey<Block> tagKey = ForgeRegistries.BLOCKS.tags().createTagKey(tag);

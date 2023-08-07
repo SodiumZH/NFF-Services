@@ -1,5 +1,6 @@
 package net.sodiumstudio.nautils.math;
 
+import java.util.Collection;
 import java.util.Random;
 
 public class RndUtil {
@@ -16,6 +17,9 @@ public class RndUtil {
 		return rnd.nextFloat() * (max - min) + min ;
 	}
 	
+	public static <T> T randomPick(T[] array)
+	{
+		return array[rnd.nextInt(array.length)];
+	}
 
-	
 }

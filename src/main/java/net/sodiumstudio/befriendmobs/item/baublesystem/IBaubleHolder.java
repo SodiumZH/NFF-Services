@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobTempData;
+import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 

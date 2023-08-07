@@ -19,24 +19,34 @@ public abstract class HandlerItemGiving extends BefriendingHandler
 	
 	protected Random rnd = new Random();
 	
-	// Check if the mob accepts the item
-	public abstract boolean isItemAcceptable(Item item);
-	public boolean isItemAcceptable(ItemStack itemstack)
+	/** Check if the mob accepts the item.
+	 * @deprecated Use ItemStack sensitive version instead
+	 */
+	@Deprecated
+	public final boolean isItemAcceptable(Item item) {
+		return isItemAcceptable(item.getDefaultInstance());
+	}
+	
+	/** Check if the mob accepts the item.
+	 */
+	public abstract boolean isItemAcceptable(ItemStack itemstack);
+	
+	/**
+	 * If true, the item should consume after using
+	 * @deprecated Use ItemStack sensitive version instead
+	 */ 
+	@Deprecated
+	public final boolean shouldItemConsume(Item item) 
 	{
-		return isItemAcceptable(itemstack.getItem());
+		return shouldItemConsume(item.getDefaultInstance());
 	}
 	
 	/**
 	 * If true, the item should consume after using
-	 */ 
-	public boolean shouldItemConsume(Item item) 
-	{
-		return true;
-	}
-	
+	 */
 	public boolean shouldItemConsume(ItemStack itemstack)
 	{
-		return shouldItemConsume(itemstack.getItem());
+		return true;
 	}
 	
 	// Additional conditions when giving items

@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 
-public class MobOwnershipTransfererItem extends Item
+public class MobOwnershipTransfererItem extends BMItem
 {
 
 	public MobOwnershipTransfererItem(Properties pProperties)

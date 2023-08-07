@@ -14,7 +14,7 @@ import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 
-public class MobRespawnerItem extends Item
+public class MobRespawnerItem extends BMItem
 {
 
 	protected boolean retainBefriendedMobInventory = true;
