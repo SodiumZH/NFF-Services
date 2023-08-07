@@ -35,6 +35,8 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 		if (getOwner().getHealth() < getOwner().getMaxHealth() && getCooldown() == 0)
 		{
 			ApplyHealingItemEvent event = new ApplyHealingItemEvent(getOwner(), stack, value, getHealingCooldownTicks());
+			ItemStack cpy = stack.copy();
+			float oldHP = getOwner().getHealth();
 			boolean canceled = MinecraftForge.EVENT_BUS.post(event);
 			if (!canceled)
 			{
@@ -46,6 +48,7 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 				if (event.sendDefaultParticles)
 					sendParticlesOnSuccess();
 				setCooldown(event.cooldown);
+				MinecraftForge.EVENT_BUS.post(new HealingSucceededEvent(getOwner(), cpy, getOwner().getHealth() - oldHP));
 				return true;
 			}
 		}
@@ -103,7 +106,27 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 			this.cooldown = cooldown;
 		}
 	}
+	
+	/**
+	 * Fired when applying healing item to living succeeded.
+	 */
+	public static class HealingSucceededEvent extends Event
+	{
+		/** Target living entity. */
+		public final LivingEntity living;
+		/** Item stack applied. It's a copy of the item stack before applying. */
+		public final ItemStack stack;
+		/** HP value actually applied. */
+		public final float healedValue;
 		
+		public HealingSucceededEvent(LivingEntity living, ItemStack stack, float healedValue)
+		{
+			this.living = living;
+			this.stack = stack;
+			this.healedValue = healedValue;
+		}
+	}
+	
 	/**
 	 * Fired when applying healing item to living failed, including because of cancellation of {@link CHealingHandler.ApplyHealingItemEvent}.
 	 */

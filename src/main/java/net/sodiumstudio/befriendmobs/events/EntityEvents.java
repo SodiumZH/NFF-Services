@@ -463,7 +463,7 @@ public class EntityEvents
 								mob.setTarget(targetLiving);
 						}
 						// Befriending handler tick
-						BefriendingTypeRegistry.getHandler((EntityType<Mob>) (mob.getType())).serverTick(mob);
+						BefriendingTypeRegistry.getHandler((EntityType<Mob>) (mob.getType())).serverTickInternal(mob);
 					});
 				}
 				// update healing handler cooldown
