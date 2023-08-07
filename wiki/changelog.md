@@ -14,6 +14,10 @@ Adjusted `HandlerItemGivingProgress` for flexibility:
 
  -- Changed `getProcValueToAdd` into player, mob and previous progress value sensitive version.
 
+Now in `BefriendingHandler` the mob will be set persistent if in process by default. To disable it, override `persistantIfInProcess` to false.
+
+Added `CHealingHandler#HealingSucceededEvent`.
+
 ### 0.1.12
 
 Fixed `ReflectHelper` callers not using SRG names.

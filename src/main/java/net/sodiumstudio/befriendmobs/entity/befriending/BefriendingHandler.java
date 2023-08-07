@@ -75,6 +75,22 @@ public abstract class BefriendingHandler
 	
 	/**
 	 * Invoked on mob tick in server.
+	 * <p> For custom tick actions, override {@code serverTick} instead.
+	 */
+	public final void serverTickInternal(Mob mob)
+	{
+		if (persistantIfInProcess())
+		{
+			mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(c -> 
+			{
+				c.setForcePersistent(isInProcess(mob));
+			});
+		}
+		serverTick(mob);
+	}
+
+	/**
+	 * Invoked on mob tick in server.
 	 */
 	public void serverTick(Mob mob)
 	{}
@@ -161,6 +177,14 @@ public abstract class BefriendingHandler
 		return 300 * 20;
 	}
 	
+	/**
+	 * If true, the mob will not despawn if any player in the level is in process with it.
+	 */
+	public boolean persistantIfInProcess()
+	{
+		return true;
+	}
+	
 	/* Util */
 	/**
 	 * Do an action for all players in process.
@@ -219,6 +243,5 @@ public abstract class BefriendingHandler
 		}
 		return rs.getValue();
 	}
-	
 	
 }
