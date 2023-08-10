@@ -20,7 +20,7 @@ public class MobOwnershipTransfererItem extends BMItem
 		super(pProperties.stacksTo(1));
 	}
 	
-	protected boolean isWritten(ItemStack stack)
+	public boolean isWritten(ItemStack stack)
 	{
 		if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof MobOwnershipTransfererItem))
 			throw new IllegalArgumentException();
