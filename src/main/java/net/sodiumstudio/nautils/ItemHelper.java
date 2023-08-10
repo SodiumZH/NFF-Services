@@ -138,7 +138,7 @@ public class ItemHelper
 	
 	public static void giveOrDropDefault(Player player, Item item)
 	{
-		if (player.addItem(item.getDefaultInstance()))
+		if (!player.addItem(item.getDefaultInstance()))
 			player.spawnAtLocation(item.getDefaultInstance());
 	}
 	
