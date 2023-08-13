@@ -154,6 +154,10 @@ Separated from DWMG mod.
 
 ## 1.18.2
 
+### 0.0.13
+
+Identical to 1.19.2-0.1.13.
+
 ### 0.0.12
 
 Identical to 1.19.2-0.1.12.
