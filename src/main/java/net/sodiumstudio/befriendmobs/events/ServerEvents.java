@@ -41,11 +41,11 @@ public class ServerEvents
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onWorldTickFinalize(TickEvent.LevelTickEvent event)
+	public static void onWorldTickFinalize(TickEvent.WorldTickEvent event)
 	{
 		if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER)
 		{
-			for (Player player: event.level.players())
+			for (Player player: event.world.players())
 			{
 				CBMPlayer.removeOneTickTags(player);
 			}

@@ -3,23 +3,36 @@ package net.sodiumstudio.nautils.math;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 
 public class LinearColor
 {
 	
-	public static final EntityDataSerializer<LinearColor> ENTITY_DATA_SERIALIZER 
-		= EntityDataSerializer.simple((buf, color) -> {
-			buf.writeDouble(color.r);
-			buf.writeDouble(color.g);
-			buf.writeDouble(color.b);
-		}, buf -> {
-			double r = buf.readDouble();
-			double g = buf.readDouble();
-			double b = buf.readDouble();
-			return LinearColor.fromNormalized(r, g, b);
-		});
+	public static final EntityDataSerializer<LinearColor> ENTITY_DATA_SERIALIZER = new EntityDataSerializer<LinearColor>()
+	{
+		@Override
+	    public void write(FriendlyByteBuf buf, LinearColor color) {
+				buf.writeDouble(color.r);
+				buf.writeDouble(color.g);
+				buf.writeDouble(color.b);
+	    }
+		
+		@Override
+	    public LinearColor read(FriendlyByteBuf buf) {
+				double r = buf.readDouble();
+				double g = buf.readDouble();
+				double b = buf.readDouble();
+				return LinearColor.fromNormalized(r, g, b);
+	    }
+		
+		@Override
+	    public LinearColor copy(LinearColor color) {
+	    	   return color;
+	    }
+	};
+
 	
 	static
 	{
