@@ -164,6 +164,7 @@ public class EntityHelper
 		sendParticlesToMob(entity, ParticleTypes.ANGRY_VILLAGER, new Vec3(0, -0.5, 0), 5, 5, 3, 1);
 	}
 
+	
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
 		if (entity.level.isClientSide)
@@ -190,30 +191,61 @@ public class EntityHelper
 		sendParticlesToEntity(entity, options, new Vec3(0d, heightOffset, 0d), rndScale, amount, speed);
 	}
 
+	
+	public static void sendHeartParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
+		sendParticlesToEntity(entity, ParticleTypes.HEART, entity.getBbHeight() - 0.2d + heightOffset, 0.5d, amount, 1d);
+	}
+	
 	public static void sendHeartParticlesToLivingDefault(LivingEntity entity, float heightOffset) {
-		sendParticlesToEntity(entity, ParticleTypes.HEART, entity.getBbHeight() - 0.2d + heightOffset, 0.5d, 10, 1d);
+		sendHeartParticlesToLivingDefault(entity, heightOffset, 10);
 	}
 
 	public static void sendHeartParticlesToLivingDefault(LivingEntity entity) {
 		sendHeartParticlesToLivingDefault(entity, 0f);
 	}
 	
-	public static void sendGlintParticlesToLivingDefault(LivingEntity entity) {
-		sendParticlesToEntity(entity, ParticleTypes.HAPPY_VILLAGER, entity.getBbHeight() - 0.2, 0.5d, 20, 1d);
+	public static void sendGlintParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
+		sendParticlesToEntity(entity, ParticleTypes.HAPPY_VILLAGER, entity.getBbHeight() - 0.2 + heightOffset, 0.5d, amount, 1d);
 	}
 
-	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity, float heightOffset) {
-		sendParticlesToEntity(entity, ParticleTypes.SMOKE, entity.getBbHeight() - 0.2 + heightOffset, 0.2d, 30, 0d);
+	public static void sendGlintParticlesToLivingDefault(LivingEntity entity, float heightOffset)
+	{
+		sendGlintParticlesToLivingDefault(entity, heightOffset, 20);
+	}
+	
+	public static void sendGlintParticlesToLivingDefault(LivingEntity entity) {
+		sendGlintParticlesToLivingDefault(entity, 0);
+	}
+	
+	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
+		sendParticlesToEntity(entity, ParticleTypes.SMOKE, entity.getBbHeight() - 0.2 + heightOffset, 0.2d, amount, 0d);
+	}
+	
+	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity, float heightOffset)
+	{
+		sendSmokeParticlesToLivingDefault(entity, heightOffset, 30);
 	}
 
 	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity) {
 		sendSmokeParticlesToLivingDefault(entity, 0f);
 	}
 	
-	public static void sendAngryParticlesToLivingDefault(LivingEntity entity) {
-		sendParticlesToEntity(entity, ParticleTypes.ANGRY_VILLAGER, entity.getBbHeight() - 0.2, 0.3d, 5, 1d);
+	
+	public static void sendAngryParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
+		sendParticlesToEntity(entity, ParticleTypes.ANGRY_VILLAGER, entity.getBbHeight() - 0.2 + heightOffset, 0.3d, amount, 1d);
 	}
 
+	public static void sendAngryParticlesToLivingDefault(LivingEntity entity, float heightOffset)
+	{
+		sendAngryParticlesToLivingDefault(entity, heightOffset, 5);
+	}
+	
+	public static void sendAngryParticlesToLivingDefault(LivingEntity entity)
+	{
+		sendAngryParticlesToLivingDefault(entity, 0);
+	}
+	
+	
 	// Get current swell value (private for Creeper class) as int. Max swell is 30.
 	public static int getCreeperSwell(Creeper creeper) {
 		return Math.round(creeper.getSwelling(1.0f) * 28.0f);
@@ -673,8 +705,5 @@ public class EntityHelper
 		}
 		return null;
 	}
-
-
-	
 	
 }

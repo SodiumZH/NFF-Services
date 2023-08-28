@@ -124,6 +124,20 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	// Setup a player-specified timer. (PS = player specified)
 	public IntTag setPlayerTimer(Player player, String key, int ticks);
 	
+	/**
+	 *  Force stop a timer.
+	 * @param key Timer key.
+	 * @param postEvent If true, it will post the timer-up event.
+	 */
+	public void stopTimer(String key, boolean postEvent);
+	
+	/**
+	 *  Force stop a player-specified timer. 
+	 * @param postEvent If true, it will post the timer-up event.
+	 */
+	public void stopPlayerTimer(Player player, String key, boolean postEvent);
+	
+	
 	// Update all timers that should be executed every tick
 	public void updateTimers();
 	

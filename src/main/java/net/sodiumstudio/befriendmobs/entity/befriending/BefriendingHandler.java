@@ -7,6 +7,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -185,6 +187,15 @@ public abstract class BefriendingHandler
 		return true;
 	}
 	
+	/**
+	 * Action when related mob fired a timer-up event, posted after the timer-up Forge event.
+	 * @param mob	Related mob.
+	 * @param timerKey	String key of the timer.
+	 * @param player	Related player if it's a player-specified timer. Null if it isn't.
+	 */
+	public void onBefriendableMobTimerUp(Mob mob, String timerKey, @Nullable Player player) {}
+	
+	
 	/* Util */
 	/**
 	 * Do an action for all players in process.
@@ -243,5 +254,5 @@ public abstract class BefriendingHandler
 		}
 		return rs.getValue();
 	}
-	
+
 }

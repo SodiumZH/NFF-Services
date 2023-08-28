@@ -18,7 +18,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-version = '0.1.13'
+version = '0.1.14'
 group = 'net.sodiumstudio.befriendmobs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'befriendmobs-1.19.2'
 
@@ -152,11 +152,11 @@ repositories {
         }
     }
     
-  /*  maven {
+    maven {
     // location of the maven that hosts JEI files
-  		  name = "Progwml6 maven"
+  		  name = "Jared Maven"
   		  url = "https://dvs1.progwml6.com/files/maven/"
-  			}*/
+  			}
  	 maven {
   		  // location of a maven mirror for JEI files, as a fallback
     	name = "ModMaven"
