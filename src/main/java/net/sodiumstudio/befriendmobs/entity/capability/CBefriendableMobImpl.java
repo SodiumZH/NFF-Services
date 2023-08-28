@@ -12,6 +12,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
+import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.events.BefriendableTimerUpEvent;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.debug.Debug;
@@ -180,6 +181,41 @@ public class CBefriendableMobImpl implements CBefriendableMob
 	}
 	
 	@Override
+	public void stopTimer(String key, boolean postEvent)
+	{
+		if (hasTimer(key))
+		{
+			nbt.getCompound("timers").remove(key);
+			if (postEvent)
+			{
+				MinecraftForge.EVENT_BUS.post(new BefriendableTimerUpEvent(this, key, null));
+				if (BefriendingTypeRegistry.getHandler(getOwner()) != null)
+				{
+					BefriendingTypeRegistry.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, null);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void stopPlayerTimer(Player player, String key, boolean postEvent)
+	{
+		if (hasPlayerTimer(player, key))
+		{
+			String actualKey = player.getStringUUID() + "_" + key;
+			nbt.getCompound("timers").getCompound("player_timers").remove(actualKey);
+			if (postEvent)
+			{
+				MinecraftForge.EVENT_BUS.post(new BefriendableTimerUpEvent(this, actualKey, player));
+				if (BefriendingTypeRegistry.getHandler(getOwner()) != null)
+				{
+					BefriendingTypeRegistry.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, player);
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void updateTimers()
 	{
 		ArrayList<String> labelRemove = new ArrayList<String>();
@@ -197,6 +233,10 @@ public class CBefriendableMobImpl implements CBefriendableMob
 					if (val == 1)
 					{
 						MinecraftForge.EVENT_BUS.post(new BefriendableTimerUpEvent(this, key, null));
+						if (BefriendingTypeRegistry.getHandler(getOwner()) != null)
+						{
+							BefriendingTypeRegistry.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, null);
+						}
 						labelRemove.add(key);
 					}
 				}
@@ -238,7 +278,13 @@ public class CBefriendableMobImpl implements CBefriendableMob
 						}
 						// Hatred time up doesn't post event
 						else 
+						{
 							MinecraftForge.EVENT_BUS.post(new BefriendableTimerUpEvent(this, actualKey, player));
+							if (BefriendingTypeRegistry.getHandler(getOwner()) != null)
+							{
+								BefriendingTypeRegistry.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, player);
+							}
+						}
 						labelRemove.add(key);
 					}
 				}
