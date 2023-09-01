@@ -2,6 +2,10 @@
 
 ## 1.19.2
 
+### 0.1.14
+
+Added `IBefriendableMob#stopTimer`related methods.
+
 ### 0.1.13
 
 Added `LinearColor` as a representation of RGB colors, and added related utilities.
