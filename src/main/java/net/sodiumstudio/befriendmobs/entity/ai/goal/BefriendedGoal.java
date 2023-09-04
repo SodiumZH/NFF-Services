@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.entity.ai.goal;
 
 import java.util.HashSet;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -21,6 +22,12 @@ public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 	protected IBefriendedMob mob = null;
 	private HashSet<BefriendedAIState> allowedStates = new HashSet<BefriendedAIState>();
 	private boolean isBlocked = false;
+	protected Random rnd = new Random();
+	/**
+	 *  If it's more than 0, when checking if this goal should be executed (only on start, not on check continue using),
+	 *  it will has chance to be directly skipped, allowing goals below to be executed.
+	 */
+	protected double skipChance = 0;
 	/**
 	 * If true, this goal will require the mob's owner is in the same level to run.
 	 */
@@ -129,6 +136,8 @@ public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 			throw new RuntimeException("Illegal method call: checkCanUse() method cannot call canUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanUse().");
 		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
+		if (skipChance > 0 && rnd.nextDouble() < skipChance)
+			return false;
 		BefriendedGoalCheckCanUseEvent event = new BefriendedGoalCheckCanUseEvent(this, BefriendedGoalCheckCanUseEvent.Phase.CAN_USE);
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.getManualSetValue().isPresent())
@@ -160,4 +169,26 @@ public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 		return checkCanContinueToUse();
 	}
 
+	/**
+	 * Get skip chance of this goal.
+	 * <p> If it has skip chance > 0, it will have a chance to be directly skipped when checking if to start, allowing goals below to be executed.
+	 * When it's skipped, it won't post {@link BefriendedGoalCheckCanUseEvent}.
+	 */
+	public double getSkipChance()
+	{
+		return skipChance;
+	}
+	
+	/**
+	 * Set skip chance of this goal. This method returns the goal itself, and use template class to specify the subclass to cast.
+	 * <p> If it has skip chance > 0, it will have a chance to be directly skipped when checking if to start, allowing goals below to be executed.
+	 * When it's skipped, it won't post {@link BefriendedGoalCheckCanUseEvent}.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedGoal> T setSkipChance(double value)
+	{
+		this.skipChance = value;
+		return (T)this;
+	}
+	
 }

@@ -2,25 +2,20 @@ package net.sodiumstudio.befriendmobs.entity.befriending;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
-import net.sodiumstudio.befriendmobs.network.BMChannels;
-import net.sodiumstudio.befriendmobs.network.ClientboundBefriendingInitPacket;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
-import net.sodiumstudio.nautils.NetworkHelper;
 import net.sodiumstudio.nautils.debug.Debug;
 import net.sodiumstudio.nautils.math.RandomSelection;
 import net.sodiumstudio.nautils.math.RndUtil;
