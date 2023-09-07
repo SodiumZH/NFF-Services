@@ -1,8 +1,9 @@
-package net.sodiumstudio.befriendmobs.entity.ai;
+package net.sodiumstudio.befriendmobs.bmevents.entity.ai;
 
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 @Cancelable
 public class BefriendedChangeAiStateEvent extends Event

@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Adjusted from vanilla WaterAvoidingRandomStrollGoal
 public class BefriendedWaterAvoidingRandomStrollGoal extends BefriendedRandomStrollGoal {

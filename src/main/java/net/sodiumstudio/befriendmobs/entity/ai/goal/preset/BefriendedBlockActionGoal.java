@@ -1,7 +1,7 @@
 package net.sodiumstudio.befriendmobs.entity.ai.goal.preset;
 
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 /* Block the actions below under certain conditions */
 public abstract class BefriendedBlockActionGoal extends BefriendedGoal

@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.entity;
+package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +25,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
+import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
-import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
@@ -461,15 +460,33 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/* Respawn */
 	
+	public static enum DeathRespawnerGenerationType
+	{
+		GIVE,	// Directly give the repawner to the player
+		DROP,	// Drop the respawner on the ground
+		NONE	// Dont generate respawner
+	}
+	
 	/**
+	 * Defines how the respawner should be generated after mob dies.
+	 */
+	public default DeathRespawnerGenerationType getDeathRespawnerGenerationType()
+	{
+		return DeathRespawnerGenerationType.DROP;
+	}
+
+	/**
+	 * (DROP only) 
 	 * Get the type (subclass) of respawner it will drop.
-	 * Return null to disable respawner dropping.
+	 * If it's null, it will be handled as if generation type is NONE.
 	 */
 	@Nullable
 	public MobRespawnerItem getRespawnerType();
 	
 	/**
+	 * (DROP only)
 	 * If true, the respawner will be invulnerable (except creative players, /kill commands and the void)
+	 * <p> This works only when Generation Type is {@code DROP}. 
 	 */
 	public default boolean isRespawnerInvulnerable()
 	{
@@ -477,6 +494,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/**
+	 * (DROP only)
 	 * If true, the respawner will be lifted up on drop into the void
 	 */
 	public default boolean shouldRespawnerRecoverOnDropInVoid()
@@ -485,6 +503,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/**
+	 * (DROP only)
 	 * If true, the respawner will never expire 
 	 */
 	public default boolean respawnerNoExpire()

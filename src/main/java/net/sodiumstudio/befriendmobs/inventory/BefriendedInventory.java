@@ -7,7 +7,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.nautils.NbtHelper;
 
 public class BefriendedInventory extends SimpleContainer

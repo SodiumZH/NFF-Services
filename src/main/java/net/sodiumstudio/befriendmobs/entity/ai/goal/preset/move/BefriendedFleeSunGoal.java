@@ -10,9 +10,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Adjusted from vanilla FleeSunGoal
 public class BefriendedFleeSunGoal extends BefriendedMoveGoal {

@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumstudio.befriendmobs.entity.BefriendedHelper;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerFinishRespawnEvent;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerStartRespawnEvent;
 import net.sodiumstudio.befriendmobs.item.event.RespawnerConstructEvent;
@@ -205,5 +205,8 @@ public class MobRespawnerInstance
 		return BefriendedHelper.getNameFromNbt(getMobNbt(), getType());
 	}
 	
-	
+	public UUID getUUID()
+	{
+		return getMobNbt().getUUID("UUID");
+	}
 }

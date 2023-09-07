@@ -18,8 +18,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendedEnderManGoals
 {

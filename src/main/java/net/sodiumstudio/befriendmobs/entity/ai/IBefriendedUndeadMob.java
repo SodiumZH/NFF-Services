@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 

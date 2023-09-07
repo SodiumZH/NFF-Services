@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Handle swell start/stop when the creeper is swelling
 public class BefriendedCreeperSwellGoal extends BefriendedGoal

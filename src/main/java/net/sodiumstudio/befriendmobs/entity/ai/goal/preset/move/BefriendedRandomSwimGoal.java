@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendedRandomSwimGoal extends BefriendedRandomStrollGoal
 {

@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.entity.capability;
+package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 /**

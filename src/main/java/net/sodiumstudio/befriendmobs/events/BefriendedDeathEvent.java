@@ -3,7 +3,7 @@ package net.sodiumstudio.befriendmobs.events;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 @Cancelable
 public class BefriendedDeathEvent extends Event

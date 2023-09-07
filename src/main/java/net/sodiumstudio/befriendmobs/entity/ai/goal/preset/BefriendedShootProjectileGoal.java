@@ -9,8 +9,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.RangedAttackMob;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Adjusted from RangedAttackGoal
 public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
