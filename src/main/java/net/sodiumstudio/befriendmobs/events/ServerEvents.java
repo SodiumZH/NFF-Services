@@ -10,7 +10,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayer;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
 
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents 
@@ -47,7 +47,7 @@ public class ServerEvents
 		{
 			for (Player player: event.world.players())
 			{
-				CBMPlayer.removeOneTickTags(player);
+				CBMPlayerModule.removeOneTickTags(player);
 			}
 		}
 	}

@@ -32,10 +32,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
+import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedUndeadMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
@@ -301,10 +302,12 @@ public class EntityEvents
 					// If drop respawner, drop and initialize
 					if (bef.getRespawnerType() != null)
 					{
-						ItemEntity resp = event.getEntity().spawnAtLocation(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
-						MobRespawnerInstance ins = MobRespawnerInstance.create(resp.getItem());
+						MobRespawnerInstance ins = MobRespawnerInstance.create(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
+						
+						
 						if (ins != null)
 						{
+							ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), ins.get());
 							if (bef.isRespawnerInvulnerable())
 							{					
 								ins.setInvulnerable(true);
@@ -312,6 +315,8 @@ public class EntityEvents
 							}
 							ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
 							ins.setNoExpire(bef.respawnerNoExpire());
+							if (!BMHooks.onBefriendedGenerateRespawnerOnDying(bef, ins))
+								event.getEntity().level.addFreshEntity(resp);
 						}
 					}
 				}

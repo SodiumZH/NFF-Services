@@ -1,6 +1,6 @@
 package net.sodiumstudio.befriendmobs.entity.befriending;
 
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendableMobInteractionResult {
 	

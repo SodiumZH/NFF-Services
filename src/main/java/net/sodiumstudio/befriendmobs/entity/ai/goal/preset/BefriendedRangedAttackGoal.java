@@ -2,7 +2,7 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal.preset;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.RangedAttackMob;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendedRangedAttackGoal extends BefriendedShootProjectileGoal
 {

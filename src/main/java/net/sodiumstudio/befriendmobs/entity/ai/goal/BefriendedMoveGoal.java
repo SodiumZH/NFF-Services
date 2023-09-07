@@ -3,8 +3,8 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal;
 import java.util.function.Predicate;
 
 import net.minecraft.world.level.block.Blocks;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedAmphibious;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 /**
  * The base class of all befriended mob goals for moving to somewhere,

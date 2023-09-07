@@ -9,8 +9,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.bmevents.entity.BefriendedGoalCheckCanUseEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public abstract class BefriendedTargetGoal extends TargetGoal implements IBefriendedGoal
 {

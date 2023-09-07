@@ -11,13 +11,13 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendableMobRegistry;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider;
-import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayer;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
-import net.sodiumstudio.befriendmobs.entity.capability.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
@@ -92,11 +92,11 @@ public class BMCapabilityAttachment {
 					new CBaubleDataCache.Prvd(b));
 		}
 		
-		// CBMPlayer
+		// CBMPlayerModule
 		if (event.getObject() instanceof Player p)
 		{
 			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_bm_player"), 
-					new CBMPlayer.Prvd(p));
+					new CBMPlayerModule.Prvd(p));
 		}
 		
 	}

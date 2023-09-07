@@ -1,9 +1,11 @@
-package net.sodiumstudio.befriendmobs.entity.ai.goal;
+package net.sodiumstudio.befriendmobs.bmevents.entity;
 
 import java.util.Optional;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.eventbus.api.Event;
+import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
+import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
 
 public class BefriendedGoalCheckCanUseEvent extends Event
 {

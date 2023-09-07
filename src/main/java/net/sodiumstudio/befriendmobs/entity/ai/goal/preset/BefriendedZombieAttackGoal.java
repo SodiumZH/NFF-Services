@@ -1,6 +1,6 @@
 package net.sodiumstudio.befriendmobs.entity.ai.goal.preset;
 
-import net.sodiumstudio.befriendmobs.entity.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Adjusted from vanilla ZombieAttackGoal
 public class BefriendedZombieAttackGoal extends BefriendedMeleeAttackGoal {

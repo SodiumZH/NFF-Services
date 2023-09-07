@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 
-public interface CBMPlayer extends INBTSerializable<CompoundTag>
+public interface CBMPlayerModule extends INBTSerializable<CompoundTag>
 {
 
 	public Player getPlayer();
@@ -90,7 +90,7 @@ public interface CBMPlayer extends INBTSerializable<CompoundTag>
 		});
 	}
 	
-	public static class Impl implements CBMPlayer
+	public static class Impl implements CBMPlayerModule
 	{
 
 		protected Player player;
@@ -179,9 +179,9 @@ public interface CBMPlayer extends INBTSerializable<CompoundTag>
 		
 	}
 	
-	public static CBMPlayer get(Player player)
+	public static CBMPlayerModule get(Player player)
 	{
-		Wrapped<CBMPlayer> wrp = new Wrapped<>(null);
+		Wrapped<CBMPlayerModule> wrp = new Wrapped<>(null);
 		player.getCapability(BMCaps.CAP_BM_PLAYER).ifPresent(c -> 
 		{
 			wrp.set(c);

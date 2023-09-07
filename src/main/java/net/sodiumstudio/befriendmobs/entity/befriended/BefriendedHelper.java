@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.entity;
+package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.util.UUID;
 
