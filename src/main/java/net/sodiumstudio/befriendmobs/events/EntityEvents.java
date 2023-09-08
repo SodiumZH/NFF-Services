@@ -37,6 +37,7 @@ import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateE
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedUndeadMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob.DeathRespawnerGenerationType;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
@@ -48,12 +49,12 @@ import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
+import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
-import net.sodiumstudio.nautils.debug.BMDebugItemHandler;
 
 // TODO: change modid after isolation
 @SuppressWarnings("removal")
@@ -303,10 +304,26 @@ public class EntityEvents
 					if (bef.getRespawnerType() != null)
 					{
 						MobRespawnerInstance ins = MobRespawnerInstance.create(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
-						
-						
 						if (ins != null)
 						{
+							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE)
+							{
+								if (bef.isOwnerPresent() && bef.getOwner().addItem(ins.get())) {}
+								else
+								{
+									if (!bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).isPresent())
+									{
+										throw new IllegalStateException("BefriendedMobs: Server level missing CBMLevelModule capability");
+									}
+									bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap ->
+									{
+										cap.addSuspendedRespawner(ins);
+									});
+								}	
+							}
+							
+							else if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.DROP)
+							{
 							ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), ins.get());
 							if (bef.isRespawnerInvulnerable())
 							{					
@@ -315,7 +332,7 @@ public class EntityEvents
 							}
 							ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
 							ins.setNoExpire(bef.respawnerNoExpire());
-							if (!BMHooks.onBefriendedGenerateRespawnerOnDying(bef, ins))
+							if (!BMHooks.onBefriendedDropRespawnerOnDying(bef, ins))
 								event.getEntity().level.addFreshEntity(resp);
 						}
 					}

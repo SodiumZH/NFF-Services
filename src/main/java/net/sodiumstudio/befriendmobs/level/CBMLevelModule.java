@@ -5,16 +5,31 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
+import net.sodiumstudio.befriendmobs.BefriendMobs;
+import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
+import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
+import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule.Impl;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.NbtHelper;
+import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.debug.Debug;
 
 /**
  * Comprehensive serializable module for levels in BM.
@@ -28,6 +43,9 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 
 	/** Get the whole NBT tag. */
 	public CompoundTag getNbt();
+	
+	/** Get the overall tick count from this level created. */
+	public long getTickCount();
 	
 	/** Add a suspended respawner.
 	 * <p> A suspended respawner is a respawner item stack generated on befriended mob dying that cannot be instantly given back to the owner.
@@ -44,22 +62,30 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 	 */
 	public boolean tryReturnSuspendedRespawner(String key);
 	
-	
 	/**
 	 * Remove a suspended respawner.
 	 */
 	public void removeSuspendedRespawner(String key);
 	
-	
 	/** Scan the saved respawner list, check if some of them can be given to the owner, and give them */
 	public void updateSuspendedRespawners();
+
+	/** Executed every tick.
+	 * Called in {@link ServerEvents#onLevelTick}.
+	 * <p> It's ticked after the vanilla level tick.
+	 */
+	public void tick();
+
+	
+	// ============================ Implementation ============================ //
 	
 	public static class Impl implements CBMLevelModule
 	{
 
 		protected ServerLevel level;
-		
 		protected CompoundTag nbt;
+		protected long tickCount = 0;
+		
 		
 		protected Impl(ServerLevel level)
 		{
@@ -89,7 +115,12 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 			return nbt;
 		}
 
-
+		@Override
+		public long getTickCount()
+		{
+			return tickCount;
+		}
+		
 		@Override
 		public void addSuspendedRespawner(MobRespawnerInstance respawner) {
 			CompoundTag tag = new CompoundTag();
@@ -115,7 +146,6 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 			else return true;	// Successfully added
 		}
 
-
 		@Override
 		public void removeSuspendedRespawner(String key) 
 		{
@@ -136,8 +166,64 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 				this.removeSuspendedRespawner(key);
 			}
 		}
-
 		
+		@Override
+		public void tick()
+		{
+			tickCount += 1;
+			BMHooks.Level.onModuleTickStart(level);
+			
+			if (getTickCount() % 20 == 0)
+				updateSuspendedRespawners();
+			
+			// Debug output time
+			if (BefriendMobs.IS_DEBUG_MODE && getTickCount() % 200 == 0 && getLevel().players().size() > 0)
+				Debug.printToScreen("Time (s) : " + Long.toString(getTickCount()), getLevel().players().get(0));
+			
+			BMHooks.Level.onModuleTickEnd(level);
+		}
+	}
+	
+	
+	// ============================ Provider ============================ //	
+	
+	public static class Prvd implements ICapabilitySerializable<CompoundTag>
+	{
+
+		protected final Impl impl;
+		
+		public Prvd(ServerLevel level)
+		{
+			impl = new Impl(level);
+		}
+		
+		@Override
+		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+			if (cap == BMCaps.CAP_BM_LEVEL)
+				return LazyOptional.of(() -> {return this.impl;}).cast();
+			else return LazyOptional.empty();
+		}
+
+		@Override
+		public CompoundTag serializeNBT() {
+			return impl.serializeNBT();
+		}
+
+		@Override
+		public void deserializeNBT(CompoundTag nbt) {
+			impl.deserializeNBT(nbt);
+		}
+		
+	}
+	
+	public static CBMPlayerModule get(Player player)
+	{
+		Wrapped<CBMPlayerModule> wrp = new Wrapped<>(null);
+		player.getCapability(BMCaps.CAP_BM_PLAYER).ifPresent(c -> 
+		{
+			wrp.set(c);
+		});
+		return wrp.get();
 	}
 	
 }

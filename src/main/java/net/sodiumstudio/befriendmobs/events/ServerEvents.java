@@ -11,6 +11,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents 
@@ -36,6 +37,7 @@ public class ServerEvents
 				{
 					MinecraftForge.EVENT_BUS.post(new ServerEntityTickEvent.PostWorldTick(entity));		
 				}
+				serverlevel.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap -> {cap.tick();});
 			}
 		}
 	}

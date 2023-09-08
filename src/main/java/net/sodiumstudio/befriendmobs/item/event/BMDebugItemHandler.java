@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.debug;
+package net.sodiumstudio.befriendmobs.item.event;
 
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -15,6 +15,7 @@ import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.InfoHelper;
 import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.debug.Debug;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
 public class BMDebugItemHandler
