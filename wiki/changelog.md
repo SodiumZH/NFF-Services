@@ -2,6 +2,16 @@
 
 ## 1.19.2
 
+### 0.1.15
+
+Added `CBMLevelModule` as a serializable capability for levels.
+
+Rename classes:
+
+​	-`CBMPlayer` => `CBMPlayerModule`
+
+Some changes about class package path.
+
 ### 0.1.14
 
 Added `IBefriendableMob#stopTimer`related methods.
