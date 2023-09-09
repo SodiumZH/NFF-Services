@@ -23,11 +23,27 @@ import net.sodiumstudio.befriendmobs.registry.BMCaps;
  */
 public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 
+	/**
+	 * Transform capability to value implementations.
+	 * In values transient data can be directly accessed.
+	 * If permanent (serializable) data is needed, use wrapped methods in IBefriendedMob instead.
+	 */
 	public default Values values()
 	{
 		return (Values)this;
 	}
 	
+	/** Get the whole NBT as compound tag.*/
+	public CompoundTag getNbt();
+	
+	/**
+	 * Save common data of all befriended mobs to the data capability tag.
+	 */
+	public void saveMobData();
+	
+	/**
+	 * Values of trancient mob data, also as implementation of interface methods.
+	 */
 	public class Values implements CBefriendedMobData
 	{
 		public IBefriendedMob mob;
@@ -47,7 +63,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		public HashMap<String, Supplier<Boolean>> sunImmuneConditions = new HashMap<String, Supplier<Boolean>>();
 		public HashMap<String, Supplier<Boolean>> sunImmuneNecessaryConditions = new HashMap<String, Supplier<Boolean>>();
 		
-		public Map<String, Object> tempObjects = Maps.newHashMap();
+		public Map<String, Object> tempObjects = new HashMap<>();
 		
 		@Override
 		public CompoundTag serializeNBT() {
