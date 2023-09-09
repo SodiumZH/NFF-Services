@@ -6,12 +6,12 @@ import net.sodiumstudio.befriendmobs.level.CBMLevelModule;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.MiscUtil;
 
-public class BMLevelModuleTickStartEvent extends Event
+public class BMLevelModuleTickEndEvent extends Event
 {
 	public final ServerLevel level;
 	public final CBMLevelModule levelModule;
 	
-	public BMLevelModuleTickStartEvent(ServerLevel level)
+	public BMLevelModuleTickEndEvent(ServerLevel level)
 	{
 		this.level = level;
 		var cap = MiscUtil.getValue(level.getCapability(BMCaps.CAP_BM_LEVEL));

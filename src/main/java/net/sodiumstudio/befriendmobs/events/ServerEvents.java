@@ -11,13 +11,14 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents 
 {
 
 	@SubscribeEvent
-	public static void onWorldTick(TickEvent.LevelTickEvent event) {
+	public static void onLevelTick(TickEvent.LevelTickEvent event) {
 
 		
 		if (event.side == LogicalSide.SERVER)
@@ -36,12 +37,13 @@ public class ServerEvents
 				{
 					MinecraftForge.EVENT_BUS.post(new ServerEntityTickEvent.PostWorldTick(entity));		
 				}
+				serverlevel.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap -> {cap.tick();});
 			}
 		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onWorldTickFinalize(TickEvent.LevelTickEvent event)
+	public static void onLevelTickFinalize(TickEvent.LevelTickEvent event)
 	{
 		if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER)
 		{

@@ -251,4 +251,32 @@ public class ContainerHelper
 		return MapPair.of(k, map.get(k));
 	}
 	
+	/**
+	 * Gather elements fulfilling certain condition, transform with a function and collect into a list
+	 */
+	public static <T, U> ArrayList<U> collectAndTransform(Collection<T> from, Predicate<T> condition, Function<T, U> transformation)
+	{
+		ArrayList<U> list = new ArrayList<>();
+		from.stream().filter(condition).forEach((T t) -> list.add(transformation.apply(t)));
+		return list;
+	}
+	
+	/**
+	 * Gather elements fulfilling certain condition, transform with a function and collect into a list
+	 * <p> Note: use this only for non-collection iterables because it's slower. For collections, use {@code collectAndTransform} instead.
+	 */
+	public static <T, U> ArrayList<U> collectIterableAndTransform(Iterable<T> from, Predicate<T> condition, Function<T, U> transformation)
+	{
+		ArrayList<U> list = new ArrayList<>();
+		for (T t: from)
+		{
+			if (condition.test(t))
+			{
+				list.add(transformation.apply(t));
+			}
+		}
+		return list;
+	}
+	
+	
 }
