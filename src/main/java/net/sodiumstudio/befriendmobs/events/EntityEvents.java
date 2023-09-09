@@ -250,47 +250,35 @@ public class EntityEvents
 	public static void onLivingDeath(LivingDeathEvent event) {
 		if (event.isCanceled())
 			return;
-		if (!event.getEntity().level.isClientSide)
-		{
-			if (event.getEntity() instanceof IBefriendedMob bef)
-			{
-				if (MinecraftForge.EVENT_BUS.post(new BefriendedDeathEvent(bef, event.getSource())))
-				{
+		if (!event.getEntity().level.isClientSide) {
+			if (event.getEntity() instanceof IBefriendedMob bef) {
+				if (MinecraftForge.EVENT_BUS.post(new BefriendedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
 					return;
 				}
 				// Befriended mobs should not kill each other with same owner, or get killed by
 				// owner-tamed animals
-				else if (event.getSource().getEntity() instanceof IBefriendedMob srcBef)
-				{
-					if (srcBef.getOwner() != null && bef.getOwner() != null && srcBef.getOwner() == bef.getOwner())
-					{
+				else if (event.getSource().getEntity() instanceof IBefriendedMob srcBef) {
+					if (srcBef.getOwner() != null && bef.getOwner() != null && srcBef.getOwner() == bef.getOwner()) {
+						bef.asMob().setHealth(1.0f);
+						bef.asMob().invulnerableTime += 20;
+						event.setCanceled(true);
+						return;
+					}
+				} else if (event.getSource().getEntity() instanceof TamableAnimal ta) {
+					if (ta.getOwner() != null && bef.getOwner() != null && ta.getOwner() == bef.getOwner()) {
 						bef.asMob().setHealth(1.0f);
 						bef.asMob().invulnerableTime += 20;
 						event.setCanceled(true);
 						return;
 					}
 				}
-				else if (event.getSource().getEntity() instanceof TamableAnimal ta)
-				{
-					if (ta.getOwner() != null && bef.getOwner() != null && ta.getOwner() == bef.getOwner())
-					{
-						bef.asMob().setHealth(1.0f);
-						bef.asMob().invulnerableTime += 20;
-						event.setCanceled(true);
-						return;
-					}
-				}
-				if (!event.getEntity().level.isClientSide)
-				{
+				if (!event.getEntity().level.isClientSide) {
 					// Drop all items in inventory if no vanishing curse
-					if (bef.dropInventoryOnDeath())
-					{
+					if (bef.dropInventoryOnDeath()) {
 						BefriendedInventory container = bef.getAdditionalInventory();
-						for (int i = 0; i < container.getContainerSize(); ++i)
-						{
-							if (container.getItem(i) != ItemStack.EMPTY)
-							{
+						for (int i = 0; i < container.getContainerSize(); ++i) {
+							if (container.getItem(i) != ItemStack.EMPTY) {
 								if (!EnchantmentHelper.hasVanishingCurse(container.getItem(i)))
 								{
 									event.getEntity().spawnAtLocation(container.getItem(i).copy());
@@ -301,68 +289,63 @@ public class EntityEvents
 						}
 					}
 					// If drop respawner, drop and initialize
-					if (bef.getRespawnerType() != null)
-					{
-						MobRespawnerInstance ins = MobRespawnerInstance.create(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
-						if (ins != null)
-						{
-							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE)
-							{
-								if (bef.isOwnerPresent() && bef.getOwner().addItem(ins.get())) {}
-								else
-								{
-									if (!bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).isPresent())
-									{
-										throw new IllegalStateException("BefriendedMobs: Server level missing CBMLevelModule capability");
+					if (bef.getRespawnerType() != null) {
+						MobRespawnerInstance ins = MobRespawnerInstance
+								.create(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
+						if (ins != null) {
+							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE) {
+								if (bef.isOwnerPresent() && bef.getOwner().addItem(ins.get())) {
+								} else {
+									if (!bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).isPresent()) {
+										throw new IllegalStateException(
+												"BefriendedMobs: Server level missing CBMLevelModule capability");
 									}
-									bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap ->
+									bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap -> 
 									{
 										cap.addSuspendedRespawner(ins);
 									});
-								}	
+								}
 							}
-							
+
 							else if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.DROP)
 							{
-							ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), ins.get());
-							if (bef.isRespawnerInvulnerable())
-							{					
-								ins.setInvulnerable(true);
-								resp.setInvulnerable(true);
+								ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(),
+										event.getEntity().getY(), event.getEntity().getZ(), ins.get());
+								if (bef.isRespawnerInvulnerable()) {
+									ins.setInvulnerable(true);
+									resp.setInvulnerable(true);
+								}
+								ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
+								ins.setNoExpire(bef.respawnerNoExpire());
+								if (!BMHooks.Befriended.onBefriendedGenerateRespawnerOnDying(bef, ins))
+									event.getEntity().level.addFreshEntity(resp);
 							}
-							ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
-							ins.setNoExpire(bef.respawnerNoExpire());
-							if (!BMHooks.onBefriendedDropRespawnerOnDying(bef, ins))
-								event.getEntity().level.addFreshEntity(resp);
 						}
 					}
 				}
-			}
-			
-			else if (event.getEntity() instanceof TamableAnimal ta)
-			{
-				if (event.getSource().getEntity() instanceof IBefriendedMob srcBef)
+
+				else if (event.getEntity() instanceof TamableAnimal ta) 
 				{
-					if (srcBef.getOwner() != null && ta.getOwner() != null && srcBef.getOwner() == ta.getOwner())
+					if (event.getSource().getEntity() instanceof IBefriendedMob srcBef) 
 					{
-						ta.setHealth(1.0f);
-						ta.invulnerableTime += 20;
-						event.setCanceled(true);
-						return;
+						if (srcBef.getOwner() != null && ta.getOwner() != null && srcBef.getOwner() == ta.getOwner()) {
+							ta.setHealth(1.0f);
+							ta.invulnerableTime += 20;
+							event.setCanceled(true);
+							return;
+						}
 					}
 				}
-			}
-			
-			else if (event.getEntity() instanceof Player player)
-			{
-				for (Entity en: ((ServerLevel)(player.level)).getAllEntities())
-				{
-					if (en instanceof Mob mob && mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()) 
-					{
-						if (!BefriendingTypeRegistry.getHandler(mob).dontInterruptOnPlayerDie() 
-								&& BefriendingTypeRegistry.getHandler(mob).isInProcess(player, mob))
+
+				else if (event.getEntity() instanceof Player player) {
+					for (Entity en : ((ServerLevel) (player.level)).getAllEntities()) {
+						if (en instanceof Mob mob && mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()) 
 						{
-							BefriendingTypeRegistry.getHandler(mob).interrupt(player, mob, true);
+							if (!BefriendingTypeRegistry.getHandler(mob).dontInterruptOnPlayerDie()
+									&& BefriendingTypeRegistry.getHandler(mob).isInProcess(player, mob))
+							{
+								BefriendingTypeRegistry.getHandler(mob).interrupt(player, mob, true);
+							}
 						}
 					}
 				}
