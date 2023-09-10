@@ -4,6 +4,8 @@
 
 ### 0.1.15
 
+Moved the common serializing data for befriended mobs from the mob class declaration to `CBefriendedMobData`.
+
 Added `CBMLevelModule` as a serializable capability for levels.
 
 Rename classes:
