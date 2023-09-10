@@ -542,7 +542,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default CBefriendedMobData.Values getTempData()
 	{
 		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
-		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
 		{
 			res.set(cap);
 		});

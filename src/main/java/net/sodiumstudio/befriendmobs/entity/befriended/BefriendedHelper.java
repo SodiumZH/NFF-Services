@@ -21,6 +21,8 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
+import net.sodiumstudio.befriendmobs.util.BMErrorHandler;
+import net.sodiumstudio.befriendmobs.util.BMRuntimeException;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NbtHelper;
 
@@ -67,11 +69,16 @@ public class BefriendedHelper
 	}
 
 	/**
-	 *  This will read owner, AI state and additional inventory
-	 *  <p>读取拥有者信息、AI状态及附加道具栏
+	 *  This will save owner, AI state and additional inventory
+	 *  <p>存储生物的拥有者信息、AI状态及附加道具栏
+	 *  @deprecated Befriended mob common data are stored in capability now. Use {@link CBefriendedMobData#saveFromMob()} instead.
 	*/
 	public static void addBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt)
 	{
+		
+		CBefriendedMobData.get(mob).saveFromMob();
+		
+		// Data saving below will be removed
 		String modId = mob.getModId();
 		String ownerKey = modId + ":befriended_owner";
 		String aiStateKey = modId + ":befriended_ai_state";
@@ -85,6 +92,7 @@ public class BefriendedHelper
 			nbt.putUUID(ownerKey, new UUID(0, 0));
 		nbt.putInt(aiStateKey, mob.getAIState().id);
 		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
+		
 	}
 	
 	@Deprecated	// Use version without modid input
@@ -94,38 +102,45 @@ public class BefriendedHelper
 	}
 	
 	/**
+	 * @deprecated Use {@link CBefriendedMobData#loadToMob()} instead.
 	 * Read mob's Mod Id, owner, AI state and additional inventory information.
 	 * <p>读取生物所属的Mod ID、拥有者信息、AI状态及附加道具栏
 	 */
-	
+	@Deprecated
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
-		String modid = null;
-		// 
-		if (nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID))
-		{
-			modid = nbt.getString("befriended_mod_id");
-		}		
 		
-		else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7. Later it will be "befriendmobs".
-		
-		String ownerKey = modid + ":befriended_owner";
-		String aiStateKey = modid + ":befriended_ai_state";
-		String inventoryKey = modid + ":befriended_additional_inventory";
-		UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
-		try {
-		if (uuid == null)
-			throw new IllegalStateException(
-					"Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?");
-		}
-		catch(IllegalStateException e)
+		try 
 		{
-			e.printStackTrace();
-			return;
+			CBefriendedMobData.get(mob).loadToMob();
 		}
-		mob.setOwnerUUID(uuid);
-		mob.init(mob.getOwnerUUID(), null);
-		mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
-		mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
+		catch (BMRuntimeException e)
+		{
+			// If the save data hasn't been correctly written into the capability, use the old data format
+			if (e.getInfo().equals("Missing befriended mob common data."))
+			{
+				e.printWarning().addInfo("If this warning emerges not repeatedly it's ignorable.");
+				String modid = nbt.getString("befriended_mod_id");
+				String ownerKey = modid + ":befriended_owner";
+				String aiStateKey = modid + ":befriended_ai_state";
+				String inventoryKey = modid + ":befriended_additional_inventory";
+				UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
+				try {
+				if (uuid == null)
+					throw new IllegalStateException(
+							"Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?");
+				}
+				catch(IllegalStateException ex)
+				{
+					ex.printStackTrace();
+					return;
+				}
+				mob.setOwnerUUID(uuid);
+				mob.init(mob.getOwnerUUID(), null);
+				mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
+				mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
+			}
+			else throw e;
+		}
 	}
 
 	/**

@@ -2,7 +2,7 @@ package net.sodiumstudio.befriendmobs.util;
 
 import com.mojang.logging.LogUtils;
 
-public class BMError {
+public class BMErrorHandler {
 
 	/**
 	 * This method throws a BM-specified exception.
@@ -10,7 +10,7 @@ public class BMError {
 	 */
 	public static void exception(String info)
 	{
-		throw new RuntimeException("BefriendedMobs Exception thrown: " + info);
+		throw new BMRuntimeException(info);
 	}
 	
 	/**
@@ -26,8 +26,7 @@ public class BMError {
 	 */
 	public static void warning(String info)
 	{
-		LogUtils.getLogger().warn("BefriendedMobs Earning: " + info);
+		LogUtils.getLogger().warn("BefriendedMobs Warning: " + info);
 	}
-	
-	
+
 }
