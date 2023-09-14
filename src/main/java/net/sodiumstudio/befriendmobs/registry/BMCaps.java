@@ -24,7 +24,7 @@ public class BMCaps {
 	
 	// Caps for data storage only
 	public static Capability<CBaubleDataCache> CAP_BAUBLE_DATA_CACHE = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CapabilityManager.get(new CapabilityToken<>(){});
+	public static Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_TEMP_DATA = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// General functional capabilities
 	public static Capability<CBMPlayerModule> CAP_BM_PLAYER = CapabilityManager.get(new CapabilityToken<>(){});

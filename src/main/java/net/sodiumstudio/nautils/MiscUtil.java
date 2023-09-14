@@ -116,22 +116,6 @@ public class MiscUtil {
 		return wrp.get();
 	}
 	
-	/**
-	 * Get the value from a lazy optional.
-	 * If the value isn't present, return default value.
-	 */
-	@Nullable
-	public static <T> T getValue(LazyOptional<T> optional, T defaultValue)
-	{
-		Wrapped<T> wrp = new Wrapped<>(null);
-		Wrapped<Boolean> isSet = new Wrapped<>(false);
-		optional.ifPresent(t -> {
-			wrp.set(t);
-			isSet.set(true);
-		});
-		return isSet.get() ? wrp.get() : defaultValue;
-	}
-	
 	public static <T> T nullThen(T test, T forNull)
 	{
 		return test == null ? forNull : test;
