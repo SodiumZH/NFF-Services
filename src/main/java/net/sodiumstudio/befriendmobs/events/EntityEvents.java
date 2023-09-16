@@ -35,8 +35,8 @@ import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedUndeadMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob.DeathRespawnerGenerationType;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
@@ -294,8 +294,10 @@ public class EntityEvents
 								.create(MobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
 						if (ins != null) {
 							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE) {
-								if (bef.isOwnerPresent() && bef.getOwner().addItem(ins.get())) {
-								} else {
+								if (bef.isOwnerPresent() && bef.getOwner().getInventory().getFreeSlot() != -1 && bef.getOwner().addItem(ins.get())) 
+								{} 
+								else 
+								{
 									if (!bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CBMLevelModule capability");
@@ -537,7 +539,7 @@ public class EntityEvents
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
 			});
 		}
-		if (event.getEntity() instanceof IBefriendedUndeadMob um)
+		if (event.getEntity() instanceof IBefriendedSunSensitiveMob um)
 		{
 			// Setup befriended undead sun-immunity rules
 			um.setupSunImmunityRules();

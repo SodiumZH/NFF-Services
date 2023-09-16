@@ -35,12 +35,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	
 	/** Get the whole NBT as compound tag.*/
 	public CompoundTag getNbt();
-	
-	/**
-	 * Save common data of all befriended mobs to the data capability tag.
-	 */
-	public void saveMobData();
-	
+
 	/**
 	 * Values of trancient mob data, also as implementation of interface methods.
 	 */
@@ -73,6 +68,11 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		@Override
 		public void deserializeNBT(CompoundTag nbt) {
 			tag = nbt;
+		}
+
+		@Override
+		public CompoundTag getNbt() {
+			return tag;
 		}		
 	}
 	

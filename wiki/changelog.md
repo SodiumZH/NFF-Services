@@ -6,11 +6,25 @@
 
 Added `CBMLevelModule` as a serializable capability for levels.
 
-Rename classes:
+Renamed classes:
 
 ​	-`CBMPlayer` => `CBMPlayerModule`
 
-Some changes about class package path.
+​	-`IBefriendedUndeadMob` => `IBefriendedSunSensitiveMob`
+
+Changed class package paths:
+
+​	-`entity.IBefriendedMob` => `entity.befriended.IBefriendedMob`
+
+​	-`entity.BefriendedHelper` => `entity.befriended.BefriendedHelper`
+
+​	-`entity.ai.IBefriendedUndeadMob` => `entity.befriended.IBefriendedSunSensitiveMob`
+
+​	-`entity.ai.IBefriendedAmphibious` => `entity.befriended.IBefriendedAmphibious`
+
+​	and some other classes.
+
+Added some parameters for `BefriendedGoal` and `BefriendedTargetGoal`.
 
 ### 0.1.14
 

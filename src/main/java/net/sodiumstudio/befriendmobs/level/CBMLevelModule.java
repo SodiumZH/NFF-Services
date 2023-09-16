@@ -141,8 +141,10 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 				return false;	// Not a valid respawner
 			if (this.getLevel().getPlayerByUUID(resp.getOwnerUUID()) == null)
 				return false;	// Player isn't present
-			if (!this.getLevel().getPlayerByUUID(resp.getOwnerUUID()).addItem(resp.get()))
+			if (this.getLevel().getPlayerByUUID(resp.getOwnerUUID()).getInventory().getFreeSlot() == -1)
 				return false;	// Player's inventory is full
+			if (!this.getLevel().getPlayerByUUID(resp.getOwnerUUID()).addItem(resp.get()))
+				return false;	// Adding failed for possible other reason
 			else return true;	// Successfully added
 		}
 
