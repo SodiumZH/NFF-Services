@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.bmevents.entity;
+package net.sodiumstudio.befriendmobs.bmevents.entity.ai;
 
 import java.util.Optional;
 

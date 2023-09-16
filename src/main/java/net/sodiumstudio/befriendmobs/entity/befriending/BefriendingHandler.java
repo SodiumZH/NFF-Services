@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
@@ -62,6 +63,7 @@ public abstract class BefriendingHandler
 		newBefMob.init(player.getUUID(), target);
 		newBefMob.setInventoryFromMob();
 		Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
+		BMHooks.Befriending.onMobBefriended(target, newBefMob);
 		newBefMob.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
 		//NetworkHelper.sendToAllPlayers(newBefMob.asMob().level, BMChannels.BM_CHANNEL, packet);
