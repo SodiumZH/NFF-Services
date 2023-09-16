@@ -26,6 +26,8 @@ Changed class package paths:
 
 Added some parameters for `BefriendedGoal` and `BefriendedTargetGoal`.
 
+Added an event on mob befriended.
+
 ### 0.1.14
 
 Added `IBefriendableMob#stopTimer`related methods.

@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumstudio.befriendmobs.bmevents.entity.BefriendedGoalCheckCanUseEvent;
+import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedGoalCheckCanUseEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
