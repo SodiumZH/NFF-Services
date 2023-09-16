@@ -1,20 +1,19 @@
-package net.sodiumstudio.befriendmobs.entity.ai;
+package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 
 /**
- * This is an interface handling sun immunity for undead mobs.
+ * This is an interface handling sun immunity for sun-sensitive mobs.
  * Put and remove entries in {@code sunImmuneConditions()} and {@sunImmuneNecessaryConditions()} to set rules.
  * Note: applying sun-immunity on mob must be manually implemented on each mob. 
  */
-public interface IBefriendedUndeadMob
+public interface IBefriendedSunSensitiveMob
 {
 	@Deprecated
 	@DontOverride
@@ -37,7 +36,7 @@ public interface IBefriendedUndeadMob
 	{
 		if (this instanceof IBefriendedMob bm)
 			return bm;
-		else throw new UnsupportedOperationException("IBefriendedUndeadMob: mob missing IBefriendedMob interface.");
+		else throw new UnsupportedOperationException("IBefriendedSunSensitiveMob: mob missing IBefriendedMob interface.");
 	}
 	
 	

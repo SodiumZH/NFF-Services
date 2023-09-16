@@ -3,8 +3,8 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal.preset.move;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.util.GoalUtils;
-import net.sodiumstudio.befriendmobs.entity.ai.IBefriendedAmphibious;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedAmphibious;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 // Adjusted from vanilla RestrictSunGoal

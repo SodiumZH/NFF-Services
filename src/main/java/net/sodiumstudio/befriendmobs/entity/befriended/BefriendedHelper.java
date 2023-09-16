@@ -72,7 +72,14 @@ public class BefriendedHelper
 	*/
 	public static void addBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt)
 	{
-		String modId = mob.getModId();
+		nbt.put("bm_common", new CompoundTag());
+		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
+		if (mob.getOwnerUUID() != null)
+			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
+		nbt.getCompound("bm_common").putInt("ai_state", mob.getAIState().id);
+		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");
+		
+		/*String modId = mob.getModId();
 		String ownerKey = modId + ":befriended_owner";
 		String aiStateKey = modId + ":befriended_ai_state";
 		String inventoryKey = modId + ":befriended_additional_inventory";
@@ -84,7 +91,7 @@ public class BefriendedHelper
 		else
 			nbt.putUUID(ownerKey, new UUID(0, 0));
 		nbt.putInt(aiStateKey, mob.getAIState().id);
-		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
+		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);*/
 	}
 	
 	@Deprecated	// Use version without modid input
@@ -99,33 +106,52 @@ public class BefriendedHelper
 	 */
 	
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
-		String modid = null;
-		// 
-		if (nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID))
-		{
-			modid = nbt.getString("befriended_mod_id");
-		}		
 		
-		else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7. Later it will be "befriendmobs".
-		
-		String ownerKey = modid + ":befriended_owner";
-		String aiStateKey = modid + ":befriended_ai_state";
-		String inventoryKey = modid + ":befriended_additional_inventory";
-		UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
-		try {
-		if (uuid == null)
-			throw new IllegalStateException(
-					"Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?");
-		}
-		catch(IllegalStateException e)
+		/** 0.x.15: new format collects all bm data to "bm_common" entry. */
+		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
 		{
-			e.printStackTrace();
-			return;
+			if (nbt.getCompound("bm_common").getUUID("owner") == null)
+			{
+				new IllegalStateException("Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?").printStackTrace();
+				return;
+			}
+			mob.setOwnerUUID(nbt.getCompound("bm_common").getUUID("owner"));
+			mob.init(mob.getOwnerUUID(), null);
+			mob.setAIState(BefriendedAIState.fromID(nbt.getCompound("bm_common").getInt("ai_state")), false);
+			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
 		}
-		mob.setOwnerUUID(uuid);
-		mob.init(mob.getOwnerUUID(), null);
-		mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
-		mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
+		
+		/** If not saved into "bm_common" entry, read from old format */
+		else {
+			
+			String modid = null;
+			if (nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID))
+			{
+				modid = nbt.getString("befriended_mod_id");
+			}		
+			
+			else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7. Later it will be "befriendmobs".
+			
+			String ownerKey = modid + ":befriended_owner";
+			String aiStateKey = modid + ":befriended_ai_state";
+			String inventoryKey = modid + ":befriended_additional_inventory";
+			UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
+			try {
+			if (uuid == null)
+				throw new IllegalStateException(
+						"Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?");
+			}
+			catch(IllegalStateException e)
+			{
+				e.printStackTrace();
+				return;
+			}
+			mob.setOwnerUUID(uuid);
+			mob.init(mob.getOwnerUUID(), null);
+			mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
+			mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
+			
+		}
 	}
 
 	/**
@@ -201,16 +227,29 @@ public class BefriendedHelper
 	 */
 	public static String getModIdFromNbt(CompoundTag nbt)
 	{
-		return nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID) ?
+		// 0.x.15+ solution
+		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
+			return nbt.getCompound("bm_common").getString("mod_id");
+		
+		// LEGACY
+		else return nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID) ?
 				nbt.getString("befriended_mod_id") : null;
 	}
 	
 	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
 	{
-		String modid = getModIdFromNbt(nbt);
-		if (modid == null)
-			return null;
-		return nbt.contains(modid + ":befriended_owner", NbtHelper.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
+		// 0.x.15+ solution
+		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
+			return nbt.getCompound("bm_common").getUUID("owner");
+		
+		// LEGACY
+		else
+		{
+			String modid = getModIdFromNbt(nbt);
+			if (modid == null)
+				return null;
+			return nbt.contains(modid + ":befriended_owner", NbtHelper.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
+		}
 	}
 	
 	public static MutableComponent getNameFromNbt(CompoundTag nbt, EntityType<?> type)
