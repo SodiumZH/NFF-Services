@@ -3,8 +3,8 @@ package net.sodiumstudio.befriendmobs.client.gui.screens;
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -51,7 +51,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	}
 
 	@Override
-	protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
+	protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, getTextureLocation());
@@ -62,29 +62,29 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * <p>背景、鼠标XY位置及窗口名已经在这里渲染过了。子类中不要重复渲染。
 	 */
 	@Override
-	public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-		this.renderBackground(pPoseStack);
+	public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+		this.renderBackground(pGuiGraphics);
 		this.xMouse = (float) pMouseX;
 		this.yMouse = (float) pMouseY;
-		super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-		this.renderTooltip(pPoseStack, pMouseX, pMouseY);
+		super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+		this.renderTooltip(pGuiGraphics, pMouseX, pMouseY);
 	}
 	
 	/**
 	 * IntVec2 version of blit
 	 */
-	public void blit(PoseStack poseStack, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
+	public void blit(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
-		blit(poseStack, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
+		blit(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
 	}
 	
 	/**
 	 * For adapting non-standard texture size
 	 */
 	@Override
-	public void blit(PoseStack pPoseStack, int pX, int pY, int pUOffset, int pVOffset, int pUWidth, int pVHeight) 
+	public void blit(GuiGraphics pGuiGraphics, int pX, int pY, int pUOffset, int pVOffset, int pUWidth, int pVHeight) 
 	{
-		blit(pPoseStack, pX, pY, this.getBlitOffset(), (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
+		blit(pGuiGraphics, pX, pY, this.getBlitOffset(), (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
 				getTextureSize().x, getTextureSize().y);
 	}
 	
@@ -101,34 +101,34 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * @param uvEmpty 当道具为空时的栏位贴图背景，在整张贴图中的位置坐标。
 	 * @param uvFilled 当道具非空时的栏位贴图背景，在整张贴图中的位置坐标。
 	 */
-	public void addSlotBg(PoseStack poseStack, int slotIndex, IntVec2 xy, @Nullable IntVec2 uvEmpty, @Nullable IntVec2 uvFilled)
+	public void addSlotBg(GuiGraphics GuiGraphics, int slotIndex, IntVec2 xy, @Nullable IntVec2 uvEmpty, @Nullable IntVec2 uvFilled)
 	{
 		if (!menu.slots.get(slotIndex).hasItem() && uvEmpty != null)
-			blit(poseStack, xy, uvEmpty, IntVec2.valueOf(18));
+			blit(GuiGraphics, xy, uvEmpty, IntVec2.valueOf(18));
 		else if (menu.slots.get(slotIndex).hasItem() && uvFilled != null)
-			blit(poseStack, xy, uvFilled, IntVec2.valueOf(18));
+			blit(GuiGraphics, xy, uvFilled, IntVec2.valueOf(18));
 	}
 
 	@Deprecated
-	public void addHealthInfo(PoseStack poseStack, IntVec2 position, int color)
+	public void addHealthInfo(GuiGraphics GuiGraphics, IntVec2 position, int color)
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
 		Component info = InfoHelper.createText("HP: " + hp + " / " + maxHp);
-		font.draw(poseStack, info, position.x, position.y, color);
+		font.draw(GuiGraphics, info, position.x, position.y, color);
 	}
 	
 	@Deprecated
-	public void addHealthInfo(PoseStack poseStack, IntVec2 position)
+	public void addHealthInfo(GuiGraphics GuiGraphics, IntVec2 position)
 	{
-		addHealthInfo(poseStack, position, 0x404040);
+		addHealthInfo(GuiGraphics, position, 0x404040);
 	}
 	
 	/** 
 	 * (Preset) Add mob attribute info, including HP/MaxHP, ATK, armor
 	 * <p>（预设）添加生物属性信息，包括HP/MaxHP、攻击力、护甲
 	 */
-	public void addAttributeInfo(PoseStack poseStack, IntVec2 position, int color, int textRowWidth)
+	public void addAttributeInfo(GuiGraphics GuiGraphics, IntVec2 position, int color, int textRowWidth)
 	{
 		IntVec2 pos = position.copy();
 		String hp = Integer.toString(Math.round(mob.asMob().getHealth()));
@@ -141,19 +141,19 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 				.append(InfoHelper.createText(": " + atk));
 		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
 				.append(InfoHelper.createText(": " + def));
-		font.draw(poseStack, hpcomp, pos.x, pos.y, color);
+		font.draw(GuiGraphics, hpcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
-		font.draw(poseStack, atkcomp, pos.x, pos.y, color);
+		font.draw(GuiGraphics, atkcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
-		font.draw(poseStack, defcomp, pos.x, pos.y, color);
+		font.draw(GuiGraphics, defcomp, pos.x, pos.y, color);
 	}
 	
 	/**
 	 * Add attribute info using default font
 	 * <p>添加生物属性信息，使用默认字体
 	 */
-	public void addAttributeInfo(PoseStack poseStack, IntVec2 position)
+	public void addAttributeInfo(GuiGraphics GuiGraphics, IntVec2 position)
 	{
-		addAttributeInfo(poseStack, position, 0x404040, 11);
+		addAttributeInfo(GuiGraphics, position, 0x404040, 11);
 	}
 }

@@ -16,7 +16,7 @@ public class LevelHelper
 	// Check if a block position is right under sun, i.e. can see sky, not raining, and is day
 	public static boolean isUnderSun(BlockPos pos, Entity levelContext)
 	{
-		return levelContext.level.canSeeSky(pos) && levelContext.level.isDay() && !levelContext.level.isRaining();
+		return levelContext.level().canSeeSky(pos) && levelContext.level().isDay() && !levelContext.level().isRaining();
 	}
 	
 	public static boolean isEntityUnderSun(Entity test)
@@ -66,16 +66,16 @@ public class LevelHelper
 	*/
 	public static int getHeightToGround(BlockPos pos, Entity context)
 	{
-		Level level = context.level;
+		Level level = context.level();
 		BlockPos pos1 = new BlockPos(pos);
 		if (level.getBlockState(pos1).entityCanStandOn(level, pos1, context)
-				|| level.getBlockState(pos1).getMaterial().isLiquid())
+				|| level.getBlockState(pos1).liquid())
 			return 0;
 		else 
 		{
 			int i = 0;
 			while (!level.getBlockState(pos1).entityCanStandOn(level, pos1, context)
-				&& !level.getBlockState(pos1).getMaterial().isLiquid())
+				&& !level.getBlockState(pos1).liquid())
 			{
 				i++;
 				pos1 = pos1.below();

@@ -15,7 +15,7 @@ public class PlayerIntMap extends SerializableMap<Player, Integer>
 	{
 		super((Player player) -> player.getStringUUID(), 
 				i -> IntTag.valueOf(i), 
-				str -> levelContext.level.getPlayerByUUID(UUID.fromString(str)),
+				str -> levelContext.level().getPlayerByUUID(UUID.fromString(str)),
 				tag -> ((IntTag)tag).getAsInt());
 	}
 }

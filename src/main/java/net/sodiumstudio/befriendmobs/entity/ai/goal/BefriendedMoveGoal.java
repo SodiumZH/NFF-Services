@@ -105,7 +105,7 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 		super.start();
 		if (isAmphibious)
 		{
-			if (mob.asMob().isInWater() && mob.asMob().level.getBlockState(new BlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
+			if (mob.asMob().isInWater() && mob.asMob().level().getBlockState(new BlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
 				((IBefriendedAmphibious)mob).switchNav(true);
 			else ((IBefriendedAmphibious)mob).switchNav(false);		
 		}

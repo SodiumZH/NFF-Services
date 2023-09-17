@@ -146,9 +146,9 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 			{
 				for (UUID uuid: l.getHatred())
 				{
-					if (l.hasPlayerData(mob.level.getPlayerByUUID(uuid), "proc_value")
-							&& l.getPlayerDataDouble(mob.level.getPlayerByUUID(uuid), "proc_value") > 0d)
-						this.interrupt(mob.level.getPlayerByUUID(uuid), mob, false);					
+					if (l.hasPlayerData(mob.level().getPlayerByUUID(uuid), "proc_value")
+							&& l.getPlayerDataDouble(mob.level().getPlayerByUUID(uuid), "proc_value") > 0d)
+						this.interrupt(mob.level().getPlayerByUUID(uuid), mob, false);					
 				}
 			}
 		});*/

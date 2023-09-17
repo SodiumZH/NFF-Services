@@ -50,7 +50,7 @@ public class BefriendedEnderManGoals
 			{
 				return false;
 			} else if (!net.minecraftforge.event.ForgeEventFactory
-					.getMobGriefingEvent(this.enderman.level, this.enderman))
+					.getMobGriefingEvent(this.enderman.level(), this.enderman))
 			{
 				return false;
 			} else
@@ -65,7 +65,7 @@ public class BefriendedEnderManGoals
 		@Override
 		public void tick() {
 			RandomSource random = this.enderman.getRandom();
-			Level level = this.enderman.level;
+			Level level = this.enderman.level();
 			int i = Mth.floor(this.enderman.getX() - 1.0D + random.nextDouble() * 2.0D);
 			int j = Mth.floor(this.enderman.getY() + random.nextDouble() * 2.0D);
 			int k = Mth.floor(this.enderman.getZ() - 1.0D + random.nextDouble() * 2.0D);
@@ -76,7 +76,7 @@ public class BefriendedEnderManGoals
 			BlockState blockstate2 = this.enderman.getCarriedBlock();
 			if (blockstate2 != null)
 			{
-				blockstate2 = Block.updateFromNeighbourShapes(blockstate2, this.enderman.level,
+				blockstate2 = Block.updateFromNeighbourShapes(blockstate2, this.enderman.level(),
 						blockpos);
 				if (this.canPlaceBlock(level, blockpos, blockstate2, blockstate, blockstate1, blockpos1)
 						&& !net.minecraftforge.event.ForgeEventFactory.onBlockPlace(enderman,
@@ -129,7 +129,7 @@ public class BefriendedEnderManGoals
 
 
 		public boolean checkCanUse() {
-			this.pendingTarget = this.enderman.level.getNearestPlayer(this.startAggroTargetConditions,
+			this.pendingTarget = this.enderman.level().getNearestPlayer(this.startAggroTargetConditions,
 					this.enderman);
 			return this.pendingTarget != null;
 		}
@@ -226,7 +226,7 @@ public class BefriendedEnderManGoals
 			{
 				return false;
 			} else if (!net.minecraftforge.event.ForgeEventFactory
-					.getMobGriefingEvent(this.enderman.level, this.enderman))
+					.getMobGriefingEvent(this.enderman.level(), this.enderman))
 			{
 				return false;
 			} else
@@ -238,7 +238,7 @@ public class BefriendedEnderManGoals
 		@Override
 		public void tick() {
 			RandomSource random = this.enderman.getRandom();
-			Level level = this.enderman.level;
+			Level level = this.enderman.level();
 			int i = Mth.floor(this.enderman.getX() - 2.0D + random.nextDouble() * 4.0D);
 			int j = Mth.floor(this.enderman.getY() + random.nextDouble() * 3.0D);
 			int k = Mth.floor(this.enderman.getZ() - 2.0D + random.nextDouble() * 4.0D);

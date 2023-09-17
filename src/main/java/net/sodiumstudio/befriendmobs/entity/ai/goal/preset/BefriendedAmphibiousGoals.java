@@ -32,7 +32,7 @@ public abstract class BefriendedAmphibiousGoals {
 		public GoToWaterGoal(IBefriendedMob pMob, double pSpeedModifier) {
 			super(pMob);
 			this.speedModifier = pSpeedModifier;
-			this.level = pMob.asMob().level;
+			this.level = pMob.asMob().level();
 			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 			allowAllStates();
 		}
@@ -112,9 +112,9 @@ public abstract class BefriendedAmphibiousGoals {
 		@Override
 		public boolean canUse() {
 			return super.canUse() 
-					&& !((IBefriendedMob) this.mob).asMob().level.isDay()
+					&& !((IBefriendedMob) this.mob).asMob().level().isDay()
 					&& pathfinder.isInWaterOrBubble()
-					&& pathfinder.getY() >= (double) (pathfinder.level.getSeaLevel() - 3);
+					&& pathfinder.getY() >= (double) (pathfinder.level().getSeaLevel() - 3);
 		}
 
 		/**

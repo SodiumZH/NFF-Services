@@ -41,7 +41,7 @@ public class ItemEvents
 		if (event.entity instanceof ItemEntity itementity)
 		{
 			// Handle respawner item entity falling into void
-			if (itementity.getY() < (double)(itementity.level.getMinBuildHeight() - 1))
+			if (itementity.getY() < (double)(itementity.level().getMinBuildHeight() - 1))
 			{
 				MobRespawnerInstance ins = MobRespawnerInstance.create(itementity.getItem());
 				if (ins != null && ins.recoverInVoid())

@@ -22,7 +22,7 @@ public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
 	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
-		else if (!getPathfinder().level.isDay())
+		else if (!getPathfinder().level().isDay())
 			return false;
 		else if (!ignoreHelmet && !getPathfinder().getItemBySlot(EquipmentSlot.HEAD).isEmpty())
 			return false;

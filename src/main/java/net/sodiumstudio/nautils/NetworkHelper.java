@@ -1,8 +1,5 @@
 package net.sodiumstudio.nautils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.function.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -14,8 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
 
 public class NetworkHelper
 {

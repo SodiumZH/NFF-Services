@@ -25,7 +25,7 @@ public class BefriendedFleeSunGoal extends BefriendedMoveGoal {
 	
 	public BefriendedFleeSunGoal(IBefriendedMob pMob, double pSpeedModifier) {
 	      super(pMob, pSpeedModifier);
-	      this.level = getPathfinder().level;
+	      this.level = getPathfinder().level();
 	      this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 	      allowAllStates();
 	   }

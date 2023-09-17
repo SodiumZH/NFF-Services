@@ -254,7 +254,7 @@ public class CBefriendableMobImpl implements CBefriendableMob
 		for (String key : nbt.getCompound("timers").getCompound("player_timers").getAllKeys())
 		{
 			UUID uuid = UUID.fromString(key.substring(0, 36));
-			Player player = owner.level.getPlayerByUUID(uuid);
+			Player player = owner.level().getPlayerByUUID(uuid);
 			// position 36 is "_"
 			String actualKey = key.substring(37);
 			// Don't update times of players not in level

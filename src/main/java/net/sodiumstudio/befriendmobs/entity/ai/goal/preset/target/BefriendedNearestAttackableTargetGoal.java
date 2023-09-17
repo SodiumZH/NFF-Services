@@ -5,19 +5,16 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.entity.vanillapreset.enderman.AbstractBefriendedEnderMan;
 
 public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> extends BefriendedTargetGoal {
   // private static final int DEFAULT_RANDOM_INTERVAL = 10;
@@ -68,7 +65,7 @@ public boolean checkCanUse() {
    protected void findTarget() {
       double followDist = mob.asMob().getAttributeValue(Attributes.FOLLOW_RANGE);
       AABB searchArea = new AABB(mob.asMob().position().subtract(new Vec3(followDist, followDist, followDist)), mob.asMob().position().add(new Vec3(followDist, followDist, followDist)));
-      mob.asMob().level.getEntities(mob.asMob(), searchArea, (Entity e) -> 
+      mob.asMob().level().getEntities(mob.asMob(), searchArea, (Entity e) -> 
       {
     	  if (e instanceof Mob m)
     	  {

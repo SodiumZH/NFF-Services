@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -18,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.PacketDistributor;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
-import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
 import net.sodiumstudio.nautils.EntityHelper;
@@ -197,9 +195,10 @@ public class BefriendedHelper
 	 * <p>打开生物的道具栏GUI。
 	 * <p>警告：如果{@link IBefriendedMob#makeMenu()}函数返回null则不要调用这个函数，否则游戏会崩溃。
 	 */
+	@SuppressWarnings("resource")
 	public static void openBefriendedInventory(Player player, IBefriendedMob mob) {
 		LivingEntity living = (LivingEntity) mob;
-		if (!player.level.isClientSide && player instanceof ServerPlayer sp
+		if (!player.level().isClientSide && player instanceof ServerPlayer sp
 				&& (!living.isVehicle() || living.hasPassenger(player)))
 		{
 			

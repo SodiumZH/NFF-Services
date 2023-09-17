@@ -144,7 +144,7 @@ public class EntityEvents
 	public static void onLivingChangeTarget_Lowest(LivingChangeTargetEvent event)
 	{
 		/** Handle {@link CBefriendableMob} AlwaysHostile feature */
-		if (!event.getEntity().level.isClientSide)
+		if (!event.getEntity().level().isClientSide)
 		{
 			event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
 			{
@@ -227,7 +227,7 @@ public class EntityEvents
 	public static void onLivingSetAttackTarget_Lowest(LivingSetAttackTargetEvent event)
 	{
 		
-		if (!event.getEntity().level.isClientSide)
+		if (!event.getEntity().level().isClientSide)
 		{
 			// Handle befriendable mobs //
 			event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
@@ -251,7 +251,7 @@ public class EntityEvents
 	public static void onLivingDeath(LivingDeathEvent event) {
 		if (event.isCanceled())
 			return;
-		if (!event.getEntity().level.isClientSide) {
+		if (!event.getEntity().level().isClientSide) {
 			if (event.getEntity() instanceof IBefriendedMob bef) {
 				if (MinecraftForge.EVENT_BUS.post(new BefriendedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
@@ -274,7 +274,7 @@ public class EntityEvents
 						return;
 					}
 				}
-				if (!event.getEntity().level.isClientSide) {
+				if (!event.getEntity().level().isClientSide) {
 					// Drop all items in inventory if no vanishing curse
 					if (bef.dropInventoryOnDeath()) {
 						BefriendedInventory container = bef.getAdditionalInventory();
@@ -299,11 +299,11 @@ public class EntityEvents
 								{} 
 								else 
 								{
-									if (!bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).isPresent()) {
+									if (!bef.asMob().level().getCapability(BMCaps.CAP_BM_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CBMLevelModule capability");
 									}
-									bef.asMob().level.getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap -> 
+									bef.asMob().level().getCapability(BMCaps.CAP_BM_LEVEL).ifPresent(cap -> 
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -321,7 +321,7 @@ public class EntityEvents
 								ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
 								ins.setNoExpire(bef.respawnerNoExpire());
 								if (!BMHooks.Befriended.onBefriendedGenerateRespawnerOnDying(bef, ins))
-									event.getEntity().level.addFreshEntity(resp);
+									event.getEntity().level().addFreshEntity(resp);
 							}
 						}
 					}
@@ -389,7 +389,7 @@ public class EntityEvents
 		LivingEntity living = event.getEntity();
 		LivingEntity source = (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof LivingEntity) ?
 				(LivingEntity)(event.getSource().getEntity()) : null;
-		if (!living.level.isClientSide)
+		if (!living.level().isClientSide)
 		{
 			// Handle befriending process events on mob attacked
 			// The events are handled in handler classes, not a forge event
@@ -442,7 +442,7 @@ public class EntityEvents
 	@SubscribeEvent
 	public static void onLivingUpdate(LivingTickEvent event)
 	{
-		if (!event.getEntity().level.isClientSide)
+		if (!event.getEntity().level().isClientSide)
 		{
 			// Tick attribute monitor
 			event.getEntity().getCapability(BMCaps.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 

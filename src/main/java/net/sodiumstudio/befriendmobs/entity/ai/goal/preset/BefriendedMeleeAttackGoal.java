@@ -61,7 +61,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
-		long i = getPathfinder().level.getGameTime();
+		long i = getPathfinder().level().getGameTime();
 		// Check canUse each 20s
 		if (i - this.lastCanUseCheck < 20L)
 		{

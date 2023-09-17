@@ -139,7 +139,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default Player getOwner() 
 	{
 		if (getOwnerUUID() != null)
-			return asMob().level.getPlayerByUUID(getOwnerUUID());
+			return asMob().level().getPlayerByUUID(getOwnerUUID());
 		else return null;
 	}
 	

@@ -155,20 +155,20 @@ public class MobRespawnerInstance
 	}
 
 	public Mob respawn(Player player, BlockPos pos, Direction direction) {
-		if (player.level.isClientSide)
+		if (player.level().isClientSide)
 			return null;
 		if (MinecraftForge.EVENT_BUS.post(new MobRespawnerStartRespawnEvent(this, player, pos, direction)))
 			return null;
-		BlockState blockstate = player.level.getBlockState(pos);
+		BlockState blockstate = player.level().getBlockState(pos);
 		BlockPos pos1;
-		if (blockstate.getCollisionShape(player.level, pos).isEmpty())
+		if (blockstate.getCollisionShape(player.level(), pos).isEmpty())
 		{
 			pos1 = pos;
 		} else
 		{
 			pos1 = pos.relative(direction);
 		}
-		Mob mob = EntityHelper.spawnDefaultMob(getType(), (ServerLevel) (player.level), null,
+		Mob mob = EntityHelper.spawnDefaultMob(getType(), (ServerLevel) (player.level()), null,
 				getCapTag().contains("mob_custom_name", NbtHelper.TAG_STRING_ID)
 						? InfoHelper.createText(getCapTag().getString("mob_custom_name"))
 						: null,

@@ -36,7 +36,7 @@ public abstract class BefriendingHandler
 	public IBefriendedMob befriend(Player player, Mob target)
 	{
 		// Don't execute on client
-		if (target.level.isClientSide())
+		if (target.level().isClientSide())
 			return null;
 		// Don't execute on mobs already befriended
 		if (target instanceof IBefriendedMob)
@@ -103,7 +103,7 @@ public abstract class BefriendingHandler
 	public boolean interruptAll(Mob mob, boolean isQuiet)
 	{
 		boolean res = false;
-		for (Player player: mob.level.players())
+		for (Player player: mob.level().players())
 		{
 			if (player != null && isInProcess(player, mob))
 			{
@@ -123,11 +123,12 @@ public abstract class BefriendingHandler
 	public abstract boolean isInProcess(Player player, Mob mob);
 	
 	/** Indicates if any player is in befriending process. */
+	@SuppressWarnings("resource")
 	public boolean isInProcess(Mob mob)
 	{
-		if (mob.level.isClientSide)
+		if (mob.level().isClientSide)
 			return false;
-		for (Player player: mob.level.players())
+		for (Player player: mob.level().players())
 		{
 			if (isInProcess(player, mob))
 				return true;
@@ -201,7 +202,7 @@ public abstract class BefriendingHandler
 	@Deprecated
 	public void forAllPlayersInProcess(Mob mob, BiConsumer<Player, Mob> todo)
 	{
-		for (Player player: mob.level.players())
+		for (Player player: mob.level().players())
 		{
 			if (isInProcess(player, mob))
 				todo.accept(player, mob);
@@ -213,7 +214,7 @@ public abstract class BefriendingHandler
 	 */
 	public void forAllPlayersInProcess(Mob mob, Consumer<Player> todo)
 	{
-		for (Player player: mob.level.players())
+		for (Player player: mob.level().players())
 		{
 			if (isInProcess(player, mob))
 				todo.accept(player);

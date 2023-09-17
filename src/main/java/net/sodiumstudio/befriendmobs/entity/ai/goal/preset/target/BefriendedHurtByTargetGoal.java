@@ -93,7 +93,7 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	protected void alertOthers() {
 		double d0 = this.getFollowDistance();
 		AABB aabb = AABB.unitCubeFromLowerCorner(mob.asMob().position()).inflate(d0, 10.0D, d0);
-		List<? extends Mob> list = mob.asMob().level.getEntitiesOfClass(mob.asMob().getClass(), aabb,
+		List<? extends Mob> list = mob.asMob().level().getEntitiesOfClass(mob.asMob().getClass(), aabb,
 				EntitySelector.NO_SPECTATORS);
 
 		for (Mob other : list) {

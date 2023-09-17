@@ -24,7 +24,7 @@ public class ClientboundBefriendingInitPacket implements Packet<ClientGamePacket
 	 */
 	public ClientboundBefriendingInitPacket(Mob target)
 	{
-		if (!target.level.isClientSide)
+		if (!target.level().isClientSide)
 		{
 			entityId = target.getId();
 			xRot = target.getXRot();

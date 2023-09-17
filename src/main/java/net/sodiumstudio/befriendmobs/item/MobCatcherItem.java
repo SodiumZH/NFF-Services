@@ -60,7 +60,7 @@ public class MobCatcherItem extends BMItem
 		 Mob mob = (Mob)interactionTarget;
 		 if (canCatchCondition == null || canCatchCondition.test(mob, player))
 		 {
-			 if (!player.level.isClientSide)
+			 if (!player.level().isClientSide)
 			 {
 				 MobRespawnerInstance resp = MobRespawnerInstance.create(MobRespawnerItem.fromMob(respawnerType, mob));
 				 MobCatcherCatchMobEvent event = new MobCatcherCatchMobEvent(mob, player, resp);
@@ -78,7 +78,7 @@ public class MobCatcherItem extends BMItem
 					 }
 					 interactionTarget.discard();
 					 stack.shrink(1);
-					 return InteractionResult.sidedSuccess(player.level.isClientSide);
+					 return InteractionResult.sidedSuccess(player.level().isClientSide);
 				 }
 			 }
 		 }

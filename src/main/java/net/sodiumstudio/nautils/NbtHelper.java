@@ -96,7 +96,7 @@ public class NbtHelper {
 	public static HashSet<Player> getAllValidPlayersContaining(CompoundTag inTag, Entity levelContext)
 	{
 		HashSet<Player> res = new HashSet<Player>();
-		for (Player player: levelContext.level.players())
+		for (Player player: levelContext.level().players())
 		{
 			if (containsPlayer(inTag, player))
 				res.add(player);

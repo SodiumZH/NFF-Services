@@ -63,7 +63,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 			if (vec3 == null) {
 				return false;
 			} 
-			else if (vec3.y < mob.asMob().level.getMinBuildHeight() - 1)	// Too far from anchor
+			else if (vec3.y < mob.asMob().level().getMinBuildHeight() - 1)	// Too far from anchor
 				return false;
 			else {
 				this.wantedX = vec3.x;
@@ -89,7 +89,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 			v = DefaultRandomPos.getPos(getPathfinder(), 10, 7);
 		}
 		if (i >= 32)
-			return new Vec3(0, mob.asMob().level.getMinBuildHeight() - 100, 0);	// Label failed
+			return new Vec3(0, mob.asMob().level().getMinBuildHeight() - 100, 0);	// Label failed
 		else return v;
 	}
 
@@ -108,7 +108,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	public void start() {
 		super.start();
 		BlockPos wanted = new BlockPos(wantedX, wantedY, wantedZ);
-		if (shouldAvoidSun.test(mob) && mob.asMob().level.canSeeSky(wanted) && mob.asMob().level.isDay())
+		if (shouldAvoidSun.test(mob) && mob.asMob().level().canSeeSky(wanted) && mob.asMob().level().isDay())
 			return;
 		getPathfinder().getNavigation().moveTo(this.wantedX, this.wantedY, this.wantedZ, this.speedModifier);
 	}

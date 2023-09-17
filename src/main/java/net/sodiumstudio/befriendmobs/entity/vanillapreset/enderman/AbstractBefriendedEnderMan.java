@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -59,6 +60,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
@@ -100,7 +102,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	protected String modId;
 	
 	protected static final EntityDataAccessor<Optional<BlockState>> DATA_CARRY_STATE = SynchedEntityData
-			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BLOCK_STATE);
+			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE);
 	protected static final EntityDataAccessor<Boolean> DATA_CREEPY = SynchedEntityData
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BOOLEAN);
 	protected static final EntityDataAccessor<Boolean> DATA_STARED_AT = SynchedEntityData
@@ -216,7 +218,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			this.lastStareSound = this.tickCount;
 			if (!this.isSilent())
 			{
-				this.level.playLocalSound(this.getX(), this.getEyeY(), this.getZ(), SoundEvents.ENDERMAN_STARE,
+				this.level().playLocalSound(this.getX(), this.getEyeY(), this.getZ(), SoundEvents.ENDERMAN_STARE,
 						this.getSoundSource(), 2.5F, 1.0F, false);
 			}
 		}
@@ -225,7 +227,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 	@Override
 	public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
-		if (DATA_CREEPY.equals(pKey) && this.hasBeenStaredAt() && this.level.isClientSide)
+		if (DATA_CREEPY.equals(pKey) && this.hasBeenStaredAt() && this.level().isClientSide)
 		{
 			this.playStareSound();
 		}
@@ -255,7 +257,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		BlockState blockstate = null;
 		if (tag.contains("carriedBlockState", 10))
 		{
-			blockstate = NbtUtils.readBlockState(tag.getCompound("carriedBlockState"));
+			blockstate = NbtUtils.readBlockState(this.level().holderLookup(Registries.BLOCK), tag.getCompound("carriedBlockState"));
 			if (blockstate.isAir())
 			{
 				blockstate = null;
@@ -263,7 +265,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		}
 
 		this.setCarriedBlock(blockstate);
-		this.readPersistentAngerSaveData(this.level, tag);
+		this.readPersistentAngerSaveData(this.level(), tag);
 		BefriendedHelper.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
@@ -315,22 +317,23 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	 * example, zombies and skeletons use this to react to sunlight and start to
 	 * burn.
 	 */
+	@SuppressWarnings("resource")
 	@Override
 	public void aiStep() {
-		if (this.level.isClientSide)
+		if (this.level().isClientSide)
 		{
 			for (int i = 0; i < 2; ++i)
 			{
-				this.level.addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY() - 0.25D,
+				this.level().addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY() - 0.25D,
 						this.getRandomZ(0.5D), (this.random.nextDouble() - 0.5D) * 2.0D, -this.random.nextDouble(),
 						(this.random.nextDouble() - 0.5D) * 2.0D);
 			}
 		}
 
 		this.jumping = false;
-		if (!this.level.isClientSide)
+		if (!this.level().isClientSide)
 		{
-			this.updatePersistentAnger((ServerLevel) this.level, true);
+			this.updatePersistentAnger((ServerLevel) this.level(), true);
 		}
 
 		super.aiStep();
@@ -344,10 +347,10 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	@Override
 	protected void customServerAiStep() {
 /*
-		if (this.level.isDay() && this.tickCount >= this.targetChangeTime + 600)
+		if (this.level().isDay() && this.tickCount >= this.targetChangeTime + 600)
 		{
 			float f = this.getBrightness();
-			if (f > 0.5F && this.level.canSeeSky(this.blockPosition())
+			if (f > 0.5F && this.level().canSeeSky(this.blockPosition())
 					&& this.random.nextFloat() * 30.0F < (f - 0.4F) * 2.0F)
 			{
 				this.setTarget((LivingEntity) null);
@@ -401,7 +404,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	}
 	
 	public boolean teleport() {
-		if (!this.level.isClientSide() && this.isAlive())
+		if (!this.level().isClientSide() && this.isAlive())
 		{
 			double d0 = this.getX() + (this.random.nextDouble() - 0.5D) * 64.0D;
 			double d1 = this.getY() + (double) (this.random.nextInt(64) - 32);
@@ -426,14 +429,14 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	public boolean teleport(double pX, double pY, double pZ) {
 		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(pX, pY, pZ);
 
-		while (blockpos$mutableblockpos.getY() > this.level.getMinBuildHeight()
-				&& !this.level.getBlockState(blockpos$mutableblockpos).getMaterial().blocksMotion())
+		while (blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight()
+				&& !this.level().getBlockState(blockpos$mutableblockpos).blocksMotion())
 		{
 			blockpos$mutableblockpos.move(Direction.DOWN);
 		}
 
-		BlockState blockstate = this.level.getBlockState(blockpos$mutableblockpos);
-		boolean flag = blockstate.getMaterial().blocksMotion();
+		BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
+		boolean flag = blockstate.blocksMotion();
 		boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
 		if (flag && !flag1)
 		{
@@ -444,7 +447,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
 			if (flag2 && !this.isSilent())
 			{
-				this.level.playSound((Player) null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT,
+				this.level().playSound((Player) null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT,
 						this.getSoundSource(), 1.0F, 1.0F);
 				this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F);
 			}
@@ -500,7 +503,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		{
 			return false;
 		} 
-		else if (pSource.equals(DamageSource.DROWN))
+		else if (pSource.equals(this.level().damageSources().drown()))
 		{
 			return this.tryTeleportOnWaterHurt(64);
 		}
@@ -530,7 +533,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		else
 		{
 			boolean flag = super.hurt(pSource, pAmount);
-			if (!this.level.isClientSide() && !(pSource.getEntity() instanceof LivingEntity)
+			if (!this.level().isClientSide() && !(pSource.getEntity() instanceof LivingEntity)
 					&& this.random.nextInt(10) != 0)
 			{
 				this.tryTeleportInOtherCases(1);
@@ -581,11 +584,11 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		{
 			if (player.getUUID().equals(getOwnerUUID()))
 			{
-				if (!player.level.isClientSide())
+				if (!player.level().isClientSide())
 				{
 					switchAIState();
 				}
-				return InteractionResult.sidedSuccess(player.level.isClientSide());
+				return InteractionResult.sidedSuccess(player.level().isClientSide());
 			}
 			/* Other actions */
 			return InteractionResult.PASS;
@@ -597,7 +600,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 				if (hand.equals(InteractionHand.MAIN_HAND))
 					BefriendedHelper.openBefriendedInventory(player, this);
-				return InteractionResult.sidedSuccess(player.level.isClientSide());
+				return InteractionResult.sidedSuccess(player.level().isClientSide());
 			}
 			/* Other actions... */
 			return InteractionResult.PASS;
@@ -618,7 +621,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 	@Override
 	public void updateFromInventory() {
-		if (!this.level.isClientSide)
+		if (!this.level().isClientSide)
 		{
 			/*
 			 * If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory,
@@ -629,7 +632,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 	@Override
 	public void setInventoryFromMob() {
-		if (!this.level.isClientSide)
+		if (!this.level().isClientSide)
 		{
 			/*
 			 * If inventory needs to be set from mob's properties on initialization, set

@@ -138,8 +138,8 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 			{
 				for (UUID uuid: l.getHatred())
 				{
-					if (isInProcess(mob.level.getPlayerByUUID(uuid), mob))
-						this.interrupt(mob.level.getPlayerByUUID(uuid), mob, false);					
+					if (isInProcess(mob.level().getPlayerByUUID(uuid), mob))
+						this.interrupt(mob.level().getPlayerByUUID(uuid), mob, false);					
 				}
 			}
 		});

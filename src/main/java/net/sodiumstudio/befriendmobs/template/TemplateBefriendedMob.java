@@ -117,14 +117,14 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 
 	@Override
 	public void updateFromInventory() {
-		if (!this.level.isClientSide) {
+		if (!this.level().isClientSide) {
 			/* If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory, set here */
 		}
 	}
 
 	@Override
 	public void setInventoryFromMob() {
-		if (!this.level.isClientSide) {
+		if (!this.level().isClientSide) {
 			/* If inventory needs to be set from mob's properties on initialization, set here */
 		}
 	}

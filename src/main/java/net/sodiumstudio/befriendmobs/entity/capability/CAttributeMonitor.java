@@ -2,7 +2,7 @@ package net.sodiumstudio.befriendmobs.entity.capability;
 
 import java.util.HashMap;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -33,7 +33,7 @@ public interface CAttributeMonitor {
 	{
 		// Use NaN to label an attribute position before entity attributes creation
 		double val = getOwner().getAttributes() == null ? Double.NaN : getOwner().getAttributeValue(attribute);
-		getListenList().put(Registry.ATTRIBUTE.getKey(attribute).toString(), val);
+		getListenList().put(BuiltInRegistries.ATTRIBUTE.getKey(attribute).toString(), val);
 		return this;
 	}
 	
@@ -45,7 +45,7 @@ public interface CAttributeMonitor {
 	{
 		for (String key: getListenList().keySet())
 		{
-			Attribute attr = Registry.ATTRIBUTE.get(new ResourceLocation(key));
+			Attribute attr = BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(key));
 			double oldVal = getListenList().get(key);
 			double newVal;
 			if (attr == null)

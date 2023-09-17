@@ -62,10 +62,10 @@ public class EntityHelper
 	 */
 	@Deprecated
 	public static Entity replaceLivingEntity(EntityType<?> newType, LivingEntity from, boolean allowNewEntityDespawn) {
-		if (from.level.isClientSide())
+		if (from.level().isClientSide())
 			return null;
 
-		Entity newEntity = newType.create(from.level);
+		Entity newEntity = newType.create(from.level());
 		newEntity.moveTo(from.getX(), from.getY(), from.getZ(), from.getYRot(), from.getXRot());
 
 		if (from.hasCustomName())
@@ -92,7 +92,7 @@ public class EntityHelper
 		}
 
 		newEntity.setInvulnerable(from.isInvulnerable());
-		from.level.addFreshEntity(newEntity);
+		from.level().addFreshEntity(newEntity);
 		from.discard();
 		return newEntity;
 	}
@@ -124,7 +124,7 @@ public class EntityHelper
 	@Deprecated // Use sendParticlesToEntity() instead
 	public static void sendParticlesToMob(LivingEntity entity, ParticleOptions options, Vec3 offset, int amount,
 			double speed, double positionRndScale, double speedRndScale) {
-		if (entity.level.isClientSide)
+		if (entity.level().isClientSide)
 			return;
 		Vec3 pos = entity.position();
 		for (int i = 0; i < amount; ++i)
@@ -133,7 +133,7 @@ public class EntityHelper
 			double d1 = new Random().nextGaussian() * 0.2 * positionRndScale;
 			double d2 = new Random().nextGaussian() * 0.1 * positionRndScale;
 			double d3 = new Random().nextGaussian() * 0.5 * speedRndScale + 1;
-			((ServerLevel) (entity.level)).sendParticles(options, pos.x + offset.x + d0,
+			((ServerLevel) (entity.level())).sendParticles(options, pos.x + offset.x + d0,
 					pos.y + entity.getBbHeight() + offset.y + d1, pos.z + offset.z + d2, 1, 0, 0, 0, speed * d3);
 		}
 	}
@@ -167,10 +167,10 @@ public class EntityHelper
 	
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
-		if (entity.level.isClientSide)
+		if (entity.level().isClientSide)
 			return;
 		Vec3 pos = entity.position();
-		((ServerLevel) (entity.level)).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
+		((ServerLevel) (entity.level())).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}
 
@@ -257,7 +257,7 @@ public class EntityHelper
 
 	// Teleport a living entity as if it ate a chorus fruit
 	public static boolean chorusLikeTeleport(LivingEntity living) {
-		if (!living.level.isClientSide)
+		if (!living.level().isClientSide)
 		{
 
 			double atX = living.getX();
@@ -268,8 +268,8 @@ public class EntityHelper
 			{
 				double tryX = living.getX() + (living.getRandom().nextDouble() - 0.5D) * 16.0D;
 				double tryY = Mth.clamp(living.getY() + (double) (living.getRandom().nextInt(16) - 8),
-						(double) living.level.getMinBuildHeight(), (double) (living.level.getMinBuildHeight()
-								+ ((ServerLevel) (living.level)).getLogicalHeight() - 1));
+						(double) living.level().getMinBuildHeight(), (double) (living.level().getMinBuildHeight()
+								+ ((ServerLevel) (living.level())).getLogicalHeight() - 1));
 				double tryZ = living.getZ() + (living.getRandom().nextDouble() - 0.5D) * 16.0D;
 				if (living.isPassenger())
 				{
@@ -284,7 +284,7 @@ public class EntityHelper
 				{
 					SoundEvent soundevent = living instanceof Fox ? SoundEvents.FOX_TELEPORT
 							: SoundEvents.CHORUS_FRUIT_TELEPORT;
-					living.level.playSound((Player) null, atX, atY, atZ, soundevent, SoundSource.PLAYERS, 1.0F, 1.0F);
+					living.level().playSound((Player) null, atX, atY, atZ, soundevent, SoundSource.PLAYERS, 1.0F, 1.0F);
 					living.playSound(soundevent, 1.0F, 1.0F);
 					return true;
 				}
@@ -296,15 +296,15 @@ public class EntityHelper
 	
 	// Random teleport an entity with given radius
 	public static boolean tryTeleportOntoGround(Entity entity, Vec3 radius, int tryTimes) {
-		if (!entity.level.isClientSide)
+		if (!entity.level().isClientSide)
 		{
 			for (int i = 0; i < tryTimes; ++i)
 			{
 				Random rnd = new Random();
 				double tryX = entity.getX() + (rnd.nextDouble() - 0.5D) * radius.x * 2d;
 				double tryY = Mth.clamp(entity.getY() + (rnd.nextDouble() - 0.5D) * radius.y * 2d,
-						(double) entity.level.getMinBuildHeight(), (double) (entity.level.getMinBuildHeight()
-								+ ((ServerLevel) (entity.level)).getLogicalHeight() - 1));
+						(double) entity.level().getMinBuildHeight(), (double) (entity.level().getMinBuildHeight()
+								+ ((ServerLevel) (entity.level())).getLogicalHeight() - 1));
 				double tryZ = entity.getZ() + (rnd.nextDouble() - 0.5D) * radius.z * 2d;
 				if (entity.isPassenger())
 				{
@@ -402,7 +402,7 @@ public class EntityHelper
 		double actualY = inY;
 		boolean noCollision = false;
 		BlockPos currentPos = new BlockPos(inX, inY, inZ);
-		Level level = entity.level;
+		Level level = entity.level();
 		if (level.hasChunkAt(currentPos))
 		{
 			boolean solidBlockFound = false;
@@ -410,7 +410,7 @@ public class EntityHelper
 			{
 				BlockPos nextPos = currentPos.below();
 				BlockState blockstate = level.getBlockState(nextPos);
-				if (blockstate.getMaterial().blocksMotion())
+				if (blockstate.blocksMotion())
 				{
 					solidBlockFound = true;
 				} else
@@ -633,7 +633,7 @@ public class EntityHelper
 	public static <T extends Entity> List<T> sortWithDistance(List<T> entities, Entity distanceTo)
 	{
 		return entities.stream()
-				.filter(e -> e.isAlive() && e.level == distanceTo.level)
+				.filter(e -> e.isAlive() && e.level() == distanceTo.level())
 				.sorted(Comparator.comparingDouble(e -> e.distanceToSqr(distanceTo)))
 				.toList();
 	}
@@ -653,12 +653,12 @@ public class EntityHelper
 		if (targetUUID != null)
 		{
 			// Try finding player first because it's fast
-			out = mob.level.getPlayerByUUID(targetUUID);
+			out = mob.level().getPlayerByUUID(targetUUID);
 			// When player is not found, search around
 			if (out == null)
 			{
 				double radius = mob.getAttributeValue(Attributes.FOLLOW_RANGE);
-				List<Entity> targets = mob.level.getEntities(
+				List<Entity> targets = mob.level().getEntities(
 					mob, EntityHelper.getNeighboringArea(mob, radius), (Entity e) -> 
 					{
 						return e != null 

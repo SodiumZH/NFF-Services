@@ -35,7 +35,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
@@ -84,6 +83,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	public boolean canIgnite = true;
 	public boolean shouldDiscardAfterExplosion = false;
 	public boolean shouldDestroyBlocks = false;
+	public boolean shouldAlwaysDropOnDestroyBlocks = false;
 	public int ignitionCooldownTicks = 200;
 	protected int currentIgnitionCooldown = 0;
 	
@@ -330,10 +330,16 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	 * radius.
 	 */
 	protected void explodeCreeper() {
-		if (!this.level.isClientSide)
+		if (!this.level().isClientSide)
 		{
-			Explosion.BlockInteraction explosion$blockinteraction = shouldDestroyBlocks && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level, this)
-					? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
+			boolean mobGriefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this);
+			
+			Level.ExplosionInteraction interactionType;// = shouldDestroyBlocks && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this)
+			
+			if (shouldDestroyBlocks && mobGriefing)
+				interactionType = this.shouldAlwaysDropOnDestroyBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.MOB;
+			else interactionType = Level.ExplosionInteraction.NONE;
+			
 			float f = this.isPowered() ? 2.0F : 1.0F;
 
 			if (!shouldDiscardAfterExplosion)
@@ -346,8 +352,8 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 				this.dead = true;
 			}
 
-			this.level.explode(this, this.getX(), this.getY(), this.getZ(), (float) this.explosionRadius * f,
-					explosion$blockinteraction);
+			this.level().explode(this, this.getX(), this.getY(), this.getZ(), (float) this.explosionRadius * f,
+					interactionType);
 
 			if (shouldDiscardAfterExplosion)
 				this.discard();
@@ -374,7 +380,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		Collection<MobEffectInstance> collection = this.getActiveEffects();
 		if (!collection.isEmpty())
 		{
-			AreaEffectCloud areaeffectcloud = new AreaEffectCloud(this.level, this.getX(), this.getY(), this.getZ());
+			AreaEffectCloud areaeffectcloud = new AreaEffectCloud(this.level(), this.getX(), this.getY(), this.getZ());
 			areaeffectcloud.setRadius(2.5F);
 			areaeffectcloud.setRadiusOnUse(-0.5F);
 			areaeffectcloud.setWaitTime(10);
@@ -386,7 +392,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 				areaeffectcloud.addEffect(new MobEffectInstance(mobeffectinstance));
 			}
 
-			this.level.addFreshEntity(areaeffectcloud);
+			this.level().addFreshEntity(areaeffectcloud);
 		}
 
 	}
@@ -428,9 +434,9 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		ItemStack itemstack = player.getItemInHand(hand);
 		if (itemstack.is(Items.FLINT_AND_STEEL) && this.canIgnite && this.currentIgnitionCooldown == 0)
 		{
-			this.level.playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.FLINTANDSTEEL_USE,
+			this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.FLINTANDSTEEL_USE,
 					this.getSoundSource(), 1.0F, this.random.nextFloat() * 0.4F + 0.8F);
-			if (!this.level.isClientSide)
+			if (!this.level().isClientSide)
 			{
 				this.setIgnited(true);
 				itemstack.hurtAndBreak(1, player, (p) ->
@@ -448,9 +454,9 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		ItemStack itemstack = player.getItemInHand(hand);
 		if (itemstack.is(ignitingItem) && this.canIgnite && this.currentIgnitionCooldown == 0)
 		{
-			this.level.playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.FLINTANDSTEEL_USE,
+			this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.FLINTANDSTEEL_USE,
 					this.getSoundSource(), 1.0F, this.random.nextFloat() * 0.4F + 0.8F);
-			if (!this.level.isClientSide)
+			if (!this.level().isClientSide)
 			{
 				this.setIgnited(true);
 				itemstack.hurtAndBreak(1, player, (p) ->
@@ -468,7 +474,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		ItemStack itemstack = player.getItemInHand(hand);
 		if (itemstack.is(ignitingItem) && this.canIgnite && this.currentIgnitionCooldown == 0)
 		{
-			if (!this.level.isClientSide)
+			if (!this.level().isClientSide)
 			{
 				this.setIgnited(true);
 			}
@@ -499,14 +505,14 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 
 	@Override
 	public void updateFromInventory() {
-		if (!this.level.isClientSide) {
+		if (!this.level().isClientSide) {
 			/* If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory, set here */
 		}
 	}
 
 	@Override
 	public void setInventoryFromMob() {
-		if (!this.level.isClientSide) {
+		if (!this.level().isClientSide) {
 			/* If inventory needs to be set from mob's properties on initialization, set here */
 		}
 	}

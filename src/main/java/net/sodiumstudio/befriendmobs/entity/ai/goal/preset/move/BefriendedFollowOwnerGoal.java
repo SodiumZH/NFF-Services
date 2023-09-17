@@ -41,7 +41,7 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	public BefriendedFollowOwnerGoal(@Nonnull IBefriendedMob inMob, double pSpeedModifier, float pStartDistance,
 			float pStopDistance, boolean pCanFly) {
 		super(inMob, pSpeedModifier);
-		this.level = mob.asMob().level;
+		this.level = mob.asMob().level();
 		this.startDistance = pStartDistance;
 		this.stopDistance = pStopDistance;
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
@@ -166,7 +166,7 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 			}
 		}
 		// To a water position
-		else if (isAmphibious && mob.asMob().level.getBlockState(pos).is(Blocks.WATER))
+		else if (isAmphibious && mob.asMob().level().getBlockState(pos).is(Blocks.WATER))
 		{
 			BlockPos blockpos = pos.subtract(getPathfinder().blockPosition());
 			return this.level.noCollision(getPathfinder(), getPathfinder().getBoundingBox().move(blockpos));

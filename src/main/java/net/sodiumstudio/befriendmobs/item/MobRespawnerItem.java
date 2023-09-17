@@ -31,7 +31,7 @@ public class MobRespawnerItem extends BMItem
 	}
 	
 	public static ItemStack fromMob(MobRespawnerItem itemType, Mob mob) {
-		if (mob.level.isClientSide)
+		if (mob.level().isClientSide)
 			return ItemStack.EMPTY;
 		MobRespawnerInstance ins = MobRespawnerInstance.create(new ItemStack(itemType, 1));
 		ins.initFromMob(mob);

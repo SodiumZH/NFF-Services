@@ -1,17 +1,10 @@
 package net.sodiumstudio.befriendmobs.level;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
@@ -20,13 +13,12 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
-import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
-import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule.Impl;
+import net.sodiumstudio.befriendmobs.events.EntityEvents;
+import net.sodiumstudio.befriendmobs.events.ServerEvents;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
-import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
-import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.debug.Debug;
