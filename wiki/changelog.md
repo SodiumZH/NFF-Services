@@ -184,6 +184,12 @@ Separated from DWMG mod.
 
 ## 1.18.2
 
+### 0.0.15
+
+All changes in 1.19.2-0.1.15.
+
+Added `AbstractFishingHookEntity`, a wrapper of `FishingHook` to support non-vanilla Fishing Rods.
+
 ### 0.0.14
 
 Identical to 1.19.2-0.1.14.
