@@ -47,7 +47,7 @@ public class ServerEvents
 	{
 		if (event.phase == TickEvent.Phase.END && event.side == LogicalSide.SERVER)
 		{
-			for (Player player: event.level().players())
+			for (Player player: event.level.players())
 			{
 				CBMPlayerModule.removeOneTickTags(player);
 			}

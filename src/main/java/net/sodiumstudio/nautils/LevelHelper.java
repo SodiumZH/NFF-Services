@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sodiumstudio.nautils.math.MathUtil;
 
 public class LevelHelper
 {
@@ -21,12 +22,12 @@ public class LevelHelper
 	
 	public static boolean isEntityUnderSun(Entity test)
 	{
-		return isUnderSun(new BlockPos(test.position()), test);
+		return isUnderSun(MathUtil.getBlockPos(test.position()), test);
 	}
 	
 	public static boolean isAboveWater(BlockPos pos, Entity levelContext)
 	{
-		Level level = levelContext.level;
+		Level level = levelContext.level();
 		for (int y = pos.getY(); y > -70; --y)
 		{
 			BlockPos currentPos = new BlockPos(pos.getX(), y, pos.getZ());
@@ -40,12 +41,12 @@ public class LevelHelper
 	
 	public static boolean isEntityAboveWater(Entity test)
 	{
-		return isAboveWater(new BlockPos(test.position()), test);
+		return isAboveWater(MathUtil.getBlockPos(test.position()), test);
 	}
 	
 	public static boolean isAboveVoid(BlockPos pos, Entity levelContext)
 	{
-		Level level = levelContext.level;
+		Level level = levelContext.level();
 		for (int y = pos.getY(); y > -70; --y)
 		{
 			BlockPos currentPos = new BlockPos(pos.getX(), y, pos.getZ());
@@ -57,7 +58,7 @@ public class LevelHelper
 	
 	public static boolean isEntityAboveVoid(Entity test)
 	{
-		return isAboveVoid(new BlockPos(test.position()), test);
+		return isAboveVoid(MathUtil.getBlockPos(test.position()), test);
 	}
 	
 	/** Get the height of a position to the standable block or liquid below.
@@ -92,7 +93,7 @@ public class LevelHelper
 	*/
 	public static int getHeightToGround(Vec3 v, Entity context)
 	{
-		return getHeightToGround(new BlockPos(v), context);
+		return getHeightToGround(MathUtil.getBlockPos(v), context);
 	}
 	
 	public ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)

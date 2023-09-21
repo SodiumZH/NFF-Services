@@ -47,7 +47,6 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	{
 		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getName() : InfoHelper.createText(""));
 		this.mob = mob;
-		this.passEvents = false;
 	}
 
 	@Override
@@ -72,7 +71,9 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	
 	/**
 	 * IntVec2 version of blit
+	 * @deprecated use {@code drawSprite} instead
 	 */
+	@Deprecated
 	public void blit(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
 		blit(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
@@ -80,12 +81,41 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	
 	/**
 	 * For adapting non-standard texture size
+	 * @deprecated use {@code drawSprite} instead
 	 */
-	@Override
-	public void blit(GuiGraphics pGuiGraphics, int pX, int pY, int pUOffset, int pVOffset, int pUWidth, int pVHeight) 
+	@Deprecated
+	public void blit(GuiGraphics graphics, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight) 
 	{
-		blit(pGuiGraphics, pX, pY, this.getBlitOffset(), (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
-				getTextureSize().x, getTextureSize().y);
+		graphics.blit(getTextureLocation(), x, y, getTextureSize().x, getTextureSize().y, uOffset, vOffset,
+				uWidth, vHeight, getTextureSize().x, getTextureSize().y);
+		/*blit(pGuiGraphics, pX, pY, pGuiGraphics.off, (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
+				getTextureSize().x, getTextureSize().y);*/
+	}
+	
+	/**
+	 * Draw a sprite (part of a texture).
+	 * @param x X position on screen.
+	 * @param y Y position on screen.
+	 * @param uOffset U (X) offset on texture (i.e. U position of the top-left corner of the sprite on texture)
+	 * @param vOffset V (Y) offset on texture (i.e. V position of the top-left corner of the sprite on texture)
+	 * @param uWidth Sprite U (X) width. 
+	 * @param vHeight Sprite V (Y) width.
+	 */
+	public void drawSprite(GuiGraphics graphics, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
+	{
+		graphics.blit(getTextureLocation(), x, y, getTextureSize().x, getTextureSize().y, uOffset, vOffset,
+				uWidth, vHeight, getTextureSize().x, getTextureSize().y);
+	}
+	
+	/**
+	 * Draw a sprite (part of a texture).
+	 * @param xy XY position on the screen
+	 * @param uvOffset UV (XY) offset on texture (i.e. UV/XY position of the top-left corner of the sprite on texture)
+	 * @param uvSize Sprite UV/XY size.
+	 */
+	public void drawSprite(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
+	{
+		drawSprite(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
 	}
 	
 	/**
@@ -104,18 +134,18 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	public void addSlotBg(GuiGraphics GuiGraphics, int slotIndex, IntVec2 xy, @Nullable IntVec2 uvEmpty, @Nullable IntVec2 uvFilled)
 	{
 		if (!menu.slots.get(slotIndex).hasItem() && uvEmpty != null)
-			blit(GuiGraphics, xy, uvEmpty, IntVec2.valueOf(18));
+			drawSprite(GuiGraphics, xy, uvEmpty, IntVec2.valueOf(18));
 		else if (menu.slots.get(slotIndex).hasItem() && uvFilled != null)
-			blit(GuiGraphics, xy, uvFilled, IntVec2.valueOf(18));
+			drawSprite(GuiGraphics, xy, uvFilled, IntVec2.valueOf(18));
 	}
 
 	@Deprecated
-	public void addHealthInfo(GuiGraphics GuiGraphics, IntVec2 position, int color)
+	public void addHealthInfo(GuiGraphics graphics, IntVec2 position, int color)
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
 		Component info = InfoHelper.createText("HP: " + hp + " / " + maxHp);
-		font.draw(GuiGraphics, info, position.x, position.y, color);
+		graphics.drawString(font, info, position.x, position.y, color);
 	}
 	
 	@Deprecated
@@ -128,7 +158,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * (Preset) Add mob attribute info, including HP/MaxHP, ATK, armor
 	 * <p>（预设）添加生物属性信息，包括HP/MaxHP、攻击力、护甲
 	 */
-	public void addAttributeInfo(GuiGraphics GuiGraphics, IntVec2 position, int color, int textRowWidth)
+	public void addAttributeInfo(GuiGraphics graphics, IntVec2 position, int color, int textRowWidth)
 	{
 		IntVec2 pos = position.copy();
 		String hp = Integer.toString(Math.round(mob.asMob().getHealth()));
@@ -141,11 +171,11 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 				.append(InfoHelper.createText(": " + atk));
 		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
 				.append(InfoHelper.createText(": " + def));
-		font.draw(GuiGraphics, hpcomp, pos.x, pos.y, color);
+		graphics.drawString(font, hpcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
-		font.draw(GuiGraphics, atkcomp, pos.x, pos.y, color);
+		graphics.drawString(font, atkcomp, pos.x, pos.y, color);
 		pos.addY(textRowWidth);
-		font.draw(GuiGraphics, defcomp, pos.x, pos.y, color);
+		graphics.drawString(font, defcomp, pos.x, pos.y, color);
 	}
 	
 	/**

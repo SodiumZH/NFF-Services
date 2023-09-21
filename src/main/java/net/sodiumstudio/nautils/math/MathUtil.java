@@ -1,5 +1,9 @@
 package net.sodiumstudio.nautils.math;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+
 public class MathUtil
 {
 	public static double max(double... vals)
@@ -75,4 +79,23 @@ public class MathUtil
 		}
 		return res;
 	}
+	
+	/**
+	 * Get BlockPos from double xyz.
+	 * This method is in place of BlockPos#new(double, double, double) because 1.20 removed it.
+	 */
+	public static BlockPos getBlockPos(double x, double y, double z)
+	{
+		return new BlockPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
+	}
+	
+	/**
+	 * Get BlockPos from Vec3.
+	 * This method is in place of BlockPos#new(Vec3) because 1.20 removed it.
+	 */
+	public static BlockPos getBlockPos(Vec3 v)
+	{
+		return getBlockPos(v.x, v.y, v.z);
+	}
+	
 }

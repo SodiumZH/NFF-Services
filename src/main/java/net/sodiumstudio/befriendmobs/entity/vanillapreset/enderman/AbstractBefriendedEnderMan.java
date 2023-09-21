@@ -28,7 +28,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -126,7 +125,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	public AbstractBefriendedEnderMan(EntityType<? extends AbstractBefriendedEnderMan> pEntityType, Level pLevel)
 	{
 		super(pEntityType, pLevel);
-		this.maxUpStep = 1.0F;
+		//this.maxUpStep = 1.0F;
 		this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
 		this.xpReward = 0;
 		Arrays.fill(this.armorDropChances, 0f);
@@ -508,7 +507,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			return this.tryTeleportOnWaterHurt(64);
 		}
 		
-		else if (pSource instanceof IndirectEntityDamageSource)
+		else if (pSource.isIndirect())
 		{
 			Entity entity = pSource.getDirectEntity();
 			boolean isByWater;

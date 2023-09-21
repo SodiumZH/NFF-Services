@@ -14,7 +14,6 @@ import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -23,8 +22,7 @@ import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent.AllowDespawn;
+import net.minecraftforge.event.entity.living.MobSpawnEvent.AllowDespawn;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -37,8 +35,8 @@ import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob.DeathRespawnerGenerationType;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredReason;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractArguments;
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteractionResult;
@@ -46,8 +44,8 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
-import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
+import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
@@ -140,6 +138,7 @@ public class EntityEvents
 		event.setCancellationResult(result.get());
 	}
 	
+	@SuppressWarnings("resource")
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingChangeTarget_Lowest(LivingChangeTargetEvent event)
 	{
@@ -160,10 +159,9 @@ public class EntityEvents
 	}
 	
 	@SubscribeEvent
-	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
+	public static void onLivingSetAttackTarget(LivingChangeTargetEvent event)
 	{
-		@SuppressWarnings("deprecation")
-		LivingEntity target = event.getTarget();		
+		LivingEntity target = event.getNewTarget();		
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
@@ -223,8 +221,9 @@ public class EntityEvents
 		// Handle mobs end //
 	}	
 	
+	@SuppressWarnings("resource")
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onLivingSetAttackTarget_Lowest(LivingSetAttackTargetEvent event)
+	public static void onLivingSetAttackTarget_Lowest(LivingChangeTargetEvent event)
 	{
 		
 		if (!event.getEntity().level().isClientSide)
@@ -312,7 +311,7 @@ public class EntityEvents
 
 							else if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.DROP)
 							{
-								ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(),
+								ItemEntity resp = new ItemEntity(event.getEntity().level(), event.getEntity().getX(),
 										event.getEntity().getY(), event.getEntity().getZ(), ins.get());
 								if (bef.isRespawnerInvulnerable()) {
 									ins.setInvulnerable(true);
@@ -341,7 +340,7 @@ public class EntityEvents
 				}
 
 				else if (event.getEntity() instanceof Player player) {
-					for (Entity en : ((ServerLevel) (player.level)).getAllEntities()) {
+					for (Entity en : ((ServerLevel) (player.level())).getAllEntities()) {
 						if (en instanceof Mob mob && mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()) 
 						{
 							if (!BefriendingTypeRegistry.getHandler(mob).dontInterruptOnPlayerDie()

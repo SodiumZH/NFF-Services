@@ -115,6 +115,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 		return 0;
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public void updateFromInventory() {
 		if (!this.level().isClientSide) {
@@ -122,6 +123,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public void setInventoryFromMob() {
 		if (!this.level().isClientSide) {

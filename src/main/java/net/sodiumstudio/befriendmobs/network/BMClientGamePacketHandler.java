@@ -19,7 +19,7 @@ public class BMClientGamePacketHandler
 	{
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
-		Entity entity = mc.level().getEntity(packet.getEntityId());
+		Entity entity = mc.level.getEntity(packet.getEntityId());
 		if (entity instanceof IBefriendedMob bef) {
 			LocalPlayer localplayer = mc.player;
 			BefriendedInventory inv = new BefriendedInventory(packet.getSize());
@@ -37,7 +37,7 @@ public class BMClientGamePacketHandler
 		@SuppressWarnings("resource")
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
-		Entity entity = mc.level().getEntity(packet.entityId);
+		Entity entity = mc.level.getEntity(packet.entityId);
 		entity.setXRot(packet.xRot);
 		entity.setYRot(packet.yRot);
 		if (entity instanceof Mob mob)

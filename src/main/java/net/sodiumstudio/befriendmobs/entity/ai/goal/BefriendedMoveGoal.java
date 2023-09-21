@@ -4,9 +4,11 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal;
 import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.Blocks;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedAmphibious;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.nautils.math.MathUtil;
 
 /**
  * The base class of all befriended mob goals for moving to somewhere,
@@ -105,7 +107,7 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 		super.start();
 		if (isAmphibious)
 		{
-			if (mob.asMob().isInWater() && mob.asMob().level().getBlockState(new BlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
+			if (mob.asMob().isInWater() && mob.asMob().level().getBlockState(MathUtil.getBlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
 				((IBefriendedAmphibious)mob).switchNav(true);
 			else ((IBefriendedAmphibious)mob).switchNav(false);		
 		}

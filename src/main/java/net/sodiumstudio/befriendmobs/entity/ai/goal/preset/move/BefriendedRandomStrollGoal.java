@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.nautils.math.MathUtil;
 
 public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 
@@ -107,7 +108,7 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	@Override
 	public void start() {
 		super.start();
-		BlockPos wanted = new BlockPos(wantedX, wantedY, wantedZ);
+		BlockPos wanted = MathUtil.getBlockPos(wantedX, wantedY, wantedZ);
 		if (shouldAvoidSun.test(mob) && mob.asMob().level().canSeeSky(wanted) && mob.asMob().level().isDay())
 			return;
 		getPathfinder().getNavigation().moveTo(this.wantedX, this.wantedY, this.wantedZ, this.speedModifier);

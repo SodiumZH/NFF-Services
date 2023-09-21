@@ -2,6 +2,7 @@ package net.sodiumstudio.nautils;
 
 import java.util.ArrayList;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.LiteralContents;
@@ -19,7 +20,7 @@ public class InfoHelper
 	// Create a component with translatable content, equals to TranslatableComponent in 1.18.2
 	public static MutableComponent createTrans(String key, Object... params)
 	{
-		return MutableComponent.create(new TranslatableContents(key, params));
+		return Component.translatable(key, params);
 	}
 	
 	public static ComponentBuilder builder()

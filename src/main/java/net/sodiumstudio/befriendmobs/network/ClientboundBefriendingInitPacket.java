@@ -22,6 +22,7 @@ public class ClientboundBefriendingInitPacket implements Packet<ClientGamePacket
 	/** On server construction only
 	 * @param target The mob BEFORE befriending.
 	 */
+	@SuppressWarnings("resource")
 	public ClientboundBefriendingInitPacket(Mob target)
 	{
 		if (!target.level().isClientSide)

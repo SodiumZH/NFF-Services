@@ -121,7 +121,7 @@ public abstract class BaubleHandler {
 	public void tick(IBaubleHolder holder)
 	{
 		LivingEntity living = holder.getLiving();
-		if (living.level != null && !living.level().isClientSide)
+		if (living.level() != null && !living.level().isClientSide)
 		{	
 			preTick(holder);
 			for (String key: holder.getBaubleSlots().keySet())

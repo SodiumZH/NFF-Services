@@ -47,6 +47,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.sodiumstudio.nautils.math.MathUtil;
 
 // Static function library for befriending-related actions.
 public class EntityHelper
@@ -121,6 +122,7 @@ public class EntityHelper
 		return replaceMob(newType, from, false);
 	}
 
+	@SuppressWarnings("resource")
 	@Deprecated // Use sendParticlesToEntity() instead
 	public static void sendParticlesToMob(LivingEntity entity, ParticleOptions options, Vec3 offset, int amount,
 			double speed, double positionRndScale, double speedRndScale) {
@@ -165,6 +167,7 @@ public class EntityHelper
 	}
 
 	
+	@SuppressWarnings("resource")
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
 		if (entity.level().isClientSide)
@@ -401,7 +404,7 @@ public class EntityHelper
 		double atZ = entity.getZ();
 		double actualY = inY;
 		boolean noCollision = false;
-		BlockPos currentPos = new BlockPos(inX, inY, inZ);
+		BlockPos currentPos = MathUtil.getBlockPos(inX, inY, inZ);
 		Level level = entity.level();
 		if (level.hasChunkAt(currentPos))
 		{
