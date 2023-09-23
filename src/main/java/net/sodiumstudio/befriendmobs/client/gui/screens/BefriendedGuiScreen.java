@@ -103,8 +103,8 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 */
 	public void drawSprite(GuiGraphics graphics, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
 	{
-		graphics.blit(getTextureLocation(), x, y, getTextureSize().x, getTextureSize().y, uOffset, vOffset,
-				uWidth, vHeight, getTextureSize().x, getTextureSize().y);
+		graphics.blit(getTextureLocation(), x, y, uWidth, vHeight, uOffset, vOffset,
+				getTextureSize().x, getTextureSize().y);
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 */
 	public void drawSprite(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
-		drawSprite(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
+		drawSprite(GuiGraphics, xy.x, xy.y, uvSize.x, uvSize.y, uvOffset.x, uvOffset.y);
 	}
 	
 	/**
@@ -171,11 +171,11 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 				.append(InfoHelper.createText(": " + atk));
 		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
 				.append(InfoHelper.createText(": " + def));
-		graphics.drawString(font, hpcomp, pos.x, pos.y, color);
+		graphics.drawString(font, hpcomp, pos.x, pos.y, color, false);
 		pos.addY(textRowWidth);
-		graphics.drawString(font, atkcomp, pos.x, pos.y, color);
+		graphics.drawString(font, atkcomp, pos.x, pos.y, color, false);
 		pos.addY(textRowWidth);
-		graphics.drawString(font, defcomp, pos.x, pos.y, color);
+		graphics.drawString(font, defcomp, pos.x, pos.y, color, false);
 	}
 	
 	/**

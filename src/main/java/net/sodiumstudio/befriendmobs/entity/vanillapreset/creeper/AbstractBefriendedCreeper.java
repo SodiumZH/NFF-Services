@@ -299,7 +299,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	/**
 	 * Sets the state of creeper, -1 to idle and 1 to be 'in fuse'
 	 */
-	 // Use setSwelling() instead
 	public void setSwellDir(int val) {
 		this.entityData.set(DATA_SWELL_DIR, val);
 	}
