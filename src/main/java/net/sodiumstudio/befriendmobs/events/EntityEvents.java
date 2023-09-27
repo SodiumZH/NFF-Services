@@ -176,7 +176,7 @@ public class EntityEvents
 	        	{
 	        		if (bef.getOwner() != null && tbef.getOwner() != null && bef.getOwner() == tbef.getOwner())
 	        		{
-	        			mob.setTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	// Befriended mob shouldn't attack owner's tamable animals
@@ -184,7 +184,7 @@ public class EntityEvents
 	        	{
 	        		if (bef.getOwner() != null && ta.getOwner() != null && bef.getOwner() == ta.getOwner())
 	        		{
-	        			mob.setTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	else
