@@ -182,6 +182,18 @@ Some minor API changes.
 
 Separated from DWMG mod.
 
+## 1.20.1
+
+### 0.2.15
+
+Ported from 1.19.2-0.1.15.
+
+Added `BlockMaterial`, an alternative `BlockBehaviour.Properties` generator class for old `Material`.
+
+Adjusted the API of `BefriendedGuiScreen`.
+
+Adjusted the explosions of `AbstractBefriendedCreeper` and added an option for always dropping blocks like TNT.
+
 ## 1.18.2
 
 ### 0.0.14
