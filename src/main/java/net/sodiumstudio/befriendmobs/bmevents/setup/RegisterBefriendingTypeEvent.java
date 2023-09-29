@@ -16,7 +16,7 @@ public class RegisterBefriendingTypeEvent extends Event implements IModBusEvent 
 		BefriendingTypeRegistry.register(from, convertTo, handler, override);
 	}
 	
-	public static void register(@Nonnull EntityType<? extends Mob> fromType, @Nonnull EntityType<? extends Mob> convertToType, @Nonnull BefriendingHandler handler)
+	public void register(@Nonnull EntityType<? extends Mob> fromType, @Nonnull EntityType<? extends Mob> convertToType, @Nonnull BefriendingHandler handler)
 	{
 		BefriendingTypeRegistry.register(fromType, convertToType, handler);
 	}
