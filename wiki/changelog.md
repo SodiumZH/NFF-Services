@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.16
+
+Added some setup hooks for simplification of BM-specific registration.
+
+
+
 ### 0.1.15
 
 Added `CBMLevelModule` as a serializable capability for levels.

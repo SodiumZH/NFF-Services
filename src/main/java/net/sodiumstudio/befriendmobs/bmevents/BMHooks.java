@@ -33,7 +33,7 @@ public class BMHooks
 	}
 	
 	
-	// Hooks during actions of the leve
+	// Hooks during actions of the level
 	public static class Level
 	{
 		public static void onModuleTickStart(ServerLevel level)
