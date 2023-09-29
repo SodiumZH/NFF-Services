@@ -334,7 +334,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		if (!this.level.isClientSide)
 		{
 			Explosion.BlockInteraction explosion$blockinteraction = shouldDestroyBlocks && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level, this)
-					? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
+					? (shouldAlwaysDropOnDestroyBlocks ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.DESTROY) : Explosion.BlockInteraction.NONE;
 			float f = this.isPowered() ? 2.0F : 1.0F;
 
 			if (!shouldDiscardAfterExplosion)
