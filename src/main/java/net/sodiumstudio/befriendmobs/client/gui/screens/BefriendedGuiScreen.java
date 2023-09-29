@@ -36,11 +36,6 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	{
 		return new IntVec2(256, 256);
 	}
-	
-	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
-			IBefriendedMob mob) {
-		this(pMenu, pPlayerInventory, mob, true);
-	}
 
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob, boolean renderName)
@@ -49,7 +44,17 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		this.mob = mob;
 		this.passEvents = false;
 	}
-
+	
+	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
+			IBefriendedMob mob) {
+		this(pMenu, pPlayerInventory, mob, true);
+	}
+	
+	public BefriendedGuiScreen(BefriendedInventoryMenu menu)
+	{
+		this(menu, menu.playerInventory, menu.mob);
+	}
+	
 	@Override
 	protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
