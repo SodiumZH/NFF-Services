@@ -57,7 +57,10 @@ public class BMChannels {
     
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
-        registerMessage();
+    	event.enqueueWork(() -> 
+    	{
+    		registerMessage();
+    	});
     }
     
 }
