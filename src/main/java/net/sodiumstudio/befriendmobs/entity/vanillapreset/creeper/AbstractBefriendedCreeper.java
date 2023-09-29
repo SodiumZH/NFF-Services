@@ -338,7 +338,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 			if (shouldDestroyBlocks && mobGriefing)
 				interactionType = this.shouldAlwaysDropOnDestroyBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.MOB;
 			else interactionType = Level.ExplosionInteraction.NONE;
-			
+
 			float f = this.isPowered() ? 2.0F : 1.0F;
 
 			if (!shouldDiscardAfterExplosion)
