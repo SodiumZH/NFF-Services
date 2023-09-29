@@ -84,6 +84,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	public boolean canIgnite = true;
 	public boolean shouldDiscardAfterExplosion = false;
 	public boolean shouldDestroyBlocks = false;
+	public boolean shouldAlwaysDropOnDestroyBlocks = true;
 	public int ignitionCooldownTicks = 200;
 	protected int currentIgnitionCooldown = 0;
 	
