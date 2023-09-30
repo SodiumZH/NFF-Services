@@ -3,12 +3,18 @@ package net.sodiumstudio.nautils;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.ForgeEventFactory;
 
 public class LevelHelper
 {
@@ -95,7 +101,14 @@ public class LevelHelper
 		return getHeightToGround(new BlockPos(v), context);
 	}
 	
-	public ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
+	/**
+	 * Get all {@link BlockPos} in a given area fulfilling given conditions.
+	 * <p> WARNING: It would be slow if the area is too large! It will invoke {@link ArrayList#add} for times of the area volume at most.
+	 * @param area Searching area.
+	 * @param filter Condition.
+	 * @return ArrayList of BlockPos. If {@code filter} is null, return all positions. 
+	 */
+	public static ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
 	{
 		Wrapped<ArrayList<BlockPos>> wrapped = new Wrapped<>(new ArrayList<>());
 		BlockPos.betweenClosedStream(area).forEach((BlockPos b) -> 
@@ -105,4 +118,129 @@ public class LevelHelper
 		});
 		return wrapped.get();
 	}
+	
+	/**
+	 * Make an explosion from entity.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param source Explosion source entity.
+	 * @param position Explosion position in level. Usually {@code source.position()}.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit.
+	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param considersMobGriefingGameRule If true, it will consider MobGriefing game rule to determine whether to break blocks. If the source isn't a {@link Mob} it's ignored.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	public static Explosion explode(Entity source, Vec3 position, float power, boolean causesFire, boolean breaksBlocks, boolean alwaysDropsItemsOnBreaking, boolean considersMobGriefingGameRule)
+	{
+		if (source.level.isClientSide)
+			return null;
+		boolean canBreak = breaksBlocks;
+		if (canBreak && source instanceof Mob && considersMobGriefingGameRule)
+			canBreak = ForgeEventFactory.getMobGriefingEvent(source.level, source);
+		return source.level.explode(source, position.x, position.y, position.z, power, causesFire, 
+				canBreak ? (alwaysDropsItemsOnBreaking ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.DESTROY) : Explosion.BlockInteraction.NONE);
+	}
+	
+	/**
+	 * Make an explosion from entity.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param source Explosion source entity.
+	 * @param position Explosion position in level. Usually {@code source.position()}.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
+	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explode(@Nonnull Entity source, Vec3 position, float power, boolean causesFire, boolean breaksBlocks, boolean alwaysDropsItemsOnBreaking)
+	{
+		return LevelHelper.explode(source, position, power, causesFire, breaksBlocks, alwaysDropsItemsOnBreaking, true);
+	}
+	
+	/**
+	 * Make an explosion from entity.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param source Explosion source entity.
+	 * @param position Explosion position in level. Usually {@code source.position()}.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit. It will NOT always drop items on breaking blocks. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explode(@Nonnull Entity source, Vec3 position, float power, boolean causesFire, boolean breaksBlocks)
+	{
+		return LevelHelper.explode(source, position, power, causesFire, breaksBlocks, false, true);
+	}
+	
+	/**
+	 * Make an explosion from entity at its position.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param source Explosion source entity.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
+	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explode(@Nonnull Entity source, float power, boolean causesFire, boolean breaksBlocks, boolean alwaysDropsItemsOnBreaking)
+	{
+		return LevelHelper.explode(source, source.position(), power, causesFire, breaksBlocks, alwaysDropsItemsOnBreaking, true);
+	}
+	
+	/**
+	 * Make an explosion from entity at its position.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param source Explosion source entity.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit. It will NOT always drop items on breaking blocks. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explode(@Nonnull Entity source, float power, boolean causesFire, boolean breaksBlocks)
+	{
+		return LevelHelper.explode(source, source.position(), power, causesFire, breaksBlocks, false, true);
+	}
+	
+	/**
+	 * Make an explosion without entity source.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param level Explosion level. On client it will not do anything.
+	 * @param position Explosion position in level.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit.
+	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explodeNoSource(Level level, Vec3 position, float power, boolean causesFire, boolean breaksBlocks, boolean alwaysDropsItemsOnBreaking)
+	{
+		if (level.isClientSide)
+			return null;
+		return level.explode(null, position.x, position.y, position.z, power, causesFire, 
+				breaksBlocks ? (alwaysDropsItemsOnBreaking ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.DESTROY) : Explosion.BlockInteraction.NONE);
+	}
+	
+	/**
+	 * Make an explosion without entity source.
+	 * This method is for API consistency to 1.20+ because {@link Explosion.BlockInteraction} is deprecated in 1.20.
+	 * @param level Explosion level. On client it will not do anything.
+	 * @param position Explosion position in level.
+	 * @param power Explosion power.
+	 * @param causesFire If true, the explosion will cause fire.
+	 * @param breaksBlocks If true, the explosion will break blocks on hit. It will NOT always drop items on breaking blocks. 
+	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @return {@link Explosion} instance, or {@code null} on client.
+	 */
+	@Nullable
+	public static Explosion explodeNoSource(Level level, Vec3 position, float power, boolean causesFire, boolean breaksBlock)
+	{
+		return LevelHelper.explodeNoSource(level, position, power, causesFire, breaksBlock, false);
+	}
+	
 }
