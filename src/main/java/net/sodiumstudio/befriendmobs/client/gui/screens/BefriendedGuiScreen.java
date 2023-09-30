@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -77,6 +78,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	
 	/**
 	 * IntVec2 version of blit
+	 * @deprecated use {@code drawSprite} instead which has identical functions.
 	 */
 	public void blit(PoseStack poseStack, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
@@ -85,12 +87,40 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	
 	/**
 	 * For adapting non-standard texture size
+	 * @deprecated use {@code drawSprite} instead which has identical functions.
 	 */
 	@Override
+	@Deprecated
 	public void blit(PoseStack pPoseStack, int pX, int pY, int pUOffset, int pVOffset, int pUWidth, int pVHeight) 
 	{
 		blit(pPoseStack, pX, pY, this.getBlitOffset(), (float) pUOffset, (float) pVOffset, pUWidth, pVHeight,
 				getTextureSize().x, getTextureSize().y);
+	}
+	
+	/**
+	 * Draw a sprite (part of a texture).
+	 * @param x X position on screen.
+	 * @param y Y position on screen.
+	 * @param uOffset U (X) offset on texture (i.e. U position of the top-left corner of the sprite on texture)
+	 * @param vOffset V (Y) offset on texture (i.e. V position of the top-left corner of the sprite on texture)
+	 * @param uWidth Sprite U (X) width. 
+	 * @param vHeight Sprite V (Y) width.
+	 */
+	public void drawSprite(PoseStack poseStack, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
+	{
+		blit(poseStack, x, y, this.getBlitOffset(), (float) uOffset, (float) vOffset, uWidth, vHeight,
+				getTextureSize().x, getTextureSize().y);
+	}
+	
+	/**
+	 * Draw a sprite (part of a texture).
+	 * @param xy XY position on the screen
+	 * @param uvOffset UV (XY) offset on texture (i.e. UV/XY position of the top-left corner of the sprite on texture)
+	 * @param uvSize Sprite UV/XY size.
+	 */
+	public void drawSprite(PoseStack GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
+	{
+		drawSprite(GuiGraphics, xy.x, xy.y, uvSize.x, uvSize.y, uvOffset.x, uvOffset.y);
 	}
 	
 	/**

@@ -159,10 +159,10 @@ public class EntityEvents
 	}*/
 	
 	@SubscribeEvent
-	public static void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
+	public static void onLivingChangeTarget(LivingChangeTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
-		LivingEntity target = event.getTarget();		
+		LivingEntity target = event.getNewTarget();		
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
@@ -171,13 +171,13 @@ public class EntityEvents
 	        {
 	        	// Befriended mob should never attack the owner
 	        	if (target == bef.getOwner())
-	        		mob.setTarget(bef.getPreviousTarget());
+	        		event.setNewTarget(bef.getPreviousTarget());
 	        	// Befriended mob shouldn't attack owner's other befriended mobs
 	        	else if (target instanceof IBefriendedMob tbef)
 	        	{
 	        		if (bef.getOwner() != null && tbef.getOwner() != null && bef.getOwner() == tbef.getOwner())
 	        		{
-	        			mob.setTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	// Befriended mob shouldn't attack owner's tamable animals
@@ -185,7 +185,7 @@ public class EntityEvents
 	        	{
 	        		if (bef.getOwner() != null && ta.getOwner() != null && bef.getOwner() == ta.getOwner())
 	        		{
-	        			mob.setTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	else
@@ -200,7 +200,7 @@ public class EntityEvents
 	        	{
 	        		if (ta.getOwner() != null && tbef.getOwner() != null && ta.getOwner() == tbef.getOwner())
 	        		{
-	        			ta.setTarget(null);
+	        			event.setCanceled(true);
 	        		}
 	        	}
 	        }
@@ -213,7 +213,7 @@ public class EntityEvents
 	        		// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
 	        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
 	        		{
-	        			g.setTarget(null);
+	        			event.setCanceled(true);
 	        		}
 	        	}
 	        }
@@ -221,6 +221,8 @@ public class EntityEvents
 		}
 		// Handle mobs end //
 	}	
+	
+	/** Here it's still necessary because other mods may reset target here overriding the AlwaysHostile feature*/
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingSetAttackTarget_Lowest(LivingSetAttackTargetEvent event)
