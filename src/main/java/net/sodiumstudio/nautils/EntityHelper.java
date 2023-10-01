@@ -709,4 +709,24 @@ public class EntityHelper
 		return null;
 	}
 	
+	/**
+	 * Remove effect if its duration (ticks) and amplifier are no more than given values.
+	 * @param target Target living entity.
+	 * @param effect Effect type.
+	 * @param maxDuration Remove only duration is no more than this value.
+	 * @param maxAmplifier Remove only amplifier is no more than this value.
+	 * @return Whether the effect is removed.
+	 */
+	public static boolean limitedRemoveEffect(LivingEntity target, MobEffect effect, int maxDuration, int maxAmplifier)
+	{
+		MobEffectInstance inst = target.getEffect(effect);
+		if (inst == null)
+			return true;
+		if (inst.getDuration() <= maxDuration && inst.getAmplifier() <= maxAmplifier)
+		{
+			target.removeEffect(effect);
+			return true;
+		}
+		else return false;
+	}
 }
