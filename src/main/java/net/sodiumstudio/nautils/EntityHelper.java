@@ -507,7 +507,7 @@ public class EntityHelper
 		{	
 			if (living.getEffect(effectInst.getEffect()).getAmplifier() > effectInst.getAmplifier())
 				return;
-			else if (living.getEffect(effectInst.getEffect()).getAmplifier() > effectInst.getAmplifier()
+			else if (living.getEffect(effectInst.getEffect()).getAmplifier() == effectInst.getAmplifier()
 					&& living.getEffect(effectInst.getEffect()).getDuration() > effectInst.getDuration())
 				return;
 		}
