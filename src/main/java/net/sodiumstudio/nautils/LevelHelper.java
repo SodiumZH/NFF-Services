@@ -243,4 +243,35 @@ public class LevelHelper
 		return LevelHelper.explodeNoSource(level, position, power, causesFire, breaksBlock, false);
 	}
 	
+	public static <T> T selectByDifficulty(Level level, T peaceful, T easy, T normal, T hard)
+	{
+		switch (level.getDifficulty())
+		{
+		case PEACEFUL:
+		{
+			return peaceful;
+		}
+		case EASY:
+		{
+			return easy;
+		}
+		case NORMAL:
+		{
+			return normal;
+		}
+		case HARD:
+		{
+			return hard;
+		}
+		default:
+		{
+			throw new IllegalStateException("Illegal difficulty.");
+		}
+		}
+	}
+	
+	public static <T> T selectByDifficulty(Entity levelContext, T peaceful, T easy, T normal, T hard)
+	{
+		return selectByDifficulty(levelContext.level, peaceful, easy, normal, hard);
+	}
 }

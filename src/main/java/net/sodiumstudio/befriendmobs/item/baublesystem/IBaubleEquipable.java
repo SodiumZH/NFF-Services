@@ -14,7 +14,7 @@ import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 
-public interface IBaubleHolder {
+public interface IBaubleEquipable {
 	
 	public HashMap<String, ItemStack> getBaubleSlots();
 
@@ -169,8 +169,6 @@ public interface IBaubleHolder {
 		getDataCache().write();
 	}
 	
-	
-	
 	/* Misc */	
 	public default LivingEntity getLiving()
 	{
@@ -181,7 +179,6 @@ public interface IBaubleHolder {
 	
 	/**
 	 * Check if there's at least one slot containing the given item.
-	 * 
 	 */
 	public default boolean hasBaubleItem(Item inItem)
 	{
@@ -191,6 +188,20 @@ public interface IBaubleHolder {
 				return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Count how many given items the mob is equipping.
+	 */
+	public default int countBaubleItem(Item inItem)
+	{
+		int res = 0;
+		for (String key: getBaubleSlots().keySet())
+		{
+			if (getBaubleSlots().get(key).is(inItem))
+				res++;
+		}
+		return res;
 	}
 	
 	/**

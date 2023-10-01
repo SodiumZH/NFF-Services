@@ -6,7 +6,13 @@
 
 Added some setup hooks for simplification of BM-specific registration.
 
+Adjusted Bauble system:
 
+​	- Added several event hooks in `BaubleHandler`.
+
+​	- Renamed class: `IBaubleHolder` => `IBaubleEquipable`
+
+​	- Set some method as `final` to prevent accident overriding.
 
 ### 0.1.15
 

@@ -47,7 +47,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
-import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleHolder;
+import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleEquipable;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
@@ -480,8 +480,8 @@ public class EntityEvents
 				{
 					l.updateCooldown();
 				});
-				// IBaubleHolder tick
-				if (mob instanceof IBaubleHolder holder)
+				// IBaubleEquipable tick
+				if (mob instanceof IBaubleEquipable holder)
 				{
 					holder.updateBaubleEffects();
 				}

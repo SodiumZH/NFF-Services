@@ -15,11 +15,11 @@ import net.sodiumstudio.nautils.NbtHelper;
 public interface CBaubleDataCache
 {
 
-	public IBaubleHolder getHolder();
+	public IBaubleEquipable getHolder();
 	
 	public CompoundTag getNbt();
 
-	public HashSet<IBaubleHolder.TransientModifierInfo> transientModifiers();
+	public HashSet<IBaubleEquipable.TransientModifierInfo> transientModifiers();
 		
 	public default HashMap<String, ItemStack> getCachedStacks() {
 		HashMap<String, ItemStack> map = new HashMap<String, ItemStack>();
@@ -55,11 +55,11 @@ public interface CBaubleDataCache
 	{
 
 		protected CompoundTag nbt = new CompoundTag();
-		public final IBaubleHolder holder;
-		public final HashSet<IBaubleHolder.TransientModifierInfo> transientModifiers 
-			= new HashSet<IBaubleHolder.TransientModifierInfo>();
+		public final IBaubleEquipable holder;
+		public final HashSet<IBaubleEquipable.TransientModifierInfo> transientModifiers 
+			= new HashSet<IBaubleEquipable.TransientModifierInfo>();
 		
-		public Impl(IBaubleHolder holder)
+		public Impl(IBaubleEquipable holder)
 		{
 			this.holder = holder;
 			nbt.put("stacks", new CompoundTag());
@@ -71,12 +71,12 @@ public interface CBaubleDataCache
 		}
 
 		@Override
-		public IBaubleHolder getHolder() {
+		public IBaubleEquipable getHolder() {
 			return holder;
 		}
 		
 		@Override
-		public HashSet<IBaubleHolder.TransientModifierInfo> transientModifiers()
+		public HashSet<IBaubleEquipable.TransientModifierInfo> transientModifiers()
 		{
 			return transientModifiers;
 		}
@@ -86,10 +86,10 @@ public interface CBaubleDataCache
 	public static class Prvd implements ICapabilityProvider
 	{
 
-		protected final IBaubleHolder holder;
+		protected final IBaubleEquipable holder;
 		protected CBaubleDataCache cap;
 		
-		public Prvd(IBaubleHolder holder)
+		public Prvd(IBaubleEquipable holder)
 		{
 			this.holder = holder;
 			cap = new CBaubleDataCache.Impl(this.holder);
