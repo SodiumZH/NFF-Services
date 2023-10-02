@@ -228,8 +228,9 @@ public class ContainerHelper
 	
 	/**
 	 * Randomly pick an element in a collection
+	 * For {@link List}, use {@code randomPick} instead since it's faster for large collections.
 	 */
-	public static <T> T randomPick(Collection<T> collection)
+	public static <T> T randomPickCollection(Collection<T> collection)
 	{
 		int r = rnd.nextInt(collection.size());
 		int i = 0;
@@ -247,8 +248,16 @@ public class ContainerHelper
 	 */
 	public static <K, V> MapPair<K, V> randomPick(Map<K, V> map)
 	{
-		K k = randomPick(map.keySet());
+		K k = randomPickCollection(map.keySet());
 		return MapPair.of(k, map.get(k));
+	}
+	
+	/**
+	 * Randomly pick an element in a list
+	 */
+	public static <T> T randomPick(List<T> list)
+	{
+		return list.get(rnd.nextInt(0, list.size()));
 	}
 	
 	/**
