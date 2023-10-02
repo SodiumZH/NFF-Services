@@ -49,16 +49,22 @@ public class RepeatableAttributeModifier
 	public void apply(LivingEntity target, Attribute attribute, int times, boolean isPermanent)
 	{
 		AttributeInstance inst = target.getAttribute(attribute);
-		for (int i = 0; i < times; ++i)
+		int i = 0;
+		for (i = 0; i < times; ++i)
 		{
-			if (inst.hasModifier(this.get(i)))
-				if (isPermanent)
-				{
-					inst.addPermanentModifier(this.get(i));
-				}
-				else inst.addTransientModifier(this.get(i));
+			inst.removeModifier(this.get(i));
+			if (isPermanent)
+			{
+				inst.addPermanentModifier(this.get(i));
+			}
+			else inst.addTransientModifier(this.get(i));
+		}
+		for (i = times; i < this.modifiers.size(); ++i)
+		{
+			inst.removeModifier(this.get(i));
 		}
 	}
+	
 	
 	public void clear(LivingEntity target, Attribute attribute)
 	{
