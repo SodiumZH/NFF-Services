@@ -154,7 +154,7 @@ public class CBefriendableMobImpl implements CBefriendableMob
 	public boolean hasPlayerTimer(Player player, String key)
 	{
 		return nbt.getCompound("timers").getCompound("player_timers")
-				.contains(player.getStringUUID() + "_" + key, 0);
+				.contains(player.getStringUUID() + "_" + key, 3);
 	}
 	
 	@Override
