@@ -120,7 +120,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 */
 	public void drawSprite(PoseStack GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
 	{
-		drawSprite(GuiGraphics, xy.x, xy.y, uvSize.x, uvSize.y, uvOffset.x, uvOffset.y);
+		drawSprite(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
 	}
 	
 	/**
