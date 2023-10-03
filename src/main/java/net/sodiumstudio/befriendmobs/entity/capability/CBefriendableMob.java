@@ -162,9 +162,11 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 		return tag.get();
 	}
 	
-	// Try adding hatred with given reason. This function will check in befriending handler if this reason is accepted,
-	// post event and check if canceled.
-	// Return if added hatred.
+	/** Try adding hatred with given reason. This function will check in befriending handler whether this reason is accepted,
+	* post event and check whether canceled.
+	* <p> Return if added hatred.
+	* <p> Note: If a zero-duration hatred is attempted to add, it will normally post events but not do anything on hatred list.
+	*/
 	public default boolean addHatredWithReason(Player player, BefriendableAddHatredReason reason)
 	{
 		BefriendingHandler handler = BefriendingTypeRegistry.getHandler(getOwner());
@@ -178,9 +180,10 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 			boolean canceled = MinecraftForge.EVENT_BUS.post(e);
 			if (!canceled)
 			{
-				addHatred(player, ticks);
+				if (ticks != 0)
+					addHatred(player, ticks);
 				handler.onAddingHatred(getOwner(), player, reason);
-				return true;
+				return ticks != 0;
 			}
 		}
 		return false;
