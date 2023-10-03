@@ -4,15 +4,31 @@
 
 ### 0.1.16
 
+Added `RepeatableAttributeModifier` for applying a same `AttributeModifier` for multiple times to a single `LivingEntity`.
+
+Added `ItemPackageItem` for a temporary container of multiple `ItemStack`s, mainly for recipe results. (Not tested)
+
 Added some setup hooks for simplification of BM-specific registration.
+
+​	-`RegisterBefriendingTypeEvent` instead of `BefriendingTypeRegistry`
+
+​	-`RegisterGuiScreenEvent` instead of `BefriendedGuiScreenMaker`
 
 Adjusted Bauble system:
 
-​	- Added several event hooks in `BaubleHandler`.
+​	-Added several event hooks in `BaubleHandler`.
 
-​	- Renamed class: `IBaubleHolder` => `IBaubleEquipable`
+​	-Renamed class: `IBaubleHolder` => `IBaubleEquipable`
 
-​	- Set some method as `final` to prevent accident overriding.
+​	-Marked some methods as `final` to prevent accident overriding.
+
+Fixed issues in `CBefriendableMob`:
+
+​	-Fixed `hasPlayerTimer` always returning `true`.
+
+​	-Fixed `addHatredWithReason` crash with input time 0. Now it will trigger all related events but not add hatred if input is 0. Internal `addHatred` still crashes with time 0.
+
+Some internal API changes for consistency with 1.20.1.
 
 ### 0.1.15
 
