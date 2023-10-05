@@ -159,10 +159,10 @@ public class EntityEvents
 	}*/
 	
 	@SubscribeEvent
-	public static void onLivingChangeTarget(LivingChangeTargetEvent event)
+	public static void onLivingSetTarget(LivingSetAttackTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
-		LivingEntity target = event.getNewTarget();		
+		LivingEntity target = event.getTarget();		
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
@@ -171,13 +171,13 @@ public class EntityEvents
 	        {
 	        	// Befriended mob should never attack the owner
 	        	if (target == bef.getOwner())
-	        		event.setNewTarget(bef.getPreviousTarget());
+	        		mob.setTarget(bef.getPreviousTarget());
 	        	// Befriended mob shouldn't attack owner's other befriended mobs
 	        	else if (target instanceof IBefriendedMob tbef)
 	        	{
 	        		if (bef.getOwner() != null && tbef.getOwner() != null && bef.getOwner() == tbef.getOwner())
 	        		{
-	        			event.setNewTarget(bef.getPreviousTarget());
+	        			mob.setTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	// Befriended mob shouldn't attack owner's tamable animals
@@ -185,7 +185,7 @@ public class EntityEvents
 	        	{
 	        		if (bef.getOwner() != null && ta.getOwner() != null && bef.getOwner() == ta.getOwner())
 	        		{
-	        			event.setNewTarget(bef.getPreviousTarget());
+	        			mob.setTarget(bef.getPreviousTarget());
 	        		}
 	        	}
 	        	else
