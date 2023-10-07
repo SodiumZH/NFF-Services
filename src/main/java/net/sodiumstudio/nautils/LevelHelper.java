@@ -3,12 +3,18 @@ package net.sodiumstudio.nautils;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.sodiumstudio.nautils.math.MathUtil;
 
 public class LevelHelper
@@ -119,15 +125,18 @@ public class LevelHelper
 	 * @param considersMobGriefingGameRule If true, it will consider MobGriefing game rule to determine whether to break blocks. If the source isn't a {@link Mob} it's ignored.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
+	@SuppressWarnings("resource")
 	public static Explosion explode(Entity source, Vec3 position, float power, boolean causesFire, boolean breaksBlocks, boolean alwaysDropsItemsOnBreaking, boolean considersMobGriefingGameRule)
 	{
-		if (source.level.isClientSide)
+		if (source.level().isClientSide)
 			return null;
 		boolean canBreak = breaksBlocks;
 		if (canBreak && source instanceof Mob && considersMobGriefingGameRule)
-			canBreak = ForgeEventFactory.getMobGriefingEvent(source.level, source);
-		return source.level.explode(source, position.x, position.y, position.z, power, causesFire, 
-				canBreak ? (alwaysDropsItemsOnBreaking ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.DESTROY) : Explosion.BlockInteraction.NONE);
+			canBreak = ForgeEventFactory.getMobGriefingEvent(source.level(), source);
+		return source.level().explode(source, position.x, position.y, position.z, power, causesFire, 
+				(!canBreak) ? Level.ExplosionInteraction.NONE : (
+				(alwaysDropsItemsOnBreaking ? Level.ExplosionInteraction.TNT : (
+				source == null ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.MOB))));
 	}
 	
 	/**
@@ -211,7 +220,7 @@ public class LevelHelper
 		if (level.isClientSide)
 			return null;
 		return level.explode(null, position.x, position.y, position.z, power, causesFire, 
-				breaksBlocks ? (alwaysDropsItemsOnBreaking ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.DESTROY) : Explosion.BlockInteraction.NONE);
+				breaksBlocks ? (alwaysDropsItemsOnBreaking ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.BLOCK) : Level.ExplosionInteraction.NONE);
 	}
 	
 	/**
@@ -260,6 +269,6 @@ public class LevelHelper
 	
 	public static <T> T selectByDifficulty(Entity levelContext, T peaceful, T easy, T normal, T hard)
 	{
-		return selectByDifficulty(levelContext.level, peaceful, easy, normal, hard);
+		return selectByDifficulty(levelContext.level(), peaceful, easy, normal, hard);
 	}
 }

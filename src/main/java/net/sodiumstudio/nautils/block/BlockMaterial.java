@@ -1,4 +1,3 @@
-@@ -1,158 +0,0 @@
 package net.sodiumstudio.nautils.block;
 
 import net.minecraft.world.level.block.state.BlockBehaviour;
