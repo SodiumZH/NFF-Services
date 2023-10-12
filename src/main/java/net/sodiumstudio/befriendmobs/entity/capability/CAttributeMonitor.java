@@ -2,17 +2,15 @@ package net.sodiumstudio.befriendmobs.entity.capability;
 
 import java.util.HashMap;
 
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import net.sodiumstudio.befriendmobs.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
-
 // A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor {
 
@@ -20,10 +18,10 @@ public interface CAttributeMonitor {
 	
 	/**
 	 * Get the listened attribute list
-	 * Key: attribute register key
+	 * Key: attribute
 	 * Value: current attribute value
 	 */
-	public HashMap<String, Double> getListenList();
+	public HashMap<Attribute, Double> getListenList();
 	
 	/** Add an attribute to the listen list.
 	 * It still works if the attribute isn't available yet (e.g. on capability attachment).
@@ -33,7 +31,7 @@ public interface CAttributeMonitor {
 	{
 		// Use NaN to label an attribute position before entity attributes creation
 		double val = getOwner().getAttributes() == null ? Double.NaN : getOwner().getAttributeValue(attribute);
-		getListenList().put(Registry.ATTRIBUTE.getKey(attribute).toString(), val);
+		getListenList().put(attribute, val);
 		return this;
 	}
 	
@@ -43,10 +41,9 @@ public interface CAttributeMonitor {
 	@DontCallManually
 	public default void tick()
 	{
-		for (String key: getListenList().keySet())
+		for (Attribute attr: getListenList().keySet())
 		{
-			Attribute attr = Registry.ATTRIBUTE.get(new ResourceLocation(key));
-			double oldVal = getListenList().get(key);
+			double oldVal = getListenList().get(attr);
 			double newVal;
 			if (attr == null)
 				newVal = Double.NaN;
@@ -57,12 +54,14 @@ public interface CAttributeMonitor {
 				&& !Double.isNaN(newVal)
 				&& (oldVal - newVal > 0.0000001 || oldVal - newVal < -0.0000001))
 			{			
-				MinecraftForge.EVENT_BUS.post(new LivingAttributeValueChangeEvent(
-						getOwner(), attr, oldVal, newVal));
 				MinecraftForge.EVENT_BUS.post(new ChangeEvent(
 						getOwner(), attr, oldVal, newVal));
+				if (getOwner() instanceof IAttributeMonitor am)
+				{
+					am.onAttributeChange(attr, oldVal, newVal);
+				}
 			}
-			getListenList().put(key, newVal);
+			getListenList().put(attr, newVal);
 		}
 	}
 	

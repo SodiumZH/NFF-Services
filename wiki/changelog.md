@@ -2,6 +2,18 @@
 
 ## 1.19.2
 
+### 0.1.17
+
+Added `CLivingEntityDelayActionHandler` capability and `ILivingDelayActions` as a wrapper interface for delay (latent) actions in `LivingEntity`s.
+
+Adjusted the implementation of `CAttributeMonitor` to support non-vanilla `Attribute`s, and added `IAttributeMonitor` as a wrapper.
+
+Adjusted `CItemStackMonitor` and added `IItemStackMonitor` as a wrapper.
+
+Now `CAttributeMonitor` and `CItemStackMonitor` are attached only to `LivingEntity`s implementing corresponding wrapper interfaces.
+
+Added `MutablePredicate` for composition of multiple checking conditions.
+
 ### 0.1.16
 
 Added `RepeatableAttributeModifier` for applying a same `AttributeModifier` for multiple times to a single `LivingEntity`.
