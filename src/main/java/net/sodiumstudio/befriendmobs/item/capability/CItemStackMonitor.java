@@ -1,9 +1,7 @@
 package net.sodiumstudio.befriendmobs.item.capability;
 
 import java.util.HashMap;
-import java.util.function.Function;
-
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +11,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.Event;
+import net.sodiumstudio.befriendmobs.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 
@@ -20,12 +19,9 @@ public interface CItemStackMonitor {
 
 	public LivingEntity getLiving();
 	
-	/**
-	 * Get a map 
-	 */
-	public HashMap<String, Function<LivingEntity, ItemStack>> getListenedStacks();
+	public HashMap<String, Supplier<ItemStack>> getListenedStacks();
 	
-	public void listen(String key, Function<LivingEntity, ItemStack> getItem);
+	public void listen(String key, Supplier<ItemStack> getItem);
 	
 	@DontOverride
 	public default void onChanged(String key, ItemStack from, ItemStack to)
@@ -58,7 +54,7 @@ public interface CItemStackMonitor {
 	{
 
 		protected final LivingEntity living;
-		protected HashMap<String, Function<LivingEntity, ItemStack>> listened = new HashMap<String, Function<LivingEntity, ItemStack>>();
+		protected HashMap<String, Supplier<ItemStack>> listened = new HashMap<>();
 		protected HashMap<String, ItemStack> stacksLastTick = new HashMap<String, ItemStack>();
 		
 		public Impl(LivingEntity living)
@@ -72,14 +68,14 @@ public interface CItemStackMonitor {
 		}
 
 		@Override
-		public HashMap<String, Function<LivingEntity, ItemStack>> getListenedStacks() {
+		public HashMap<String, Supplier<ItemStack>> getListenedStacks() {
 			return listened;
 		}
 
 		@Override
-		public void listen(String key, Function<LivingEntity, ItemStack> getItem) {
+		public void listen(String key, Supplier<ItemStack> getItem) {
 			listened.put(key, getItem);
-			ItemStack current = getItem.apply(living);
+			ItemStack current = getItem.get().copy();
 			stacksLastTick.put(key, current == null ? ItemStack.EMPTY : current);
 		}
 
@@ -87,12 +83,16 @@ public interface CItemStackMonitor {
 		public void tick() {	
 			for (String key: listened.keySet())
 			{
-				ItemStack newStack = listened.get(key).apply(living);
+				ItemStack newStack = listened.get(key).get().copy();
 				if (newStack == null)
 					newStack = ItemStack.EMPTY;
 				if (!newStack.equals(stacksLastTick.get(key), false))
 				{
-					onChanged(key, stacksLastTick.get(key), newStack);
+					onChanged(key, stacksLastTick.get(key).copy(), newStack.copy());
+					if (this.getLiving() instanceof IItemStackMonitor i)
+					{
+						i.onItemStackChange(key, stacksLastTick.get(key).copy(), newStack.copy());
+					}
 					stacksLastTick.put(key, newStack.copy());
 				}
 			}
