@@ -20,9 +20,9 @@ import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitorProvider
 import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMobProvider;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerProvider;
-import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayActionHandler;
+import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumstudio.befriendmobs.entity.capability.wrapper.IAttributeMonitor;
-import net.sodiumstudio.befriendmobs.entity.capability.wrapper.ILivingDelayActions;
+import net.sodiumstudio.befriendmobs.entity.capability.wrapper.ILivingDelayedActions;
 import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.baublesystem.IBaubleEquipable;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
@@ -53,9 +53,9 @@ public class BMCapabilityAttachment {
 				event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_item_stack_monitor"), prvd1);
 			}
 			// Delay action handler
-			if (living instanceof ILivingDelayActions)
+			if (living instanceof ILivingDelayedActions)
 			{
-				CLivingEntityDelayActionHandler.Prvd prvd = new CLivingEntityDelayActionHandler.Prvd(living);
+				CLivingEntityDelayedActionHandler.Prvd prvd = new CLivingEntityDelayedActionHandler.Prvd(living);
 				event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_delay_action_handler"), prvd);
 			}
 		}			

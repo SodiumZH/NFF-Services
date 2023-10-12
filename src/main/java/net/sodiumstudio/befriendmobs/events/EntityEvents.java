@@ -43,7 +43,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteracti
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.entity.capability.CAttributeMonitor;
-import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayActionHandler;
+import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
@@ -449,7 +449,7 @@ public class EntityEvents
 			// Tick item stack monitor
 			event.getEntity().getCapability(BMCaps.CAP_ITEM_STACK_MONITOR).ifPresent(CItemStackMonitor::tick);
 			// Tick delay action handler
-			event.getEntity().getCapability(BMCaps.CAP_DELAY_ACTION_HANDLER).ifPresent(CLivingEntityDelayActionHandler::tick);
+			event.getEntity().getCapability(BMCaps.CAP_DELAYED_ACTION_HANDLER).ifPresent(CLivingEntityDelayedActionHandler::tick);
 			if (event.getEntity() instanceof Mob mob)
 			{
 				// update befriendable mobs

@@ -4,7 +4,7 @@
 
 ### 0.1.17
 
-Added `CLivingEntityDelayActionHandler` capability and `ILivingDelayActions` as a wrapper interface for delay (latent) actions in `LivingEntity`s.
+Added `CLivingEntityDelayedActionHandler` capability and `ILivingDelayedActions` as a wrapper interface for delayed (latent) actions in `LivingEntity`s.
 
 Adjusted the implementation of `CAttributeMonitor` to support non-vanilla `Attribute`s, and added `IAttributeMonitor` as a wrapper.
 
