@@ -17,6 +17,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.nautils.function.MutablePredicate;
 
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
@@ -55,8 +56,11 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		public Vec3 anchor;
 		
 		// BefriendedUndeadMob data
+		@Deprecated
 		public HashMap<String, Supplier<Boolean>> sunImmuneConditions = new HashMap<String, Supplier<Boolean>>();
+		@Deprecated
 		public HashMap<String, Supplier<Boolean>> sunImmuneNecessaryConditions = new HashMap<String, Supplier<Boolean>>();
+		public MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
 		
 		public Map<String, Object> tempObjects = new HashMap<>();
 		

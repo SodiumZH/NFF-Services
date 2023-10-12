@@ -31,6 +31,13 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	 *  it will has chance to be directly skipped, allowing goals below to be executed.
 	 */
 	protected double skipChance = 0;
+	
+	/**
+	 * Chance to be interrupted each second running.
+	 * This value is intended to prevent infinite running of a single goal.
+	 */
+	protected double interruptChance = 0;
+	
 	/**
 	 * If true, this goal will require the mob's owner is in the same level to run.
 	 */
@@ -170,6 +177,11 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 			throw new RuntimeException("Illegal method call: checkCanContinueToUse() method cannot call canContinueToUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanContinueToUse().");
 		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
+		// Interruption
+		// Most goals tick each 2 level-ticks so tickCount is always odd or always even
+		int i = (this.requiresUpdateEveryTick() || this.mob.asMob().tickCount % 2 == 0) ? 0 : 1;
+		if (this.mob.asMob().tickCount % 20 == i && this.rnd.nextDouble() < interruptChance)
+			return false;
 		BefriendedGoalCheckCanUseEvent event = new BefriendedGoalCheckCanUseEvent(this, BefriendedGoalCheckCanUseEvent.Phase.CAN_CONTINUE_TO_USE);
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.getManualSetValue().isPresent())
@@ -204,6 +216,19 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	public <T extends BefriendedTargetGoal> T setSkipChance(double value)
 	{
 		this.skipChance = value;
+		return (T)this;
+	}
+	
+	/**
+	 * Set interruption chance of this goal. 
+	 * <p> If it has interruption chance > 0, it will have a chance to be interrupted <b>each second</b> when running.
+	 * <p> It's not recommended to set this value too large as it will be checked frequently.
+	 * <p> When it's interrupted, it won't post {@link BefriendedGoalCheckCanUseEvent}.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedTargetGoal> T setInterruptChance(double value)
+	{
+		this.interruptChance = value;
 		return (T)this;
 	}
 	

@@ -3,12 +3,13 @@ package net.sodiumstudio.befriendmobs.entity.capability;
 import java.util.HashMap;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 
 public class CAttributeMonitorImpl implements CAttributeMonitor {
 
 	protected LivingEntity owner;
 	
-	protected HashMap<String, Double> map = new HashMap<String, Double>();
+	protected HashMap<Attribute, Double> map = new HashMap<Attribute, Double>();
 	
 	public CAttributeMonitorImpl(LivingEntity owner)
 	{
@@ -21,7 +22,7 @@ public class CAttributeMonitorImpl implements CAttributeMonitor {
 	}
 
 	@Override
-	public HashMap<String, Double> getListenList() {
+	public HashMap<Attribute, Double> getListenList() {
 		return map;
 	}
 
