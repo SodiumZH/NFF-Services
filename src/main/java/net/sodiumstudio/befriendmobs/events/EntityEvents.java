@@ -213,7 +213,7 @@ public class EntityEvents
 	        		// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
 	        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
 	        		{
-	        			event.setCanceled(true);
+	        			g.setTarget(null);
 	        		}
 	        	}
 	        }
