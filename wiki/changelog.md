@@ -12,7 +12,7 @@ Adjusted `CItemStackMonitor` and added `IItemStackMonitor` as a wrapper.
 
 Now `CAttributeMonitor` and `CItemStackMonitor` are attached only to `LivingEntity`s implementing corresponding wrapper interfaces.
 
-Added `MutablePredicate` for composition of multiple checking conditions.
+Added `MutablePredicate` for composition of multiple checking conditions, and re-implemented `BefriendedSunSensitiveMob` sun-immunity with it.
 
 ### 0.1.16
 
@@ -224,6 +224,10 @@ Separated from DWMG mod.
 
 ## 1.20.1
 
+### 0.2.16
+
+Identical to 1.19.2-0.1.16.
+
 ### 0.2.15
 
 Ported from 1.19.2-0.1.15.
@@ -235,6 +239,14 @@ Adjusted the API of `BefriendedGuiScreen`.
 Adjusted the explosions of `AbstractBefriendedCreeper` and added an option for always dropping blocks like TNT.
 
 ## 1.18.2
+
+### 0.0.17
+
+Fixed crash on mob changing target.
+
+### 0.0.16
+
+Identical to 1.19.2-0.1.16.
 
 ### 0.0.15
 
