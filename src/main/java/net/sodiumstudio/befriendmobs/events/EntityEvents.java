@@ -201,7 +201,7 @@ public class EntityEvents
 	        	{
 	        		if (ta.getOwner() != null && tbef.getOwner() != null && ta.getOwner() == tbef.getOwner())
 	        		{
-	        			event.setCanceled(true);
+	        			ta.setTarget(null);
 	        		}
 	        	}
 	        }
