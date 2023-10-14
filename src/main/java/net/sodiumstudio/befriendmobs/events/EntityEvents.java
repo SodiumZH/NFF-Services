@@ -237,8 +237,10 @@ public class EntityEvents
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
 				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
 				if (target != null && target instanceof LivingEntity targetLiving)
-					EntityHelper.forceSetTarget(mob, targetLiving);
-				
+				{
+					event.setNewTarget(targetLiving);
+					event.setCanceled(false);
+				}
         		// Add hatred only when settring to player
         		if (mob.getTarget() instanceof Player player)
         			cap.addHatredWithReason(player, BefriendableAddHatredReason.SET_TARGET);	   
