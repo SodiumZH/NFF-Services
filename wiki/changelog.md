@@ -242,6 +242,8 @@ Adjusted the explosions of `AbstractBefriendedCreeper` and added an option for a
 
 ### 0.0.17
 
+All changes in 1.19.2-0.1.17.
+
 Fixed crash on mob changing target.
 
 ### 0.0.16
