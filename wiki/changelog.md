@@ -224,6 +224,14 @@ Separated from DWMG mod.
 
 ## 1.20.1
 
+### 0.2.17
+
+All changes in 1.19.2-0.1.17.
+
+### 0.2.16
+
+All changes in 1.19.2-0.1.16.
+
 ### 0.2.15
 
 Ported from 1.19.2-0.1.15.
