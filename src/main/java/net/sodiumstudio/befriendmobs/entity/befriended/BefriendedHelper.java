@@ -1,6 +1,10 @@
 package net.sodiumstudio.befriendmobs.entity.befriended;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -19,6 +23,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
+import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NbtHelper;
 
@@ -261,5 +266,38 @@ public class BefriendedHelper
             return Component.Serializer.fromJson(s);
         }
 		else return (MutableComponent)(type.getDescription());
+	}
+	
+	/**
+	 * Get owner if the owner is closer than the given distance of the mob. Otherwise return {@link Optional#empty}.
+	 * @param mob Mob (implements {@link IBefriendedMob}) to test. No need to do {@IBefriendedMob#isOwnerPresent} check.
+	 * @param radius Search area
+	 * @param sphericalArea If true, it will search in a sphere with given radius. Otherwise search in a box with given radius.
+	 * @return Owner if the owner is present and in the given area. Otherwise {@link Optional#empty}.
+	 */
+	public static Optional<Player> getOwnerInArea(IBefriendedMob mob, double radius, boolean sphericalArea)
+	{
+		if (!mob.isOwnerPresent())
+			return Optional.empty();
+		List<Entity> list = mob.asMob().level.getEntities(mob.asMob(), EntityHelper.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
+		if (list.isEmpty())
+			return Optional.empty();
+		else if (!sphericalArea)
+			return Optional.of((Player)(list.get(0)));
+		else if (mob.asMob().distanceToSqr(list.get(0)) <= radius * radius)
+			return Optional.of((Player)(list.get(0)));
+		else return Optional.empty();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends Mob> ArrayList<T> getOwningMobsInArea(Player player, EntityType<T> type, double radius, boolean sphericalArea)
+	{
+		if (!IBefriendedMob.class.isAssignableFrom(type.getBaseClass()))
+			throw new IllegalArgumentException("Mob type doesn't implement IBefriendedMob interface.");
+		Stream<Entity> stream = player.level.getEntities(player, EntityHelper.getNeighboringArea(player, radius),
+				e -> (e.getType() == type && e instanceof IBefriendedMob bm && bm.getOwner() == player)).stream();
+		if (sphericalArea)
+			stream = stream.filter(e -> e.distanceToSqr(player) >= radius * radius);
+		return ContainerHelper.castList(stream.toList(), (Class<T>)(type.getBaseClass()));
 	}
 }

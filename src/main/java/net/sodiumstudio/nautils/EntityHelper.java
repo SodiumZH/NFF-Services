@@ -729,4 +729,15 @@ public class EntityHelper
 		}
 		else return false;
 	}
+	
+	public static void addModifierIfAbsent(LivingEntity entity, Attribute attribute, AttributeModifier modifier, boolean isPermanent)
+	{
+		if (!entity.getAttribute(attribute).hasModifier(modifier))
+		{
+			if (isPermanent)
+				entity.getAttribute(attribute).addPermanentModifier(modifier);
+			else entity.getAttribute(attribute).addTransientModifier(modifier);
+		}
+	}
+
 }
