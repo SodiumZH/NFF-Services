@@ -287,5 +287,19 @@ public class ContainerHelper
 		return list;
 	}
 	
-	
+	/**
+	 * Cast a list element-wise to a subclass. If cast failed, the element will be ignored.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T, U> ArrayList<U> castList(List<T> list, Class<U> castToClass)
+	{
+		ArrayList<U> out = new ArrayList<>();
+		list.forEach(t -> {
+			if (t.getClass().isAssignableFrom(castToClass))
+			{
+				out.add((U)t);
+			}
+		});
+		return out;
+	}
 }
