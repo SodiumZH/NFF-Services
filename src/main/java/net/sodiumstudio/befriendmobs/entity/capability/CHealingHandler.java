@@ -30,6 +30,10 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 		this.setCooldown(tag.getAsInt());
 	}
 	
+	/**
+	 * @deprecated Use cooldown-sensitive version instead
+	 */
+	@Deprecated
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume)
 	{
 		if (getOwner().getHealth() < getOwner().getMaxHealth() && getCooldown() == 0)
@@ -47,7 +51,8 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 				getOwner().heal(event.healValue);
 				if (event.sendDefaultParticles)
 					sendParticlesOnSuccess();
-				setCooldown(event.cooldown);
+				if (event.cooldown > 0)
+					setCooldown(event.cooldown);
 				MinecraftForge.EVENT_BUS.post(new HealingSucceededEvent(getOwner(), cpy, getOwner().getHealth() - oldHP));
 				return true;
 			}
@@ -57,7 +62,36 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 		if (event.sendDefaultParticles)
 			sendParticlesOnFailure();
 		return false;
-
+	}
+	
+	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown)
+	{
+		if (getOwner().getHealth() < getOwner().getMaxHealth() && getCooldown() == 0)
+		{
+			ApplyHealingItemEvent event = new ApplyHealingItemEvent(getOwner(), stack, value, cooldown);
+			ItemStack cpy = stack.copy();
+			float oldHP = getOwner().getHealth();
+			boolean canceled = MinecraftForge.EVENT_BUS.post(event);
+			if (!canceled)
+			{
+				if (consume)
+				{
+					stack.shrink(1);
+				}
+				getOwner().heal(event.healValue);
+				if (event.sendDefaultParticles)
+					sendParticlesOnSuccess();
+				if (event.cooldown > 0)
+					setCooldown(event.cooldown);
+				MinecraftForge.EVENT_BUS.post(new HealingSucceededEvent(getOwner(), cpy, getOwner().getHealth() - oldHP));
+				return true;
+			}
+		}
+		HealingFailedEvent event = new HealingFailedEvent(getOwner(), stack);
+		MinecraftForge.EVENT_BUS.post(event);
+		if (event.sendDefaultParticles)
+			sendParticlesOnFailure();
+		return false;
 	}
 	
 	public default void sendParticlesOnSuccess()
@@ -71,6 +105,10 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 	}
 	
 	// Get expected cooldown time each healing 
+	/**
+	 * @deprecated Now input in {@code applyHealingItem}
+	 */
+	@Deprecated
 	public int getHealingCooldownTicks();
 	
 	// Get the current cooldown ticks

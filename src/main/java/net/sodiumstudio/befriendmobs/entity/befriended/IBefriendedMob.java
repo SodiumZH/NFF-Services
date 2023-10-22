@@ -29,14 +29,20 @@ import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateE
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
+import net.sodiumstudio.befriendmobs.entity.capability.HealingItemTable;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
+import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
+import net.sodiumstudio.nautils.containers.DynamicItemKeyMap;
+import net.sodiumstudio.nautils.object.ItemOrKey;
+import net.sodiumstudio.nautils.object.ObjectOrKey;
+import net.sodiumstudio.nautils.object.ObjectOrSupplier;
 
 public interface IBefriendedMob extends ContainerListener  {
 
@@ -418,27 +424,48 @@ public interface IBefriendedMob extends ContainerListener  {
 		return CHealingHandlerImplDefault.class;
 	}
 
-	@DontOverride
+	/**
+	 * @deprecated Use cooldown-sensitive version instead
+	 */
+	@Deprecated
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume)
 	{
 		Wrapped.Boolean succeeded = new Wrapped.Boolean(false);		
 		this.asMob().getCapability(BMCaps.CAP_HEALING_HANDLER).ifPresent((l) ->
 		{
-			succeeded.set(l.applyHealingItem(stack, value, consume));
+			@SuppressWarnings("deprecation")
+			int cooldown = l.getHealingCooldownTicks();
+			succeeded.set(l.applyHealingItem(stack, value, consume, cooldown));
+		});		
+		return succeeded.get();
+	}
+	
+	@DontOverride
+	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown)
+	{
+		Wrapped.Boolean succeeded = new Wrapped.Boolean(false);		
+		this.asMob().getCapability(BMCaps.CAP_HEALING_HANDLER).ifPresent((l) ->
+		{
+			succeeded.set(l.applyHealingItem(stack, value, consume, cooldown));
 		});		
 		return succeeded.get();
 	}
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
-	public default Map<Item, Float> getHealingItems()
+	@Nullable
+	public default HealingItemTable getHealingItems()
 	{
-		return new HashMap<Item, Float>();
+		return null;
 	}
 	
-	// Specify which items in the map above don't consume after usage
-	public default Set<Item> getNonconsumingHealingItems()
+	/**
+	 * @deprecated No longer used. Use {@link HealingItemTable#noConsume()} instead on {@link HealingItemTable} construction in {@code getHealingItems}. 
+	 */
+	@Nullable
+	@Deprecated
+	public default Set<ItemOrKey> getNonconsumingHealingItems()
 	{	
-		return new HashSet<Item>();
+		return null;
 	}
 	
 	@DontOverride
@@ -446,15 +473,16 @@ public interface IBefriendedMob extends ContainerListener  {
 	{
 		if (stack.isEmpty())
 			return InteractionResult.PASS;
-		if (getHealingItems().containsKey(stack.getItem()))
+		HealingItemTable table = getHealingItems();
+		if (table == null) 
 		{
-			if (getNonconsumingHealingItems().contains(stack.getItem()))
-			{
-				return applyHealingItem(stack, getHealingItems().get(stack.getItem()), false) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-			}
-			else return applyHealingItem(stack, getHealingItems().get(stack.getItem()), true) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			return InteractionResult.PASS;
 		}
-		
+		HealingItemTable.HealingOutput output = table.getOutput(this.asMob(), stack);
+		if (output != null)
+		{
+			return applyHealingItem(stack, output.amount(), !output.noConsume()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+		}
 		return InteractionResult.PASS;
 	}
 	

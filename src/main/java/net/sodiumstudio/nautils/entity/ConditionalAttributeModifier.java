@@ -55,7 +55,8 @@ public final class ConditionalAttributeModifier {
 	
 	public void apply(LivingEntity living)
 	{
-		usingLivings.add(living);
+		if (living != null && living.isAlive())
+			usingLivings.add(living);
 	}
 	
 	public void remove(LivingEntity living)

@@ -23,6 +23,7 @@ public abstract class CHealingHandlerImpl implements CHealingHandler
 		this.owner = owner;
 	}	
 	
+	@Deprecated
 	@Override
 	public int getHealingCooldownTicks() 
 	{

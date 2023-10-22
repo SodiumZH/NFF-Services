@@ -1,6 +1,5 @@
 package net.sodiumstudio.befriendmobs.item;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -172,7 +171,7 @@ public class MobRespawnerInstance
 				getCapTag().contains("mob_custom_name", NbtHelper.TAG_STRING_ID)
 						? InfoHelper.createText(getCapTag().getString("mob_custom_name"))
 						: null,
-				player, pos1, true, !Objects.equals(pos, pos1) && direction == Direction.UP);
+				player, pos1, true, !pos.equals(pos1) && direction == Direction.UP);
 		if (mob != null)
 		{
 			CompoundTag nbt = makeMobData(player, pos1, direction);

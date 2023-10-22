@@ -288,16 +288,14 @@ public class BefriendedHelper
 			return Optional.of((Player)(list.get(0)));
 		else return Optional.empty();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T extends Mob> ArrayList<T> getOwningMobsInArea(Player player, EntityType<T> type, double radius, boolean sphericalArea)
 	{
-		if (!IBefriendedMob.class.isAssignableFrom(type.getBaseClass()))
-			throw new IllegalArgumentException("Mob type doesn't implement IBefriendedMob interface.");
 		Stream<Entity> stream = player.level.getEntities(player, EntityHelper.getNeighboringArea(player, radius),
 				e -> (e.getType() == type && e instanceof IBefriendedMob bm && bm.getOwner() == player)).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) >= radius * radius);
-		return ContainerHelper.castList(stream.toList(), (Class<T>)(type.getBaseClass()));
+		return ContainerHelper.castListType(stream.toList(), (Class<T>)(type.getBaseClass()));
 	}
 }
