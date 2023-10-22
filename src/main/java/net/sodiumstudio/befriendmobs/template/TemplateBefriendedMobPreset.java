@@ -3,6 +3,7 @@ package net.sodiumstudio.befriendmobs.template;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,11 +29,14 @@ import net.sodiumstudio.befriendmobs.entity.ai.goal.preset.target.BefriendedOwne
 import net.sodiumstudio.befriendmobs.entity.ai.goal.preset.target.BefriendedOwnerHurtTargetGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.capability.HealingItemTable;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryWithEquipment;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
+import net.sodiumstudio.nautils.containers.DynamicItemKeyMap;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
+import net.sodiumstudio.nautils.object.ItemOrKey;
 
 /**
  * This is a template with more preset
@@ -92,21 +96,9 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	// Map items that can heal the mob and healing values here.
 	// Leave it empty if you don't need healing features.
 	@Override
-	public HashMap<Item, Float> getHealingItems()
+	public HealingItemTable getHealingItems()
 	{
-		HashMap<Item, Float> map = new HashMap<Item, Float>();
-		// map.put(YOUR_ITEM_TYPE, HEALING_HEALTH_VALUE);
-		return map;
-	}
-	
-	// Set of items that can heal the mob WITHOUT CONSUMING.
-	// Leave it empty if not needed.
-	@Override
-	public HashSet<Item> getNonconsumingHealingItems()
-	{
-		HashSet<Item> set = new HashSet<Item>();
-		// set.add(YOUR_ITEM_TYPE);
-		return set;
+		return HealingItemTable.create();
 	}
 	
 	@Override

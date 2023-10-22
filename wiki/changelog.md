@@ -2,6 +2,25 @@
 
 ## 1.19.2
 
+### 0.1.18
+
+##### BefriendMobs
+
+- Added `HealingItemTable` to handle healing.
+
+- Changed `IBefriendedMob#getHealingItems` to `HealingItemTable`. Deprecated `IBefriendedMob#getNonconsumingHealingItems`.
+- Changed `CHealingHandler` to adapt `HealingItemTable`. Now ``CHealingHandler#applyHealingItem` accepts cooldown ticks input. Deprecated `CHealingHandler#getHealingCooldownTicks`.
+
+##### NaUtils
+
+- Added `ConditionalAttributeModifier` as an auto-updating `AttributeModifier` added and removed depending on a `Predicate` as condition.
+
+- Added`ObjectOrSupplier` as a supplier either from a static object or a functional `Supplier`.
+- Added `ObjectOrKey` as a supplier either from a static object or a key of registry.
+- Added `ItemOrKey` and `EntityTypeOrKey` as wrappers for `ObjectOrKey` of `Item` and `EntityType` .
+- Added `DynamicObjectKeyMap` as a mapping from registered objects to something. It has `ObjectOrKey` as keys and `ObjectOrSupplier` as values, allowing to dynamically find objects from registries and get volatile values (e.g. max health) from static map objects.
+- Added `DynamicItemKeyMap` and `DynamicEntityTypeKeyMap` as wrappers of `DynamicObjectKeyMap` of `Item` and `EntityType`.
+
 ### 0.1.17
 
 Added `CLivingEntityDelayedActionHandler` capability and `ILivingDelayedActions` as a wrapper interface for delayed (latent) actions in `LivingEntity`s.
