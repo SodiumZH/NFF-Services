@@ -302,4 +302,25 @@ public class ContainerHelper
 		});
 		return out;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T, U> ArrayList<U> castListTypeUnchecked(List<T> list, boolean suppressException)
+	{
+		ArrayList<U> out = new ArrayList<>();
+		list.forEach(t -> {
+			try {
+				out.add((U)t);
+			} 
+			catch (ClassCastException e) {
+				if (!suppressException)
+					e.printStackTrace();
+			}
+		});
+		return out;
+	}
+	
+	public static <T, U> ArrayList<U> castListTypeUnchecked(List<T> list)
+	{
+		return castListTypeUnchecked(list, false);
+	}
 }
