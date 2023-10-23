@@ -289,13 +289,12 @@ public class BefriendedHelper
 		else return Optional.empty();
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T extends Mob> ArrayList<T> getOwningMobsInArea(Player player, EntityType<T> type, double radius, boolean sphericalArea)
+	public static ArrayList<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
 		Stream<Entity> stream = player.level.getEntities(player, EntityHelper.getNeighboringArea(player, radius),
 				e -> (e.getType() == type && e instanceof IBefriendedMob bm && bm.getOwner() == player)).stream();
 		if (sphericalArea)
-			stream = stream.filter(e -> e.distanceToSqr(player) >= radius * radius);
-		return ContainerHelper.castListType(stream.toList(), (Class<T>)(type.getBaseClass()));
+			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
+		return ContainerHelper.castListTypeUnchecked(stream.toList());
 	}
 }
