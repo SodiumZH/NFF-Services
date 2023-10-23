@@ -481,7 +481,7 @@ public interface IBefriendedMob extends ContainerListener  {
 		HealingItemTable.HealingOutput output = table.getOutput(this.asMob(), stack);
 		if (output != null)
 		{
-			return applyHealingItem(stack, output.amount(), !output.noConsume()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			return applyHealingItem(stack, output.amount(), !output.noConsume(), output.cooldown()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 		}
 		return InteractionResult.PASS;
 	}
