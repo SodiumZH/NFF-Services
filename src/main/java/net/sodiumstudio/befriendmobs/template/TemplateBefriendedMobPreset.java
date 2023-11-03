@@ -98,7 +98,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	@Override
 	public HealingItemTable getHealingItems()
 	{
-		return HealingItemTable.create();
+		return HealingItemTable.EMPTY;
 	}
 	
 	@Override
