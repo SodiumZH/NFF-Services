@@ -99,7 +99,10 @@ public interface CLivingEntityDelayedActionHandler
 
 		@Override
 		public void addDelayedAction(int delayTicks, Runnable action) {
-			actions.add(new DelayedActionEntry(delayTicks, action));
+			if (delayTicks <= 0)
+				action.run();
+			else
+				actions.add(new DelayedActionEntry(delayTicks, action));
 		}
 
 		@Override

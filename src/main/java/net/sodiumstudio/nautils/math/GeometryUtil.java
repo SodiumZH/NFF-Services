@@ -101,6 +101,41 @@ public class GeometryUtil
 	}
 	
 	/**
+	 * Referred to UE4
+	 */
+	public static Vec3 rotate(Vec3 v, Vec3 axis, double angleDegrees)
+	{
+		if (axis.length() < 1e-12d)
+			LogUtils.getLogger().warn("NaUtils: GeometryUtils#rotate: input vector is too short. Result may be inaccurate.");
+			
+		Vec3 axisNorm = axis.normalize();
+		double radian = angleDegrees * Math.PI / 180d;
+		double s = Math.sin(radian);
+		double c = Math.cos(radian);
+
+		double xx = axisNorm.x * axisNorm.x;
+		double yy = axisNorm.y * axisNorm.y;
+		double zz = axisNorm.z * axisNorm.z;
+
+		double xy = axisNorm.x * axisNorm.y;
+		double yz = axisNorm.y * axisNorm.z;
+		double zx = axisNorm.z * axisNorm.x;
+
+		double xs = axisNorm.x * s;
+		double ys = axisNorm.y * s;
+		double zs = axisNorm.z * s;
+
+		double omc = 1.d - c;
+
+		return new Vec3(
+			(omc * xx + c) * v.x + (omc * xy - zs) * v.y + (omc * zx + ys) * v.z,
+			(omc * xy + zs) * v.x + (omc * yy + c) * v.y + (omc * yz - xs) * v.z,
+			(omc * zx - ys) * v.x + (omc * yz + xs) * v.y + (omc * zz + c) * v.z
+			);
+	}
+	
+	
+	/**
 	 * Get a random unit vector with uniform-distribution on sphere surface area.
 	 */
 	public static Vec3 randomVector()

@@ -3,6 +3,9 @@ package net.sodiumstudio.nautils.math;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * A {@code RandomSelection} is a series of objects that will be randomly selected.
+ */
 public class RandomSelection<T>
 {
 
@@ -11,17 +14,26 @@ public class RandomSelection<T>
 	protected ArrayList<T> valSequence = new ArrayList<T>();
 	protected T defaultVal = null;
 
-	protected RandomSelection()
+	protected RandomSelection(T defaultValue)
 	{
+		defaultVal = defaultValue;
 	}
 
+	/**
+	 * Create a {@code RandomSelection} with given default value.
+	 * @param defaultValue Value if none of the added values are chosen.
+	 */
 	public static <T> RandomSelection<T> create(T defaultValue) {
-		return new RandomSelection<T>().defaultValue(defaultValue);
+		return new RandomSelection<T>(defaultValue);
 	}
 
-	public static RandomSelection<Double> createDouble(double defaultValue)
+	/**
+	 * Create a {@code RandomSelection} of double.
+	 * @param defaultValue Value if none of the added values are chosen.
+	 */
+	public static DoubleRandomSelection createDouble(double defaultValue)
 	{
-		return new RandomSelection<Double>().defaultValue(Double.valueOf(defaultValue));
+		return new DoubleRandomSelection(defaultValue);
 	}
 	
 	public RandomSelection<T> add(T value, double probability) {
@@ -45,12 +57,4 @@ public class RandomSelection<T>
 		}
 		return defaultVal;
 	}
-
-	public double getDouble() {
-		if (defaultVal instanceof Double)
-			return ((Double) (getValue())).doubleValue();
-		else
-			throw new ClassCastException("RandomSelection::getDouble() must invoke on RandomSelection<Double>.");
-	}
-	
 }
