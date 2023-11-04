@@ -6,12 +6,16 @@
 
 ##### BefriendMobs
 
+* Added Mixin. Now adding BefriendMobs API as dependency requires to add Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
+
 - Added `HealingItemTable` to handle healing. It accepts 4 methods to check if can use: item, tag, item stack predicate and item registry key. Generally it accepts only one of them. Adding multiple methods is allowed but not recommended.
 
 - Changed `IBefriendedMob#getHealingItems` to `HealingItemTable`. Deprecated `IBefriendedMob#getNonconsumingHealingItems`.
 - Changed `CHealingHandler` to adapt `HealingItemTable`. Now ``CHealingHandler#applyHealingItem` accepts cooldown ticks input. Deprecated `CHealingHandler#getHealingCooldownTicks`.
 
 ##### NaUtils
+
+* Added Mixin. Now adding BefriendMobs API as dependency requires to add Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
 
 - Added `ConditionalAttributeModifier` as an auto-updating `AttributeModifier` added and removed depending on a `Predicate` as condition.
 
