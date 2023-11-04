@@ -151,7 +151,7 @@ public class EntityEvents
 			{
 				Mob mob = cap.getOwner();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
-				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
+				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob).orElse(null);
 				if (target != null 
 						&& target instanceof LivingEntity targetLiving
 						&& event.getNewTarget() != target)
@@ -238,7 +238,7 @@ public class EntityEvents
 				/** Handle {@link CBefriendableMob} AlwaysHostile feature */
 				Mob mob = cap.getOwner();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
-				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob);
+				Entity target = EntityHelper.getIfCanSee(alwaysHostileUUID, mob).orElse(null);
 				if (target != null && target instanceof LivingEntity targetLiving)
 					EntityHelper.forceSetTarget(mob, targetLiving);
 				
@@ -465,7 +465,7 @@ public class EntityEvents
 						// AlwaysHostile feature
 						if (l.getAlwaysHostileTo() != null)
 						{
-							Entity target = EntityHelper.getIfCanSee(l.getAlwaysHostileTo(), mob);
+							Entity target = EntityHelper.getIfCanSee(l.getAlwaysHostileTo(), mob).orElse(null);
 							if (target != null && target instanceof LivingEntity targetLiving)
 								mob.setTarget(targetLiving);
 						}

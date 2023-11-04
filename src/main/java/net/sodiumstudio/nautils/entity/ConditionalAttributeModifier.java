@@ -14,9 +14,7 @@ import net.sodiumstudio.nautils.annotation.DontCallManually;
  * A {@code ConditionalAttributeModifier} is a wrapped {@link AttributeModifier} that updates on tick
  * to be added when condition is satisfied and removed otherwise.
  * <p> It needs only a single-instance for each operation and will be automatically updated.
- * <p> Note: Applying {@link Attribute} for a single {@code ConditionalAttributeModifier} is fixed. If different {@link Attribute}, create another {@code ConditionalAttributeModifier} instance.
- * @author Sodium
- *
+ * <p> Note: Applying {@link Attribute} for a single {@code ConditionalAttributeModifier} is fixed. If different {@link Attribute} is needed, create another {@code ConditionalAttributeModifier} instance.
  */
 public final class ConditionalAttributeModifier {
 

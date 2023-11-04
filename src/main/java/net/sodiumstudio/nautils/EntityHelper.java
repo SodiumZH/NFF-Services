@@ -2,6 +2,7 @@ package net.sodiumstudio.nautils;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -164,7 +165,10 @@ public class EntityHelper
 		sendParticlesToMob(entity, ParticleTypes.ANGRY_VILLAGER, new Vec3(0, -0.5, 0), 5, 5, 3, 1);
 	}
 
-	
+	/**
+	 * @deprecated Use {@link NaParticleUtils} versions instead
+	 */
+	@Deprecated
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
 		if (entity.level.isClientSide)
@@ -174,6 +178,10 @@ public class EntityHelper
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils} versions instead
+	 */
+	@Deprecated
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, double posOffsetX,
 			double posOffsetY, double posOffsetZ, double rndScaleX, double rndScaleY, double rndScaleZ, int amount,
 			double speed) {
@@ -181,65 +189,119 @@ public class EntityHelper
 				new Vec3(rndScaleX, rndScaleY, rndScaleZ), amount, speed);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils} versions instead
+	 */
+	@Deprecated
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 posOffset, double rndScale,
 			int amount, double speed) {
 		sendParticlesToEntity(entity, options, posOffset, new Vec3(rndScale, rndScale, rndScale), amount, speed);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils} versions instead
+	 */
+	@Deprecated
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, double heightOffset,
 			double rndScale, int amount, double speed) {
 		sendParticlesToEntity(entity, options, new Vec3(0d, heightOffset, 0d), rndScale, amount, speed);
 	}
 
-	
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendHeartParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendHeartParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
 		sendParticlesToEntity(entity, ParticleTypes.HEART, entity.getBbHeight() - 0.2d + heightOffset, 0.5d, amount, 1d);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendHeartParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendHeartParticlesToLivingDefault(LivingEntity entity, float heightOffset) {
 		sendHeartParticlesToLivingDefault(entity, heightOffset, 10);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendHeartParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendHeartParticlesToLivingDefault(LivingEntity entity) {
 		sendHeartParticlesToLivingDefault(entity, 0f);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendGlintParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendGlintParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
 		sendParticlesToEntity(entity, ParticleTypes.HAPPY_VILLAGER, entity.getBbHeight() - 0.2 + heightOffset, 0.5d, amount, 1d);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendGlintParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendGlintParticlesToLivingDefault(LivingEntity entity, float heightOffset)
 	{
 		sendGlintParticlesToLivingDefault(entity, heightOffset, 20);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendGlintParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendGlintParticlesToLivingDefault(LivingEntity entity) {
 		sendGlintParticlesToLivingDefault(entity, 0);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendSmokeParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
 		sendParticlesToEntity(entity, ParticleTypes.SMOKE, entity.getBbHeight() - 0.2 + heightOffset, 0.2d, amount, 0d);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendSmokeParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity, float heightOffset)
 	{
 		sendSmokeParticlesToLivingDefault(entity, heightOffset, 30);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendSmokeParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendSmokeParticlesToLivingDefault(LivingEntity entity) {
 		sendSmokeParticlesToLivingDefault(entity, 0f);
 	}
 	
-	
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendAngryParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendAngryParticlesToLivingDefault(LivingEntity entity, float heightOffset, int amount) {
 		sendParticlesToEntity(entity, ParticleTypes.ANGRY_VILLAGER, entity.getBbHeight() - 0.2 + heightOffset, 0.3d, amount, 1d);
 	}
 
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendAngryParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendAngryParticlesToLivingDefault(LivingEntity entity, float heightOffset)
 	{
 		sendAngryParticlesToLivingDefault(entity, heightOffset, 5);
 	}
-	
+
+	/**
+	 * @deprecated Use {@link NaParticleUtils#sendAngryParticlesToEntityDefault} versions instead
+	 */
+	@Deprecated
 	public static void sendAngryParticlesToLivingDefault(LivingEntity entity)
 	{
 		sendAngryParticlesToLivingDefault(entity, 0);
@@ -582,10 +644,13 @@ public class EntityHelper
 	 * @param entity Entity as the center.
 	 * @param radius XYZ radius of the box. (Radius, not diameter!)
 	 * @return Bounding box.
+	 * @deprecated Use {@link AABB#inflate} instead.
 	 */
+	@Deprecated
 	public static AABB getNeighboringArea(Entity entity, Vec3 radius)
 	{
-		return new AABB(entity.position().subtract(radius), entity.position().add(radius));
+		return entity.getBoundingBox().inflate(radius.x, radius.y, radius.z);
+		//return new AABB(entity.position().subtract(radius), entity.position().add(radius));
 	}
 	
 	/**
@@ -595,7 +660,9 @@ public class EntityHelper
 	 * @param yRadius Y radius of the box. (Radius, not diameter!)
 	 * @param zRadius Z radius of the box. (Radius, not diameter!)
 	 * @return Bounding box.
+	 * @deprecated Use {@link AABB#inflate} instead.
 	 */
+	@Deprecated
 	public static AABB getNeighboringArea(Entity entity, double xRadius, double yRadius, double zRadius)
 	{
 		return getNeighboringArea(entity, new Vec3(xRadius, yRadius, zRadius));
@@ -607,7 +674,9 @@ public class EntityHelper
 	 * @param xzRadius XZ radius of the box. (Radius, not diameter!)
 	 * @param yRadius Y radius of the box. (Radius, not diameter!)
 	 * @return Bounding box.
+	 * @deprecated Use {@link AABB#inflate} instead.
 	 */
+	@Deprecated
 	public static AABB getNeighboringArea(Entity entity, double xzRadius, double yRadius)
 	{
 		return getNeighboringArea(entity, new Vec3(xzRadius, yRadius, xzRadius));
@@ -618,7 +687,9 @@ public class EntityHelper
 	 * @param entity Entity as the center.
 	 * @param radius XYZ radius of the box. (Radius, not diameter!)
 	 * @return Bounding box.
+	 * @deprecated Use {@link AABB#inflate} instead.
 	 */
+	@Deprecated
 	public static AABB getNeighboringArea(Entity entity, double radius)
 	{
 		return getNeighboringArea(entity, new Vec3(radius, radius, radius));
@@ -630,6 +701,7 @@ public class EntityHelper
 	 * @param distanceTo Given entity to compare the distance.
 	 * @return A sorted list. If the element entity isn't in the level, it will be removed.
 	 */
+	@Deprecated
 	public static <T extends Entity> List<T> sortWithDistance(List<T> entities, Entity distanceTo)
 	{
 		return entities.stream()
@@ -645,7 +717,7 @@ public class EntityHelper
 	 * @return Target entity if can see, or null.
 	 */
 	@Nullable
-	public static Entity getIfCanSee(UUID targetUUID, Mob mob)
+	public static Optional<Entity> getIfCanSee(UUID targetUUID, Mob mob)
 	{
 		if (mob == null || !mob.isAlive())
 			return null;
@@ -667,7 +739,7 @@ public class EntityHelper
 					});
 				if (targets.size() > 0)
 				{
-					out = (LivingEntity) targets.get(0);
+					out = targets.get(0);
 				}
 			}					
 		}
@@ -680,7 +752,7 @@ public class EntityHelper
 				out = null;
 			}
 		}
-		return out;
+		return out == null ? Optional.empty() : Optional.of(out);
 	}
 	
 	/**
