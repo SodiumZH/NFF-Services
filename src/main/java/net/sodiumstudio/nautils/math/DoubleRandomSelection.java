@@ -1,6 +1,6 @@
 package net.sodiumstudio.nautils.math;
 
-public class DoubleRandomSelection extends RandomSelection<Double>
+public final class DoubleRandomSelection extends RandomSelection<Double>
 {
 	protected DoubleRandomSelection(double defaultValue)
 	{
@@ -9,5 +9,11 @@ public class DoubleRandomSelection extends RandomSelection<Double>
 	
 	public double getDouble() {
 		return getValue();
+	}
+	
+	public DoubleRandomSelection add(double value, double probability)
+	{
+		super.add(value, probability);
+		return this;
 	}
 }
