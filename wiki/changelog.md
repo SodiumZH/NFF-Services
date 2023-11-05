@@ -15,7 +15,8 @@
 
 ##### NaUtils
 
-* Added Mixin. Now adding BefriendMobs API as dependency requires to add Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
+* Added Mixin. Now adding BefriendMobs API as dependency requires Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
+* Added `ItemEntityHurtEvent` and `NonLivingEntityHurtEvent`, allowing to cancel damages to non-living entities.
 
 - Added `ConditionalAttributeModifier` as an auto-updating `AttributeModifier` added and removed depending on a `Predicate` as condition.
 
@@ -246,6 +247,10 @@ Some minor API changes.
 Separated from DWMG mod.
 
 ## 1.20.1
+
+### 0.2.17
+
+Identical to 1.19.2-0.1.17.
 
 ### 0.2.16
 

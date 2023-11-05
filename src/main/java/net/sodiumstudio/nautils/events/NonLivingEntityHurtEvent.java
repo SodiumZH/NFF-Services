@@ -1,0 +1,24 @@
+package net.sodiumstudio.nautils.events;
+
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+
+/**
+ * Fired when a non-living entity gets hurt only on server.
+ * <p>Note: {@link ItemEntity} will not fire this but {@link ItemEntityHurtEvent}.
+ * <p>For LivingEntity, use {@link LivingHurtEvent}.
+ */
+public class NonLivingEntityHurtEvent extends EntityEvent {
+	public final DamageSource damageSource;
+	public final float amount;
+	
+	public NonLivingEntityHurtEvent(Entity entity, DamageSource src, float amount)
+	{
+		super(entity);
+		this.damageSource = src;
+		this.amount = amount;
+	}
+}
