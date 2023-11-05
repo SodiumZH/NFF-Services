@@ -16,11 +16,6 @@ buildscript {
     }
 }
 
-/*plugins {
-    id 'eclipse'
-    id 'maven-publish'
-    id 'org.spongepowered.mixin' version '0.7.+'
-}*/
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'

@@ -15,7 +15,8 @@
 
 ##### NaUtils
 
-* Added Mixin. Now adding BefriendMobs API as dependency requires to add Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
+* Added Mixin. Now adding BefriendMobs API as dependency requires Mixin in `build.gradle`. For details see `build.gradle` in mod *Days with Monster Girls*. 
+* Added `ItemEntityHurtEvent` and `NonLivingEntityHurtEvent`, allowing to cancel damages to non-living entities.
 
 - Added `ConditionalAttributeModifier` as an auto-updating `AttributeModifier` added and removed depending on a `Predicate` as condition.
 
@@ -35,7 +36,7 @@ Adjusted `CItemStackMonitor` and added `IItemStackMonitor` as a wrapper.
 
 Now `CAttributeMonitor` and `CItemStackMonitor` are attached only to `LivingEntity`s implementing corresponding wrapper interfaces.
 
-Added `MutablePredicate` for composition of multiple checking conditions.
+Added `MutablePredicate` for composition of multiple checking conditions, and re-implemented `BefriendedSunSensitiveMob` sun-immunity with it.
 
 ### 0.1.16
 
@@ -245,7 +246,43 @@ Some minor API changes.
 
 Separated from DWMG mod.
 
+## 1.20.1
+
+### 0.2.17
+
+Identical to 1.19.2-0.1.17.
+
+### 0.2.16
+
+Identical to 1.19.2-0.1.16.
+
+### 0.2.15
+
+Ported from 1.19.2-0.1.15.
+
+Added `BlockMaterial`, an alternative `BlockBehaviour.Properties` generator class for old `Material`.
+
+Adjusted the API of `BefriendedGuiScreen`.
+
+Adjusted the explosions of `AbstractBefriendedCreeper` and added an option for always dropping blocks like TNT.
+
 ## 1.18.2
+
+### 0.0.17
+
+All changes in 1.19.2-0.1.17.
+
+Fixed crash on mob changing target.
+
+### 0.0.16
+
+Identical to 1.19.2-0.1.16.
+
+### 0.0.15
+
+All changes in 1.19.2-0.1.15.
+
+Added `AbstractFishingHookEntity`, a wrapper of `FishingHook` to support non-vanilla Fishing Rods.
 
 ### 0.0.14
 
