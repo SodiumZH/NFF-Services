@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixin;
+package net.sodiumstudio.nautils.mixins;
 
 import com.mojang.logging.LogUtils;
 
