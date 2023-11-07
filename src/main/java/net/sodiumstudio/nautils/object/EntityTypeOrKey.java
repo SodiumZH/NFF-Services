@@ -15,17 +15,17 @@ public class EntityTypeOrKey extends ObjectOrKey<EntityType<?>>
 	
 	public EntityTypeOrKey(ResourceLocation key)
 	{
-		super(key, ForgeRegistries.ENTITY_TYPES);
+		super(key, ForgeRegistries.ENTITIES);
 	}
 
 	public EntityTypeOrKey(String key)
 	{
-		super(key, ForgeRegistries.ENTITY_TYPES);
+		super(key, ForgeRegistries.ENTITIES);
 	}
 	
 	public EntityTypeOrKey(String namespace, String key)
 	{
-		super(namespace, key, ForgeRegistries.ENTITY_TYPES);
+		super(namespace, key, ForgeRegistries.ENTITIES);
 	}
 	
 	public static EntityTypeOrKey of(EntityType<?> type)

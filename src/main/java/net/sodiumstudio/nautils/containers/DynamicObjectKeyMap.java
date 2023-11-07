@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.object.EntityTypeOrKey;
 import net.sodiumstudio.nautils.object.ItemOrKey;
@@ -28,7 +29,7 @@ import net.sodiumstudio.nautils.object.ObjectOrSupplier;
  * @param <V> Raw value type.
  * @param <W> {@link ObjectOrKey} wrapper type.
  */
-public class DynamicObjectKeyMap<K, V, W extends ObjectOrKey<K>>
+public class DynamicObjectKeyMap<K extends IForgeRegistryEntry<K>, V, W extends ObjectOrKey<K>>
 {
 
 	protected final HashMap<W, ObjectOrSupplier<V>> map = new HashMap<>();
