@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -279,7 +280,7 @@ public class BefriendedHelper
 	{
 		if (!mob.isOwnerPresent())
 			return Optional.empty();
-		List<Entity> list = mob.asMob().level.getEntities(mob.asMob(), EntityHelper.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
+		List<Entity> list = mob.asMob().level().getEntities(mob.asMob(), EntityHelper.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
 		if (list.isEmpty())
 			return Optional.empty();
 		else if (!sphericalArea)
@@ -291,7 +292,7 @@ public class BefriendedHelper
 
 	public static ArrayList<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
-		Stream<Entity> stream = player.level.getEntities(player, EntityHelper.getNeighboringArea(player, radius),
+		Stream<Entity> stream = player.level().getEntities(player, EntityHelper.getNeighboringArea(player, radius),
 				e -> (e.getType() == type && e instanceof IBefriendedMob bm && bm.getOwner() == player)).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);

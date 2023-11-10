@@ -11,10 +11,10 @@ public class NaParticleUtils {
 	
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
-		if (entity.level.isClientSide)
+		if (entity.level().isClientSide)
 			return;
 		Vec3 pos = entity.position();
-		((ServerLevel) (entity.level)).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
+		((ServerLevel) (entity.level())).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}
 	

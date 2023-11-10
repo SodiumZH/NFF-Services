@@ -71,7 +71,7 @@ public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 	@Override
 	public boolean checkCanContinueToUse() {
 		return this.tryTicks >= -this.maxStayTicks && this.tryTicks <= 1200
-				&& this.isValidTarget(this.mobPathfinder.level, this.blockPos);
+				&& this.isValidTarget(this.mobPathfinder.level(), this.blockPos);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 					{
 						blockpos$mutableblockpos.setWithOffset(blockpos, i1, k - 1, j1);
 						if (this.mobPathfinder.isWithinRestriction(blockpos$mutableblockpos)
-								&& this.isValidTarget(this.mobPathfinder.level, blockpos$mutableblockpos))
+								&& this.isValidTarget(this.mobPathfinder.level(), blockpos$mutableblockpos))
 						{
 							this.blockPos = blockpos$mutableblockpos;
 							return true;

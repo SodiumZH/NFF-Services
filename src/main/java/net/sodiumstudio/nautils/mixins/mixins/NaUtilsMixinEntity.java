@@ -19,7 +19,7 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 	@Inject(at = @At("HEAD"), method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", cancellable = true)
 	private void hurt(DamageSource src, float amount, CallbackInfoReturnable<Boolean> callback)
 	{
-		if (!get().level.isClientSide
+		if (!get().level().isClientSide
 				&& !(get() instanceof LivingEntity)
 				&& !(get() instanceof ItemEntity)
 				&& MinecraftForge.EVENT_BUS.post(new NonLivingEntityHurtEvent(get(), src, amount)))
