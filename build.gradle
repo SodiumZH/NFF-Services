@@ -25,6 +25,11 @@ base {
     archivesName = archive_base_name
 }
 
+mixin {
+    add sourceSets.main, "befriendmobs.refmap.json"
+    config 'befriendmobs.mixins.json'
+}
+
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -208,15 +213,13 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-
+    from sourceSets.main.allSource
+    duplicatesStrategy "exclude"
     // This is the preferred method to reobfuscate your jar file
     finalizedBy 'reobfJar'
 }
+//jar.finalizedBy('reobfJar')
 
-mixin {
-    add sourceSets.main, "befriendmobs.refmap.json"
-    config 'befriendmobs.mixins.json'
-}
 
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
 // tasks.named('publish').configure {
@@ -224,7 +227,7 @@ mixin {
 // }
 
 // Example configuration to allow publishing using the maven-publish plugin
-publishing {
+/*publishing {
     publications {
         register('mavenJava', MavenPublication) {
             artifact jar
@@ -235,7 +238,7 @@ publishing {
             url "file://${project.projectDir}/mcmodsrepo"
         }
     }
-}
+}*/
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
