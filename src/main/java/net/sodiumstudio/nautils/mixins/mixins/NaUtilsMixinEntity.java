@@ -11,7 +11,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.NonLivingEntityHurtEvent;
+import net.sodiumstudio.nautils.events.NonLivingEntityOutOfWorldEvent;
 import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
+import net.sodiumstudio.nautils.mixins.NaUtilsMixinHooks;
 
 @Mixin(Entity.class)
 public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
@@ -19,13 +21,8 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 	@Inject(at = @At("HEAD"), method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", cancellable = true)
 	private void hurt(DamageSource src, float amount, CallbackInfoReturnable<Boolean> callback)
 	{
-		if (!get().level.isClientSide
-				&& !(get() instanceof LivingEntity)
-				&& !(get() instanceof ItemEntity)
-				&& MinecraftForge.EVENT_BUS.post(new NonLivingEntityHurtEvent(get(), src, amount)))
-		{
+		if (NaUtilsMixinHooks.onNonLivingEntityHurt(get(), src, amount))
 			callback.setReturnValue(false);
-		}
 	}
 	
 }
