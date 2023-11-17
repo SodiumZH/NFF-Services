@@ -6,6 +6,7 @@ import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedAmphibious;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
 
 // Adjusted from vanilla RestrictSunGoal
 public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
@@ -25,6 +26,8 @@ public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
 		else if (!getPathfinder().level.isDay())
 			return false;
 		else if (!ignoreHelmet && !getPathfinder().getItemBySlot(EquipmentSlot.HEAD).isEmpty())
+			return false;
+		else if (mob instanceof IBefriendedSunSensitiveMob bssm && bssm.isSunImmune())
 			return false;
 		else if (this.mob.asMob().isInWater())
 			return false;

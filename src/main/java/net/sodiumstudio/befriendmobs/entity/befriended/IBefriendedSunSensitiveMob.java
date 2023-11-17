@@ -1,15 +1,11 @@
 package net.sodiumstudio.befriendmobs.entity.befriended;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.function.MutablePredicate;
-
+import net.sodiumstudio.nautils.mixins.mixins.NaUtilsMixinMob;
+import net.sodiumstudio.befriendmobs.events.BMEntityEvents;
 /**
  * This is an interface handling sun immunity for sun-sensitive mobs.
  * Put and remove entries in {@code sunImmuneConditions()} and {@sunImmuneNecessaryConditions()} to set rules.
@@ -43,40 +39,10 @@ public interface IBefriendedSunSensitiveMob
 			return m;
 		else throw new UnsupportedOperationException("IBefriendedSunSensitiveMob: wrong object type, must be a mob.");
 	}
-	
-	
-	/**
-	 * @deprecated Use {@code getSunImmunity} instead
-	 * Get checking rules for whether the mob is immune to sun.
-	 * When the mob fulfills all rules in {@code sunImmuneNecessaryConditions} and
-	 * any one rule in {@code sunImmuneConditions}, it will be sun-immune.
-	 * The key is a string to identify each rule (predicate).
-	 * If empty, it will be always false (not immune).
-	 */
-	@DontOverride
-	@Deprecated
-	public default HashMap<String, Supplier<Boolean>> sunImmuneConditions()
-	{
-		return this.asBefriended().getTempData().values().sunImmuneConditions;
-	}
-	
-	/**
-	 * @deprecated Use {@code getSunImmunity} instead
-	 * Get necessary checking rules for whether the mob is immune to sun.
-	 * When the mob fulfills all rules in {@code sunImmuneNecessaryConditions} and
-	 * any one rule in {@code sunImmuneConditions}, it will be sun-immune.
-	 * The key is a string to identify each rule (predicate).
-	 * If empty, necessary condition check will be skipped and whether immune to sun only depends on {@code sunImmuneConditions}.
-	 */
-	@DontOverride
-	@Deprecated
-	public default HashMap<String, Supplier<Boolean>> sunImmuneNecessaryConditions()
-	{
-		return this.asBefriended().getTempData().values().sunImmuneNecessaryConditions;
-	}
-	
+
 	/**
 	 * Check if the mob is immune to sun from rules.
+	 * Implemented in {@link BMEntityEvents#onMobSunBurnTick} via {@link NaUtilsMixinMob#isSunBurnTick}
 	 */
 	@DontOverride
 	public default boolean isSunImmune()

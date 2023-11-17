@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedMoveGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
+import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
 
 // Adjusted from vanilla FleeSunGoal
 public class BefriendedFleeSunGoal extends BefriendedMoveGoal {
@@ -42,6 +43,8 @@ public class BefriendedFleeSunGoal extends BefriendedMoveGoal {
 		else if (!this.level.canSeeSky(getPathfinder().blockPosition())) 
 			return false;
 		else if (!ignoreHelmet && !getPathfinder().getItemBySlot(EquipmentSlot.HEAD).isEmpty())
+			return false;
+		else if (mob instanceof IBefriendedSunSensitiveMob bssm && bssm.isSunImmune())
 			return false;
 		else if	(!this.setWantedPos())
 			return false;
