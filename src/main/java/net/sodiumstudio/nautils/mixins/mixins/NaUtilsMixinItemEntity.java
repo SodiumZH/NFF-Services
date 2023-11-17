@@ -9,6 +9,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.ItemEntityHurtEvent;
+import net.sodiumstudio.nautils.events.ItemEntityOutOfWorldEvent;
+import net.sodiumstudio.nautils.events.NonLivingEntityHurtEvent;
+import net.sodiumstudio.nautils.events.NonLivingEntityOutOfWorldEvent;
 import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(ItemEntity.class)
@@ -20,9 +23,18 @@ public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {
 		{
 			callback.setReturnValue(false);
 		}
-		else if (MinecraftForge.EVENT_BUS.post(new ItemEntityHurtEvent(get(), src, amount)))
+		else
 		{
-			callback.setReturnValue(false);
+			if (src == DamageSource.OUT_OF_WORLD && amount != Integer.MAX_VALUE)
+			{
+				if (MinecraftForge.EVENT_BUS.post(new ItemEntityOutOfWorldEvent(get(), amount)))
+					callback.setReturnValue(false);
+			}
+			else
+			{
+				if (MinecraftForge.EVENT_BUS.post(new ItemEntityHurtEvent(get(), src, amount)))
+					callback.setReturnValue(false);
+			}
 		}
 	}
 }
