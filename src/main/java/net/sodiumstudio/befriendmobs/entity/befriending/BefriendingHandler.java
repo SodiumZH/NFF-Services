@@ -135,7 +135,7 @@ public abstract class BefriendingHandler
 	}
 	
 	/** Execute when the mob attacks the player in befriending process with it
-	 * Fired in EntityEvents and no need to manually invoke
+	 * Fired in BMEntityEvents and no need to manually invoke
 	 * This function doesn't check if player is in hatred
 	 * No action by default
 	 *
@@ -146,7 +146,7 @@ public abstract class BefriendingHandler
 	}
 	
 	/** Execute when the mob is attacked by the player in befriending process with it
-	* Fired in EntityEvents and no need to manually invoke
+	* Fired in BMEntityEvents and no need to manually invoke
 	* This function doesn't check if player is in hatred
 	* By default no action. Usually it will interrupt because of hatred
 	* */

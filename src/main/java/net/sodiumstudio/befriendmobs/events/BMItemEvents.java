@@ -17,7 +17,7 @@ import net.sodiumstudio.nautils.Wrapped;
 // Handle Item, Item Stack and Item Entity events
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ItemEvents
+public class BMItemEvents
 {
 	
 	@SubscribeEvent
