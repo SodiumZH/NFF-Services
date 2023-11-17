@@ -56,6 +56,7 @@ import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.events.MobSunBurnTickEvent;
 
 // TODO: change modid after isolation
 @SuppressWarnings("removal")
@@ -553,5 +554,12 @@ public class EntityEvents
 			if (cap.isForcePersistent())
 				event.setResult(Result.DENY);
 		});
+	}
+	
+	@SubscribeEvent
+	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
+	{
+		if (event.getEntity() instanceof IBefriendedSunSensitiveMob bssm && bssm.isSunImmune())
+			event.setCanceled(true);
 	}
 }

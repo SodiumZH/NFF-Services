@@ -5,7 +5,8 @@
 	"refmap": "befriendmobs.refmap.json",
 	"mixins": [
 		"NaUtilsMixinItemEntity",
-		"NaUtilsMixinEntity"
+		"NaUtilsMixinEntity",
+		"NaUtilsMixinMob"
 	],
 	"client": [
 	],
