@@ -1,5 +1,6 @@
 package net.sodiumstudio.befriendmobs.events;
 
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +20,8 @@ public class BMSetupEvents {
 		event.enqueueWork(() ->
 		{
 			ModLoader.get().postEvent(new RegisterBefriendingTypeEvent());
+			// For display atk in gui
+			Attributes.ATTACK_DAMAGE.setSyncable(true);
 		});
 	}
 	
