@@ -14,7 +14,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ServerEvents 
+public class BMServerEvents 
 {
 
 	@SubscribeEvent
