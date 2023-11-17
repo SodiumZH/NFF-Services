@@ -62,7 +62,7 @@ import net.sodiumstudio.nautils.events.MobSunBurnTickEvent;
 // TODO: change modid after isolation
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class EntityEvents
+public class BMEntityEvents
 {
 
 	@SubscribeEvent

@@ -22,7 +22,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableAddHatredRea
 import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
 import net.sodiumstudio.befriendmobs.entity.befriending.registry.BefriendingTypeRegistry;
 import net.sodiumstudio.befriendmobs.events.BefriendableAddHatredEvent;
-import net.sodiumstudio.befriendmobs.events.EntityEvents;
+import net.sodiumstudio.befriendmobs.events.BMEntityEvents;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.Wrapped;
@@ -194,8 +194,8 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	/**
 	 * Set the mob is always hostile to a specified target once it's in the follow range, ignoring target goals.
 	 * If input is null, the previous always-hostile-to target will be removed and the mob will perform normally.
-	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Lowest},
-	 * {@link EntityEvents#onLivingSetAttackTarget_Lowest} and 
+	 * Its implementation is in {@link BMEntityEvents#onLivingChangeTarget_Lowest},
+	 * {@link BMEntityEvents#onLivingSetAttackTarget_Lowest} and 
 	 */
 	public default void setAlwaysHostileTo(@Nullable LivingEntity target)
 	{
@@ -212,7 +212,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	/**
 	 * get the target the mob is always hostile to.
 	 * If the mob isn't set always hostile to anything, it will return null, no matter if the mob has a target.
-	 * Its implementation is in {@link EntityEvents#onLivingChangeTarget_Lowest} and {@link EntityEvents#onLivingSetAttackTarget_Lowest}
+	 * Its implementation is in {@link BMEntityEvents#onLivingChangeTarget_Lowest} and {@link BMEntityEvents#onLivingSetAttackTarget_Lowest}
 	 */
 	@Nullable
 	public default UUID getAlwaysHostileTo()
@@ -226,7 +226,7 @@ public interface CBefriendableMob extends INBTSerializable<CompoundTag> {
 	
 	/**
 	 * Set if the mob is forced not despawning despite the return of {@link Mob#isPersistenceRequired}
-	 * Its implementation is in {@link EntityEvents#onCheckDespawn}
+	 * Its implementation is in {@link BMEntityEvents#onCheckDespawn}
 	 * @param value True to keep it persistance. False to apply {@link Mob#isPersistenceRequired} on check.
 	 */
 	public default void setForcePersistent(boolean value)

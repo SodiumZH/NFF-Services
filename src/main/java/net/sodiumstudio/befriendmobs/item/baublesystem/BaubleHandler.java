@@ -92,7 +92,7 @@ public abstract class BaubleHandler {
 	}
 	
 	/** Executed every tick
-	* This is automatically ticked in events.EntityEvents and 
+	* This is automatically ticked in events.BMEntityEvents and 
 	* do not call it anywhere else unless you know what you're doing.
 	*/
 	@DontOverride

@@ -51,7 +51,7 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 	 * <p> A suspended respawner is a respawner item stack generated on befriended mob dying that cannot be instantly given back to the owner.
 	 * So it will be temporarily saved in the level, and once the owner enters the level, the respawner will be given and removed from the suspended list.
 	 * <p> Suspended respawners are added only when {@link IBefriendedMob#getDeathRespawnerGenerationType} returns {@code DeathRespawnerGenerationType.GIVE}, but can be given back any time.
-	 * <p> The adding action will be handled in {@link EntityEvents#onLivingDeath}.
+	 * <p> The adding action will be handled in {@link BMEntityEvents#onLivingDeath}.
 	 * @param owner UUID of the owner.
 	 */
 	public void addSuspendedRespawner(MobRespawnerInstance respawner);
@@ -71,7 +71,7 @@ public interface CBMLevelModule extends INBTSerializable<CompoundTag>
 	public void updateSuspendedRespawners();
 
 	/** Executed every tick.
-	 * Called in {@link ServerEvents#onLevelTick}.
+	 * Called in {@link BMServerEvents#onLevelTick}.
 	 * <p> It's ticked after the vanilla level tick.
 	 */
 	public void tick();
