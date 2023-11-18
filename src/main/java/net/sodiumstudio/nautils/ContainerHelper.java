@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import net.minecraft.util.Mth;
 import net.sodiumstudio.nautils.containers.MapPair;
 
 /**
@@ -323,4 +324,37 @@ public class ContainerHelper
 	{
 		return castListTypeUnchecked(list, false);
 	}
+	
+	/**
+	 * Generate a raw array of arithmetic sequence.
+	 */
+	public static int[] intRangeArray(int start, int endExcluded, int step)
+	{
+		int size = Mth.floor((endExcluded - start) / step) + 1;
+		int[] out = new int[size];
+		int j = start;
+		for (int i = 0; i < size; ++i)
+		{
+			out[i] = j;
+			j += step;
+		}
+		return out;
+	}
+	
+	/**
+	 * Generate a raw array of arithmetic sequence.
+	 */
+	public static double[] doubleRangeArray(double start, double endExcluded, double step)
+	{
+		int size = Mth.floor((endExcluded - start) / step) + 1;
+		double[] out = new double[size];
+		double j = start;
+		for (int i = 0; i < size; ++i)
+		{
+			out[i] = j;
+			j += step;
+		}
+		return out;
+	}
+	
 }
