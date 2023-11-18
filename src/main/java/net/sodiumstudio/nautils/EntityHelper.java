@@ -716,11 +716,10 @@ public class EntityHelper
 	 * @param mob Input mob to test if can see.
 	 * @return Target entity if can see, or null.
 	 */
-	@Nullable
 	public static Optional<Entity> getIfCanSee(UUID targetUUID, Mob mob)
 	{
 		if (mob == null || !mob.isAlive())
-			return null;
+			return Optional.empty();
 		Entity out = null;
 		if (targetUUID != null)
 		{
