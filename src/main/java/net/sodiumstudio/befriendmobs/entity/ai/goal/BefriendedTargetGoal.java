@@ -3,6 +3,7 @@ package net.sodiumstudio.befriendmobs.entity.ai.goal;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedGoalCheckCanUseEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.entity.ai.goal.preset.target.BefriendedOwnerHurtByTargetGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public abstract class BefriendedTargetGoal extends TargetGoal implements IBefriendedGoal
@@ -46,6 +48,19 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	 * Additional condition to start this goal. (Not checked on checking continue to use)
 	 */
 	protected Predicate<BefriendedTargetGoal> startCondition = null;
+	
+	/**
+	 * If the {@code noGiveUpCondition} keeps false over this time (in ticks), the target goal will be interrupted.
+	 * Set it negative to disable.
+	 */
+	protected int giveUpTicks = -1;
+	private int giveUpTimer = 0;
+	
+	/**
+	 * Condition to prevent the target goal from giving up.
+	 */
+	protected Supplier<Boolean> noGiveUpCondition = () -> true;
+	
 	
 	public BefriendedTargetGoal(IBefriendedMob mob, boolean mustSee)
 	{
@@ -188,7 +203,66 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 			return event.getManualSetValue().get();
 		if (isDisabled())
 			return false;
+		if (this.giveUpTimer > this.giveUpTicks)
+			return false;
 		return checkCanContinueToUse() && super.canContinueToUse();
+	}
+	
+	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onStart()}.
+	 */
+	@Override
+	public final void start()
+	{
+		// Detect if onStart() calling super.start() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStart"))
+			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStart().");
+		this.giveUpTimer = 0;
+		this.onStart();
+	}
+	
+	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onTick()}.
+	 */
+	@Override
+	public final void tick()
+	{
+		// Detect if onTick() calling super.tick() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onTick"))
+			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' tick, call onTick().");
+		if (this.giveUpTicks > 0)
+		{
+			if (this.noGiveUpCondition.get())
+				this.giveUpTimer = 0;
+			else this.giveUpTimer++;
+		}
+		this.onTick();
+	}
+
+	
+	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onStop()}.
+	 */
+	@Override
+	public final void stop()
+	{
+		// Detect if onStart() calling super.start() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStop"))
+			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStop().");
+		if (this.giveUpTicks > 0)
+		{
+			if (this.noGiveUpCondition.get())
+				this.giveUpTimer = 0;
+			else this.giveUpTimer++;
+		}
+		this.giveUpTimer = 0;
+		this.onStop();
 	}
 	
 	@Override
@@ -249,6 +323,13 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	public <T extends BefriendedTargetGoal> T setRequireOwnerPresent(boolean value)
 	{
 		this.requireOwnerPresent = value;
+		return (T)this;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedTargetGoal> T setGiveUpTicks(int ticks)
+	{
+		this.giveUpTicks = ticks;
 		return (T)this;
 	}
 	

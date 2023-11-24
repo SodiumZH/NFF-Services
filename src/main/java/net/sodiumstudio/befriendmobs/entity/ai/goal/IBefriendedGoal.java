@@ -41,4 +41,30 @@ public interface IBefriendedGoal
 		return this.checkCanUse();
 	}
 	
+	/**
+	 * The alternate of {@code start} method for befriend goals.
+	 * Override this for {@code start} check instead in subclasses. 
+	 */
+	public default void onStart()
+	{
+		return;
+	}
+	
+	/**
+	 * The alternate of {@code tick} method for befriend goals.
+	 * Override this for {@code tick} check instead in subclasses. 
+	 */
+	public default void onTick()
+	{
+		return;
+	}
+	
+	/**
+	 * The alternate of {@code stop} method for befriend goals.
+	 * Override this for {@code stop} check instead in subclasses. 
+	 */
+	public default void onStop()
+	{
+		return;
+	}
 }
