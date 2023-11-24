@@ -116,4 +116,29 @@ public class MiscUtil {
 	{
 		return test == null ? forNull : test;
 	}
+	
+	/**
+	 * Cast a given object to a given class. If class mismatches, return null.
+	 * <p> Equivalent to {@code dynamic_cast} in C++. It will run a type check before casting. If you're sure the type matches, you can
+	 * use {@code castRaw} to trivially save resource.
+	 */
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static <T> T cast(Object obj, Class<T> clazz)
+	{
+		if (clazz.isAssignableFrom(obj.getClass()))
+			return (T)obj;
+		else return null;
+	}
+	
+	/**
+	 * Cast an object to a given class without type check. It may be faster than {@link MiscUtil#cast} but throws exception when failed.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T castRaw(Object obj, Class<T> clazz)
+	{
+		return (T)obj;
+	}
+	
+	
 }

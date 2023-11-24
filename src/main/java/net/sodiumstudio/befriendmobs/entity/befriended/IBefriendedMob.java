@@ -24,6 +24,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
@@ -389,6 +390,7 @@ public interface IBefriendedMob extends ContainerListener  {
 		return this.getInventoryItemStack(pos).getItem();
 	}
 
+	@Nullable
 	public BefriendedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
 
 	/* ContainerListener interface */
@@ -565,7 +567,10 @@ public interface IBefriendedMob extends ContainerListener  {
 	/**
 	 * Specify the mod ID this mob belongs to.
 	 */
-	public String getModId();
+	public default String getModId()
+	{
+		return ForgeRegistries.ENTITY_TYPES.getKey(asMob().getType()).getNamespace();
+	}
 	
 	public default CBefriendedMobData.Values getTempData()
 	{
