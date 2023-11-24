@@ -75,7 +75,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		@Override
-		public void start() {
+		public void onStart() {
 			this.mob.asMob().getNavigation().moveTo(this.wantedX, this.wantedY, this.wantedZ, this.speedModifier);
 		}
 
@@ -114,7 +114,7 @@ public abstract class BefriendedAmphibiousGoals {
 			return super.canUse() 
 					&& !((IBefriendedMob) this.mob).asMob().level.isDay()
 					&& pathfinder.isInWaterOrBubble()
-					&& pathfinder.getY() >= (double) (pathfinder.level.getSeaLevel() - 3);
+					&& pathfinder.getY() >= pathfinder.level.getSeaLevel() - 3;
 		}
 
 		/**
@@ -189,13 +189,13 @@ public abstract class BefriendedAmphibiousGoals {
 		}
 
 		@Override
-		public void tick() {
+		public void onTick() {
 
-			if (this.getPathfinder().getY() < (double) (this.seaLevel - 1)
+			if (this.getPathfinder().getY() < this.seaLevel - 1
 					&& (this.getPathfinder().getNavigation().isDone() || closeToNextPos(4.0d))) {
 				Vec3 vec3 = DefaultRandomPos.getPosTowards(this.getPathfinder(), 4, 8,
-						new Vec3(this.getPathfinder().getX(), (double) (this.seaLevel - 1), this.getPathfinder().getZ()),
-						(double) ((float) Math.PI / 2F));
+						new Vec3(this.getPathfinder().getX(), this.seaLevel - 1, this.getPathfinder().getZ()),
+						(float) Math.PI / 2F);
 				if (vec3 == null) {
 					this.stuck = true;
 					return;
@@ -210,7 +210,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		@Override
-		public void start() {
+		public void onStart() {
 			this.stuck = false;
 		}
 
@@ -219,7 +219,7 @@ public abstract class BefriendedAmphibiousGoals {
 		 * another one
 		 */
 		@Override
-		public void stop() {			
+		public void onStop() {			
 		}
 
 		 protected boolean closeToNextPos(double threshold) {
@@ -227,7 +227,7 @@ public abstract class BefriendedAmphibiousGoals {
 		      if (path != null) {
 		         BlockPos blockpos = path.getTarget();
 		         if (blockpos != null) {
-		            double d0 = this.getPathfinder().distanceToSqr((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
+		            double d0 = this.getPathfinder().distanceToSqr(blockpos.getX(), blockpos.getY(), blockpos.getZ());
 		            if (d0 < threshold) {
 		               return true;
 		            }

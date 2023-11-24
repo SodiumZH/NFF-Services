@@ -72,7 +72,7 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 		this.target = null;
 		this.seeTime = 0;
 		this.attackTime = -1;
@@ -87,7 +87,7 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
+	public void onTick() {
 		double d0 = this.mob.asMob().distanceToSqr(this.target.getX(), this.target.getY(), this.target.getZ());
 		boolean flag = this.mob.asMob().getSensing().hasLineOfSight(this.target);
 		if (flag) {
@@ -96,7 +96,7 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 			this.seeTime = 0;
 		}
 
-		if (!(d0 > (double) this.attackRadiusSqr) && this.seeTime >= 5) {
+		if (!(d0 > this.attackRadiusSqr) && this.seeTime >= 5) {
 			this.mob.asMob().getNavigation().stop();
 		} else {
 			this.mob.asMob().getNavigation().moveTo(this.target, this.speedModifier);
@@ -112,10 +112,10 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 			float f1 = Mth.clamp(f, 0.1F, 1.0F);
 			this.performShooting(this.target, f1);	// Removed RangedAttackMob 
 			this.attackTime = Mth.floor(
-					f * (float) (this.attackIntervalMax - this.attackIntervalMin) + (float) this.attackIntervalMin);
+					f * (this.attackIntervalMax - this.attackIntervalMin) + this.attackIntervalMin);
 		} else if (this.attackTime < 0) {
-			this.attackTime = Mth.floor(Mth.lerp(Math.sqrt(d0) / (double) this.attackRadius,
-					(double) this.attackIntervalMin, (double) this.attackIntervalMax));
+			this.attackTime = Mth.floor(Mth.lerp(Math.sqrt(d0) / this.attackRadius,
+					this.attackIntervalMin, this.attackIntervalMax));
 		}
 	}
 	

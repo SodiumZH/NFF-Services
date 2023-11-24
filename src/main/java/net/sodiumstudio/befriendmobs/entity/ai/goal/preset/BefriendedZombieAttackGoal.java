@@ -15,8 +15,8 @@ public class BefriendedZombieAttackGoal extends BefriendedMeleeAttackGoal {
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
-		super.start();
+	public void onStart() {
+		super.onStart();
 		this.raiseArmTicks = 0;
 	}
 
@@ -25,8 +25,8 @@ public class BefriendedZombieAttackGoal extends BefriendedMeleeAttackGoal {
 	 * another one
 	 */
 	@Override
-	public void stop() {
-		super.stop();
+	public void onStop() {
+		super.onStop();
 		this.mob.asMob().setAggressive(false);
 	}
 
@@ -34,8 +34,8 @@ public class BefriendedZombieAttackGoal extends BefriendedMeleeAttackGoal {
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
-		super.tick();
+	public void onTick() {
+		super.onTick();
 		++this.raiseArmTicks;
 		if (this.raiseArmTicks >= 5 && this.getTicksUntilNextAttack() < this.getAttackInterval() / 2) {
 			this.mob.asMob().setAggressive(true);

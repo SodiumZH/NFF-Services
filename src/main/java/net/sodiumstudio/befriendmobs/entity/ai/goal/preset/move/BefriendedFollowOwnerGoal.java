@@ -57,7 +57,7 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 			return false;
 		if (livingentity.isSpectator()) {
 			return false;
-		}  else if (mob.asMob().distanceToSqr(livingentity) < (double) (this.startDistance * this.startDistance)) {
+		}  else if (mob.asMob().distanceToSqr(livingentity) < this.startDistance * this.startDistance) {
 			return false;
 		} else {
 			return true;
@@ -72,20 +72,20 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 		if (!mob.isOwnerPresent())
 			return false;
 		else {
- 			return mob.asMob().distanceToSqr(mob.getOwner()) > (double) (this.stopDistance * this.stopDistance);
+ 			return mob.asMob().distanceToSqr(mob.getOwner()) > this.stopDistance * this.stopDistance;
 		}
 	}
 
 	@Override
-	public void start() {
-		super.start();
+	public void onStart() {
+		super.onStart();
 		this.timeToRecalcPath = 0;
 		this.oldWaterCost = getPathfinder().getPathfindingMalus(BlockPathTypes.WATER);
 		getPathfinder().setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
 	}
  
 	@Override
-	public void stop() {
+	public void onStop() {
 		this.getPathfinder().getNavigation().stop();
 		getPathfinder().setPathfindingMalus(BlockPathTypes.WATER, this.oldWaterCost);
 	}
@@ -94,10 +94,10 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
+	public void onTick() {
 		if (!mob.isOwnerPresent())
 			return;
-		getPathfinder().getLookControl().setLookAt(mob.getOwner(), 10.0F, (float) getPathfinder().getMaxHeadXRot());
+		getPathfinder().getLookControl().setLookAt(mob.getOwner(), 10.0F, getPathfinder().getMaxHeadXRot());
 		if (--this.timeToRecalcPath <= 0) {
 			this.timeToRecalcPath = this.adjustedTickDelay(10);
 			if (!getPathfinder().isLeashed() && !getPathfinder().isPassenger()) {
@@ -134,13 +134,13 @@ public class BefriendedFollowOwnerGoal extends BefriendedMoveGoal {
 	}
 
 	protected boolean tryTeleportTo(int pX, int pY, int pZ) {
-		if (Math.abs((double) pX - mob.getOwner().getX()) < 2.0D
-				&& Math.abs((double) pZ - mob.getOwner().getZ()) < 2.0D) {
+		if (Math.abs(pX - mob.getOwner().getX()) < 2.0D
+				&& Math.abs(pZ - mob.getOwner().getZ()) < 2.0D) {
 			return false;
 		} else if (!this.canTeleportTo(new BlockPos(pX, pY, pZ))) {
 			return false;
 		} else {
-			getPathfinder().moveTo((double) pX + 0.5D, (double) pY, (double) pZ + 0.5D, getPathfinder().getYRot(),
+			getPathfinder().moveTo(pX + 0.5D, pY, pZ + 0.5D, getPathfinder().getYRot(),
 					getPathfinder().getXRot());
 			this.getPathfinder().getNavigation().stop();
 			return true;

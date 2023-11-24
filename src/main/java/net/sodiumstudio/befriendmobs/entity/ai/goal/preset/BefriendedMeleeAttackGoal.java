@@ -154,7 +154,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
+	public void onStart() {
 		// Try nav
 		getPathfinder().getNavigation().moveTo(this.path, this.speedModifier);
 		getPathfinder().setAggressive(true);
@@ -168,7 +168,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 		LivingEntity livingentity = getPathfinder().getTarget();
 		if (!EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingentity))
 		{
@@ -188,7 +188,7 @@ public class BefriendedMeleeAttackGoal extends BefriendedGoal
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
+	public void onTick() {
 		LivingEntity livingentity = getPathfinder().getTarget();
 		if (livingentity != null)
 		{

@@ -24,7 +24,7 @@ public class BefriendedCreeperSwellGoal extends BefriendedGoal
 	{
 		super(creeper);
 		this.creeper = creeper;
-		this.mob = (IBefriendedMob) creeper;
+		this.mob = creeper;
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 		this.allowAllStates();
 	}
@@ -66,7 +66,7 @@ public class BefriendedCreeperSwellGoal extends BefriendedGoal
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
+	public void onStart() {
 		//this.creeper.getNavigation().stop();
 		this.target = this.creeper.getTarget();
 		if (this.creeper.getSwell() == 0)
@@ -80,7 +80,7 @@ public class BefriendedCreeperSwellGoal extends BefriendedGoal
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 	//	this.target = null;
 	}
 
@@ -93,7 +93,7 @@ public class BefriendedCreeperSwellGoal extends BefriendedGoal
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
+	public void onTick() {
 		if (targetedSwelling)
 		{
 			if (this.target == null)

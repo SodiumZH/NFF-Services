@@ -66,8 +66,8 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
-		super.start();
+	public void onStart() {
+		super.onStart();
 		this.mob.asMob().setAggressive(true);
 	}
 
@@ -76,8 +76,8 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * another one
 	 */
 	@Override
-	public void stop() {
-		super.stop();
+	public void onStop() {
+		super.onStop();
 		this.mob.asMob().setAggressive(false);
 		this.seeTime = 0;
 		this.attackTime = -1;
@@ -93,7 +93,7 @@ public class BefriendedRangedBowAttackGoal extends BefriendedGoal
 	 * Keep ticking a continuous task that has already been started
 	 */
 	@Override
-	public void tick() {
+	public void onTick() {
 		LivingEntity livingentity = this.mob.asMob().getTarget();
 		if (livingentity != null)
 		{
