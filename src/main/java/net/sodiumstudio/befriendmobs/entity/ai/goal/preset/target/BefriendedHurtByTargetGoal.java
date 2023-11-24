@@ -30,6 +30,7 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	/** Store the previous revengeTimer value */
 	private int timestamp;
 	private final Class<?>[] toIgnoreDamage;
+	private LivingEntity target;
 	@Nullable
 	private Class<?>[] toIgnoreAlert;
 
@@ -39,6 +40,7 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 		this.setFlags(EnumSet.of(Goal.Flag.TARGET));
 		this.setRequireOwnerPresent(false);
 		allowAllStates();
+		this.noGiveUpCondition = () -> (this.mob.asMob().getLastHurtByMob() == this.target);
 	}
 
 	/**
@@ -78,16 +80,16 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
-		mob.asMob().setTarget(mob.asMob().getLastHurtByMob());
+	public void onStart() {
+		this.target = mob.asMob().getLastHurtByMob();
+		mob.asMob().setTarget(this.target);
 		this.targetMob = mob.asMob().getTarget();
 		this.timestamp = mob.asMob().getLastHurtByMobTimestamp();
 		this.unseenMemoryTicks = 300;
 	/*	if (this.alertSameType) {
 			this.alertOthers();
 		}*/
-
-		super.start();
+		super.onStart();
 	}
 /*
 	protected void alertOthers() {
@@ -131,4 +133,12 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 	protected void alertOther(Mob pMob, LivingEntity pTarget) {
 		pMob.setTarget(pTarget);
 	}*/
+	
+	@Override
+	public void onStop()
+	{
+		this.target = null;
+		this.mob.asMob().setTarget(null);
+	}
+	
 }

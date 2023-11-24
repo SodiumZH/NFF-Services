@@ -17,6 +17,7 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 		super(inMob, false);
 		this.setFlags(EnumSet.of(Goal.Flag.TARGET));
 		allowAllStatesExceptWait();
+		this.noGiveUpCondition = () -> (this.mob.isOwnerPresent() && this.mob.asMob().getLastHurtByMob() == this.ownerLastHurtBy);
 	}
 
 	/**
@@ -44,18 +45,30 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 		}
 	}
 
+	@Override
+	public boolean checkCanContinueToUse()
+	{
+		return super.checkCanContinueToUse();
+	}
+	
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
+	public void onStart() {
 		mob.asMob().setTarget(this.ownerLastHurtBy);
 		LivingEntity livingentity = mob.getOwner();
 		if (livingentity != null) {
 			this.timestamp = livingentity.getLastHurtByMobTimestamp();
 		}
-
-		super.start();
+		super.onStart();
 	}
-
+	
+	@Override
+	public void onStop()
+	{
+		this.mob.asMob().setTarget(null);
+		this.ownerLastHurtBy = null;
+	}
+	
 }
