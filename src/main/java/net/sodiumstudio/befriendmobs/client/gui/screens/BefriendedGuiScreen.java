@@ -39,9 +39,9 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	}
 
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
-			IBefriendedMob mob, boolean renderName)
+			IBefriendedMob mob, boolean rendersName)
 	{
-		super(pMenu, pPlayerInventory, renderName ? ((LivingEntity)mob).getName() : InfoHelper.createText(""));
+		super(pMenu, pPlayerInventory, rendersName ? ((LivingEntity)mob).getName() : InfoHelper.createText(""));
 		this.mob = mob;
 		this.passEvents = false;
 	}
