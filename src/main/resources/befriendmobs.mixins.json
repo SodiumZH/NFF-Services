@@ -6,7 +6,8 @@
 	"mixins": [
 		"NaUtilsMixinItemEntity",
 		"NaUtilsMixinEntity",
-		"NaUtilsMixinMob"
+		"NaUtilsMixinMob",
+		"NaUtilsMixinPlayer"
 	],
 	"client": [
 	],
