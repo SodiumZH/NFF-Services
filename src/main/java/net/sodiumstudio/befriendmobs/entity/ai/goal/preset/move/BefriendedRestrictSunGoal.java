@@ -40,8 +40,8 @@ public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
-		super.start();
+	public void onStart() {
+		super.onStart();
 		if (isAmphibious)
 		{
 			((IBefriendedAmphibious)mob).switchNav(false);			
@@ -55,7 +55,7 @@ public class BefriendedRestrictSunGoal extends BefriendedMoveGoal {
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 		if (GoalUtils.hasGroundPathNavigation(getPathfinder())) {
 			((GroundPathNavigation) getPathfinder().getNavigation()).setAvoidSun(false);
 		}

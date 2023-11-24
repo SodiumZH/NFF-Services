@@ -105,8 +105,8 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
-		super.start();
+	public void onStart() {
+		super.onStart();
 		BlockPos wanted = new BlockPos(wantedX, wantedY, wantedZ);
 		if (shouldAvoidSun.test(mob) && mob.asMob().level.canSeeSky(wanted) && mob.asMob().level.isDay())
 			return;
@@ -118,9 +118,9 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 		getPathfinder().getNavigation().stop();
-		super.stop();
+		super.onStop();
 	}
 
 	/**

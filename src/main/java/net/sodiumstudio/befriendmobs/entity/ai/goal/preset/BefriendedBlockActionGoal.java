@@ -25,7 +25,7 @@ public abstract class BefriendedBlockActionGoal extends BefriendedGoal
 	}
 	
 	@Override
-	public void start()
+	public void onStart()
 	{
 		mob.asMob().getNavigation().stop();
 	}

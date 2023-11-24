@@ -98,9 +98,9 @@ public abstract class BefriendedMoveGoal extends BefriendedGoal
 	}
 	
 	@Override
-	public void start()
+	public void onStart()
 	{
-		super.start();
+		super.onStart();
 		if (isAmphibious)
 		{
 			if (mob.asMob().isInWater() && mob.asMob().level.getBlockState(mob.asMob().eyeBlockPosition()).is(Blocks.WATER))
