@@ -31,7 +31,7 @@ public class BefriendedEnderManGoals
 		public LeaveBlockGoal(AbstractBefriendedEnderMan enderman)
 		{
 			super(enderman);
-			this.mob = (IBefriendedMob) enderman;
+			this.mob = enderman;
 			this.enderman = enderman;
 			this.allowState(WANDER);
 		}
@@ -63,7 +63,7 @@ public class BefriendedEnderManGoals
 		 * Keep ticking a continuous task that has already been started
 		 */
 		@Override
-		public void tick() {
+		public void onTick() {
 			RandomSource random = this.enderman.getRandom();
 			Level level = this.enderman.level();
 			int i = Mth.floor(this.enderman.getX() - 1.0D + random.nextDouble() * 2.0D);
@@ -211,7 +211,7 @@ public class BefriendedEnderManGoals
 		public TakeBlockGoal(AbstractBefriendedEnderMan enderman)
 		{
 			super(enderman);
-			this.mob = (IBefriendedMob)enderman;
+			this.mob = enderman;
 			this.enderman = enderman;
 			this.allowState(WANDER);
 		}
@@ -236,7 +236,7 @@ public class BefriendedEnderManGoals
 		}
 
 		@Override
-		public void tick() {
+		public void onTick() {
 			RandomSource random = this.enderman.getRandom();
 			Level level = this.enderman.level();
 			int i = Mth.floor(this.enderman.getX() - 2.0D + random.nextDouble() * 4.0D);
@@ -244,9 +244,9 @@ public class BefriendedEnderManGoals
 			int k = Mth.floor(this.enderman.getZ() - 2.0D + random.nextDouble() * 4.0D);
 			BlockPos blockpos = new BlockPos(i, j, k);
 			BlockState blockstate = level.getBlockState(blockpos);
-			Vec3 vec3 = new Vec3((double) this.enderman.getBlockX() + 0.5D, (double) j + 0.5D,
-					(double) this.enderman.getBlockZ() + 0.5D);
-			Vec3 vec31 = new Vec3((double) i + 0.5D, (double) j + 0.5D, (double) k + 0.5D);
+			Vec3 vec3 = new Vec3(this.enderman.getBlockX() + 0.5D, j + 0.5D,
+					this.enderman.getBlockZ() + 0.5D);
+			Vec3 vec31 = new Vec3(i + 0.5D, j + 0.5D, k + 0.5D);
 			BlockHitResult blockhitresult = level.clip(new ClipContext(vec3, vec31, ClipContext.Block.OUTLINE,
 					ClipContext.Fluid.NONE, this.enderman));
 			boolean flag = blockhitresult.getBlockPos().equals(blockpos);

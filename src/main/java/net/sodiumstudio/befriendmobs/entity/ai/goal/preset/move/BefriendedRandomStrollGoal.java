@@ -119,9 +119,9 @@ public class BefriendedRandomStrollGoal extends BefriendedMoveGoal {
 	 * another one
 	 */
 	@Override
-	public void stop() {
+	public void onStop() {
 		getPathfinder().getNavigation().stop();
-		super.stop();
+		super.onStop();
 	}
 
 	/**

@@ -189,6 +189,48 @@ public abstract class BefriendedGoal extends Goal implements IBefriendedGoal {
 	}
 	
 	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onStart()}.
+	 */
+	@Override
+	public final void start()
+	{
+		// Detect if onStart() calling super.start() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStart"))
+			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStart().");
+		this.onStart();
+	}
+	
+	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onTick()}.
+	 */
+	@Override
+	public final void tick()
+	{
+		// Detect if onTick() calling super.tick() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onTick"))
+			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' tick, call onTick().");
+		this.onTick();
+	}
+
+	/**
+	 * Fixed here because some common actions are needed here.
+	 * In subclasses, override {@code onStop()}.
+	 */
+	@Override
+	public final void stop()
+	{
+		// Detect if onStart() calling super.start() which leads to infinite loop
+		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStop"))
+			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStop().");
+		this.onStop();
+	}
+	
+	/**
 	 * Get skip chance of this goal.
 	 * <p> If it has skip chance > 0, it will have a chance to be directly skipped when checking if to start, allowing goals below to be executed.
 	 * When it's skipped, it won't post {@link BefriendedGoalCheckCanUseEvent}.

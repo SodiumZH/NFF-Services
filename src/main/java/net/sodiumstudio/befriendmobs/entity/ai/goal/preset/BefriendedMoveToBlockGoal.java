@@ -11,9 +11,9 @@ import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 {
-	private static final int GIVE_UP_TICKS = 1200;
+	/*private static final int GIVE_UP_TICKS = 1200;
 	private static final int STAY_TICKS = 1200;
-	private static final int INTERVAL_TICKS = 200;
+	private static final int INTERVAL_TICKS = 200;*/
 	protected final PathfinderMob mobPathfinder;
 	/** Controls task execution delay */
 	protected int nextStartTick;
@@ -78,15 +78,15 @@ public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void start() {
+	public void onStart() {
 		this.moveMobToBlock();
 		this.tryTicks = 0;
 		this.maxStayTicks = this.mob.asMob().getRandom().nextInt(this.mob.asMob().getRandom().nextInt(1200) + 1200) + 1200;
 	}
 
 	protected void moveMobToBlock() {
-		this.mobPathfinder.getNavigation().moveTo((double) ((float) this.blockPos.getX()) + 0.5D,
-				(double) (this.blockPos.getY() + 1), (double) ((float) this.blockPos.getZ()) + 0.5D,
+		this.mobPathfinder.getNavigation().moveTo((this.blockPos.getX()) + 0.5D,
+				this.blockPos.getY() + 1, (this.blockPos.getZ()) + 0.5D,
 				this.speedModifier);
 	}
 
@@ -106,7 +106,8 @@ public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 	/**
 	 * Keep ticking a continuous task that has already been started
 	 */
-	public void tick() {
+	@Override
+	public void onTick() {
 		BlockPos blockpos = this.getMoveToTarget();
 		if (!blockpos.closerToCenterThan(this.mobPathfinder.position(), this.acceptedDistance()))
 		{
@@ -114,8 +115,8 @@ public abstract class BefriendedMoveToBlockGoal extends BefriendedMoveGoal
 			++this.tryTicks;
 			if (this.shouldRecalculatePath())
 			{
-				this.mobPathfinder.getNavigation().moveTo((double) ((float) blockpos.getX()) + 0.5D, (double) blockpos.getY(),
-						(double) ((float) blockpos.getZ()) + 0.5D, this.speedModifier);
+				this.mobPathfinder.getNavigation().moveTo((blockpos.getX()) + 0.5D, blockpos.getY(),
+						(blockpos.getZ()) + 0.5D, this.speedModifier);
 			}
 		} else
 		{
