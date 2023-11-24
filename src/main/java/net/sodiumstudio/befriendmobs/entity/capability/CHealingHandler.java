@@ -9,6 +9,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.ItemHelper;
+import net.sodiumstudio.nautils.NaParticleUtils;
 
 public interface CHealingHandler extends INBTSerializable<IntTag>
 {
@@ -96,12 +97,14 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 	
 	public default void sendParticlesOnSuccess()
 	{
-		EntityHelper.sendGlintParticlesToLivingDefault(getOwner());
+		//EntityHelper.sendGlintParticlesToLivingDefault(getOwner());
+		NaParticleUtils.sendGlintParticlesToEntityDefault(getOwner());
 	}
 	
 	public default void sendParticlesOnFailure()
 	{
-		EntityHelper.sendSmokeParticlesToLivingDefault(getOwner());
+		//EntityHelper.sendSmokeParticlesToLivingDefault(getOwner());
+		NaParticleUtils.sendSmokeParticlesToEntityDefault(getOwner());
 	}
 	
 	// Get expected cooldown time each healing 
