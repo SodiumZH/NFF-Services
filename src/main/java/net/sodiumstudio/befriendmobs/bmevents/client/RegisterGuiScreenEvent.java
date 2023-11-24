@@ -38,6 +38,7 @@ public class RegisterGuiScreenEvent extends Event implements IModBusEvent
 		this.register(menuClass, (menu) -> prvd.create(menu, menu.playerInventory, menu.mob));
 	}
 	
+	@FunctionalInterface
 	public static interface Provider
 	{
 		BefriendedGuiScreen create(BefriendedInventoryMenu menu, Inventory inv, IBefriendedMob mob);

@@ -2,7 +2,7 @@ package net.sodiumstudio.nautils;
 
 
 /**
- * A class to hide variable inside to 
+ * A class to hide variable inside in order to 
  * enable changing in final variables or lambda functions
  * @param <T> Type of wrapped variable
  */
@@ -35,6 +35,10 @@ public class Wrapped<T> {
 		return new Wrapped<T>(val);
 	}
 	
+	/**
+	 * @deprecated Use {@code Wrapped<Boolean>} instead
+	 */
+	@Deprecated
 	public static class Boolean
 	{
 		private boolean value;
