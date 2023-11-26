@@ -17,7 +17,8 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 		super(inMob, false);
 		this.setFlags(EnumSet.of(Goal.Flag.TARGET));
 		allowAllStatesExceptWait();
-		this.noGiveUpCondition = () -> (this.mob.isOwnerPresent() && this.mob.asMob().getLastHurtByMob() == this.ownerLastHurtBy);
+		this.setNoExpireCondition(() -> (this.mob.isOwnerPresent() && this.mob.asMob().getLastHurtByMob() == this.ownerLastHurtBy));
+		this.setExpireTicks(30 * 20);	// Expires after 30s by default
 	}
 
 	/**

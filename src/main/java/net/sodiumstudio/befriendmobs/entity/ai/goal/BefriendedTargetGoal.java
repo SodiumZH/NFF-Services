@@ -50,16 +50,16 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	protected Predicate<BefriendedTargetGoal> startCondition = null;
 	
 	/**
-	 * If the {@code noGiveUpCondition} keeps false over this time (in ticks), the target goal will be interrupted.
+	 * If the {@code noExpireCondition} keeps false over this time (in ticks), the target goal will be interrupted.
 	 * Set it negative to disable.
 	 */
-	protected int giveUpTicks = -1;
-	private int giveUpTimer = 0;
+	protected int expireTicks = -1;
+	private int expireTimer = 0;
 	
 	/**
 	 * Condition to prevent the target goal from giving up.
 	 */
-	protected Supplier<Boolean> noGiveUpCondition = () -> true;
+	protected Supplier<Boolean> noExpireCondition = () -> true;
 	
 	
 	public BefriendedTargetGoal(IBefriendedMob mob, boolean mustSee)
@@ -203,7 +203,7 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 			return event.getManualSetValue().get();
 		if (isDisabled())
 			return false;
-		if (this.giveUpTimer > this.giveUpTicks)
+		if (this.expireTimer > this.expireTicks)
 			return false;
 		return checkCanContinueToUse() && super.canContinueToUse();
 	}
@@ -219,7 +219,7 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStart"))
 			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStart().");
-		this.giveUpTimer = 0;
+		this.expireTimer = 0;
 		this.onStart();
 	}
 	
@@ -234,11 +234,11 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onTick"))
 			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' tick, call onTick().");
-		if (this.giveUpTicks > 0)
+		if (this.expireTicks > 0)
 		{
-			if (this.noGiveUpCondition.get())
-				this.giveUpTimer = 0;
-			else this.giveUpTimer++;
+			if (this.noExpireCondition.get())
+				this.expireTimer = 0;
+			else this.expireTimer++;
 		}
 		this.onTick();
 	}
@@ -255,13 +255,13 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStop"))
 			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStop().");
-		if (this.giveUpTicks > 0)
+		if (this.expireTicks > 0)
 		{
-			if (this.noGiveUpCondition.get())
-				this.giveUpTimer = 0;
-			else this.giveUpTimer++;
+			if (this.noExpireCondition.get())
+				this.expireTimer = 0;
+			else this.expireTimer++;
 		}
-		this.giveUpTimer = 0;
+		this.expireTimer = 0;
 		this.onStop();
 	}
 	
@@ -327,9 +327,26 @@ public abstract class BefriendedTargetGoal extends TargetGoal implements IBefrie
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends BefriendedTargetGoal> T setGiveUpTicks(int ticks)
+	public <T extends BefriendedTargetGoal> T setExpireTicks(int ticks)
 	{
-		this.giveUpTicks = ticks;
+		this.expireTicks = ticks;
+		return (T)this;
+	}
+	
+	/**
+	 * Set this target goal should not expire.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedTargetGoal> T noExpire()
+	{
+		this.expireTicks = -1;
+		return (T)this;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedTargetGoal> T setNoExpireCondition(Supplier<Boolean> condition)
+	{
+		this.noExpireCondition = condition;
 		return (T)this;
 	}
 	
