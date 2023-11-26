@@ -2,6 +2,30 @@
 
 ## 1.19.2
 
+### 0.1.19
+
+##### BefriendMobs
+
+Added Mixin-Extras dependency.
+
+Labeled `start()`, `stop()` and `tick()` in `BefriendedGoal` and `BefriendedTargetGoal` as final. To override these, use `IBefriendedMob#onStart`, `IBefriendedMob#onStop` and `IBefriendedMob#onTick` instead.
+
+Now `IBefriendedSunSensitiveMob` sun immunity feature is automatically implemented using `MobSunBurnTickEvent`.
+
+Now `BefriendedRestrictSunGoal` and `BefriendedFleeSunGoal` will not run for sun-immune `IBefriendedSunSensitiveMob`.
+
+##### NaUtils
+
+Added Mixin-Extras dependency.
+
+Added some Mixin-based events:
+
+​	-Excluded out-of-world damage from `NonLivingEntityHurtEvent` and `ItemEntityHurtEvent`. For out-of-world damage it will post `NonLivingEntityOutOfWorldEvent` and `ItemEntityOutOfWorldEvent` instead. 
+
+​	-`MobSunBurnTickEvent` before a mob is tested to be on a sun burn tick. It will only affect sun-burn features using `Mob#isSunBurnTick`.
+
+​	-`LivingEntitySweepHurtEvent` before a living entity is hurt by player sweep attack.
+
 ### 0.1.18
 
 ##### BefriendMobs
