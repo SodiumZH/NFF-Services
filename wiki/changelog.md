@@ -8,6 +8,8 @@
 
 Added Mixin-Extras dependency.
 
+Labeled `start()`, `stop()` and `tick()` in `BefriendedGoal` and `BefriendedTargetGoal` as final. To override these, use `IBefriendedMob#onStart`, `IBefriendedMob#onStop` and `IBefriendedMob#onTick` instead.
+
 Now `IBefriendedSunSensitiveMob` sun immunity feature is automatically implemented using `MobSunBurnTickEvent`.
 
 Now `BefriendedRestrictSunGoal` and `BefriendedFleeSunGoal` will not run for sun-immune `IBefriendedSunSensitiveMob`.
