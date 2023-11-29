@@ -8,7 +8,7 @@
 
 Added Mixin-Extras dependency.
 
-Temporarily removed `IBefriendedMob#dropInventoryOnDeath` due to a bug that the items will get lost if it returns false. Currently mobs always drop inventory on death.
+Temporarily removed `IBefriendedMob#dropInventoryOnDeath` feature due to a bug that the items will get lost if it returns false. Currently mobs always drop inventory on death.
 
 Labeled `start()`, `stop()` and `tick()` in `BefriendedGoal` and `BefriendedTargetGoal` as final. To override these, use `IBefriendedMob#onStart`, `IBefriendedMob#onStop` and `IBefriendedMob#onTick` instead.
 
