@@ -74,6 +74,10 @@ minecraft {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', 'befriendmobs'
 
+			property 'mixin.debug.export', 'true'
+			property 'mixin.debug.export.decompile', 'true'
+
+
             mods {
                 befriendmobs {
                     source sourceSets.main
