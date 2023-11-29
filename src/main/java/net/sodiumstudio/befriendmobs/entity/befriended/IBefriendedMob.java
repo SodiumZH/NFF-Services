@@ -573,7 +573,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 */
 	public default String getModId()
 	{
-		return ForgeRegistries.ENTITY_TYPES.getKey(asMob().getType()).getNamespace();
+		return ForgeRegistries.ENTITIES.getKey(asMob().getType()).getNamespace();
 	}
 	
 	public default CBefriendedMobData.Values getTempData()
