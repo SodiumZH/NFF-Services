@@ -180,6 +180,7 @@ public class MobRespawnerInstance
 			mob.setHealth(mob.getMaxHealth());
 			if (mob instanceof IBefriendedMob b)
 			{
+				//b.setInventoryFromMob();
 				b.updateAnchor();
 				b.setInit();
 			}

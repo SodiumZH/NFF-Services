@@ -411,6 +411,10 @@ public interface IBefriendedMob extends ContainerListener  {
 	{
 	}
 
+	/**
+	 * @deprecated Not implemented
+	 */
+	@Deprecated
 	public default boolean dropInventoryOnDeath()
 	{
 		return true;
