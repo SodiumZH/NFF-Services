@@ -279,7 +279,7 @@ public class BMEntityEvents
 				}
 				if (!event.getEntity().level.isClientSide) {
 					// Drop all items in inventory if no vanishing curse
-					if (bef.dropInventoryOnDeath()) {
+					if (/*bef.dropInventoryOnDeath()*//** TODO: Fix item loss if not dropping */true) {
 						BefriendedInventory container = bef.getAdditionalInventory();
 						for (int i = 0; i < container.getContainerSize(); ++i) {
 							if (container.getItem(i) != ItemStack.EMPTY) {
