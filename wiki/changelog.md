@@ -280,6 +280,10 @@ Separated from DWMG mod.
 
 ## 1.20.1
 
+### 0.2.18
+
+Identical to 1.19.2-0.1.18.
+
 ### 0.2.17
 
 Identical to 1.19.2-0.1.17.
@@ -299,6 +303,16 @@ Adjusted the API of `BefriendedGuiScreen`.
 Adjusted the explosions of `AbstractBefriendedCreeper` and added an option for always dropping blocks like TNT.
 
 ## 1.18.2
+
+### 0.0.19
+
+All changes in 1.19.2-0.0.19.
+
+Updated Forge dependency to 40.2.4.
+
+### 0.0.18
+
+Identical to 1.19.2-0.1.18.
 
 ### 0.0.17
 
