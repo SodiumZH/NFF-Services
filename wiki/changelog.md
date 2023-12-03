@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.19.1
+
+##### NaUtils
+
+Fixed `LivingEntitySweepHurtEvent` not working and making sweeping attack not work.
+
 ### 0.1.19
 
 ##### BefriendMobs
