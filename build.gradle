@@ -20,9 +20,9 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '0.0.19'
+version = "${version}"
 group = 'net.sodiumstudio.befriendmobs' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'befriendmobs-1.18.2'
+archivesBaseName = "befriendmobs-${mc_version}"
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -40,7 +40,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 tasks.jarJar.configure {
   archiveClassifier = ''
 }
-jarJar.dependsOn 'reobfJarJar'
+
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
@@ -215,6 +215,10 @@ jar {
     }
     from sourceSets.main.allSource
     duplicatesStrategy "include"
+}
+
+reobf {
+	jarJar {}
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
