@@ -38,7 +38,9 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 //jarJar.enable()
 
 tasks.jarJar.configure {
-  archiveClassifier = ''
+	archiveClassifier = ''
+	from sourceSets.main.allSource
+	duplicatesStrategy "include"
 }
 
 minecraft {
