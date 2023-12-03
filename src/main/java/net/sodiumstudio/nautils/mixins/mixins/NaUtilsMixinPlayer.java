@@ -30,6 +30,6 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 		if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
 			return false;
 		// If originally false, it shouldn't take sweep hurt at all, so no posting and return false
-		else return original.call(entity, amount);
+		else return original.call(caller, entity, amount);
 	}
 }
