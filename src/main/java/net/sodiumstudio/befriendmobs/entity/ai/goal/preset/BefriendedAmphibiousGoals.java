@@ -114,7 +114,7 @@ public abstract class BefriendedAmphibiousGoals {
 			return super.canUse() 
 					&& !((IBefriendedMob) this.mob).asMob().level().isDay()
 					&& pathfinder.isInWaterOrBubble()
-					&& pathfinder.getY() >= pathfinder.level.getSeaLevel() - 3;
+					&& pathfinder.getY() >= pathfinder.level().getSeaLevel() - 3;
 		}
 
 		/**

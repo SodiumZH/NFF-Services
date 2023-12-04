@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.ItemEntityHurtEvent;
@@ -25,7 +26,7 @@ public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {
 		}
 		else
 		{
-			if (src == DamageSource.OUT_OF_WORLD && amount != Integer.MAX_VALUE)
+			if (src.is(DamageTypes.FELL_OUT_OF_WORLD) && amount != Integer.MAX_VALUE)
 			{
 				if (MinecraftForge.EVENT_BUS.post(new ItemEntityOutOfWorldEvent(get(), amount)))
 					callback.setReturnValue(false);

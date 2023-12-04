@@ -812,7 +812,7 @@ public class EntityHelper
 
 	public static BlockState getEyePositionBlock(LivingEntity living)
 	{
-		return living.level.getBlockState(new BlockPos(living.getEyePosition()));
+		return living.level().getBlockState(MathUtil.getBlockPos(living.getEyePosition()));
 	}
 	
 }
