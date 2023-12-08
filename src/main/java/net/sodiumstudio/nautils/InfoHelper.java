@@ -24,11 +24,19 @@ public class InfoHelper
 
 	}
 	
+	/**
+	 * @deprecated Use {@link net.sodiumstudio.nautils.info.ComponentBuilder#create()} instead.
+	 */
+	@Deprecated
 	public static ComponentBuilder builder()
 	{
 		return new ComponentBuilder();
 	}
 	
+	/**
+	 * @deprecated Use {@link net.sodiumstudio.nautils.info.ComponentBuilder} instead.
+	 */
+	@Deprecated
 	public static class ComponentBuilder
 	{
 		private ArrayList<MutableComponent> components = new ArrayList<>();
