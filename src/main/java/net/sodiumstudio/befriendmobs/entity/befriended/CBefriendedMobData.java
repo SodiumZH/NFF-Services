@@ -1,11 +1,14 @@
 package net.sodiumstudio.befriendmobs.entity.befriended;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
@@ -15,9 +18,12 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -37,16 +43,14 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	 * Transform capability to value implementations.
 	 * In values transient data can be directly accessed.
 	 * If permanent (serializable) data is needed, use wrapped methods in IBefriendedMob instead.
-	 * @deprecated Don't directly access the values (capability implementation) here. Use getters and setters instead.
 	 */
-	@Deprecated
 	public default Values values()
 	{
 		return (Values)this;
 	}
 	
 	/** Get the befriended mob owning this data. */
-	public IBefriendedMob getOwner();
+	public IBefriendedMob getMob();
 	
 	/** Get the whole NBT as compound tag.*/
 	public CompoundTag getNbt();
@@ -91,9 +95,14 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	
 	// Owner info related
 	/**
-	 * Get the owner's display name, or "Not Present" if not found.
+	 * Get the owner's display name, or "(Unknown)" if not found.
 	 */
 	public String getOwnerName();
+	
+	/**
+	 * Set the owner's display name.
+	 */
+	public void setOwnerName(@Nonnull Player owner);
 	
 	/**
 	 * Get the date it's befriended.
@@ -103,21 +112,9 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	public int[] getBefriendedDate();
 	
 	/**
-	 * Get the dimension where it's befriended, or "Not Recorded" if not recorded (legacy).
-	 * @return Dimension name.
-	 */
-	public MutableComponent getBefriendedDimension();
-	
-	/**
-	 * Get the coordination where it's befriended, or null if not recorded (legacy).
-	 */
-	@Nullable
-	public Vec3 getBefriendedLocation();
-	
-	/**
 	 * Record info about befriending time and location. Invoked in {@link BefriendingHandler#befriend).
 	 */
-	public void recordBefriendedInfo();
+	public void recordBefriendedInfo(Player owner);
 	
 	/**
 	 * Values of trancient mob data, also as implementation of interface methods.
@@ -146,11 +143,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		public CompoundTag serializeNBT() {
 			// TODO: remove this in release. This is only for porting old data to new one.
 			mob.getOwnerInDimension().ifPresent(player -> {
-				if (!tag.contains("befriended_date", NbtHelper.TAG_COMPOUND_ID))
-				{
-					tag.put("befriended_date", new CompoundTag());
-					tag.getCompound("befriended_date")
-				}
+				this.setOwnerName(player);
 			});
 			return tag;
 		}
@@ -166,7 +159,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		}
 
 		@Override
-		public IBefriendedMob getOwner() {
+		public IBefriendedMob getMob() {
 			return mob;
 		}
 
@@ -194,34 +187,32 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 
 		@Override
 		public String getOwnerName() {
-			// TODO Auto-generated method stub
-			return null;
+			if (!tag.contains("owner_name", NbtHelper.TAG_STRING_ID))
+				return "Unknown";
+			else return tag.getString("owner_name");
 		}
 
+		@Override
+		public void setOwnerName(Player owner) {
+			tag.putString("owner_name", owner.getName().getString());
+		}		
+		
 		@Override
 		public int[] getBefriendedDate() {
-			// TODO Auto-generated method stub
-			return null;
+			if (!tag.contains("befriended_date", NbtHelper.TAG_INT_ARRAY_ID))
+				return null;
+			else return tag.getIntArray("befriended_date");
 		}
 
 		@Override
-		public MutableComponent getBefriendedDimension() {
-			// TODO Auto-generated method stub
-			return null;
+		public void recordBefriendedInfo(Player owner) {
+			if (!mob.asMob().level.isClientSide)
+			{
+				this.setOwnerName(owner);
+				LocalDate now = LocalDate.now();
+				this.tag.putIntArray("befriended_date", new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)});
+			}
 		}
-
-		@Override
-		public Vec3 getBefriendedLocation() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void recordBefriendedInfo() {
-			tag.put("befriended_info", new CompoundTag());
-			CompoundTag info = tag.getCompound("befriended_info");
-			info.putString("dimension", RegistryAccess//mob.asMob().level.dimensionType());
-		}		
 	}
 	
 	public class Prvd implements ICapabilitySerializable<CompoundTag>

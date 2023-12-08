@@ -60,7 +60,7 @@ public interface IBefriendedSunSensitiveMob
 	@DontOverride
 	public default MutablePredicate<IBefriendedSunSensitiveMob> getSunImmunity()
 	{
-		return this.getBefriended().getTempData().values().sunImmunity;
+		return this.getBefriended().getTempData().getSunImmunity();
 	}
 	
 }
