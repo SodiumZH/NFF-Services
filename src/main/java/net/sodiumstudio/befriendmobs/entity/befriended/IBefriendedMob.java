@@ -1,8 +1,5 @@
 package net.sodiumstudio.befriendmobs.entity.befriended;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -10,11 +7,13 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -22,6 +21,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -35,15 +35,10 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
-import net.sodiumstudio.befriendmobs.registry.BMItems;
-import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
-import net.sodiumstudio.nautils.containers.DynamicItemKeyMap;
 import net.sodiumstudio.nautils.object.ItemOrKey;
-import net.sodiumstudio.nautils.object.ObjectOrKey;
-import net.sodiumstudio.nautils.object.ObjectOrSupplier;
 
 public interface IBefriendedMob extends ContainerListener  {
 
@@ -136,6 +131,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	/** 
 	 * Get owner as player entity.
 	 * @return Owner as entity, or null if the owner is absent in the level.
+	 * @deprecated Use {@code getOwnerInDimension} or {@code getOwnerInWorld} instead.
 	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	* <p>获取拥有者的玩家实体。
 	* <p>拥有者实体，若拥有者不在世界中时返回null。
@@ -143,12 +139,52 @@ public interface IBefriendedMob extends ContainerListener  {
 	*/
 	@DontOverride
 	@Nullable
+	@Deprecated
 	public default Player getOwner() 
 	{
 		if (getOwnerUUID() != null)
 			return asMob().level.getPlayerByUUID(getOwnerUUID());
 		else return null;
 	}
+	
+	/**
+	 * Get owner if the owner is in the same dimension. Otherwise return {@code Optional#EMPTY}.
+	 */
+	@DontOverride
+	public default Optional<Player> getOwnerInDimension()
+	{
+		if (getOwnerUUID() != null)
+		{
+			return Optional.ofNullable(this.asMob().level.getPlayerByUUID(getOwnerUUID()));
+		}
+		else return Optional.empty();
+	}
+	
+	@DontOverride
+	public default Optional<Player> getOwnerInWorld()
+	{
+		if (getOwnerUUID() != null)
+		{
+			if (this.asMob().level.isClientSide)
+			{
+				return getOwnerInDimension();
+			}
+			else
+			{
+				MinecraftServer sv = this.asMob().level.getServer();
+				Player owner = null;
+				for (Level level: sv.getAllLevels())
+				{
+					owner = level.getPlayerByUUID(getOwnerUUID());
+					if (owner != null)
+						return Optional.of(owner);
+				}
+				return Optional.empty();
+			}
+		}
+		return Optional.empty();
+	}
+	
 	
 	/** 
 	 * Get owner as UUID.
@@ -195,6 +231,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	
 	/**
 	 * Check if owner is in the level.
+	 * @deprecated Use {@code isOwnerInDimension} or {@code isOwnerInWorld} instead.
 	 * <p>检查拥有者是否在同一世界中。
 	 */
 	@DontOverride
