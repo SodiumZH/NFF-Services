@@ -16,6 +16,10 @@ buildscript {
     }
 }
 
+plugins {
+	id 'java'
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
@@ -204,6 +208,7 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading at runtime.
 jar {
+	archiveClassifier = 'slim'
     manifest {
         attributes([
                 "Specification-Title"     : "befriendmobs",
