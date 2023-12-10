@@ -69,7 +69,7 @@ public class MobOwnershipTransfererItem extends BMItem
 			throw new IllegalArgumentException();
 		if (!mob.isOwnerPresent())
 			throw new IllegalStateException("MobOwnershipTransfererItem writing requires the owner to be present in the level.");
-		stack.getOrCreateTag().putBoolean("mot_written", true);
+		stack.getOrCreateTag().putBoolean("mot_written", true);	// "mot" means "mob ownership transferer"
 		stack.getTag().putUUID("mot_mob_uuid", mob.asMob().getUUID());
 		stack.getTag().putString("mot_mob_name", mob.asMob().getName().getString());
 		stack.getTag().putUUID("mot_owner_uuid", mob.getOwnerUUID());
@@ -99,7 +99,8 @@ public class MobOwnershipTransfererItem extends BMItem
 		if (stack.getOrCreateTag().getBoolean("mot_locked"))
 			return InteractionResult.PASS;
 		mob.setOwnerUUID(player.getUUID());
-		return InteractionResult.sidedSuccess(player.level().isClientSide);
+		mob.getData().recordBefriendedInfo(player);
+		return InteractionResult.sidedSuccess(player.level.isClientSide);
 	}
 	
 	@Override

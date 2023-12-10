@@ -31,6 +31,7 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumstudio.befriendmobs.entity.capability.HealingItemTable;
+import net.sodiumstudio.befriendmobs.events.BMEntityEvents;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
@@ -84,8 +85,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	 */
 	@DontCallManually
 	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
-	
-	
+
 	/**
 	 * Get whether this mob has finished initialization.
 	 * <p>After finishing initialization the mob will start updating from its inventory.
@@ -95,7 +95,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default boolean hasInit()
 	{
-		return this.getTempData().hasInit;
+		return this.getData().hasInit();
 	}
 	
 	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
@@ -110,7 +110,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default void setInit()
 	{
-		this.getTempData().hasInit = true;
+		this.getData().setInitState(true);;
 	}
 
 	/** Label a mob not finished initialization.
@@ -123,7 +123,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default void setNotInit()
 	{
-		this.getTempData().hasInit = false;
+		this.getData().setInitState(false);
 	}
 	
 	/* Ownership */
@@ -240,6 +240,24 @@ public interface IBefriendedMob extends ContainerListener  {
 		return getOwner() != null;
 	}
 	
+	/**
+	 * Check if the owner is in the same dimension as the mob.
+	 */
+	@DontOverride
+	public default boolean isOwnerInDimension()
+	{
+		return this.getOwnerInDimension().isPresent();
+	}
+	
+	/**
+	 * Check if the owner is in the server in any dimension.
+	*/
+	@DontOverride
+	public default boolean isOwnerInWorld()
+	{
+		return this.getOwnerInWorld().isPresent();
+	}
+	
 	/* -------------------------------------------------------- */
 	/* AI configs */
 	
@@ -321,24 +339,28 @@ public interface IBefriendedMob extends ContainerListener  {
 		return BefriendedHelper.wantsToAttackDefault(this, pTarget);
 	}
 	
-	/** Get the previous target before updating target.
-	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
-	*/
+	/** 
+	 * <b> Don't call manually! </b> This method is only called in {@link BMEntityEvents#onLivingChangeTarget}. 
+	 * Get the previous target before updating target.
+	 * This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
+	 */
 	@DontOverride
 	@DontCallManually
 	public default LivingEntity getPreviousTarget()
 	{
-		return this.getTempData().previousTarget;
+		return this.getData().getPreviousTarget();
 	}
 	
-	/** Get the previous target after updating target.
+	/** 
+	* <b> Don't call manually! </b> This method is only called in {@link BMEntityEvents#onLivingChangeTarget}. 
+	* Get the previous target after updating target.
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/
 	@DontOverride
 	@DontCallManually
 	public default void setPreviousTarget(LivingEntity target)
 	{
-		this.getTempData().previousTarget = target;
+		this.getData().setPreviousTarget(target);;
 	}
 	
 	/** Get the anchor pos that the mob won't stroll too far from it
@@ -347,13 +369,13 @@ public interface IBefriendedMob extends ContainerListener  {
 	@Nullable
 	public default Vec3 getAnchorPos() 
 	{
-		return this.getTempData().anchor;
+		return this.getData().getAnchor();
 	}
 	
 	@DontOverride
 	public default void setAnchorPos(Vec3 pos) 
 	{
-		this.getTempData().anchor = pos;
+		this.getData().setAnchor(pos);
 	}
 	
 	public default double getAnchoredStrollRadius()  
@@ -486,7 +508,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown)
 	{
-		Wrapped.Boolean succeeded = new Wrapped.Boolean(false);		
+		Wrapped<Boolean> succeeded = new Wrapped<>(false);		
 		this.asMob().getCapability(BMCaps.CAP_HEALING_HANDLER).ifPresent((l) ->
 		{
 			succeeded.set(l.applyHealingItem(stack, value, consume, cooldown));
@@ -613,6 +635,7 @@ public interface IBefriendedMob extends ContainerListener  {
 		return ForgeRegistries.ENTITY_TYPES.getKey(asMob().getType()).getNamespace();
 	}
 	
+	@Deprecated
 	public default CBefriendedMobData.Values getTempData()
 	{
 		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
@@ -626,4 +649,17 @@ public interface IBefriendedMob extends ContainerListener  {
 		return res.get().values();
 	}
 
+	public default CBefriendedMobData getData()
+	{
+		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
+		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		{
+			res.set(cap);
+		});
+		if (res.get() == null)
+			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
+			return new CBefriendedMobData.Values(this);	
+		return res.get();
+	}
+	
 }

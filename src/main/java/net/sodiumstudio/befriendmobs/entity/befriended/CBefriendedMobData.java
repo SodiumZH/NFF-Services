@@ -32,7 +32,10 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
+import net.sodiumstudio.nautils.annotation.DontCallManually;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.function.MutablePredicate;
+import net.sodiumstudio.befriendmobs.events.*;
 
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
@@ -48,6 +51,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	{
 		return (Values)this;
 	}
+	
+	// General //
 	
 	/** Get the befriended mob owning this data. */
 	public IBefriendedMob getMob();
@@ -93,7 +98,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		}
 	}
 	
-	// Owner info related
+	// Owner info related //
+	
 	/**
 	 * Get the owner's display name, or "(Unknown)" if not found.
 	 */
@@ -105,20 +111,63 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	public void setOwnerName(@Nonnull Player owner);
 	
 	/**
-	 * Get the date it's befriended.
+	 * Get the date player encountered it, including befriended, or took ownership from another player.
 	 * @return An int[3] indicating year, month and day, or null if not recorded (legacy).
 	 */
 	@Nullable
-	public int[] getBefriendedDate();
+	public int[] getEncounteredDate();
 	
 	/**
 	 * Record info about befriending time and location. Invoked in {@link BefriendingHandler#befriend).
 	 */
+	@DontCallManually
 	public void recordBefriendedInfo(Player owner);
 	
+	// Anchor related //
+	
 	/**
-	 * Values of trancient mob data, also as implementation of interface methods.
+	 * Get random stroll anchor point as vector.
 	 */
+	public Vec3 getAnchor();
+	
+	/**
+	* Set random stroll anchor point.
+	*/ 
+	public void setAnchor(Vec3 anchor);
+	
+	// Misc //
+	
+	/**
+	 * <b> Don't call manually! </b> Use {@link IBefriendedMob#hasInit()} instead.
+	 * Get whether this mob has finished initialization.
+	 * <p>After finishing initialization the mob will start updating from its inventory.
+	 */
+	@DontCallManually
+	public boolean hasInit();
+	
+	/**
+	 * <b> Don't call manually! </b> Use {@link IBefriendedMob#setInit()} or {@link IBefriendedMob#setNotInit()} instead.
+	 * Set the label for if this mob has finished initialization.
+	 */
+	@DontCallManually
+	public void setInitState(boolean value);
+	
+	/**
+	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#getPreviousTarget}.
+	 */
+	@DontCallManually
+	@Nullable
+	public LivingEntity getPreviousTarget();
+	
+	/**
+	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#setPreviousTarget}.
+	 */
+	@DontCallManually
+	@Nullable
+	public void setPreviousTarget(LivingEntity target);
+	
+	
+	 // Values of mob data, also as implementation of interface methods.
 	public class Values implements CBefriendedMobData
 	{
 		private IBefriendedMob mob;
@@ -130,9 +179,9 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			this.tag = new CompoundTag();
 		}
 		
-		public boolean hasInit = false;
-		public LivingEntity previousTarget = null;
-		public Vec3 anchor;
+		private boolean hasInit = false;
+		private LivingEntity previousTarget = null;
+		private Vec3 anchor;
 		
 		// BefriendedUndeadMob data
 		private MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -198,10 +247,10 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		}		
 		
 		@Override
-		public int[] getBefriendedDate() {
-			if (!tag.contains("befriended_date", NbtHelper.TAG_INT_ARRAY_ID))
+		public int[] getEncounteredDate() {
+			if (!tag.contains("encountered_date", NbtHelper.TAG_INT_ARRAY_ID))
 				return null;
-			else return tag.getIntArray("befriended_date");
+			else return tag.getIntArray("encountered_date");
 		}
 
 		@Override
@@ -210,9 +259,42 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			{
 				this.setOwnerName(owner);
 				LocalDate now = LocalDate.now();
-				this.tag.putIntArray("befriended_date", new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)});
+				this.tag.putIntArray("encountered_date", new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)});
 			}
 		}
+
+		@Override
+		public Vec3 getAnchor() {
+			return anchor;
+		}
+
+		@Override
+		public void setAnchor(Vec3 anchor) {
+			this.anchor = anchor;
+		}
+
+		@Override
+		public boolean hasInit() {
+			return this.hasInit;
+		}
+
+		@Override
+		public void setInitState(boolean value) {
+			this.hasInit = value;
+		}
+
+		@Override
+		public LivingEntity getPreviousTarget() {
+			return this.previousTarget;
+		}
+
+		@Override
+		public void setPreviousTarget(LivingEntity target) {
+			this.previousTarget = target;
+		}
+		
+		
+		
 	}
 	
 	public class Prvd implements ICapabilitySerializable<CompoundTag>
