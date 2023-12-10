@@ -1,5 +1,7 @@
 package net.sodiumstudio.befriendmobs.events;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.server.level.ServerLevel;
@@ -10,6 +12,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -55,6 +59,7 @@ import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.ReflectHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.events.MobSunBurnTickEvent;
@@ -563,4 +568,5 @@ public class BMEntityEvents
 		if (event.getEntity() instanceof IBefriendedSunSensitiveMob bssm && bssm.isSunImmune())
 			event.setCanceled(true);
 	}
+	
 }
