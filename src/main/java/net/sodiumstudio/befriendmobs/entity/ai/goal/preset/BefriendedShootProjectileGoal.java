@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.entity.ai.goal.preset;
 
 import java.util.EnumSet;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -12,18 +13,43 @@ import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedGoal;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
-// Adjusted from RangedAttackGoal
+/** Adjusted from vanilla RangedAttackGoal.
+ * <p>Base class for mobs shooting any type of projectiles.
+ * <p>This goal doesn't require the mob to implement {@link RangedAttackMob}.
+ * For vanilla {@link RangedAttackMob} support, use {@link BefriendedRangedAttackGoal}.
+ */
 public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 	@Nullable
 	protected LivingEntity target;
 	protected int attackTime = -1;
 	protected final double speedModifier;
 	protected int seeTime;
-	protected final int attackIntervalMin;
-	protected final int attackIntervalMax;
+	protected int attackIntervalMin;
+	protected int attackIntervalMax;
 	protected final float attackRadius;
 	protected final float attackRadiusSqr;
 
+	/**
+	 * If non-null, the {@code attackIntervalMin} will be updated every tick.
+	 * @throws IllegalStateException If the interval minimum is larger than maximum.
+	 */
+	@Nullable
+	protected Supplier<Integer> attackIntervalMinGetter = null;
+	
+	/**
+	 * If non-null, the {@code attackIntervalMax} will be updated every tick.
+	 */
+	@Nullable
+	protected Supplier<Integer> attackIntervalMaxGetter = null;
+	
+	/**
+	 * If non-null, the {@code attackIntervalMin} and {@code attackIntervalMax} will be updated samely every tick.
+	 * It overrides {@code attackIntervalMinGetter} and {@code attackIntervalMaxGetter}.
+	 */
+	@Nullable
+	protected Supplier<Integer> attackIntervalGetter = null;
+	
+	
 	public BefriendedShootProjectileGoal(IBefriendedMob mob, double pSpeedModifier, int pAttackInterval,
 			float pAttackRadius) {
 		this(mob, pSpeedModifier, pAttackInterval, pAttackInterval, pAttackRadius);
@@ -42,6 +68,30 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 		allowAllStatesExceptWait();
 	}
 
+	/**
+	 * Set attack interval getter. It will update min and max interval samely every tick on running.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedShootProjectileGoal> T setAttackIntervalGetter(Supplier<Integer> getter)
+	{
+		this.attackIntervalGetter = getter;
+		return (T) this;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedShootProjectileGoal> T setAttackIntervalMinGetter(Supplier<Integer> getter)
+	{
+		this.attackIntervalMinGetter = getter;
+		return (T) this;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedShootProjectileGoal> T setAttackIntervalMaxGetter(Supplier<Integer> getter)
+	{
+		this.attackIntervalMaxGetter = getter;
+		return (T) this;
+	}
+	
 	/**
 	 * Returns whether execution should begin. You can also read and cache any state
 	 * necessary for execution in this method as well.
@@ -83,9 +133,6 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 		return true;
 	}
 
-	/**
-	 * Keep ticking a continuous task that has already been started
-	 */
 	@Override
 	public void onTick() {
 		double d0 = this.mob.asMob().distanceToSqr(this.target.getX(), this.target.getY(), this.target.getZ());
@@ -102,6 +149,22 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 			this.mob.asMob().getNavigation().moveTo(this.target, this.speedModifier);
 		}
 
+		// Update attack interval
+		if (this.attackIntervalGetter != null)
+		{
+			int interval = this.attackIntervalGetter.get();
+			this.attackIntervalMax = interval;
+			this.attackIntervalMin = interval;
+		}
+		else
+		{
+			if (this.attackIntervalMaxGetter != null)
+				this.attackIntervalMax = attackIntervalMaxGetter.get();
+			if (this.attackIntervalMinGetter != null)
+				this.attackIntervalMin = attackIntervalMinGetter.get();
+		}
+		// Update attack interval end
+		
 		this.mob.asMob().getLookControl().setLookAt(this.target, 30.0F, 30.0F);
 		if (--this.attackTime == 0) {
 			if (!flag) {
@@ -120,12 +183,14 @@ public abstract class BefriendedShootProjectileGoal extends BefriendedGoal {
 	}
 	
 	/**
-	 * Method to perform shooting.
+	 * Method to perform shooting. This includes adding projectiles, setting up its properties and any other actions on shooting.
+	 * <p>Actually you can do anything in this, even other than adding projectiles.
 	 */
 	protected abstract void performShooting(LivingEntity target, float velocity);
 	
 	/**
-	 * Method to update target.
+	 * Method to update target. Invoked on each time it checks can use or can continue to use.
+	 * <p>If the result is non-null, the goal will start or continue. Return null to stop the goal.
 	 * @return New target to set.
 	 */
 	protected abstract LivingEntity updateTarget();
