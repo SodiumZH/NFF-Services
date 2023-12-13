@@ -178,9 +178,8 @@ repositories {
     }
     
     maven {
-    // location of the maven that hosts JEI files
-  		  name = "Jared Maven"
-  		  url = "https://dvs1.progwml6.com/files/maven/"
+  		name = "Jared Maven"
+  		url = "https://maven.blamejared.com/"
   			}
  	 maven {
   		  // location of a maven mirror for JEI files, as a fallback
