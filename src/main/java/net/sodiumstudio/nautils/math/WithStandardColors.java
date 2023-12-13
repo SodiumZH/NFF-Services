@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 /**
- * A table for objects that have variants of the 16 vanilla standard colors, e.g. dyes, wools, terracottas, etc.
+ * A collection for objects that have variants of the 16 vanilla standard colors, e.g. dyes, wools, terracottas, etc.
  */
 public class WithStandardColors<T>
 {
@@ -33,8 +33,23 @@ public class WithStandardColors<T>
 		}
 	}
 	
+	/**
+	 * Create an instance with 16 object variants.
+	 * <p>Order: white, black, gray, lightGray, red, green, blue, yellow, lightBlue, magenta, cyan, orange, lime, purple, brown, pink
+	 */
 	public static <U> WithStandardColors<U> of(U white, U black, U gray, U lightGray,
 			U red, U green, U blue, U yellow, U lightBlue, U magenta, U cyan, U orange, U lime, U purple, U brown, U pink)
+	{
+		return new WithStandardColors<U>(white, black, gray, lightGray, 
+				red, green, blue, yellow, lightBlue, magenta, cyan, orange, lime, purple, brown, pink);
+	}
+	
+	/**
+	 * Create an instance with 16 object variants.
+	 * <p>Objects in alphabetic order of the color names. Note: "gray" is spelled as "GRAY" so it's in front of "green".
+	 */
+	public static <U> WithStandardColors<U> ofAlphabetic(U black, U blue, U brown, U cyan, U gray, U green,
+			U lightBlue, U lightGray, U lime, U magenta, U orange, U pink, U purple, U red, U white, U yellow)
 	{
 		return new WithStandardColors<U>(white, black, gray, lightGray, 
 				red, green, blue, yellow, lightBlue, magenta, cyan, orange, lime, purple, brown, pink);
@@ -77,5 +92,14 @@ public class WithStandardColors<T>
 	{
 		return map.get(StandardColor.ofId(rnd.nextInt(16)));
 	}
+	
+	/**
+	 * Get the object of the same color in another {@code WithStandardColors} of given item in this collection.
+	 */
+	public <U> U ofSameColor(T object, WithStandardColors<U> otherCollection)
+	{
+		return otherCollection.ofColor(this.getColor(object));
+	}
+
 	
 }
