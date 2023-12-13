@@ -2,6 +2,22 @@
 
 ## 1.19.2
 
+### 0.1.20
+
+##### BefriendMobs
+
+Labeled parameters in `CBefriendedMobData#Values` as private. Now they can be accessed only with getters and setters.
+
+Now `CBefriendedMobData` will record the owner's name and encountered time.
+
+Now `BefriendedShootProjectileGoal` supports dynamic attack intervals.
+
+##### NaUtils
+
+Added `WithStandardColors` as a collection of the same-type object with 16 vanilla color variants, like Wools, Dyes, etc. It allows to browse color by object and browse object by color. The vanilla colored objects are collected in `ColoredBlocks` and `ColoredItems`.
+
+Added `ProjectileHitEvent` which is fired when a projectile hits anything. It's implemented by mixin-injecting into the beginning of `Projectile#onHit`. WARNING: NOT TESTED!
+
 ### 0.1.19.1
 
 ##### NaUtils
