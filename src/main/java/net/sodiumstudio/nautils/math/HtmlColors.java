@@ -160,7 +160,7 @@ public class HtmlColors
 	
 	public static MutableComponent getTranslationKey(String key)
 	{
-		return InfoHelper.createText("color.nautils.html." + key);
+		return InfoHelper.createTrans("color.nautils.html." + key);
 	}
 	
 	public static String getNearestHtmlColor(LinearColor color)
