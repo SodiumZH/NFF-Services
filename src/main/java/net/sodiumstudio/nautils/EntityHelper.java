@@ -21,6 +21,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +43,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.LevelEntityGetter;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -813,6 +815,32 @@ public class EntityHelper
 	public static BlockState getEyePositionBlock(LivingEntity living)
 	{
 		return living.level().getBlockState(MathUtil.getBlockPos(living.getEyePosition()));
+	}
+	
+	/**
+	 * Deal real damage bypassing any damage-reducing mechanisms except Absorption.
+	 */
+	public static void realDamage(LivingEntity target, float amount, @Nullable DamageSource damageSource)
+	{
+		float amount1 = amount;
+		if (target.getAbsorptionAmount() >= amount1)
+		{
+			target.setAbsorptionAmount(target.getAbsorptionAmount() - amount1);
+			amount1 = 0f;
+		}
+		else if (target.getAbsorptionAmount() > 0f)
+		{
+			amount1 -= target.getAbsorptionAmount();
+			target.setAbsorptionAmount(0f);
+		}
+		if (amount1 > 0f)
+		{
+            target.getCombatTracker().recordDamage(damageSource, target.getHealth(), amount1);
+            target.setHealth(target.getHealth() - amount1);
+            target.gameEvent(GameEvent.ENTITY_DAMAGE);
+            if (target.getHealth() <= 0)
+            	target.die(damageSource);
+		}
 	}
 	
 }
