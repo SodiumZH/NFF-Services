@@ -191,9 +191,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		@Override
 		public CompoundTag serializeNBT() {
 			// TODO: remove this in release. This is only for porting old data to new one.
-			mob.getOwnerInDimension().ifPresent(player -> {
-				this.setOwnerName(player);
-			});
+			if (!tag.contains("owner_name", NbtHelper.TAG_STRING_ID) && mob.getOwnerInDimension() != null)
+				this.setOwnerName(mob.getOwnerInDimension());
 			return tag;
 		}
 
@@ -309,7 +308,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (cap == BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA)
+			if (cap == BMCaps.CAP_BEFRIENDED_MOB_DATA)
 				return LazyOptional.of(() -> {return this.values;}).cast();
 			else return LazyOptional.empty();
 		}
