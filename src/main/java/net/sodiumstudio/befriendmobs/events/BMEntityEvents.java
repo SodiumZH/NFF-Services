@@ -23,6 +23,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -165,6 +166,58 @@ public class BMEntityEvents
 	}*/
 	
 	@SubscribeEvent
+	public static void onLivingChangeTarget(LivingChangeTargetEvent event)
+	{
+		
+        // Handle Golems //
+        // TODO: Port LivingChangeTargetEvent to 1.18.2 and move this inside
+        if (event.getEntity() instanceof AbstractGolem g)
+        {
+        	if (event.getNewTarget() instanceof IBefriendedMob bm)
+        	{
+        		
+        		switch (bm.golemAttitude())
+        		{
+        		case DEFAULT:
+        		{
+        			// No change
+        			break;
+        		}
+        		case NEUTRAL:
+        		{
+        			// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
+	        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(event.getNewTarget()))
+	        		{
+	        			event.setCanceled(true);
+	        		}
+	        		break;
+        		}
+        		case PASSIVE:
+        		{
+        			// Always cancel
+        			event.setCanceled(true);
+        			break;
+        		}
+        		case CUSTOM:
+        		{
+        			// Use custom config
+        			if (!bm.shouldGolemAttack(g))
+        			{
+        				event.setCanceled(true);
+        			}
+        			break;
+        		}
+        		default:
+        		{
+        			throw new RuntimeException();
+        		}
+        		}
+        	}
+        }
+        // Handle Golems End
+	}
+	
+	@SubscribeEvent
 	public static void onLivingSetTarget(LivingSetAttackTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
@@ -211,55 +264,7 @@ public class BMEntityEvents
 	        	}
 	        }
 	        // Handle TamableAnimal end //
-	        // Handle Golems //
-	        // TODO: Port LivingChangeTargetEvent to 1.18.2 and move this inside
-	        if (mob instanceof AbstractGolem g)
-	        {
-	        	if (target instanceof IBefriendedMob bm)
-	        	{
-	        		
-	        		switch (bm.golemAttitude())
-	        		{
-	        		case DEFAULT:
-	        		{
-	        			// No change
-	        			break;
-	        		}
-	        		case NEUTRAL:
-	        		{
-	        			// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
-		        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
-		        		{
-		        			//event.setCanceled(true);
-		        			g.setTarget(null);
-		        		}
-		        		break;
-	        		}
-	        		case PASSIVE:
-	        		{
-	        			// Always cancel
-	        			// event.setCanceled(true);
-	        			g.setTarget(null);
-	        			break;
-	        		}
-	        		case CUSTOM:
-	        		{
-	        			// Use custom config
-	        			if (!bm.shouldGolemAttack(g))
-	        			{
-	        				//event.setCanceled(true);
-	        				g.setTarget(null);
-	        			}
-	        			break;
-	        		}
-	        		default:
-	        		{
-	        			throw new RuntimeException();
-	        		}
-	        		}
-	        	}
-	        }
-	        // Handle Golems End
+
 		}
 		// Handle mobs end //
 	}	
