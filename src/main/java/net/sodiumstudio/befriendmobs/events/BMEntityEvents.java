@@ -63,7 +63,6 @@ import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.events.MobSunBurnTickEvent;
 
-// TODO: change modid after isolation
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BMEntityEvents
@@ -213,14 +212,50 @@ public class BMEntityEvents
 	        }
 	        // Handle TamableAnimal end //
 	        // Handle Golems //
+	        // TODO: Port LivingChangeTargetEvent to 1.18.2 and move this inside
 	        if (mob instanceof AbstractGolem g)
 	        {
-	        	if (target instanceof IBefriendedMob)
+	        	if (target instanceof IBefriendedMob bm)
 	        	{
-	        		// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
-	        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
+	        		
+	        		switch (bm.golemAttitude())
 	        		{
+	        		case DEFAULT:
+	        		{
+	        			// No change
+	        			break;
+	        		}
+	        		case NEUTRAL:
+	        		{
+	        			// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
+		        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
+		        		{
+		        			//event.setCanceled(true);
+		        			g.setTarget(null);
+		        		}
+		        		break;
+	        		}
+	        		case PASSIVE:
+	        		{
+	        			// Always cancel
+	        			// event.setCanceled(true);
 	        			g.setTarget(null);
+	        			break;
+	        		}
+	        		case CUSTOM:
+	        		{
+	        			// Use custom config
+	        			if (!bm.shouldGolemAttack(g))
+	        			{
+	        				//event.setCanceled(true);
+	        				g.setTarget(null);
+	        			}
+	        			break;
+	        		}
+	        		default:
+	        		{
+	        			throw new RuntimeException();
+	        		}
 	        		}
 	        	}
 	        }
