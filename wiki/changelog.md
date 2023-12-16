@@ -12,6 +12,14 @@ Now `CBefriendedMobData` will record the owner's name and encountered time.
 
 Now `BefriendedShootProjectileGoal` supports dynamic attack intervals.
 
+Changed method names:
+
+ -`IBefriendedMob#getTempData` => `IBefriendedMob#getData`
+
+Changed parameter names:
+
+ -`BMCaps#CAP_BEFRIENDED_MOB_TEMP_DATA` => `BMCaps#CAP_BEFRIENDED_MOB_DATA`
+
 ##### NaUtils
 
 Added `WithStandardColors` as a collection of the same-type object with 16 vanilla color variants, like Wools, Dyes, etc. It allows to browse color by object and browse object by color. The vanilla colored objects are collected in `ColoredBlocks` and `ColoredItems`.

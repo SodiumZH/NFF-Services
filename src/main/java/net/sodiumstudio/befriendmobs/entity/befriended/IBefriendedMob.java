@@ -17,6 +17,7 @@ import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -148,20 +149,26 @@ public interface IBefriendedMob extends ContainerListener  {
 	}
 	
 	/**
-	 * Get owner if the owner is in the same dimension. Otherwise return {@code Optional#EMPTY}.
+	 * Get owner if the owner is in the same dimension. Otherwise return {@code null}.
 	 */
 	@DontOverride
-	public default Optional<Player> getOwnerInDimension()
+	@Nullable
+	public default Player getOwnerInDimension()
 	{
 		if (getOwnerUUID() != null)
 		{
-			return Optional.ofNullable(this.asMob().level.getPlayerByUUID(getOwnerUUID()));
+			return this.asMob().level.getPlayerByUUID(getOwnerUUID());
 		}
-		else return Optional.empty();
+		else return null;
 	}
 	
+	/**
+	 * Get owner if the owner is in any dimension. Otherwise return {@code null}.
+	 * <p> In client it will only check the loaded dimension.
+	 */
 	@DontOverride
-	public default Optional<Player> getOwnerInWorld()
+	@Nullable
+	public default Player getOwnerInWorld()
 	{
 		if (getOwnerUUID() != null)
 		{
@@ -177,12 +184,12 @@ public interface IBefriendedMob extends ContainerListener  {
 				{
 					owner = level.getPlayerByUUID(getOwnerUUID());
 					if (owner != null)
-						return Optional.of(owner);
+						return owner;
 				}
-				return Optional.empty();
+				return null;
 			}
 		}
-		return Optional.empty();
+		return null;
 	}
 	
 	
@@ -246,7 +253,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default boolean isOwnerInDimension()
 	{
-		return this.getOwnerInDimension().isPresent();
+		return this.getOwnerInDimension() != null;
 	}
 	
 	/**
@@ -255,7 +262,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	@DontOverride
 	public default boolean isOwnerInWorld()
 	{
-		return this.getOwnerInWorld().isPresent();
+		return this.getOwnerInWorld() != null;
 	}
 	
 	/* -------------------------------------------------------- */
@@ -639,7 +646,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default CBefriendedMobData.Values getTempData()
 	{
 		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
-		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
 		{
 			res.set(cap);
 		});
@@ -652,7 +659,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	public default CBefriendedMobData getData()
 	{
 		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
-		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_TEMP_DATA).ifPresent((cap) ->
+		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
 		{
 			res.set(cap);
 		});
@@ -660,6 +667,43 @@ public interface IBefriendedMob extends ContainerListener  {
 			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
 			return new CBefriendedMobData.Values(this);	
 		return res.get();
+	}
+
+	public static enum GolemAttitude
+	{
+		/**
+		 * Golems will not proactively attack the mob, but will attack for other reasons
+		 */
+		NEUTRAL, 
+		/**
+		 * Golems will keep default attitude, usually hostile to mobs under Monster class.
+		 */
+		DEFAULT, 
+		/**
+		 * Golems will be totally passive and never attacks the mob
+		 */
+		PASSIVE,
+		/**
+		 * Custom, defined in {@link IBefriendMob#shouldGolemAttack}.
+		 */
+		CUSTOM
+	}
+	
+	/**
+	 * Defines how golems should handle hostility towards this mob.
+	 */
+	public default GolemAttitude golemAttitude()
+	{
+		return GolemAttitude.NEUTRAL;
+	}
+	
+	/**
+	 * Only when {@link IBefriendedMob#golemAttitude} is {@link GolemAttitude#CUSTOM}, check if a golem should attack
+	 * when it attempts to set target to this mob.
+	 */
+	public default boolean shouldGolemAttack(AbstractGolem golem)
+	{
+		return true;
 	}
 	
 }
