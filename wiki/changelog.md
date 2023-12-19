@@ -12,6 +12,10 @@ Now `CBefriendedMobData` will record the owner's name and encountered time.
 
 Now `BefriendedShootProjectileGoal` supports dynamic attack intervals.
 
+Added `IBefriendedMob#GolemAttitude` for configuring how golems should handle hostility to the mob.
+
+Deprecated `IBefriendedMob#getOwner` and `IBefriendedMob#isOwnerPresent`. Use `getOwnerInDimension`, `getOwnerInWorld`, `isOwnerInDimension` and `isOwnerInWorld` instead.
+
 Changed method names:
 
  -`IBefriendedMob#getTempData` => `IBefriendedMob#getData`
