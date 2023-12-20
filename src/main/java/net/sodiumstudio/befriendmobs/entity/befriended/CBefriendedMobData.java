@@ -2,40 +2,27 @@ package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
-import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.function.MutablePredicate;
-import net.sodiumstudio.befriendmobs.events.*;
 
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
@@ -254,7 +241,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 
 		@Override
 		public void recordBefriendedInfo(Player owner) {
-			if (!mob.asMob().level.isClientSide)
+			if (!mob.asMob().level().isClientSide)
 			{
 				this.setOwnerName(owner);
 				LocalDate now = LocalDate.now();

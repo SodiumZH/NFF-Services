@@ -157,7 +157,7 @@ public interface IBefriendedMob extends ContainerListener  {
 	{
 		if (getOwnerUUID() != null)
 		{
-			return this.asMob().level.getPlayerByUUID(getOwnerUUID());
+			return this.asMob().level().getPlayerByUUID(getOwnerUUID());
 		}
 		else return null;
 	}
@@ -172,13 +172,13 @@ public interface IBefriendedMob extends ContainerListener  {
 	{
 		if (getOwnerUUID() != null)
 		{
-			if (this.asMob().level.isClientSide)
+			if (this.asMob().level().isClientSide)
 			{
 				return getOwnerInDimension();
 			}
 			else
 			{
-				MinecraftServer sv = this.asMob().level.getServer();
+				MinecraftServer sv = this.asMob().level().getServer();
 				Player owner = null;
 				for (Level level: sv.getAllLevels())
 				{

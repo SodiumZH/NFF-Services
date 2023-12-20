@@ -100,7 +100,7 @@ public class MobOwnershipTransfererItem extends BMItem
 			return InteractionResult.PASS;
 		mob.setOwnerUUID(player.getUUID());
 		mob.getData().recordBefriendedInfo(player);
-		return InteractionResult.sidedSuccess(player.level.isClientSide);
+		return InteractionResult.sidedSuccess(player.level().isClientSide);
 	}
 	
 	@Override

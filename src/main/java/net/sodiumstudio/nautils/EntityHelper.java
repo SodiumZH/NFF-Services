@@ -835,7 +835,7 @@ public class EntityHelper
 		}
 		if (amount1 > 0f)
 		{
-            target.getCombatTracker().recordDamage(damageSource, target.getHealth(), amount1);
+            target.getCombatTracker().recordDamage(damageSource, amount1);
             target.setHealth(target.getHealth() - amount1);
             target.gameEvent(GameEvent.ENTITY_DAMAGE);
             if (target.getHealth() <= 0)
