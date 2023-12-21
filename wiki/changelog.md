@@ -2,6 +2,12 @@
 
 ## 1.19.2
 
+### 0.1.20.1
+
+##### NaUtils
+
+Fixed a wrong mixin in `NaUtilsMixinPlayer` causing compat issues.
+
 ### 0.1.20
 
 ##### BefriendMobs
