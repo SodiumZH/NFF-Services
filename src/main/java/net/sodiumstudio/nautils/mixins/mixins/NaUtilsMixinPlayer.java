@@ -19,7 +19,7 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 {
 
 	// Last condition is "this.distanceToSqr(livingentity) < entityReachSq", so make it false if cancelled
-	@ModifyReturnValue(method = "attack(Lnet/minecraft/world/entity/Entity;)V",
+	@WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/world/entity/player/Player;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"
