@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +29,9 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 	private double acceptSweepDamage(Player caller, Entity entity, Operation<Double> original)
 	{
 		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
-		if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
+		if (entity instanceof LivingEntity living
+				&& original.call(caller, entity) < Mth.square(caller.getEntityReach())
+				&& MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
 			return Double.MAX_VALUE;
 		// If originally false, it shouldn't take sweep hurt at all, so no posting and return false
 		else return original.call(caller, entity);
