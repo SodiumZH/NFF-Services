@@ -28,6 +28,7 @@ import net.sodiumstudio.nautils.annotation.DontOverride;
  * Methods to process all baubles of a mob.
  * It should be single-instance.
  */
+@Deprecated
 public abstract class BaubleHandler {
 	
 	public static final Predicate<IBaubleEquipable> ALWAYS = (m) -> true;

@@ -2,17 +2,17 @@ package net.sodiumstudio.befriendmobs.subsystems.baublesystem;
 
 import java.util.function.BiPredicate;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumstudio.nautils.annotation.DontOverride;
 
 /**
- * An {@code IBaubleRegistryEntry} is the common interface of all classes that can be used to register a bauble.
- * <p> Generally, it's a representation of what a bauble should be defined and it's behaviors, including which item(s) it should be,
- * which slot(s) on which mob(s) it can be equipped on, what to do to the mob if equipped, etc.
+ * {@code IBaubleRegistryEntry} is the common interface of all classes that can be used to register a bauble.
  */
 public interface IBaubleRegistryEntry
 {
@@ -28,7 +28,7 @@ public interface IBaubleRegistryEntry
 	 */
 	@Nullable
 	public Item getItem();
-	
+
 	/**
 	 * Modify this <b>ONLY</b> when trying to add a series of items (defined by predicate, e.g. all pickaxes) as bauble.
 	 * <p>Every such entry will increase the resource cost <b>on tick</b> because the condition check must be performed every tick on every item,
@@ -64,6 +64,7 @@ public interface IBaubleRegistryEntry
 	/**
 	 * The overall condition if this bauble should be equippable and apply effect.
 	 */
+	@Nonnull
 	public BaubleEquippingCondition getEquippingCondition();
 	
 	/**
@@ -75,13 +76,13 @@ public interface IBaubleRegistryEntry
 	
 	/**
 	 * Invoked once before the slots start ticking if this bauble is present, despite the amount.
-	 * Note: ItemStack in args will be ignored.
+	 * Note: ItemStack in args is invalid and attempt to access it will cause exception.
 	 */
 	public void preSlotTick(BaubleProcessingArgs args);
 	
 	/**
 	 * Invoked once before the slots end ticking if this bauble is present, despite the amount.
-	 * Note: ItemStack in args will be ignored.
+	 * Note: ItemStack in args is invalid and attempt to access it will cause exception.
 	 */
 	public void postSlotTick(BaubleProcessingArgs args);
 	
@@ -99,15 +100,29 @@ public interface IBaubleRegistryEntry
 	// Modifier management
 	
 	/**
-	 * Getter of {@link BaubleModifier}s that should be added once no matter how many this bauble is equipped.
+	 * Getter of {@link BaubleAttributeModifier}s that should be added once no matter how many this bauble is equipped.
 	 */
-	public default BaubleModifier[] getNonDuplicatableModifiers(CBaubleEquippableMob mob)
-	{
-		return new BaubleModifier[] {};
-	}
+	@Nullable
+	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob);
 	
 	/**
-	 * Getter of {@link BaubleModifier}s that should be added each this bauble is added.
+	 * Getter of {@link BaubleAttributeModifier}s that should be added each this bauble is added.
 	 */
-	public BaubleModifier[] getDuplicatableModifiers(BaubleProcessingArgs args);
+	@Nullable
+	public BaubleAttributeModifier[] getDuplicatableModifiers(BaubleProcessingArgs args);
+	
+	// Utilities
+	
+	/**
+	 * Check if this entry is for multi-item.
+	 * @return
+	 */
+	@DontOverride
+	public default boolean isMulti()
+	{
+		if (this.getItem() == null && this.getMultiItemCondition() == null || this.getItem() != null && this.getMultiItemCondition() != null)
+			throw new IllegalStateException("IBaubleRegistryEntry: illegal entry \"" + getBaubleRegistryKey().toString()
+					+ " found. For a valid entry, getItem() and getMultiItemCondition() must be either but not both non-null.");
+		return this.getItem() == null && this.getMultiItemCondition() != null;
+	}
 }
