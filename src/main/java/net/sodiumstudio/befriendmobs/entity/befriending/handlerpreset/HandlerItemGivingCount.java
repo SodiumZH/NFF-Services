@@ -10,7 +10,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteracti
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
-import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.debug.Debug;
 
@@ -81,7 +81,7 @@ public abstract class HandlerItemGivingCount extends HandlerItemGiving
 						player.getMainHandItem().shrink(1);
 					}
 					alreadyGiven++;
-					MiscUtil.printToScreen(
+					NaMiscUtils.printToScreen(
 							"Item(s) given: " + Integer.toString(alreadyGiven) + " / " + Integer.toString(overallAmount),
 							player);
 					if (alreadyGiven == overallAmount)
