@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.nautils.InfoHelper;
-import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.exceptions.AssertionFailedException;
 
 // All debug output should work only in development.
@@ -19,7 +19,7 @@ public class Debug {
 	public static void printToScreen(String text, Player receiver)
 	{		
 		if(BefriendMobs.IS_DEBUG_MODE)			
-			MiscUtil.printToScreen(text, receiver);
+			NaMiscUtils.printToScreen(text, receiver);
 	}
 	
 }
