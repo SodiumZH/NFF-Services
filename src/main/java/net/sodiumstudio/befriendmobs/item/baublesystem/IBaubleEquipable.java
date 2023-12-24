@@ -14,6 +14,7 @@ import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.Wrapped;
 
+@Deprecated
 public interface IBaubleEquipable {
 	
 	public HashMap<String, ItemStack> getBaubleSlots();

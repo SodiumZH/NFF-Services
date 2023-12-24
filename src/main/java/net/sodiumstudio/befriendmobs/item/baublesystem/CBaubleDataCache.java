@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 
+@Deprecated
 public interface CBaubleDataCache
 {
 

@@ -1,9 +1,6 @@
 package net.sodiumstudio.nautils.function;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class NaFunctionUtils
 {
@@ -40,35 +37,4 @@ public class NaFunctionUtils
 		return false;
 	}
 	
-	/**
-	 * Convert a {@link Function} to {@link Supplier} with given parameter.
-	 */
-	public static <T, U> Supplier<U> withParam(Function<T, U> function, T param)
-	{
-		return () -> function.apply(param);
-	}
-	
-	/**
-	 * Convert a {@link Function} to {@link Supplier} with given parameter supplier.
-	 */
-	public static <T, U> Supplier<U> withParam(Function<T, U> function, Supplier<T> paramSupplier)
-	{
-		return () -> function.apply(paramSupplier.get());
-	}
-	
-	/**
-	 * Convert a {@link Consumer} to {@link Runnable} with given parameter.
-	 */	
-	public static <T> Runnable withParam(Consumer<T> consumer, T param)
-	{
-		return () -> consumer.accept(param);
-	}
-	
-	/**
-	 * Convert a {@link Consumer} to {@link Runnable} with given parameter supplier.
-	 */	
-	public static <T> Runnable withParam(Consumer<T> consumer, Supplier<T> paramSupplier)
-	{
-		return () -> consumer.accept(paramSupplier.get());
-	}
 }
