@@ -2,7 +2,9 @@ package net.sodiumstudio.nautils;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.Component;
@@ -12,8 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullSupplier;
 
-public class MiscUtil {
+public class NaMiscUtils {
 	
 	public static UUID getUUIDIfExists(Entity entity)
 	{
@@ -44,7 +47,7 @@ public class MiscUtil {
 	
 	public static void printToScreen(String text, Player receiver)
 	{
-		MiscUtil.printToScreen(InfoHelper.createText(text), receiver);
+		NaMiscUtils.printToScreen(InfoHelper.createText(text), receiver);
 	}
 	
 	/** @deprecated Useless function */
@@ -99,7 +102,7 @@ public class MiscUtil {
 	}
 	
 	/**
-	 * Get the value from a lazy optional.
+	 * Get the value from a {@link LazyOptional}.
 	 * If the value isn't present, return null.
 	 */
 	@Nullable
@@ -110,6 +113,18 @@ public class MiscUtil {
 			wrp.set(t);
 		});
 		return wrp.get();
+	}
+	
+	/**
+	 * Get the value from a {@link LazyOptional}.
+	 * If the value isn't present, return a default instance defined by supplier.
+	 */
+	@Nonnull
+	public static <T> T getValueOrDefault(LazyOptional<T> optional, NonNullSupplier<T> defaultSupplier)
+	{
+		T val = getValue(optional);
+		if (val != null) return val;
+		else return defaultSupplier.get();
 	}
 	
 	public static <T> T nullThen(T test, T forNull)
@@ -132,7 +147,7 @@ public class MiscUtil {
 	}
 	
 	/**
-	 * Cast an object to a given class without type check. It may be faster than {@link MiscUtil#cast} but throws exception when failed.
+	 * Cast an object to a given class without type check. It may be faster than {@link NaMiscUtils#cast} but throws exception when failed.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T castRaw(Object obj, Class<T> clazz)

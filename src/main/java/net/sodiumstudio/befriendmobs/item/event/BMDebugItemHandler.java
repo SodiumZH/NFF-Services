@@ -14,7 +14,7 @@ import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.InfoHelper;
-import net.sodiumstudio.nautils.MiscUtil;
+import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.debug.Debug;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
@@ -79,9 +79,9 @@ public class BMDebugItemHandler
 		else if (item == BMItems.DEBUG_AI_SWITCH.get())
 		{
 			target.setNoAi(!target.isNoAi());
-			String key = target.isNoAi() ? "info.befriendmobs.debug_ai_switch_off" : "info.befriendmobs.debug_ai_switch_on";		
-			MutableComponent info = new TranslatableComponent(key, target.getName().getString());
-			MiscUtil.printToScreen(info, player);
+			String key = target.isNoAi() ? "info.befriendmobs.debug_ai_switch_off" : "info.befriendmobs.debug_ai_switch_on";
+			MutableComponent info = Component.translatable(key, target.getName().getString());
+			NaMiscUtils.printToScreen(info, player);
 		}
 
 /*

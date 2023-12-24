@@ -1,5 +1,21 @@
 # Change Log
 
+
+
+
+
+### 0.x.21
+
+
+
+### 0.2.20.1
+
+##### NaUtils
+
+Fixed a wrong mixin in `NaUtilsMixinPlayer` which causes compat issues.
+
+## Old Versions
+
 ## 1.19.2
 
 ### 0.1.20
