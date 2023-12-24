@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
 
+@Deprecated
 public class BaubleHandlerRegistry
 {
 
