@@ -12,8 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.befriendmobs.item.event.MobCatcherCatchMobEvent;
+import net.sodiumstudio.nautils.item.NaUtilsItem;
 
-public class MobCatcherItem extends BMItem
+public class MobCatcherItem extends NaUtilsItem
 {
 	
 	protected BiPredicate<Mob, Player> canCatchCondition = null;

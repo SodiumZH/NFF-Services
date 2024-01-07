@@ -10,12 +10,7 @@ import javax.annotation.Nullable;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.sodiumstudio.nautils.ContainerHelper;
-import net.sodiumstudio.nautils.object.EntityTypeOrKey;
-import net.sodiumstudio.nautils.object.ItemOrKey;
 import net.sodiumstudio.nautils.object.ObjectOrKey;
 import net.sodiumstudio.nautils.object.ObjectOrSupplier;
 
