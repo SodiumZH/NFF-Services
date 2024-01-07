@@ -21,7 +21,7 @@ public class ComponentBuilder
 	/**
 	 * Create a new (empty) ComponentBuilder. Use append methods to add contents.
 	 */
-	public ComponentBuilder create()
+	public static ComponentBuilder create()
 	{
 		return new ComponentBuilder();
 	}

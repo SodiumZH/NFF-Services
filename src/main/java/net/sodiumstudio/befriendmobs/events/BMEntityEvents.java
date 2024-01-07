@@ -58,6 +58,7 @@ import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
+import net.sodiumstudio.befriendmobs.registry.BMTags;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.ReflectHelper;
 import net.sodiumstudio.nautils.TagHelper;
@@ -265,6 +266,54 @@ public class BMEntityEvents
 	        }
 	        // Handle TamableAnimal end //
 
+	        // Handle Golems //
+	        if (mob instanceof AbstractGolem g)
+	        {
+	        	if (target instanceof IBefriendedMob bm)
+	        	{
+	        		
+	        		switch (bm.golemAttitude())
+	        		{
+	        		case DEFAULT:
+	        		{
+	        			// No change
+	        			break;
+	        		}
+	        		case NEUTRAL:
+	        		{
+	        			// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
+		        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
+		        		{
+		        			event.setCanceled(true);
+		        		}
+		        		break;
+	        		}
+	        		case PASSIVE:
+	        		{
+	        			// Always cancel
+	        			event.setCanceled(true);
+	        			break;
+	        		}
+	        		case CUSTOM:
+	        		{
+	        			// Use custom config
+	        			if (!bm.shouldGolemAttack(g))
+	        			{
+	        				event.setCanceled(true);
+	        			}
+	        			break;
+	        		}
+	        		default:
+	        		{
+	        			throw new RuntimeException();
+	        		}
+	        		}
+	        	}
+	        }
+	        // Handle Golems End
+	        // Handle tag befriendmobs:neutral_to_bm_mobs
+	        if (mob.getType().is(BMTags.NEUTRAL_TO_BM_MOBS) && target instanceof IBefriendedMob && mob.getLastHurtByMob() != target)
+	        	event.setCanceled(true);
 		}
 		// Handle mobs end //
 	}	
