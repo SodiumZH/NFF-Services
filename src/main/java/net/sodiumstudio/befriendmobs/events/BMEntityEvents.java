@@ -56,6 +56,7 @@ import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.item.event.BMDebugItemHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
+import net.sodiumstudio.befriendmobs.registry.BMTags;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.ReflectHelper;
 import net.sodiumstudio.nautils.TagHelper;
@@ -255,6 +256,9 @@ public class BMEntityEvents
 	        	}
 	        }
 	        // Handle Golems End
+	        // Handle tag befriendmobs:neutral_to_bm_mobs
+	        if (mob.getType().is(BMTags.NEUTRAL_TO_BM_MOBS) && target instanceof IBefriendedMob && mob.getLastHurtByMob() != target)
+	        	event.setCanceled(true);
 		}
 		// Handle mobs end //
 	}	
