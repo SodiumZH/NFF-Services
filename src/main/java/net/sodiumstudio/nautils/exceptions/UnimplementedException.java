@@ -1,6 +1,9 @@
 package net.sodiumstudio.nautils.exceptions;
 
-// Exception thrown on calling unimplemented code.
+/**
+ * Thrown on calling unimplemented code. 
+ * Used to label methods that haven't been implemented yet to prevent accident silent calling which may cause hidden bugs.
+ */
 public class UnimplementedException extends RuntimeException {
 
 	public UnimplementedException(String s)

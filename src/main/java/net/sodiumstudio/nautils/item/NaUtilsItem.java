@@ -1,4 +1,4 @@
-package net.sodiumstudio.befriendmobs.item;
+package net.sodiumstudio.nautils.item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,41 +11,53 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sodiumstudio.befriendmobs.item.baublesystem.BaubleItem;
 
-public class BMItem extends Item
+/**
+ * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
+ */
+public class NaUtilsItem extends Item
 {
-
 	protected List<MutableComponent> descriptions = new ArrayList<MutableComponent>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	
-	public BMItem(Properties pProperties)
+	public NaUtilsItem(Properties pProperties)
 	{
 		super(pProperties);
 	}
 
-	public BMItem description(MutableComponent desc)
+	/**
+	 * Add a description {@code Component} to hovering text. 
+	 */
+	public NaUtilsItem description(MutableComponent desc)
 	{
 		descriptions.add(desc);
 		return this;
 	}
 	
-	public BMItem foil()
+	/**
+	 * Set the item should be always foiled as if it's enchanted.
+	 */
+	public final NaUtilsItem alwaysFoil()
 	{
 		shouldBeFoil = (i) -> true;
 		return this;
 	}
 	
-	public BMItem foilCondition(Predicate<ItemStack> cond)
+	/**
+	 * If input condition is true, the item will be foiled as if it's enchanted.
+	 */
+	public NaUtilsItem foilCondition(Predicate<ItemStack> cond)
 	{
 		shouldBeFoil = cond;
 		return this;
 	}
 	
+	/**
+	 * Fixed here. Invoke {@code foilCondition} instead.
+	 */
 	@Override
 	public final boolean isFoil(ItemStack stack)
 	{
@@ -59,14 +71,25 @@ public class BMItem extends Item
 	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag)
 	{
 		super.appendHoverText(stack, level, list, tooltipFlag);
+		this.beforeAddingHoveringDescriptions(stack, level, list, tooltipFlag);
 		for (MutableComponent c: descriptions)
 		{
 			list.add(c);
 		}
 	}
 	
+	/**
+	 * Invoked before adding description text to hovering text. No action by default.
+	 */
+	@OnlyIn(Dist.CLIENT)
+	public void beforeAddingHoveringDescriptions(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {}
+	
+	/**
+	 * Cast to subclasses.
+	 * <p>Note: this method is for simplification, hiding an unchecked casting inside. So take care doing this to prevent {@code ClassCastException}.
+	 */
 	@SuppressWarnings("unchecked")
-	public <T extends BMItem> T cast()
+	public <T extends NaUtilsItem> T cast()
 	{
 		return (T)this;
 	}

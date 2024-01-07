@@ -13,8 +13,9 @@ import net.minecraft.world.level.Level;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
 import net.sodiumstudio.nautils.EntityHelper;
+import net.sodiumstudio.nautils.item.NaUtilsItem;
 
-public class MobRespawnerItem extends BMItem
+public class MobRespawnerItem extends NaUtilsItem
 {
 
 	protected boolean retainBefriendedMobInventory = true;
