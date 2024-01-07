@@ -1,5 +1,8 @@
 package net.sodiumstudio.nautils.exceptions;
 
+/**
+ * Thrown when a method call requires the target object to implement a given interface but it doesn't.
+ */
 public class MissingInterfaceException extends Exception
 {
 	public MissingInterfaceException(String string) {

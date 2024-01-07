@@ -1,5 +1,8 @@
 package net.sodiumstudio.nautils.exceptions;
 
+/**
+ * Thrown when trying to register something but an entry of the same key is already existing.
+ */
 public class DuplicatedRegistryEntryException extends RuntimeException {
 
 	public DuplicatedRegistryEntryException(String string) {
