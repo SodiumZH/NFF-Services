@@ -5,9 +5,9 @@ package net.sodiumstudio.nautils.containers;
  */
 public class Tuple3<A, B, C>
 {
-	public final A a;
-	public final B b;
-	public final C c;
+	public A a;
+	public B b;
+	public C c;
 	
 	public Tuple3(A a, B b, C c)
 	{

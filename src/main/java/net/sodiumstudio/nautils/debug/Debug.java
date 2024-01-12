@@ -8,6 +8,7 @@ import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.exceptions.AssertionFailedException;
 
 // All debug output should work only in development.
+@Deprecated
 public class Debug {
 	
 	@Deprecated
@@ -16,6 +17,7 @@ public class Debug {
 		printToScreen(text, receiver);
 	}
 	
+	@Deprecated
 	public static void printToScreen(String text, Player receiver)
 	{		
 		if(BefriendMobs.IS_DEBUG_MODE)			

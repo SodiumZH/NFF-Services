@@ -79,7 +79,7 @@ public class ContainerHelper
 		return null;
 	}
 	
-	// Pick all elements fulfilling the condition from a set.
+	/** Pick all elements fulfilling the condition from a set. */
 	public static <T> HashSet<T> pickSetElements(Set<T> set, Predicate<T> condition)
 	{
 		HashSet<T> out = new HashSet<T>();
@@ -87,6 +87,18 @@ public class ContainerHelper
 		{
 			if (condition.test(t))
 				out.add(t);
+		}
+		return out;
+	}
+	
+	/** Pick all keys of which values satisfying the condition from a map. */
+	public static <K, V> HashSet<K> pickMapKeys(Map<K, V> map, Predicate<V> valueCondition)
+	{
+		HashSet<K> out = new HashSet<>();
+		for (K key: map.keySet())
+		{
+			if (valueCondition.test(map.get(key)))
+				out.add(key);
 		}
 		return out;
 	}
