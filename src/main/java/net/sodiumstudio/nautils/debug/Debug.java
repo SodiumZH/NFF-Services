@@ -9,13 +9,13 @@ import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.exceptions.AssertionFailedException;
 
 // All debug output should work only in development.
+@Deprecated
 public class Debug {
 	
 	// param receiver should be player
 	public static void printToScreen(String text, Player receiver, Entity sender)
 	{
-		if(BefriendMobs.IS_DEBUG_MODE)			
-			receiver.sendMessage(InfoHelper.createText(text), sender.getUUID());
+		printToScreen(text, receiver);
 	}
 
 	@Deprecated
