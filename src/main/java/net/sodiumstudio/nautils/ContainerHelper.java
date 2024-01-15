@@ -1,5 +1,6 @@
 package net.sodiumstudio.nautils;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.Map.Entry;
 
 import net.minecraft.util.Mth;
 import net.sodiumstudio.nautils.containers.MapPair;
@@ -380,6 +382,5 @@ public class ContainerHelper
 		return arrayList;
 			
 	}
-	
-	
+
 }
