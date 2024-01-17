@@ -371,13 +371,13 @@ public class ContainerHelper
 		return out;
 	}
 	
-	/** Convert a general list (modifiable or not) to an ArrayList. */
+	/** Convert a generic list (modifiable or not) to an ArrayList. */
 	public static <T> ArrayList<T> toArrayList(List<T> list)
 	{
-		ArrayList<T> arrayList = new ArrayList<T>((int) (list.size() * 1.5));
+		ArrayList<T> arrayList = new ArrayList<T>();
 		for (int i = 0; i < list.size(); ++i)
 		{
-			arrayList.set(i, list.get(i));
+			arrayList.add(list.get(i));
 		}
 		return arrayList;
 			
