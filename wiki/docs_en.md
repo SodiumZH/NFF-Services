@@ -1,5 +1,7 @@
 # BefriendMobs Framework Tutorial
 
+By SodiumZH
+
 ## Overview
 
 BefriendMobs Framework is intended to help modders easily create features of befriending (or say taming) mobs and friendly mobs despite their type hierarchy.
