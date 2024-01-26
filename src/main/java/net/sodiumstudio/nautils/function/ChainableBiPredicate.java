@@ -7,7 +7,7 @@ import java.util.function.BiPredicate;
  * A sequence of bi-predicates that can be appended with AND operation (but not OR). Each bi-predicate will be stored separately 
  * to prevent endless recursion. (Like: {@code condition = i -> condition.test(i) && other.test(i)})
  */
-public class ChainableBiPredicate<T1, T2> implements BiPredicate<T1, T2>
+public class ChainableBiPredicate<T1, T2>
 {
 	protected ArrayList<BiPredicate<T1, T2>> predicates = new ArrayList<>();
 	
@@ -20,7 +20,7 @@ public class ChainableBiPredicate<T1, T2> implements BiPredicate<T1, T2>
 	{
 	}
 	
-	public BiPredicate<T1, T2> and(BiPredicate<? super T1, ? super T2> other)
+	public ChainableBiPredicate<T1, T2> and(BiPredicate<T1, T2> other)
 	{
 		predicates.add(other);
 		return this;
@@ -35,5 +35,4 @@ public class ChainableBiPredicate<T1, T2> implements BiPredicate<T1, T2>
 		}
 		return true;
 	}
-	
 }
