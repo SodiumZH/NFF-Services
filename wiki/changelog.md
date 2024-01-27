@@ -2,7 +2,7 @@
 
 ### 0.x.21
 
-Bauble System remade. WARNING: it's very unstable! Keep your data backed-up!!!
+Bauble System remade. WARNING: it's probably very unstable! Keep your data backed-up!!!
 
 Added tag: `befriendmobs:neutral_to_bm_mobs`. Mobs with this tag will not proactively attack befriended mobs unless being attacked.
 
