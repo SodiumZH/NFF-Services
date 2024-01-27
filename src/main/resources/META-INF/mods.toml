@@ -4,7 +4,7 @@ license="LGPL-3.0"
 issueTrackerURL="https://github.com/SodiumZH/Befriend-Mobs"
 [[mods]] #mandatory
 modId="befriendmobs" #mandatory
-version="0.0.20"
+version="0.0.21"
 displayName="BefriendMobs API" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/befriendmobs-api"
