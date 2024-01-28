@@ -1,15 +1,9 @@
 package net.sodiumstudio.nautils;
 
-import java.util.ArrayList;
-
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.sodiumstudio.nautils.info.ComponentBuilder;
-import net.sodiumstudio.nautils.math.LinearColor;
 
 public class InfoHelper
 {
