@@ -3,6 +3,7 @@ package net.sodiumstudio.nautils;
 import java.util.ArrayList;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -131,16 +132,16 @@ public class TagHelper
 	
 	public static TagKey<Block> createBlockTag(String modId, String name)
 	{
-		return TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(modId, name));
+		return TagKey.create(Registries.BLOCK, new ResourceLocation(modId, name));
 	}
 	
 	public static TagKey<Item> createItemTag(String modId, String name)
 	{
-		return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(modId, name));
+		return TagKey.create(Registries.ITEM, new ResourceLocation(modId, name));
 	}
 	
 	public static TagKey<EntityType<?>> createEntityTypeTag(String modId, String name)
 	{
-		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(modId, name));
+		return TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(modId, name));
 	}
 }

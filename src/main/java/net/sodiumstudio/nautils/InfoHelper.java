@@ -31,7 +31,7 @@ public class InfoHelper
 	/** Create a component with translatable content, equals to TranslatableComponent in 1.18.2 */
 	public static MutableComponent createTranslatable(String key, Object... params)
 	{
-		return MutableComponent.create(new TranslatableContents(key, params));
+		return Component.translatable(key, params);
 	}
 	
 	/**
