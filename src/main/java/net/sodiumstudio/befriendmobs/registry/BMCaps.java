@@ -11,7 +11,6 @@ import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule;
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandler;
 import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayedActionHandler;
-import net.sodiumstudio.befriendmobs.item.baublesystem.CBaubleDataCache;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.level.CBMLevelModule;
 
@@ -24,7 +23,6 @@ public class BMCaps {
 	public static Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// Caps for data storage only
-	public static Capability<CBaubleDataCache> CAP_BAUBLE_DATA_CACHE = CapabilityManager.get(new CapabilityToken<>(){});
 	public static Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// General functional capabilities
@@ -39,7 +37,7 @@ public class BMCaps {
 		event.register(CBefriendableMob.class);
 		event.register(CHealingHandler.class);
 		event.register(CAttributeMonitor.class);
-		event.register(CBaubleDataCache.class);
+		//event.register(CBaubleDataCache.class);
 		event.register(CBefriendedMobData.class);
 		event.register(CItemStackMonitor.class);
 		event.register(CBMPlayerModule.class);
