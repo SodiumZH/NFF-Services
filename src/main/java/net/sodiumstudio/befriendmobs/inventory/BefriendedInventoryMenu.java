@@ -1,7 +1,8 @@
 package net.sodiumstudio.befriendmobs.inventory;
 
+import java.util.function.Predicate;
+
 import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreen;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
-import net.sodiumstudio.befriendmobs.item.baublesystem.BaubleHandler;
+import net.sodiumstudio.befriendmobs.subsystems.baublesystem.BaubleSystem;
 import net.sodiumstudio.nautils.math.IntVec2;
 
 public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
@@ -36,13 +37,13 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 	}
 
 	protected abstract void addMenuSlots();
-	
-	protected void addBaubleSlot(int slot, IntVec2 pos, String key)
+
+	protected void addBaubleSlot(int slot, IntVec2 pos, String key, Predicate<ItemStack> additionalCondition)
 	{
 		addSlot(new Slot(container, slot, pos.x, pos.y) {			
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return BaubleHandler.shouldBaubleSlotAccept(stack, this, mob, key);
+				return BaubleSystem.canEquipOn(stack, mob.asMob(), key) && additionalCondition.test(stack);
 			}			
 			@Override
 			public int getMaxStackSize() {
@@ -51,13 +52,9 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		});
 	}
 	
-	/**
-	 * Use key-sensitive version
-	 */
-	@Deprecated
-	protected void addBaubleSlot(int slot, IntVec2 pos)
+	protected void addBaubleSlot(int slot, IntVec2 pos, String key)
 	{
-		addBaubleSlot(slot, pos, "null");
+		addBaubleSlot(slot, pos, key, stack -> true);
 	}
 	
 	protected boolean doAddPlayerInventory()
@@ -86,7 +83,7 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(Player player) {
-		return mob.getOwner() == player && ((LivingEntity) mob).distanceTo(player) < 16.0;
+		return mob.getOwnerInDimension() == player && ((LivingEntity) mob).distanceTo(player) < 16.0;
 	}
 
 	@Override
