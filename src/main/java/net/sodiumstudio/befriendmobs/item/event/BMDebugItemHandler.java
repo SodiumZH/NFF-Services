@@ -18,12 +18,13 @@ import net.sodiumstudio.nautils.NaMiscUtils;
 import net.sodiumstudio.nautils.debug.Debug;
 import net.sodiumstudio.nautils.exceptions.UnimplementedException;
 
+@Deprecated
 public class BMDebugItemHandler
 {
-
+/*
 	@SuppressWarnings("unchecked")
 	public static void onDebugItemUsed(Player player, Mob target, Item item) {
-/*
+
 		if (item.equals(BMItems.DEBUG_TARGET_SETTER.get()))
 		{
 			MobEffect effect = target.getMobType().equals(MobType.UNDEAD) ? MobEffects.HARM : MobEffects.HEAL;
@@ -52,7 +53,7 @@ public class BMDebugItemHandler
 			}
 		}
 
-		else */if (item.equals(BMItems.DEBUG_BEFRIENDER.get()) && player.isCreative())
+		else if (item.equals(BMItems.DEBUG_BEFRIENDER.get()) && player.isCreative())
 		{
 			if (target instanceof IBefriendedMob bef)
 			{
@@ -84,7 +85,6 @@ public class BMDebugItemHandler
 			NaMiscUtils.printToScreen(info, player);
 		}
 
-/*
 		else if (item.equals(BMItems.DEBUG_ARMOR_GIVER.get()) && target.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent())
 		{
 			if (target.getItemBySlot(EquipmentSlot.HEAD).isEmpty())
@@ -113,7 +113,7 @@ public class BMDebugItemHandler
 		{
 			Debug.printToScreen("Base: " + Double.toString(target.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)), player);
 			Debug.printToScreen("Applied: " + Double.toString(target.getAttributeValue(Attributes.ATTACK_DAMAGE)), player);
-		}*/
+		}
 		else MinecraftForge.EVENT_BUS.post(new UseEvent(player, target, item));
 	}
 	
@@ -129,5 +129,5 @@ public class BMDebugItemHandler
 			this.target = mob;
 			this.debugItem = item;
 		}
-	}
+	}*/
 }
