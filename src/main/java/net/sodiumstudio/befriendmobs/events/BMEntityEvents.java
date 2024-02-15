@@ -84,7 +84,7 @@ public class BMEntityEvents
 
 			
 			// Do debug actions and skip when holding debug items
-			if (TagHelper.hasTag(player.getMainHandItem().getItem(), "befriendmobs", "debug_tools"))
+			/*if (TagHelper.hasTag(player.getMainHandItem().getItem(), "befriendmobs", "debug_tools"))
 			{
 				if (!isClientSide && isMainHand)
 					BMDebugItemHandler.onDebugItemUsed(player, (Mob)target, player.getMainHandItem().getItem());
@@ -94,7 +94,7 @@ public class BMEntityEvents
 			}
 			
 			// Handle befriendable mob start //
-			else if (mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()
+			else*/ if (mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).isPresent()
 					&& !(mob instanceof IBefriendedMob)) {
 				mob.getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
 				{

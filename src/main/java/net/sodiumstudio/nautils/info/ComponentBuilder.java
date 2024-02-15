@@ -40,7 +40,7 @@ public class ComponentBuilder
 	 */
 	public ComponentBuilder appendTranslatable(String key, Object... params)
 	{
-		components.add(InfoHelper.createTrans(key, params));
+		components.add(InfoHelper.createTranslatable(key, params));
 		return this;
 	}
 	
