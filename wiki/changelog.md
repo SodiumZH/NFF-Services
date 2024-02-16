@@ -1,5 +1,27 @@
 # Change Log
 
+### 0.x.22
+
+##### BefriendMobs
+
+Fully removed the old Bauble System.
+
+Removed Debug AI Switch (migrated to NaUtils).
+
+Refactored debug items.
+
+
+
+##### NaUtils
+
+Added Debug AI Switch.
+
+Added Mixin-based events: `ThrownTridentSetBaseDamageEvent` and `ThrownTridentSetFinalDamageEvent` for modifying damage of Thrown Trident. 
+
+Renamed classes:
+
+ -`ItemHelper` => `NaItemUtils`
+
 ### 0.x.21
 
 Bauble System remade. WARNING: it's probably very unstable! Keep your data backed-up!!!
