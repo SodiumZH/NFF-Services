@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Creeper;
@@ -298,4 +299,31 @@ public class BefriendedHelper
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
 		return ContainerHelper.castListTypeUnchecked(stream.toList());
 	}
+	
+	/**
+	 * Check if a living entity should be considered as ally by a befriended mob.
+	 * <p>On server only. On client always {@code false}.
+	 */
+	public static boolean isAlly(IBefriendedMob mob, LivingEntity test)
+	{
+		if (mob.asMob().level.isClientSide)
+			return false;
+		if ((LivingEntity)(mob.asMob()) == test)
+			return true;
+		boolean allowPvp = mob.asMob().level.getServer().isPvpAllowed();
+		if (!allowPvp)
+		{
+			return (test instanceof Player || test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null);
+		}
+		else
+		{
+			UUID ownerUUID = mob.getOwnerUUID();
+			if (test.getUUID().equals(ownerUUID))
+				return true;
+			else if (test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null && ownable.getOwnerUUID().equals(ownerUUID))
+				return true;
+			else return false;
+		}
+	}
+	
 }

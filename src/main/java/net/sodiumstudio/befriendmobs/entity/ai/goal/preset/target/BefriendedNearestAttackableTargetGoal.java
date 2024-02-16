@@ -50,13 +50,14 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
    }
 
    @Override
-public boolean checkCanUse() {
+   public boolean checkCanUse() {
 	  if (isDisabled())
 		  return false;
       if (this.randomInterval > 0 && this.mob.asMob().getRandom().nextInt(this.randomInterval) != 0) {
          return false;
       } else {
          this.findTarget();
+         if (this.target == mob.getOwner()) return false;
          return this.target != null;
       }
    }
