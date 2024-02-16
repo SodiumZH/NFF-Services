@@ -29,13 +29,15 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 	public boolean checkCanUse() {
 		if (isDisabled())
 			return false;
-		LivingEntity livingentity = mob.getOwner();
-		if (livingentity == null)
+		LivingEntity owner = mob.getOwner();
+		if (owner == null)
 			return false;
 		else 
 		{
-			this.ownerLastHurtBy = livingentity.getLastHurtByMob();
-			int i = livingentity.getLastHurtByMobTimestamp();
+			this.ownerLastHurtBy = owner.getLastHurtByMob();
+			if (this.ownerLastHurtBy == owner)
+				return false;
+			int i = owner.getLastHurtByMobTimestamp();
 			if (i == this.timestamp)
 				return false;
 			else if (!this.canAttack(this.ownerLastHurtBy, TargetingConditions.DEFAULT))

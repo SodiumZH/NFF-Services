@@ -53,7 +53,7 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 		LivingEntity lastHurt = mob.asMob().getLastHurtByMob();
 		if (mob.asMob().getLastHurtByMobTimestamp() != this.timestamp && lastHurt != null) 
 		{
-			if (lastHurt instanceof Player && mob.getOwner() != (Player)lastHurt) 
+			if (mob.getOwner() == lastHurt) 
 				return false;
 			else 
 			{

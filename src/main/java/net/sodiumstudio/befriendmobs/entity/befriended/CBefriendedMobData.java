@@ -72,7 +72,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public default <T> T getTempObjectCasted(String key)
+	public default <T> T getTempObjectCast(String key)
 	{
 		Object obj = getTempObject(key);
 		if (obj == null) return null;
@@ -81,7 +81,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		}
 		catch (ClassCastException e) {
 			LogUtils.getLogger().error("CBefriendedMobData#getTempObjectCasted: class mismatch found.");
-			throw e;
+			return null;
 		}
 	}
 	
