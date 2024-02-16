@@ -8,7 +8,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumstudio.nautils.EntityHelper;
-import net.sodiumstudio.nautils.ItemHelper;
+import net.sodiumstudio.nautils.NaItemUtils;
 import net.sodiumstudio.nautils.NaParticleUtils;
 
 public interface CHealingHandler extends INBTSerializable<IntTag>
