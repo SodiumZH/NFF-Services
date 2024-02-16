@@ -14,7 +14,7 @@ import net.sodiumstudio.befriendmobs.entity.befriending.BefriendableMobInteracti
 import net.sodiumstudio.befriendmobs.entity.capability.CBefriendableMob;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.EntityHelper;
-import net.sodiumstudio.nautils.ItemHelper;
+import net.sodiumstudio.nautils.NaItemUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.debug.Debug;
@@ -82,7 +82,7 @@ public abstract class HandlerItemGivingProgress extends HandlerItemGiving{
 							procValue = 0;
 						if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
 							player.getMainHandItem().shrink(1);
-						ItemHelper.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
+						NaItemUtils.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
 						if (procValue > 0)
 							NbtHelper.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
 						else interrupt(player, target, true);

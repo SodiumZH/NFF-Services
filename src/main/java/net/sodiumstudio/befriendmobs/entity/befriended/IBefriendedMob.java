@@ -17,6 +17,7 @@ import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +43,7 @@ import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.object.ItemOrKey;
 
-public interface IBefriendedMob extends ContainerListener  {
+public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 
 	/* Initialization */
 	
@@ -132,20 +133,17 @@ public interface IBefriendedMob extends ContainerListener  {
 	/** 
 	 * Get owner as player entity.
 	 * @return Owner as entity, or null if the owner is absent in the level.
-	 * @deprecated Use {@code getOwnerInDimension} or {@code getOwnerInWorld} instead.
 	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	* <p>获取拥有者的玩家实体。
 	* <p>拥有者实体，若拥有者不在世界中时返回null。
 	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
 	*/
+	@Override
 	@DontOverride
 	@Nullable
-	@Deprecated
 	public default Player getOwner() 
 	{
-		if (getOwnerUUID() != null)
-			return asMob().level().getPlayerByUUID(getOwnerUUID());
-		else return null;
+		return getOwnerInDimension();
 	}
 	
 	/**

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.sodiumstudio.nautils.ItemHelper;
+import net.sodiumstudio.nautils.NaItemUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 
 public class ItemPackageItem extends Item
@@ -61,7 +61,7 @@ public class ItemPackageItem extends Item
 		{
 			for (ItemStack stack: getContainingItems(player.getItemInHand(usedHand)))
 			{
-				ItemHelper.giveOrDrop(player, stack);
+				NaItemUtils.giveOrDrop(player, stack);
 			}
 			player.getItemInHand(usedHand).shrink(1);
 		}

@@ -5,22 +5,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ItemHelper
+public class NaItemUtils
 {
-	
-	/** @deprecated use {@link ItemStack#shrink} instead
-	 * 
-	*/
-	@Deprecated
-	public static void consumeOne(ItemStack stack)
-	{
-		if (stack.isEmpty())
-			return;
-		int amount = stack.getCount();
-		stack.setCount(amount - 1);
-	}
 	
 	/**
 	 * Check if player has the input item on either hand.
@@ -156,5 +145,14 @@ public class ItemHelper
 			player.spawnAtLocation(stack);
 		}
 	}
+	
+	/**
+	 * Get enchantment level. This is for unifying 1.18 and 1.20 API.
+	 */
+	public int getItemEnchantmentLevel(Enchantment enc, ItemStack stack)
+	{
+		return stack.getEnchantmentLevel(enc);
+	}
+	
 	
 }
