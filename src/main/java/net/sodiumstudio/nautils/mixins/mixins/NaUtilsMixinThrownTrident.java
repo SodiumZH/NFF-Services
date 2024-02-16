@@ -24,7 +24,7 @@ public class NaUtilsMixinThrownTrident implements NaUtilsMixin<ThrownTrident>
 	}
 	
 	@ModifyVariable(method = "onHitEntity(Lnet/minecraft/world/phys/EntityHitResult;)V", at = @At(value = "INVOKE", 
-			target = "Lnet/minecraft/world/entity/Entity/hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z",
+			target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z",
 			shift = At.Shift.BEFORE),
 			ordinal = 0)
 	private float modifyFinalDamage(float original)

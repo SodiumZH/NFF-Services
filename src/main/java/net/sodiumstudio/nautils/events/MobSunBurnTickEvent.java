@@ -11,9 +11,9 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * <p> Note: it affects only {@link Mob#isSunBurnTick}. For sun-sensitive mobs not using {@link Mob#isSunBurnTick} you must manually add compatibility.
  */
 @Cancelable
-public class MobSunBurnTickEvent extends LivingEvent
+public class MobSunBurnTickEvent extends NaUtilsLivingEvent<Mob>
 {
-	public MobSunBurnTickEvent(LivingEntity entity)
+	public MobSunBurnTickEvent(Mob entity)
 	{
 		super(entity);
 	}
