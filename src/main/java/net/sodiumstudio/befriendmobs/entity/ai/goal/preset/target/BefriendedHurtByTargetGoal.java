@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.phys.AABB;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 @SuppressWarnings("unused")
@@ -54,6 +55,8 @@ public class BefriendedHurtByTargetGoal extends BefriendedTargetGoal {
 		if (mob.asMob().getLastHurtByMobTimestamp() != this.timestamp && lastHurt != null) 
 		{
 			if (mob.getOwner() == lastHurt) 
+				return false;
+			if (BefriendedHelper.isLivingAlliedToBM(mob, lastHurt) || !mob.wantsToAttack(lastHurt))
 				return false;
 			else 
 			{

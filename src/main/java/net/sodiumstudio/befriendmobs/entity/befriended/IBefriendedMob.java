@@ -639,20 +639,6 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	{
 		return ForgeRegistries.ENTITY_TYPES.getKey(asMob().getType()).getNamespace();
 	}
-	
-	@Deprecated
-	public default CBefriendedMobData.Values getTempData()
-	{
-		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
-		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
-		{
-			res.set(cap);
-		});
-		if (res.get() == null)
-			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
-			return new CBefriendedMobData.Values(this);	
-		return res.get().values();
-	}
 
 	public default CBefriendedMobData getData()
 	{
@@ -666,7 +652,9 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 			return new CBefriendedMobData.Values(this);	
 		return res.get();
 	}
-
+	
+	/* Behaviors */
+	
 	public static enum GolemAttitude
 	{
 		/**
@@ -702,6 +690,22 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	public default boolean shouldGolemAttack(AbstractGolem golem)
 	{
 		return true;
+	}
+	
+	/**
+	 * If true, it can attack creepers (mobs under {@link Creeper} class).
+	 */
+	public default boolean canAttackCreeper()
+	{
+		return false;
+	}
+	
+	/**
+	 * If true, it can attack ghasts (mobs under {@link Ghast} class).
+	 */
+	public default boolean canAttackGhast()
+	{
+		return false;
 	}
 	
 }
