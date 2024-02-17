@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
@@ -35,7 +36,7 @@ public class BefriendedOwnerHurtByTargetGoal extends BefriendedTargetGoal {
 		else 
 		{
 			this.ownerLastHurtBy = owner.getLastHurtByMob();
-			if (this.ownerLastHurtBy == owner)
+			if (BefriendedHelper.isLivingAlliedToBM(mob, this.ownerLastHurtBy) || !mob.wantsToAttack(this.ownerLastHurtBy))
 				return false;
 			int i = owner.getLastHurtByMobTimestamp();
 			if (i == this.timestamp)
