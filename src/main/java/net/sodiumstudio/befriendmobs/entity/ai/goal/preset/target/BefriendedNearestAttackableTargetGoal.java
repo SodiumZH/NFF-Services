@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.befriendmobs.entity.ai.goal.BefriendedTargetGoal;
+import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.vanillapreset.enderman.AbstractBefriendedEnderMan;
 
@@ -57,7 +58,8 @@ public class BefriendedNearestAttackableTargetGoal<T extends LivingEntity> exten
          return false;
       } else {
          this.findTarget();
-         if (this.target == mob.getOwner()) return false;
+		if (BefriendedHelper.isLivingAlliedToBM(mob, this.target) || !mob.wantsToAttack(this.target))
+			return false;
          return this.target != null;
       }
    }

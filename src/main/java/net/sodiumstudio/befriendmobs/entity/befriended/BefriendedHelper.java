@@ -40,27 +40,16 @@ public class BefriendedHelper
 	/* AI */
 
 	/**
-	 *  Default settings of the rule of what the mob can attack.
+	 *  Default settings of the rule about what the mob can attack.
 	 *  <p>判断生物是否可以攻击对象的规则的默认预设。
 	 */
 	public static boolean wantsToAttackDefault(IBefriendedMob mob, LivingEntity target) {
-		// Don't attack creeper or ghast
-		if ((target instanceof Creeper) || (target instanceof Ghast))
+		if (target instanceof Creeper && !mob.canAttackCreeper())
 			return false;
-		// For tamable mobs: attack untamed or (others' mobs if pvp allowed)
-		else if (target instanceof TamableAnimal tamable)
-			return !tamable.isTame() || (mob.isOwnerPresent() && tamable.getOwner() != mob.getOwner()
-					&& (mob.getOwner()).canHarmPlayer((Player) (tamable.getOwner())));
-		// For players: attack if pvp allowed
-		else if (target instanceof Player targetPlayer)
-			return mob.isOwnerPresent() && mob.getOwner().canHarmPlayer(targetPlayer);
-		// For IBefriendedMob: similar to tamable mobs
-		else if (target instanceof IBefriendedMob bef)
-			return mob.isOwnerPresent() && bef.getOwner() != mob.getOwner() && (mob.getOwner()).canHarmPlayer(bef.getOwner());
-		// For horses: attack untamed only
-		else if (target instanceof AbstractHorse && ((AbstractHorse) target).isTamed())
+		else if (target instanceof Ghast && !mob.canAttackGhast())
 			return false;
-		// Can attack other
+		else if (isLivingAlliedToBM(mob, target))
+			return false;
 		else
 			return true;
 	}
@@ -301,29 +290,60 @@ public class BefriendedHelper
 	}
 	
 	/**
-	 * Check if a living entity should be considered as ally by a befriended mob.
+	 * Check if a living entity ({@code test}) should be considered as ally by an {@code OwnableEntity} ({@code entity}) under BMF rule.
+	 * <p>This method is private because it doesn't involve BM, so directly calling this may cause unexpected
+	 * behavior changes on vanilla mobs. Call {@code isLivingAlliedToBM} and {@code isBMAlliedToOwnable} instead.
 	 * <p>On server only. On client always {@code false}.
 	 */
-	public static boolean isAlly(IBefriendedMob mob, LivingEntity test)
+	private static boolean isLivingAlliedToOwnable(OwnableEntity entity, LivingEntity test)
 	{
-		if (mob.asMob().level.isClientSide)
-			return false;
-		if ((LivingEntity)(mob.asMob()) == test)
-			return true;
-		boolean allowPvp = mob.asMob().level.getServer().isPvpAllowed();
-		if (!allowPvp)
+		if (entity instanceof LivingEntity living && entity.getOwnerUUID() != null && entity.getOwner() != null && entity.getOwner() instanceof Player)
 		{
-			return (test instanceof Player || test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null);
-		}
-		else
-		{
-			UUID ownerUUID = mob.getOwnerUUID();
-			if (test.getUUID().equals(ownerUUID))
+			if (living.level.isClientSide)
+				return false;
+			if (living == test)
 				return true;
-			else if (test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null && ownable.getOwnerUUID().equals(ownerUUID))
-				return true;
-			else return false;
+			boolean allowPvp = living.level.getServer().isPvpAllowed();
+			// If don't allow pvp, it don't attack any players or owned entities
+			// If allow pvp, it just don't attack its owner and owner's other entities
+			// Horse is a special case since it's virtually ownable but doesn't have OwnableEntity interface
+			if (test instanceof AbstractHorse horse)
+			{
+				return horse.getOwnerUUID() != null && (allowPvp ? horse.getOwnerUUID().equals(entity.getOwnerUUID()) : true);
+			}
+			if (!allowPvp)
+			{
+				return test instanceof Player || test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null;
+			}
+
+			else
+			{
+				UUID ownerUUID = entity.getOwnerUUID();
+				if (test.getUUID().equals(ownerUUID))
+					return true;
+				else if (test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null && ownable.getOwnerUUID().equals(ownerUUID))
+					return true;
+				else return false;
+			}
 		}
+		return false;
 	}
 	
+	/**
+	 * Check if a BM is considered as ally by an {@code OwnableEntity}.
+	 * <p>On server only. On client always {@code false}.
+	 */
+	public static boolean isBMAlliedToOwnable(OwnableEntity entity, IBefriendedMob test)
+	{
+		return isLivingAlliedToOwnable(entity, test.asMob());
+	}
+	
+	/**
+	 * Check if a {@code LivingEntity} is considered as ally by a BM.
+	 * <p>On server only. On client always {@code false}.
+	 */
+	public static boolean isLivingAlliedToBM(IBefriendedMob bm, LivingEntity test)
+	{
+		return isLivingAlliedToOwnable(bm, test);
+	}
 }
