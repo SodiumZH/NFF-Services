@@ -18,9 +18,9 @@ public class ThrownTridentSetFinalDamageEvent extends NaUtilsEntityEvent<ThrownT
 		return dmg;
 	}
 	
-	public void setDamage()
+	public void setDamage(float value)
 	{
-		this.dmg = dmg;
+		this.dmg = value;
 	}
 	
 	public float getOriginalDamage()
