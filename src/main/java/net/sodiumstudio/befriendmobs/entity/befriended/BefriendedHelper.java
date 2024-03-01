@@ -297,6 +297,7 @@ public class BefriendedHelper
 	 */
 	private static boolean isLivingAlliedToOwnable(OwnableEntity entity, LivingEntity test)
 	{
+		if (test == null) return false;
 		if (entity instanceof LivingEntity living && entity.getOwnerUUID() != null && entity.getOwner() != null && entity.getOwner() instanceof Player)
 		{
 			if (living.level.isClientSide)
