@@ -118,7 +118,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	public int[] getEncounteredDate();
 	
 	/**
-	 * Record info about befriending time and location. Invoked in {@link BefriendingHandler#befriend).
+	 * Record info about befriending time and location. Invoked in {@link BefriendingHandler#befriend}.
 	 */
 	@DontCallManually
 	public void recordBefriendedInfo(Player owner);
@@ -168,7 +168,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	
 	
 	 // Values of mob data, also as implementation of interface methods.
-	public class Values implements CBefriendedMobData
+	public static class Values implements CBefriendedMobData
 	{
 		private IBefriendedMob mob;
 		private CompoundTag tag = new CompoundTag();
@@ -296,7 +296,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		
 	}
 	
-	public class Prvd implements ICapabilitySerializable<CompoundTag>
+	public static class Prvd implements ICapabilitySerializable<CompoundTag>
 	{
 		
 		public CBefriendedMobData values;
