@@ -151,7 +151,7 @@ public class NaItemUtils
 	 */
 	public int getItemEnchantmentLevel(Enchantment enc, ItemStack stack)
 	{
-		return stack.getEnchantmentLevel(enc);
+		return EnchantmentHelper.getItemEnchantmentLevel(enc, stack);
 	}
 	
 	
