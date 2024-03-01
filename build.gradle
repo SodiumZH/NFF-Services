@@ -206,7 +206,6 @@ dependencies {
     }
     compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
     runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
-
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
