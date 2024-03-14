@@ -10,11 +10,11 @@ Removed Debug AI Switch (migrated to NaUtils).
 
 Refactored debug items.
 
-
-
 ##### NaUtils
 
 Added Debug AI Switch.
+
+Added Debug Target Setter.
 
 Added Mixin-based events: `ThrownTridentSetBaseDamageEvent` and `ThrownTridentSetFinalDamageEvent` for modifying damage of Thrown Trident. 
 
