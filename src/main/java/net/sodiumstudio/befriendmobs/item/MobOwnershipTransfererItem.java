@@ -122,8 +122,9 @@ public class MobOwnershipTransfererItem extends NaUtilsItem
 	}
 	
 	@Override
-	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity living, InteractionHand usedHand)
+	public InteractionResult interactLivingEntity(Player player, LivingEntity living, InteractionHand usedHand)
 	{
+		ItemStack stack = player.getItemInHand(usedHand);
 		if (!player.level().isClientSide && living instanceof IBefriendedMob bm)
 		{
 			if (isWritten(stack))
