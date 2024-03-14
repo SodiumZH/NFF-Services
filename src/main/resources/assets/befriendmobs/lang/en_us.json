@@ -1,6 +1,7 @@
 {
    "item.befriendmobs.debug_befriender": "Debug Befriender",
    "item.befriendmobs.debug_ai_switch": "Debug AI Switch",
+   "item.befriendmobs.debug_target_setter": "Debug Target Setter",
    "item.befriendmobs.mob_respawner": "Respawner",
    "item.befriendmobs.dummy_item": "Dummy Item (IF YOU SEE THIS WITHOUT USING /give, PLEASE REPORT BUGS.)",
    "info.befriendmobs.gui_health": "HP",
