@@ -8,6 +8,10 @@ import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -66,6 +70,22 @@ public class NaUtilsItem extends Item
 		return shouldBeFoil.test(stack);
 	}
 	
+	public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand)
+	{
+		return InteractionResult.PASS;
+	}
+	
+	/**
+	 * Fixed here because the input {@code ItemStack} is a copy which may confuse the developers
+	 * and cause bugs hard to find when attempting to modify the ItemStack NBT.
+	 * <p> Override the version without {@code ItemStack} instead. To access the copy, use {@code player.getItemInHand(hand).copy()} instead.
+	 */
+	@Override
+	public final InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand)
+	{
+		return interactLivingEntity(player, target, hand);
+	}
+	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag)
@@ -93,6 +113,5 @@ public class NaUtilsItem extends Item
 	{
 		return (T)this;
 	}
-	
-	
+
 }

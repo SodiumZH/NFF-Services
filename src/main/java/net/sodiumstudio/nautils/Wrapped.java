@@ -1,33 +1,34 @@
 package net.sodiumstudio.nautils;
 
+import org.apache.commons.lang3.mutable.MutableObject;
 
 /**
  * A class to hide variable inside in order to 
  * enable changing in final variables or lambda functions
  * @param <T> Type of wrapped variable
+ * @deprecated Use {@link MutableObject} instead
  */
-public class Wrapped<T> {
-	
-	private T value;
+@Deprecated
+public class Wrapped<T> extends MutableObject<T> {
 	
 	public Wrapped()
 	{
-		this(null);
+		super();
 	}
 	
 	public Wrapped(T value)
 	{
-		this.value = value;
+		super(value);
 	}
 	
 	public T get()
 	{
-		return value;
+		return this.getValue();
 	}
 	
 	public void set(T value)
 	{
-		this.value = value;
+		this.setValue(value);
 	}
 	
 	public Wrapped<T> valueOf(T val)
@@ -36,7 +37,7 @@ public class Wrapped<T> {
 	}
 	
 	/**
-	 * @deprecated Use {@code Wrapped<Boolean>} instead
+	 * @deprecated Use {@code MutableObject<Boolean>} instead
 	 */
 	@Deprecated
 	public static class Boolean
