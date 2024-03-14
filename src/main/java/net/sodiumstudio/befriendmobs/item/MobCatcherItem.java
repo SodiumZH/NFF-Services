@@ -54,7 +54,7 @@ public class MobCatcherItem extends NaUtilsItem
 	}
 	
 	@Override
-	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) 
+	public InteractionResult interactLivingEntity(Player player, LivingEntity interactionTarget, InteractionHand usedHand) 
 	 {
 		 if (!(interactionTarget instanceof Mob))
 			 return InteractionResult.PASS;
@@ -78,7 +78,7 @@ public class MobCatcherItem extends NaUtilsItem
 						 player.spawnAtLocation(resp.get());
 					 }
 					 interactionTarget.discard();
-					 stack.shrink(1);
+					 player.getItemInHand(usedHand).shrink(1);
 					 return InteractionResult.sidedSuccess(player.level.isClientSide);
 				 }
 			 }

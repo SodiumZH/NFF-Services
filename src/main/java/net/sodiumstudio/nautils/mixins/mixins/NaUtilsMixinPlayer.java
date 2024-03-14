@@ -19,11 +19,8 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 
 	// This is the last condition of sweeping, so canceling this means canceling sweeping	
 	@WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/world/entity/player/Player;canHit(Lnet/minecraft/world/entity/Entity;D)Z"
-					)
-			)
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/player/Player;canHit(Lnet/minecraft/world/entity/Entity;D)Z"))
 	private boolean acceptSweepDamage(Player caller, Entity entity, double amount, Operation<Boolean> original)
 	{
 		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
