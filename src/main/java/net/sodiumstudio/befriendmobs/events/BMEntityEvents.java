@@ -3,6 +3,7 @@ package net.sodiumstudio.befriendmobs.events;
 import java.util.UUID;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -21,6 +22,7 @@ import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent.AllowDespawn;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
@@ -590,6 +592,18 @@ public class BMEntityEvents
 		});
 	}
 	
+	@SubscribeEvent
+	public static void onMobFall(LivingFallEvent event)
+	{
+		// Keep fall damage immunity after befriended
+		if (event.getEntity() instanceof IBefriendedMob bm)
+		{
+			EntityType<? extends Mob> before = BefriendingTypeRegistry.getTypeBefore(bm.asMob());
+			if (before != null && before.is(EntityTypeTags.FALL_DAMAGE_IMMUNE))
+				event.setCanceled(true);
+		}
+	}
+
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
 	{

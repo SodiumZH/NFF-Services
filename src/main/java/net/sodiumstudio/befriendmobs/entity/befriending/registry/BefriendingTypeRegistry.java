@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -141,6 +142,7 @@ public class BefriendingTypeRegistry {
 		throw new IllegalArgumentException("Type " + befriendedType.getDescriptionId() + "is not a befriended mob.");
 	}
 	
+	@Nullable
 	@SuppressWarnings("unchecked")
 	public static EntityType<? extends Mob> getTypeBefore(Mob befriendedMob)
 	{
@@ -153,7 +155,7 @@ public class BefriendingTypeRegistry {
 				return entry.fromType;
 			}
 		}
-		throw new IllegalArgumentException("Type " + befriendedType.getDescriptionId() + "is not a befriended mob.");
+		return null;
 	}	
 	
 	public static Set<EntityType<?>> getAllBefriendableTypes()
