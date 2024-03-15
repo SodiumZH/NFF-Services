@@ -300,11 +300,11 @@ public class BefriendedHelper
 		if (test == null) return false;
 		if (entity instanceof LivingEntity living && entity.getOwnerUUID() != null && entity.getOwner() != null && entity.getOwner() instanceof Player)
 		{
-			if (living.level.isClientSide)
+			if (living.level().isClientSide)
 				return false;
 			if (living == test)
 				return true;
-			boolean allowPvp = living.level.getServer().isPvpAllowed();
+			boolean allowPvp = living.level().getServer().isPvpAllowed();
 			// If don't allow pvp, it don't attack any players or owned entities
 			// If allow pvp, it just don't attack its owner and owner's other entities
 			// Horse is a special case since it's virtually ownable but doesn't have OwnableEntity interface

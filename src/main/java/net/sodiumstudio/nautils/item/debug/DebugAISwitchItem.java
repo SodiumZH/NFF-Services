@@ -30,7 +30,7 @@ public class DebugAISwitchItem extends Item
 			String key = mob.isNoAi() ? "info.befriendmobs.debug_ai_switch_off" : "info.befriendmobs.debug_ai_switch_on";		
 			MutableComponent info = Component.translatable(key, target.getName().getString());
 			NaMiscUtils.printToScreen(info, player);
-			return InteractionResult.sidedSuccess(player.level.isClientSide);
+			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		else return InteractionResult.PASS;
 	}

@@ -30,7 +30,7 @@ public class DebugBefrienderItem extends Item
 	@SuppressWarnings("unchecked")
 	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) 
 	{
-		if (player.isCreative() && !player.level.isClientSide)
+		if (player.isCreative() && !player.level().isClientSide)
 		{
 			if (target instanceof IBefriendedMob bef)
 			{
@@ -53,7 +53,7 @@ public class DebugBefrienderItem extends Item
 	
 				});
 			}
-			return InteractionResult.sidedSuccess(player.level.isClientSide);
+			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		else return InteractionResult.PASS;
 	}

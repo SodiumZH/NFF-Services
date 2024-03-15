@@ -58,9 +58,9 @@ public class DebugTargetSetterItem extends NaUtilsItem
 	@Override
 	public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand) 
 	{
-		Mob attacker = getAttacker(player.getItemInHand(hand), player.level);
+		Mob attacker = getAttacker(player.getItemInHand(hand), player.level());
 		// If targeting a mob attacking the user player, remove the target and reset
-		if (player.level.isClientSide)
+		if (player.level().isClientSide)
 			return InteractionResult.SUCCESS;
 		if (target instanceof Mob mob && mob.getTarget() == player)
 		{
@@ -71,7 +71,7 @@ public class DebugTargetSetterItem extends NaUtilsItem
 				setAttacker(player.getItemInHand(hand), null);
 				NaMiscUtils.printToScreen("Target Setter reset.", player);
 			}
-			return InteractionResult.sidedSuccess(player.level.isClientSide);
+			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		// If no attacker, set attacker first
 		else if (attacker == null)
@@ -80,7 +80,7 @@ public class DebugTargetSetterItem extends NaUtilsItem
 			{
 				setAttacker(player.getItemInHand(hand), m);
 				NaMiscUtils.printToScreen("Setting the target of [" + m.getName().getString() + "]...", player);
-				return InteractionResult.sidedSuccess(player.level.isClientSide);
+				return InteractionResult.sidedSuccess(player.level().isClientSide);
 			}
 		} else
 		{
@@ -91,11 +91,11 @@ public class DebugTargetSetterItem extends NaUtilsItem
 				{
 					attacker.setTarget(null);
 					NaMiscUtils.printToScreen("Removed the target of [" + attacker.getName().getString() + "].", player);
-					return InteractionResult.sidedSuccess(player.level.isClientSide);
+					return InteractionResult.sidedSuccess(player.level().isClientSide);
 				} else
 				{
 					NaMiscUtils.printToScreen("Setting the target of [" + attacker.getName().getString() + "]...", player);
-					return InteractionResult.sidedSuccess(player.level.isClientSide);
+					return InteractionResult.sidedSuccess(player.level().isClientSide);
 				}
 			}
 			// Otherwise set target
@@ -105,7 +105,7 @@ public class DebugTargetSetterItem extends NaUtilsItem
 				NaMiscUtils.printToScreen(
 						"Set the target of [" + attacker.getName().getString() + "] to [" + target.getName().getString() + "].",
 						player);
-				return InteractionResult.sidedSuccess(player.level.isClientSide);
+				return InteractionResult.sidedSuccess(player.level().isClientSide);
 			}
 		}
 		return InteractionResult.PASS;
@@ -115,22 +115,22 @@ public class DebugTargetSetterItem extends NaUtilsItem
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
 	{
 		ItemStack stack = player.getItemInHand(hand);
-		if (player.level.isClientSide) 
+		if (player.level().isClientSide) 
 			return InteractionResultHolder.success(stack);
-		Mob mob = getAttacker(stack, player.level);
+		Mob mob = getAttacker(stack, player.level());
 		if (mob != null)
 		{
 			if (!player.isShiftKeyDown())
 			{
 				setAttacker(player.getItemInHand(hand), null);
 				NaMiscUtils.printToScreen("Target Setter reset.", player);
-				return InteractionResultHolder.sidedSuccess(stack, player.level.isClientSide);
+				return InteractionResultHolder.sidedSuccess(stack, player.level().isClientSide);
 			}
 			else
 			{
 				mob.setTarget(player);
 				NaMiscUtils.printToScreen("Set the target of [" + mob.getName().getString() + "] to self (" + player.getName().getString() + ")!", player);
-				return InteractionResultHolder.sidedSuccess(stack, player.level.isClientSide);
+				return InteractionResultHolder.sidedSuccess(stack, player.level().isClientSide);
 			}
 		}
 		return InteractionResultHolder.pass(stack);
