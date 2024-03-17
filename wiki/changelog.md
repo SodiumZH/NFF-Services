@@ -10,6 +10,8 @@ Removed Debug AI Switch (migrated to NaUtils).
 
 Refactored debug items.
 
+Now mobs befriended from falling-immune mobs will be also falling-immune. (1.20.1)
+
 ##### NaUtils
 
 Added Debug AI Switch.
