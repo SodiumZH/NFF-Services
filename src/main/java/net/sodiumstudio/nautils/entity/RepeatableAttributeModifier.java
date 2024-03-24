@@ -41,7 +41,7 @@ public class RepeatableAttributeModifier
 			throw new IllegalArgumentException("Index is larger than the set max. Attempted index: " + Integer.toString(index) + "; Set max: " + Integer.toString(maxSize));
 		while (modifiers.size() <= index)
 		{
-			modifiers.add(new AttributeModifier(UUID.randomUUID(), Integer.toString(modifiers.size()), this.value, this.operation));
+			modifiers.add(new AttributeModifier(UUID.randomUUID(), Integer.toString(modifiers.size()), this.value * (index + 1), this.operation));
 		}
 		return modifiers.get(index);
 	}
@@ -50,28 +50,24 @@ public class RepeatableAttributeModifier
 	{
 		AttributeInstance inst = target.getAttribute(attribute);
 		int i = 0;
-		for (i = 0; i < times; ++i)
+		for (var modifier: modifiers)
 		{
-			inst.removeModifier(this.get(i));
-			if (isPermanent)
-			{
-				inst.addPermanentModifier(this.get(i));
-			}
-			else inst.addTransientModifier(this.get(i));
+			inst.removeModifier(modifier);
 		}
-		for (i = times; i < this.modifiers.size(); ++i)
+		if (isPermanent)
 		{
-			inst.removeModifier(this.get(i));
+			inst.addPermanentModifier(this.get(i));
 		}
+		else inst.addTransientModifier(this.get(i));
 	}
 	
 	
 	public void clear(LivingEntity target, Attribute attribute)
 	{
 		AttributeInstance inst = target.getAttribute(attribute);
-		for (int i = 0; i < modifiers.size(); ++i)
+		for (var modifier: modifiers)
 		{
-			inst.removeModifier(modifiers.get(i));
+			inst.removeModifier(modifier);
 		}
 	}
 	
