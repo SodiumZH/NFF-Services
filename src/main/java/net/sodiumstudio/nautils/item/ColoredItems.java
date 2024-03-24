@@ -1,85 +1,82 @@
 package net.sodiumstudio.nautils.item;
 
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.sodiumstudio.nautils.math.WithStandardColors;
+import net.sodiumstudio.nautils.math.WithDyeColors;
 
 public class ColoredItems
 {	
-	public static final WithStandardColors<Item> DYES = WithStandardColors.of(
-			Items.WHITE_DYE, Items.BLACK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE,
-			Items.RED_DYE, Items.GREEN_DYE, Items.BLUE_DYE, Items.YELLOW_DYE,
-			Items.LIGHT_BLUE_DYE, Items.MAGENTA_DYE, Items.CYAN_DYE, Items.ORANGE_DYE,
-			Items.LIME_DYE, Items.PURPLE_DYE, Items.BROWN_DYE, Items.PINK_DYE);
+	public static final WithDyeColors<Item> DYES = new WithDyeColors<>(
+			"white", Items.WHITE_DYE, "black", Items.BLACK_DYE, "gray", Items.GRAY_DYE, "light_gray", Items.LIGHT_GRAY_DYE,
+			"red", Items.RED_DYE, "green", Items.GREEN_DYE, "blue", Items.BLUE_DYE, "yellow", Items.YELLOW_DYE,
+			"light_blue", Items.LIGHT_BLUE_DYE, "magenta", Items.MAGENTA_DYE, "cyan", Items.CYAN_DYE, "orange", Items.ORANGE_DYE,
+			"lime", Items.LIME_DYE, "purple", Items.PURPLE_DYE, "brown", Items.BROWN_DYE, "pink", Items.PINK_DYE);
 	
-	public static final WithStandardColors<Item> WOOL_ITEMS = WithStandardColors.of(
-			Items.WHITE_WOOL, Items.BLACK_WOOL, Items.GRAY_WOOL, Items.LIGHT_GRAY_WOOL,
-			Items.RED_WOOL, Items.GREEN_WOOL, Items.BLUE_WOOL, Items.YELLOW_WOOL,
-			Items.LIGHT_BLUE_WOOL, Items.MAGENTA_WOOL, Items.CYAN_WOOL, Items.ORANGE_WOOL, 
-			Items.LIME_WOOL, Items.PURPLE_WOOL, Items.BROWN_WOOL, Items.PINK_WOOL);
+	public static final WithDyeColors<Item> WOOL_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_WOOL, "black", Items.BLACK_WOOL, "gray", Items.GRAY_WOOL, "light_gray", Items.LIGHT_GRAY_WOOL,
+			"red", Items.RED_WOOL, "green", Items.GREEN_WOOL, "blue", Items.BLUE_WOOL, "yellow", Items.YELLOW_WOOL,
+			"light_blue", Items.LIGHT_BLUE_WOOL, "magenta", Items.MAGENTA_WOOL, "cyan", Items.CYAN_WOOL, "orange", Items.ORANGE_WOOL, 
+			"lime", Items.LIME_WOOL, "purple", Items.PURPLE_WOOL, "brown", Items.BROWN_WOOL, "pink", Items.PINK_WOOL);
 	
-	public static final WithStandardColors<Item> CARPET_ITEMS = WithStandardColors.of(
-			Items.WHITE_CARPET, Items.BLACK_CARPET, Items.GRAY_CARPET, Items.LIGHT_GRAY_CARPET,
-			Items.RED_CARPET, Items.GREEN_CARPET, Items.BLUE_CARPET, Items.YELLOW_CARPET,
-			Items.LIGHT_BLUE_CARPET, Items.MAGENTA_CARPET, Items.CYAN_CARPET, Items.ORANGE_CARPET, 
-			Items.LIME_CARPET, Items.PURPLE_CARPET, Items.BROWN_CARPET, Items.PINK_CARPET);
+	public static final WithDyeColors<Item> CARPET_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_CARPET, "black", Items.BLACK_CARPET, "gray", Items.GRAY_CARPET, "light_gray", Items.LIGHT_GRAY_CARPET,
+			"red", Items.RED_CARPET, "green", Items.GREEN_CARPET, "blue", Items.BLUE_CARPET, "yellow", Items.YELLOW_CARPET,
+			"light_blue", Items.LIGHT_BLUE_CARPET, "magenta", Items.MAGENTA_CARPET, "cyan", Items.CYAN_CARPET, "orange", Items.ORANGE_CARPET, 
+			"lime", Items.LIME_CARPET, "purple", Items.PURPLE_CARPET, "brown", Items.BROWN_CARPET, "pink", Items.PINK_CARPET);
 	
-	public static final WithStandardColors<Item> BANNER_ITEMS = WithStandardColors.of(
-			Items.WHITE_BANNER, Items.BLACK_BANNER, Items.GRAY_BANNER, Items.LIGHT_GRAY_BANNER,
-			Items.RED_BANNER, Items.GREEN_BANNER, Items.BLUE_BANNER, Items.YELLOW_BANNER,
-			Items.LIGHT_BLUE_BANNER, Items.MAGENTA_BANNER, Items.CYAN_BANNER, Items.ORANGE_BANNER, 
-			Items.LIME_BANNER, Items.PURPLE_BANNER, Items.BROWN_BANNER, Items.PINK_BANNER);
+	public static final WithDyeColors<Item> BANNER_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_BANNER, "black", Items.BLACK_BANNER, "gray", Items.GRAY_BANNER, "light_gray", Items.LIGHT_GRAY_BANNER,
+			"red", Items.RED_BANNER, "green", Items.GREEN_BANNER, "blue", Items.BLUE_BANNER, "yellow", Items.YELLOW_BANNER,
+			"light_blue", Items.LIGHT_BLUE_BANNER, "magenta", Items.MAGENTA_BANNER, "cyan", Items.CYAN_BANNER, "orange", Items.ORANGE_BANNER, 
+			"lime", Items.LIME_BANNER, "purple", Items.PURPLE_BANNER, "brown", Items.BROWN_BANNER, "pink", Items.PINK_BANNER);
 	
-	public static final WithStandardColors<Item> CANDLE_ITEMS = WithStandardColors.of(
-			Items.WHITE_CANDLE, Items.BLACK_CANDLE, Items.GRAY_CANDLE, Items.LIGHT_GRAY_CANDLE,
-			Items.RED_CANDLE, Items.GREEN_CANDLE, Items.BLUE_CANDLE, Items.YELLOW_CANDLE,
-			Items.LIGHT_BLUE_CANDLE, Items.MAGENTA_CANDLE, Items.CYAN_CANDLE, Items.ORANGE_CANDLE, 
-			Items.LIME_CANDLE, Items.PURPLE_CANDLE, Items.BROWN_CANDLE, Items.PINK_CANDLE);
+	public static final WithDyeColors<Item> CANDLE_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_CANDLE, "black", Items.BLACK_CANDLE, "gray", Items.GRAY_CANDLE, "light_gray", Items.LIGHT_GRAY_CANDLE,
+			"red", Items.RED_CANDLE, "green", Items.GREEN_CANDLE, "blue", Items.BLUE_CANDLE, "yellow", Items.YELLOW_CANDLE,
+			"light_blue", Items.LIGHT_BLUE_CANDLE, "magenta", Items.MAGENTA_CANDLE, "cyan", Items.CYAN_CANDLE, "orange", Items.ORANGE_CANDLE, 
+			"lime", Items.LIME_CANDLE, "purple", Items.PURPLE_CANDLE, "brown", Items.BROWN_CANDLE, "pink", Items.PINK_CANDLE);
 	
-	public static final WithStandardColors<Item> TERRACOTTA_ITEMS = WithStandardColors.of(
-			Items.WHITE_TERRACOTTA, Items.BLACK_TERRACOTTA, Items.GRAY_TERRACOTTA, Items.LIGHT_GRAY_TERRACOTTA,
-			Items.RED_TERRACOTTA, Items.GREEN_TERRACOTTA, Items.BLUE_TERRACOTTA, Items.YELLOW_TERRACOTTA, 
-			Items.LIGHT_BLUE_TERRACOTTA, Items.MAGENTA_TERRACOTTA, Items.CYAN_TERRACOTTA, Items.ORANGE_TERRACOTTA,
-			Items.LIME_TERRACOTTA, Items.PURPLE_TERRACOTTA, Items.BROWN_TERRACOTTA, Items.PINK_TERRACOTTA);
+	public static final WithDyeColors<Item> TERRACOTTA_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_TERRACOTTA, "black", Items.BLACK_TERRACOTTA, "gray", Items.GRAY_TERRACOTTA, "light_gray", Items.LIGHT_GRAY_TERRACOTTA,
+			"red", Items.RED_TERRACOTTA, "green", Items.GREEN_TERRACOTTA, "blue", Items.BLUE_TERRACOTTA, "yellow", Items.YELLOW_TERRACOTTA, 
+			"light_blue", Items.LIGHT_BLUE_TERRACOTTA, "magenta", Items.MAGENTA_TERRACOTTA, "cyan", Items.CYAN_TERRACOTTA, "orange", Items.ORANGE_TERRACOTTA,
+			"lime", Items.LIME_TERRACOTTA, "purple", Items.PURPLE_TERRACOTTA, "brown", Items.BROWN_TERRACOTTA, "pink", Items.PINK_TERRACOTTA);
 
-	public static final WithStandardColors<Item> GLAZED_TERRACOTTA_ITEMS = WithStandardColors.of(
-			Items.WHITE_GLAZED_TERRACOTTA, Items.BLACK_GLAZED_TERRACOTTA, Items.GRAY_GLAZED_TERRACOTTA, Items.LIGHT_GRAY_GLAZED_TERRACOTTA,
-			Items.RED_GLAZED_TERRACOTTA, Items.GREEN_GLAZED_TERRACOTTA, Items.BLUE_GLAZED_TERRACOTTA, Items.YELLOW_GLAZED_TERRACOTTA,
-			Items.LIGHT_BLUE_GLAZED_TERRACOTTA, Items.MAGENTA_GLAZED_TERRACOTTA, Items.CYAN_GLAZED_TERRACOTTA, Items.ORANGE_GLAZED_TERRACOTTA, 
-			Items.LIME_GLAZED_TERRACOTTA, Items.PURPLE_GLAZED_TERRACOTTA, Items.BROWN_GLAZED_TERRACOTTA, Items.PINK_GLAZED_TERRACOTTA);
+	public static final WithDyeColors<Item> GLAZED_TERRACOTTA_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_GLAZED_TERRACOTTA, "black", Items.BLACK_GLAZED_TERRACOTTA, "gray", Items.GRAY_GLAZED_TERRACOTTA, "light_gray", Items.LIGHT_GRAY_GLAZED_TERRACOTTA,
+			"red", Items.RED_GLAZED_TERRACOTTA, "green", Items.GREEN_GLAZED_TERRACOTTA, "blue", Items.BLUE_GLAZED_TERRACOTTA, "yellow", Items.YELLOW_GLAZED_TERRACOTTA,
+			"light_blue", Items.LIGHT_BLUE_GLAZED_TERRACOTTA, "magenta", Items.MAGENTA_GLAZED_TERRACOTTA, "cyan", Items.CYAN_GLAZED_TERRACOTTA, "orange", Items.ORANGE_GLAZED_TERRACOTTA, 
+			"lime", Items.LIME_GLAZED_TERRACOTTA, "purple", Items.PURPLE_GLAZED_TERRACOTTA, "brown", Items.BROWN_GLAZED_TERRACOTTA, "pink", Items.PINK_GLAZED_TERRACOTTA);
 
-	public static final WithStandardColors<Item> STAINED_GLASS_ITEMS = WithStandardColors.of(
-			Items.WHITE_STAINED_GLASS, Items.BLACK_STAINED_GLASS, Items.GRAY_STAINED_GLASS, Items.LIGHT_GRAY_STAINED_GLASS,
-			Items.RED_STAINED_GLASS, Items.GREEN_STAINED_GLASS, Items.BLUE_STAINED_GLASS, Items.YELLOW_STAINED_GLASS,
-			Items.LIGHT_BLUE_STAINED_GLASS, Items.MAGENTA_STAINED_GLASS, Items.CYAN_STAINED_GLASS, Items.ORANGE_STAINED_GLASS, 
-			Items.LIME_STAINED_GLASS, Items.PURPLE_STAINED_GLASS, Items.BROWN_STAINED_GLASS, Items.PINK_STAINED_GLASS);
+	public static final WithDyeColors<Item> STAINED_GLASS_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_STAINED_GLASS, "black", Items.BLACK_STAINED_GLASS, "gray", Items.GRAY_STAINED_GLASS, "light_gray", Items.LIGHT_GRAY_STAINED_GLASS,
+			"red", Items.RED_STAINED_GLASS, "green", Items.GREEN_STAINED_GLASS, "blue", Items.BLUE_STAINED_GLASS, "yellow", Items.YELLOW_STAINED_GLASS,
+			"light_blue", Items.LIGHT_BLUE_STAINED_GLASS, "magenta", Items.MAGENTA_STAINED_GLASS, "cyan", Items.CYAN_STAINED_GLASS, "orange", Items.ORANGE_STAINED_GLASS, 
+			"lime", Items.LIME_STAINED_GLASS, "purple", Items.PURPLE_STAINED_GLASS, "brown", Items.BROWN_STAINED_GLASS, "pink", Items.PINK_STAINED_GLASS);
 	
-	public static final WithStandardColors<Item> STAINED_GLASS_PANE_ITEMS = WithStandardColors.of(
-			Items.WHITE_STAINED_GLASS_PANE, Items.BLACK_STAINED_GLASS_PANE, Items.GRAY_STAINED_GLASS_PANE, Items.LIGHT_GRAY_STAINED_GLASS_PANE,
-			Items.RED_STAINED_GLASS_PANE, Items.GREEN_STAINED_GLASS_PANE, Items.BLUE_STAINED_GLASS_PANE, Items.YELLOW_STAINED_GLASS_PANE,
-			Items.LIGHT_BLUE_STAINED_GLASS_PANE, Items.MAGENTA_STAINED_GLASS_PANE, Items.CYAN_STAINED_GLASS_PANE, Items.ORANGE_STAINED_GLASS_PANE, 
-			Items.LIME_STAINED_GLASS_PANE, Items.PURPLE_STAINED_GLASS_PANE, Items.BROWN_STAINED_GLASS_PANE, Items.PINK_STAINED_GLASS_PANE);
+	public static final WithDyeColors<Item> STAINED_GLASS_PANE_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_STAINED_GLASS_PANE, "black", Items.BLACK_STAINED_GLASS_PANE, "gray", Items.GRAY_STAINED_GLASS_PANE, "light_gray", Items.LIGHT_GRAY_STAINED_GLASS_PANE,
+			"red", Items.RED_STAINED_GLASS_PANE, "green", Items.GREEN_STAINED_GLASS_PANE, "blue", Items.BLUE_STAINED_GLASS_PANE, "yellow", Items.YELLOW_STAINED_GLASS_PANE,
+			"light_blue", Items.LIGHT_BLUE_STAINED_GLASS_PANE, "magenta", Items.MAGENTA_STAINED_GLASS_PANE, "cyan", Items.CYAN_STAINED_GLASS_PANE, "orange", Items.ORANGE_STAINED_GLASS_PANE, 
+			"lime", Items.LIME_STAINED_GLASS_PANE, "purple", Items.PURPLE_STAINED_GLASS_PANE, "brown", Items.BROWN_STAINED_GLASS_PANE, "pink", Items.PINK_STAINED_GLASS_PANE);
 	
-	public static final WithStandardColors<Item> SHULKER_BOX_ITEMS = WithStandardColors.of(
-			Items.WHITE_SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX,
-			Items.RED_SHULKER_BOX, Items.GREEN_SHULKER_BOX, Items.BLUE_SHULKER_BOX, Items.YELLOW_SHULKER_BOX,
-			Items.LIGHT_BLUE_SHULKER_BOX, Items.MAGENTA_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, 
-			Items.LIME_SHULKER_BOX, Items.PURPLE_SHULKER_BOX, Items.BROWN_SHULKER_BOX, Items.PINK_SHULKER_BOX);
+	public static final WithDyeColors<Item> SHULKER_BOX_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_SHULKER_BOX, "black", Items.BLACK_SHULKER_BOX, "gray", Items.GRAY_SHULKER_BOX, "light_gray", Items.LIGHT_GRAY_SHULKER_BOX,
+			"red", Items.RED_SHULKER_BOX, "green", Items.GREEN_SHULKER_BOX, "blue", Items.BLUE_SHULKER_BOX, "yellow", Items.YELLOW_SHULKER_BOX,
+			"light_blue", Items.LIGHT_BLUE_SHULKER_BOX, "magenta", Items.MAGENTA_SHULKER_BOX, "cyan", Items.CYAN_SHULKER_BOX, "orange", Items.ORANGE_SHULKER_BOX, 
+			"lime", Items.LIME_SHULKER_BOX, "purple", Items.PURPLE_SHULKER_BOX, "brown", Items.BROWN_SHULKER_BOX, "pink", Items.PINK_SHULKER_BOX);
 	
-	public static final WithStandardColors<Item> BED_ITEMS = WithStandardColors.of(
-			Items.WHITE_BED, Items.BLACK_BED, Items.GRAY_BED, Items.LIGHT_GRAY_BED,
-			Items.RED_BED, Items.GREEN_BED, Items.BLUE_BED, Items.YELLOW_BED,
-			Items.LIGHT_BLUE_BED, Items.MAGENTA_BED, Items.CYAN_BED, Items.ORANGE_BED, 
-			Items.LIME_BED, Items.PURPLE_BED, Items.BROWN_BED, Items.PINK_BED);
-	
-	
-	
+	public static final WithDyeColors<Item> BED_ITEMS = new WithDyeColors<>(
+			"white", Items.WHITE_BED, "black", Items.BLACK_BED, "gray", Items.GRAY_BED, "light_gray", Items.LIGHT_GRAY_BED,
+			"red", Items.RED_BED, "green", Items.GREEN_BED, "blue", Items.BLUE_BED, "yellow", Items.YELLOW_BED,
+			"light_blue", Items.LIGHT_BLUE_BED, "magenta", Items.MAGENTA_BED, "cyan", Items.CYAN_BED, "orange", Items.ORANGE_BED, 
+			"lime", Items.LIME_BED, "purple", Items.PURPLE_BED, "brown", Items.BROWN_BED, "pink", Items.PINK_BED);
+
 	/*		
-	public static final WithStandardColors<Item>  = WithStandardColors.of(
-		Items.WHITE_, Items.BLACK_, Items.GRAY_, Items.LIGHT_GRAY_,
-		Items.RED_, Items.GREEN_, Items.BLUE_, Items.YELLOW_,
-		Items.LIGHT_BLUE_, Items.MAGENTA_, Items.CYAN_, Items.ORANGE_, 
-		Items.LIME_, Items.PURPLE_, Items.BROWN_, Items.PINK_,);*/
+	public static final WithDyeColors<Item>  = new WithDyeColors<>(
+		"white", Items.WHITE_, "black", Items.BLACK_, "gray", Items.GRAY_, "light_gray", Items.LIGHT_GRAY_,
+		"red", Items.RED_, "green", Items.GREEN_, "blue", Items.BLUE_, "yellow", Items.YELLOW_,
+		"light_blue", Items.LIGHT_BLUE_, "magenta", Items.MAGENTA_, "cyan", Items.CYAN_, "orange", Items.ORANGE_, 
+		"lime", Items.LIME_, "purple", Items.PURPLE_, "brown", Items.BROWN_, "pink", Items.PINK_,);*/
 		
 }
