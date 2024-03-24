@@ -1,5 +1,15 @@
 # Change Log
 
+### 0.x.23
+
+##### BefriendMobs
+
+##### NaUtils
+
+Removed `StandardColor`. Use vanilla `DyeColor` instead.
+
+Replaced `WithStandardColor` with `WithDyeColor` in which the constructor was changed.
+
 ### 0.x.22
 
 ##### BefriendMobs
