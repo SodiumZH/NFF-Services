@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.nautils.ContainerHelper;
 import net.sodiumstudio.nautils.InfoHelper;
@@ -171,4 +172,5 @@ public class HtmlColors
 			return colorv.distanceToSqr(HTML_COLORS.get(key).toNormalized());
 		})).toList().get(0);
 	}
+	
 }
