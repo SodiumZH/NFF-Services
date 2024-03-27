@@ -2,6 +2,8 @@ package net.sodiumstudio.befriendmobs.events;
 
 import java.util.UUID;
 
+import com.mojang.logging.LogUtils;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
@@ -36,6 +38,7 @@ import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob.DeathRespawnerGenerationType;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
@@ -169,29 +172,31 @@ public class BMEntityEvents
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{ 	
 	        // Handle befriended mobs //	        
-	        if (mob instanceof IBefriendedMob bef)
+	        if (mob instanceof IBefriendedMob bm)
 	        {
 	        	// Befriended mob should never attack the owner
-	        	if (target == bef.getOwner())
-	        		mob.setTarget(bef.getPreviousTarget());
+	        	if (target == bm.getOwner())
+	        		event.setNewTarget(bm.getPreviousTarget());
+
 	        	// Befriended mob shouldn't attack owner's other befriended mobs
 	        	else if (target instanceof IBefriendedMob tbef)
 	        	{
-	        		if (bef.getOwner() != null && tbef.getOwner() != null && bef.getOwner() == tbef.getOwner())
+	        		if (bm.getOwner() != null && tbef.getOwner() != null && bm.getOwner() == tbef.getOwner())
 	        		{
-	        			event.setNewTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bm.getPreviousTarget());
 	        		}
 	        	}
 	        	// Befriended mob shouldn't attack owner's tamable animals
 	        	else if (target instanceof TamableAnimal ta)
 	        	{
-	        		if (bef.getOwner() != null && ta.getOwner() != null && bef.getOwner() == ta.getOwner())
+	        		if (bm.getOwner() != null && ta.getOwner() != null && bm.getOwner() == ta.getOwner())
 	        		{
-	        			event.setNewTarget(bef.getPreviousTarget());
+	        			event.setNewTarget(bm.getPreviousTarget());
 	        		}
 	        	}
 	        	else
-	        		bef.setPreviousTarget(target);
+	        		bm.setPreviousTarget(target);
+	        	
 	        }
 	        // Handle befriended mobs end //
 	        // Handle TamableAnimal //	
@@ -521,14 +526,27 @@ public class BMEntityEvents
 				}*/
 				
 				// update befriended mob anchor position
-				if (mob instanceof IBefriendedMob b)
+				if (mob instanceof IBefriendedMob bm)
 				{
-					if (b.getAnchorPos() != null)
+					if (bm.getAnchorPos() != null)
 					{
 						// Stop update when wandering
-						if (b.getAIState() != BefriendedAIState.WANDER)
-							b.updateAnchor();
+						if (bm.getAIState() != BefriendedAIState.WANDER)
+							bm.updateAnchor();
 					}
+					// Sometimes it may happens that the mobs still attack allies, reset here
+		        	// Generally the code below shouldn't be invoked, so print an error to log
+		        	if (BefriendedHelper.isLivingAlliedToBM(bm, bm.asMob().getTarget()))
+		        	{
+		        		LogUtils.getLogger().error("BefriendedMobs Framework: Befriended mob [" 
+		        				+ bm.asMob().getName().getString() + "] attempting to attack ally ["
+		        				+ bm.asMob().getTarget().getName().getString() + "]. Target reset.");
+		        		bm.asMob().setTarget(null);
+		        		if (bm.asMob().getTarget() != null)
+		        			// Maybe sometimes setTarget can be cancelled
+		        			EntityHelper.forceSetTarget(bm.asMob(), null);
+		        		bm.setPreviousTarget(null);
+		        	}
 				}
 			}
 		}
