@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.nautils.InfoHelper;
-import net.sodiumstudio.nautils.math.IntVec2;
+import net.sodiumstudio.nautils.math.GuiPos;
 
 public abstract class BefriendedGuiScreen extends AbstractContainerScreen<BefriendedInventoryMenu> {
 
@@ -32,9 +32,9 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	/**
 	 * If the texture is not a standard 256x256 image, override this value
 	 */
-	public IntVec2 getTextureSize() 
+	public GuiPos getTextureSize() 
 	{
-		return new IntVec2(256, 256);
+		return new GuiPos(256, 256);
 	}
 
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
@@ -79,7 +79,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * @deprecated use {@code drawSprite} instead
 	 */
 	@Deprecated
-	public void blit(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
+	public void blit(GuiGraphics GuiGraphics, GuiPos xy, GuiPos uvOffset, GuiPos uvSize)
 	{
 		blit(GuiGraphics, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
 	}
@@ -118,7 +118,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * @param uvOffset UV (XY) offset on texture (i.e. UV/XY position of the top-left corner of the sprite on texture)
 	 * @param uvSize Sprite UV/XY size.
 	 */
-	public void drawSprite(GuiGraphics GuiGraphics, IntVec2 xy, IntVec2 uvOffset, IntVec2 uvSize)
+	public void drawSprite(GuiGraphics GuiGraphics, GuiPos xy, GuiPos uvOffset, GuiPos uvSize)
 	{
 		drawSprite(GuiGraphics, xy.x, xy.y, uvSize.x, uvSize.y, uvOffset.x, uvOffset.y);
 	}
@@ -136,16 +136,16 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * @param uvEmpty 当道具为空时的栏位贴图背景，在整张贴图中的位置坐标。
 	 * @param uvFilled 当道具非空时的栏位贴图背景，在整张贴图中的位置坐标。
 	 */
-	public void addSlotBg(GuiGraphics GuiGraphics, int slotIndex, IntVec2 xy, @Nullable IntVec2 uvEmpty, @Nullable IntVec2 uvFilled)
+	public void addSlotBg(GuiGraphics GuiGraphics, int slotIndex, GuiPos xy, @Nullable GuiPos uvEmpty, @Nullable GuiPos uvFilled)
 	{
 		if (!menu.slots.get(slotIndex).hasItem() && uvEmpty != null)
-			drawSprite(GuiGraphics, xy, uvEmpty, IntVec2.valueOf(18));
+			drawSprite(GuiGraphics, xy, uvEmpty, GuiPos.valueOf(18));
 		else if (menu.slots.get(slotIndex).hasItem() && uvFilled != null)
-			drawSprite(GuiGraphics, xy, uvFilled, IntVec2.valueOf(18));
+			drawSprite(GuiGraphics, xy, uvFilled, GuiPos.valueOf(18));
 	}
 
 	@Deprecated
-	public void addHealthInfo(GuiGraphics graphics, IntVec2 position, int color)
+	public void addHealthInfo(GuiGraphics graphics, GuiPos position, int color)
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
@@ -154,7 +154,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	}
 	
 	@Deprecated
-	public void addHealthInfo(GuiGraphics GuiGraphics, IntVec2 position)
+	public void addHealthInfo(GuiGraphics GuiGraphics, GuiPos position)
 	{
 		addHealthInfo(GuiGraphics, position, 0x404040);
 	}
@@ -163,9 +163,9 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * (Preset) Add mob attribute info, including HP/MaxHP, ATK, armor
 	 * <p>（预设）添加生物属性信息，包括HP/MaxHP、攻击力、护甲
 	 */
-	public void addAttributeInfo(GuiGraphics graphics, IntVec2 position, int color, int textRowWidth)
+	public void addAttributeInfo(GuiGraphics graphics, GuiPos position, int color, int textRowWidth)
 	{
-		IntVec2 pos = position.copy();
+		GuiPos pos = position.copy();
 		String hp = Integer.toString(Math.round(mob.asMob().getHealth()));
 		String maxHp = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH)));
 		String atk = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE)));
@@ -187,7 +187,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 * Add attribute info using default font
 	 * <p>添加生物属性信息，使用默认字体
 	 */
-	public void addAttributeInfo(GuiGraphics GuiGraphics, IntVec2 position)
+	public void addAttributeInfo(GuiGraphics GuiGraphics, GuiPos position)
 	{
 		addAttributeInfo(GuiGraphics, position, 0x404040, 11);
 	}
