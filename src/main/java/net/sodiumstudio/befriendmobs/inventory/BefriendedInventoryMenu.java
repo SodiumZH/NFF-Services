@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreen;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.subsystems.baublesystem.BaubleSystem;
-import net.sodiumstudio.nautils.math.IntVec2;
+import net.sodiumstudio.nautils.math.GuiPos;
 
 public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 
@@ -38,7 +38,7 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 
 	protected abstract void addMenuSlots();
 
-	protected void addBaubleSlot(int slot, IntVec2 pos, String key, Predicate<ItemStack> additionalCondition)
+	protected void addBaubleSlot(int slot, GuiPos pos, String key, Predicate<ItemStack> additionalCondition)
 	{
 		addSlot(new Slot(container, slot, pos.x, pos.y) {			
 			@Override
@@ -52,7 +52,7 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		});
 	}
 	
-	protected void addBaubleSlot(int slot, IntVec2 pos, String key)
+	protected void addBaubleSlot(int slot, GuiPos pos, String key)
 	{
 		addBaubleSlot(slot, pos, key, stack -> true);
 	}
@@ -62,7 +62,7 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		return true;
 	}
 	
-	protected abstract IntVec2 getPlayerInventoryPosition();
+	protected abstract GuiPos getPlayerInventoryPosition();
 	
 	private void addPlayerInventorySlots(Inventory playerInventory, int startX, int startY) 
 	{
@@ -92,10 +92,4 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		this.container.stopOpen(pPlayer);
 	}
 
-	/** 
-	 * @deprecated This method is not compatible to and will not work on dedicated server.
-	 * <p> Use {@code BefriendedGuiScreenMaker::put()} in {@code FMLCommonSetupEvent} instead to define GUI construction method. 
-	 */
-	@Deprecated
-	public BefriendedGuiScreen makeGui() {return null;}
 }
