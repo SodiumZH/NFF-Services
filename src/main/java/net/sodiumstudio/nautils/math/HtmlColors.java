@@ -6,12 +6,12 @@ import java.util.HashMap;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.InfoHelper;
 
 public class HtmlColors
 {
-	public static final HashMap<String, LinearColor> HTML_COLORS = ContainerHelper.mapOf();
+	public static final HashMap<String, LinearColor> HTML_COLORS = NaContainerUtils.mapOf();
 	static
 	{
 		HTML_COLORS.put("alice_blue", LinearColor.fromCode(0xf0f8ff));

@@ -26,7 +26,7 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NbtHelper;
 
@@ -286,7 +286,7 @@ public class BefriendedHelper
 				e -> (e.getType() == type && e instanceof IBefriendedMob bm && bm.getOwner() == player)).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
-		return ContainerHelper.castListTypeUnchecked(stream.toList());
+		return NaContainerUtils.castListTypeUnchecked(stream.toList());
 	}
 	
 	/**

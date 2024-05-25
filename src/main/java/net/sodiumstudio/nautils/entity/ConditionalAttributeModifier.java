@@ -13,8 +13,11 @@ import net.sodiumstudio.nautils.annotation.DontCallManually;
 /**
  * A {@code ConditionalAttributeModifier} is a wrapped {@link AttributeModifier} that updates on tick
  * to be added when condition is satisfied and removed otherwise.
- * <p> It needs only a single-instance for each operation and will be automatically updated.
- * <p> Note: Applying {@link Attribute} for a single {@code ConditionalAttributeModifier} is fixed. If different {@link Attribute} is needed, create another {@code ConditionalAttributeModifier} instance.
+ * <p>It needs only a single-instance for each operation and will be automatically updated.
+ * <p>Note: For a given {@code ConditionalAttributeModifier}, it can only be applied to a given {@link Attribute} specified on construction. 
+ * To apply the modifier to another {@link Attribute}, create another {@code ConditionalAttributeModifier} instance.
+ * <p>Note: It's always <b>transient</b> i.e. not saved into entities' data. If needs saving, consider saving into the entity additional
+ * data and manually apply on construction, deserialization or tick. 
  */
 public final class ConditionalAttributeModifier {
 
@@ -25,7 +28,8 @@ public final class ConditionalAttributeModifier {
 	private final Attribute attribute;
 	private final AttributeModifier modifier;
 	private final Predicate<LivingEntity> condition;
-	private boolean isPermanent = false;
+	@Deprecated	// Invalid
+	private final boolean isPermanent = false;
 	
 	public ConditionalAttributeModifier(Attribute attribute, AttributeModifier modifier, Predicate<LivingEntity> condition)
 	{
@@ -45,9 +49,10 @@ public final class ConditionalAttributeModifier {
 		ALL_MODIFIERS.add(this);
 	}
 	
+	@Deprecated
 	public ConditionalAttributeModifier setPermanent(boolean val)
 	{
-		this.isPermanent = val;
+		//this.isPermanent = val;
 		return this;
 	}
 	
@@ -82,9 +87,7 @@ public final class ConditionalAttributeModifier {
 				{
 					if (!living.getAttribute(cam.attribute).hasModifier(cam.modifier))
 					{
-						if (cam.isPermanent)
-							living.getAttribute(cam.attribute).addPermanentModifier(cam.modifier);
-						else living.getAttribute(cam.attribute).addTransientModifier(cam.modifier);
+						living.getAttribute(cam.attribute).addTransientModifier(cam.modifier);
 					}
 				}
 				else living.getAttribute(cam.attribute).removeModifier(cam.modifier);

@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.object.ObjectOrKey;
 import net.sodiumstudio.nautils.object.ObjectOrSupplier;
 
@@ -85,7 +85,7 @@ public class DynamicObjectKeyMap<K, V, W extends ObjectOrKey<K>>
 	
 	public HashMap<K, V> getRawMap()
 	{
-		return ContainerHelper.castMap(map, k -> k.get(), v -> v.get());
+		return NaContainerUtils.castMap(map, k -> k.get(), v -> v.get());
 	}
 	
 	/**

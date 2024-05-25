@@ -612,7 +612,7 @@ public class EntityHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "f_26051_"); // targetConditions
+				 Class<?> targetType = NaReflectionUtils.forceGet(natg, NearestAttackableTargetGoal.class, "f_26051_").cast(); // targetConditions
 				 if (targetType == isHostileTo.getClass())
 				 {
 					 return true;
@@ -631,7 +631,7 @@ public class EntityHelper
 		 {
 			 if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> natg)
 			 {
-				 Class<?> targetType = (Class<?>) ReflectHelper.forceGet(natg, NearestAttackableTargetGoal.class, "f_26051_"); // targetConditions
+				 Class<?> targetType = NaReflectionUtils.forceGet(natg, NearestAttackableTargetGoal.class, "f_26051_").cast(); // targetConditions
 				 if (targetType == Player.class)
 				 {
 					 return true;
@@ -761,7 +761,7 @@ public class EntityHelper
 	 */
 	public static void forceSetTarget(Mob mob, LivingEntity newTarget)
 	{
-		ReflectHelper.forceSet(mob, Mob.class, "f_21362_", newTarget);	// Mob.target
+		NaReflectionUtils.forceSet(mob, Mob.class, "f_21362_", newTarget);	// Mob.target
 	}
 	
 	@Nullable
@@ -770,7 +770,7 @@ public class EntityHelper
 		if (level.getPlayerByUUID(uuid) != null)
 			return level.getPlayerByUUID(uuid);
 		@SuppressWarnings("unchecked")
-		Iterable<Entity> entities = ((LevelEntityGetter<Entity>) ReflectHelper.forceInvokeRetVal(level, Level.class, "m_142425_")).getAll();	// Level#getEntities
+		Iterable<Entity> entities = ((LevelEntityGetter<Entity>) NaReflectionUtils.forceInvokeRetVal(level, Level.class, "m_142425_")).getAll();	// Level#getEntities
 		for (Entity e: entities)
 		{
 			if (e.getUUID().equals(uuid))

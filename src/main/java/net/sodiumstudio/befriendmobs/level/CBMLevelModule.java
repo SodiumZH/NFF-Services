@@ -26,7 +26,7 @@ import net.sodiumstudio.befriendmobs.entity.capability.CBMPlayerModule.Impl;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.debug.Debug;
