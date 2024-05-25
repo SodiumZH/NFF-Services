@@ -202,5 +202,10 @@ public class GuiPos
 		return add(18 * x, 18 * y);
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "GuiPos(" + Integer.toString(x) + ", " + Integer.toString(y) + ")";
+	}
 	
 }

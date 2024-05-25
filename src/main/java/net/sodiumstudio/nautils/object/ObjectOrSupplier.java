@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 
 public class ObjectOrSupplier<T> implements Supplier<T>
 {
@@ -56,7 +56,7 @@ public class ObjectOrSupplier<T> implements Supplier<T>
 	 */
 	public static <K, V> HashMap<ObjectOrSupplier<K>, V> fromObjectKeyMap(Map<K, V> in)
 	{
-		return ContainerHelper.castMap(in, k -> ObjectOrSupplier.of(k), v -> v, true);
+		return NaContainerUtils.castMap(in, k -> ObjectOrSupplier.of(k), v -> v, true);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class ObjectOrSupplier<T> implements Supplier<T>
 	 */
 	public static <K, V> HashMap<K, ObjectOrSupplier<V>> fromObjectValueMap(Map<K, V> in)
 	{
-		return ContainerHelper.castMap(in, k -> k, v -> ObjectOrSupplier.of(v), true); 
+		return NaContainerUtils.castMap(in, k -> k, v -> ObjectOrSupplier.of(v), true); 
 	}
 	
 	/**

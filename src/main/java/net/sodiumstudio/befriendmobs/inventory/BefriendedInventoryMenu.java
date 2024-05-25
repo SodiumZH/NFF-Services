@@ -27,7 +27,7 @@ public abstract class BefriendedInventoryMenu extends AbstractContainerMenu {
 		this.mob = mob;
 		this.container = container;
 		if (!(this.container instanceof BefriendedInventory))
-			throw new UnsupportedOperationException("InventoryMenuBefriended only receives BefriendedInventory.");
+			throw new UnsupportedOperationException("BefriendedInventoryMenu only receives BefriendedInventory.");
 		((BefriendedInventory)(this.container)).addListener(mob);
 		this.playerInventory = playerInventory;
 		addMenuSlots();

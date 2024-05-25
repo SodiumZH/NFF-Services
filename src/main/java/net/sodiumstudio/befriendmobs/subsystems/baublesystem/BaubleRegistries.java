@@ -16,7 +16,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.containers.Tuple3;
 import net.sodiumstudio.nautils.containers.Tuple4;
@@ -101,7 +101,7 @@ class BaubleRegistries
 		{
 			ToDoubleFunction<Tuple4<Double, ResourceLocation, IBaubleRegistryEntry, BaubleEquippingCondition>> func = t -> t.a;
 			var sorted = SINGLE_REGISTRY.get(item).stream().sorted(Comparator.comparingDouble(func).reversed()).toList();
-			SINGLE_REGISTRY.put(item, ContainerHelper.toArrayList(sorted));
+			SINGLE_REGISTRY.put(item, NaContainerUtils.toArrayList(sorted));
 		}
 	}
 	

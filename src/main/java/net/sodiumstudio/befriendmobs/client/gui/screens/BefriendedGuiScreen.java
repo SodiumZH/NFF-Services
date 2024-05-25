@@ -22,20 +22,29 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	public IBefriendedMob mob;
 	protected float xMouse = 0;
 	protected float yMouse = 0;
-
+	private ResourceLocation currentTextureLocation = null;
+	private GuiPos textureSize;
+	
 	/**
 	 * Specifies the texture image it uses.
 	 * <p>指定所用的贴图。
 	 */
-	public abstract ResourceLocation getTextureLocation();
-	
-	/**
-	 * If the texture is not a standard 256x256 image, override this value
-	 */
-	public GuiPos getTextureSize() 
+	public final ResourceLocation getTextureLocation()
 	{
-		return new GuiPos(256, 256);
+		return currentTextureLocation;
 	}
+	
+	public final GuiPos getTextureSize() 
+	{
+		return textureSize;
+	}
+	
+	public final void setTexture(ResourceLocation loc, GuiPos size)
+	{
+		currentTextureLocation = loc;
+		this.textureSize = size;
+	}
+
 
 	public BefriendedGuiScreen(BefriendedInventoryMenu pMenu, Inventory pPlayerInventory,
 			IBefriendedMob mob, boolean rendersName)
@@ -165,7 +174,7 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 	 */
 	public void addAttributeInfo(GuiGraphics graphics, GuiPos position, int color, int textRowWidth)
 	{
-		GuiPos pos = position.copy();
+		GuiPos pos = position;
 		String hp = Integer.toString(Math.round(mob.asMob().getHealth()));
 		String maxHp = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH)));
 		String atk = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE)));
@@ -177,9 +186,9 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
 				.append(InfoHelper.createText(": " + def));
 		graphics.drawString(font, hpcomp, pos.x, pos.y, color, false);
-		pos.addY(textRowWidth);
+		pos = pos.addY(textRowWidth);
 		graphics.drawString(font, atkcomp, pos.x, pos.y, color, false);
-		pos.addY(textRowWidth);
+		pos = pos.addY(textRowWidth);
 		graphics.drawString(font, defcomp, pos.x, pos.y, color, false);
 	}
 	

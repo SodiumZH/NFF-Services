@@ -19,6 +19,7 @@ import net.sodiumstudio.befriendmobs.events.BMEntityEvents;
 import net.sodiumstudio.befriendmobs.events.BMServerEvents;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerInstance;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.nautils.NaContainerUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.debug.Debug;

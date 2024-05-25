@@ -1,5 +1,9 @@
 package net.sodiumstudio.nautils.math;
 
+/**
+ * @deprecated Use {@link RandomSelection<Double>} instead.
+ */
+@Deprecated
 public final class DoubleRandomSelection extends RandomSelection<Double>
 {
 	protected DoubleRandomSelection(double defaultValue)

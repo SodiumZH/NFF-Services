@@ -8,7 +8,7 @@ import java.util.Set;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumstudio.nautils.ContainerHelper;
+import net.sodiumstudio.nautils.NaContainerUtils;
 
 public class ItemOrKey extends ObjectOrKey<Item>
 {
@@ -50,7 +50,7 @@ public class ItemOrKey extends ObjectOrKey<Item>
 	 */
 	public static <V> HashMap<ItemOrKey, V> fromItemKeyMap(Map<Item, V> in)
 	{
-		return ContainerHelper.castMap(in, k -> ItemOrKey.of(k), v -> v, true);
+		return NaContainerUtils.castMap(in, k -> ItemOrKey.of(k), v -> v, true);
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class ItemOrKey extends ObjectOrKey<Item>
 	 */
 	public static <K> HashMap<K, ItemOrKey> fromItemValueMap(Map<K, Item> in)
 	{
-		return ContainerHelper.castMap(in, k -> k, v -> ItemOrKey.of(v), true); 
+		return NaContainerUtils.castMap(in, k -> k, v -> ItemOrKey.of(v), true); 
 	}
 	
 	/**
