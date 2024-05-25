@@ -4,7 +4,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.sodiumstudio.nautils.ReflectHelper;
+import net.sodiumstudio.nautils.NaReflectionUtils;
 
 /**
  * Event to modify existing attributes, e.g. change the range, syncability, etc.
@@ -20,8 +20,8 @@ public class ModifyAttributeEvent extends Event implements IModBusEvent
 	{
 		if (attr instanceof RangedAttribute ra)
 		{
-			ReflectHelper.forceSet(ra, RangedAttribute.class, "f_22307_", min);		// RangedAttribute#minValue
-			ReflectHelper.forceSet(ra, RangedAttribute.class, "f_22308_", max);		// RangedAttribute#maxValue
+			NaReflectionUtils.forceSet(ra, RangedAttribute.class, "f_22307_", min);		// RangedAttribute#minValue
+			NaReflectionUtils.forceSet(ra, RangedAttribute.class, "f_22308_", max);		// RangedAttribute#maxValue
 			verifyAttribute(ra);
 		}
 	}
@@ -34,7 +34,7 @@ public class ModifyAttributeEvent extends Event implements IModBusEvent
 	{
 		if (attr instanceof RangedAttribute ra)
 		{
-			ReflectHelper.forceSet(ra, RangedAttribute.class, "f_22307_", min);		// RangedAttribute#minValue
+			NaReflectionUtils.forceSet(ra, RangedAttribute.class, "f_22307_", min);		// RangedAttribute#minValue
 			verifyAttribute(ra);
 		}
 	}
@@ -47,7 +47,7 @@ public class ModifyAttributeEvent extends Event implements IModBusEvent
 	{
 		if (attr instanceof RangedAttribute ra)
 		{
-			ReflectHelper.forceSet(ra, RangedAttribute.class, "f_22308_", max);		// RangedAttribute#maxValue
+			NaReflectionUtils.forceSet(ra, RangedAttribute.class, "f_22308_", max);		// RangedAttribute#maxValue
 			verifyAttribute(ra);
 		}
 	}
@@ -57,7 +57,7 @@ public class ModifyAttributeEvent extends Event implements IModBusEvent
 	 */
 	public void setAttributeDefaultValue(Attribute attr, double defaultVal)
 	{
-		ReflectHelper.forceSet(attr, Attribute.class, "f_22076", defaultVal);		// Attribute#defaultValue
+		NaReflectionUtils.forceSet(attr, Attribute.class, "f_22076", defaultVal);		// Attribute#defaultValue
 		if (attr instanceof RangedAttribute ra)
 		{
 			verifyAttribute(ra);

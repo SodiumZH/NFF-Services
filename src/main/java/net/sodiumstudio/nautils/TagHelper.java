@@ -84,7 +84,7 @@ public class TagHelper
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(ResourceLocation tag)
 	{
 		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITIES.tags().createTagKey(tag);
-		return ContainerHelper.iterableToList(ForgeRegistries.ENTITIES.tags().getTag(tagKey));
+		return NaContainerUtils.iterableToList(ForgeRegistries.ENTITIES.tags().getTag(tagKey));
 	}
 	
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(String tag)
@@ -100,7 +100,7 @@ public class TagHelper
 	public static ArrayList<Item> getAllItemsUnderTag(ResourceLocation tag)
 	{
 		TagKey<Item> tagKey = ForgeRegistries.ITEMS.tags().createTagKey(tag);
-		return ContainerHelper.iterableToList(ForgeRegistries.ITEMS.tags().getTag(tagKey));
+		return NaContainerUtils.iterableToList(ForgeRegistries.ITEMS.tags().getTag(tagKey));
 	}
 	
 	public static ArrayList<Item> getAllItemsUnderTag(String tag)
@@ -116,7 +116,7 @@ public class TagHelper
 	public static ArrayList<Block> getAllBlocksUnderTag(ResourceLocation tag)
 	{
 		TagKey<Block> tagKey = ForgeRegistries.BLOCKS.tags().createTagKey(tag);
-		return ContainerHelper.iterableToList(ForgeRegistries.BLOCKS.tags().getTag(tagKey));
+		return NaContainerUtils.iterableToList(ForgeRegistries.BLOCKS.tags().getTag(tagKey));
 	}
 	
 	public static ArrayList<Block> getAllBlocksUnderTag(String tag)

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.sodiumstudio.nautils.containers.IterableArray;
+import net.sodiumstudio.nautils.containers.ArrayIterationHelper;
 
 public class RegisterBaubleEquippableMobsEvent extends Event implements IModBusEvent
 {
@@ -73,7 +73,7 @@ public class RegisterBaubleEquippableMobsEvent extends Event implements IModBusE
 		 */
 		public SlotRegisterer addSpecialSlotItem(String... acceptedEntryKeys)
 		{
-			for (String entryKey: IterableArray.of(acceptedEntryKeys))
+			for (String entryKey: ArrayIterationHelper.of(acceptedEntryKeys))
 				BaubleEquippableMobRegistries.getMobSlotPropertyMap(clazz).get(slotKey).d.add(BaubleRegistries.getEntryByKey(entryKey));
 			return new SlotRegisterer(clazz);
 		}
@@ -84,7 +84,7 @@ public class RegisterBaubleEquippableMobsEvent extends Event implements IModBusE
 		 */
 		public SlotRegisterer addSpecialSlotItem(ResourceLocation... acceptedEntryKeys)
 		{
-			for (ResourceLocation entryKey: IterableArray.of(acceptedEntryKeys))
+			for (ResourceLocation entryKey: ArrayIterationHelper.of(acceptedEntryKeys))
 				BaubleEquippableMobRegistries.getMobSlotPropertyMap(clazz).get(slotKey).d.add(BaubleRegistries.getEntryByKey(entryKey));
 			return new SlotRegisterer(clazz);
 		}

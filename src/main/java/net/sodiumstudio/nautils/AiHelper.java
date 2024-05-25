@@ -24,12 +24,12 @@ public class AiHelper
 	@SuppressWarnings("unchecked")
 	public static Class<? extends LivingEntity> getTargetType(NearestAttackableTargetGoal<?> goal)
 	{
-		return (Class<? extends LivingEntity>) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "f_26048_");
+		return NaReflectionUtils.forceGet(goal, NearestAttackableTargetGoal.class, "f_26048_").cast();
 	}
 	
 	public static TargetingConditions getTargetConditions(NearestAttackableTargetGoal<?> goal)
 	{
-		return (TargetingConditions) ReflectHelper.forceGet(goal, NearestAttackableTargetGoal.class, "f_26051_");
+		return NaReflectionUtils.forceGet(goal, NearestAttackableTargetGoal.class, "f_26051_").cast();
 	}
 	
 	public static boolean isMobHostileTo(Mob test, LivingEntity isHostileTo)

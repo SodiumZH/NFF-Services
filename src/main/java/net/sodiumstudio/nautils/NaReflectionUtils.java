@@ -1,8 +1,9 @@
 package net.sodiumstudio.nautils;
 
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.sodiumstudio.nautils.object.CastableObject;
 
-public class ReflectHelper
+public class NaReflectionUtils
 {
 	
 	/**
@@ -14,7 +15,7 @@ public class ReflectHelper
 	 * @param value New value to get.
 	 * @return Value got.
 	 */
-	public static <T> Object forceGet(T obj, Class<? super T> declaredClass, String fieldNameSrg, boolean noStackTrace)
+	public static <T> CastableObject forceGet(T obj, Class<? super T> declaredClass, String fieldNameSrg, boolean noStackTrace)
 	{
 		Object result = null;
 		try
@@ -27,7 +28,7 @@ public class ReflectHelper
 				e.printStackTrace();
 			return null;
 		}
-		return result;
+		return new CastableObject(result);
 	}
 	
 	/**
@@ -38,7 +39,7 @@ public class ReflectHelper
 	 * @param value New value to get.
 	 * @return Value got.
 	 */
-	public static <T> Object forceGet(T obj, Class<? super T> declaredClass, String fieldNameSrg)
+	public static <T> CastableObject forceGet(T obj, Class<? super T> declaredClass, String fieldNameSrg)
 	{
 		return forceGet(obj, declaredClass, fieldNameSrg, false);
 	}
@@ -135,7 +136,7 @@ public class ReflectHelper
 	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
 	 * <p>{@code forceInvokeRetVal(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static <T> Object forceInvokeRetVal(T obj, Class<? super T> declaredClass, boolean noStackTrace, String methodNameSrg, Object... paramTypesThenValues)
+	public static <T> CastableObject forceInvokeRetVal(T obj, Class<? super T> declaredClass, boolean noStackTrace, String methodNameSrg, Object... paramTypesThenValues)
 	{
 		Object result = null;
 		try
@@ -158,7 +159,7 @@ public class ReflectHelper
 				e.printStackTrace();
 			return null;
 		}
-		return result;
+		return new CastableObject(result);
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class ReflectHelper
 	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
 	 * <p>{@code forceInvokeRetVal(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static <T> Object forceInvokeRetVal(T obj, Class<? super T> declaredClass, String methodNameSrg, Object... paramTypesThenValues)
+	public static <T> CastableObject forceInvokeRetVal(T obj, Class<? super T> declaredClass, String methodNameSrg, Object... paramTypesThenValues)
 	{
 		return forceInvokeRetVal(obj, declaredClass, false, methodNameSrg, paramTypesThenValues);
 	}

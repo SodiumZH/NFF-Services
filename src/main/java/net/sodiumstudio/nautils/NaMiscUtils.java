@@ -2,10 +2,13 @@ package net.sodiumstudio.nautils;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
 
@@ -155,5 +159,15 @@ public class NaMiscUtils {
 		return (T)obj;
 	}
 	
+	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access, T fallback)
+	{
+		MutableObject<T> res = new MutableObject<>(fallback);
+		target.getCapability(holder).ifPresent(cap -> res.setValue(access.apply(cap)));
+		return res.getValue();
+	}
 	
+	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access)
+	{
+		return getValueFromCapability(target, holder, access, null);
+	}
 }

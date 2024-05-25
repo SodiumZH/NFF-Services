@@ -3,22 +3,22 @@ package net.sodiumstudio.nautils.containers;
 import java.util.Iterator;
 
 /**
- * A wrapper of array for iteration.
+ * A wrapper of array for iteration. Also can be used to input as argument for {@code Iterable}.
  */
-public class IterableArray<T> implements Iterable<T>
+public class ArrayIterationHelper<T> implements Iterable<T>
 {
 
 	private T[] array;
 	
-	public IterableArray(T[] array)
+	public ArrayIterationHelper(T[] array)
 	{
 		this.array = array;
 	}
 	
 	@SafeVarargs
-	public static <S> IterableArray<S> of(S... elems)
+	public static <S> ArrayIterationHelper<S> of(S... elems)
 	{
-		return new IterableArray<>(elems);
+		return new ArrayIterationHelper<>(elems);
 	}
 	
 	@Override
@@ -30,6 +30,8 @@ public class IterableArray<T> implements Iterable<T>
 	{
 		return array;
 	}
+	
+	
 	
 	private static class IteratorImpl<U> implements Iterator<U>
 	{
