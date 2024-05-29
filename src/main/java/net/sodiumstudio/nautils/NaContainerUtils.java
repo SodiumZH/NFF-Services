@@ -549,6 +549,15 @@ public class NaContainerUtils
 		return res;
 	}
 	
+	public static <T1, T2> void castListAndFill(List<T1> list, Function<T1, T2> cast, List<T2> fillInto)
+	{
+		fillInto.clear();
+		for (T1 elem: list)
+		{
+			fillInto.add(cast.apply(elem));
+		}
+	}
+	
 	public static <T> HashSet<T> getRandomSubset(Set<T> parent, int subsetSize)
 	{
 		if (subsetSize > parent.size())
@@ -563,4 +572,5 @@ public class NaContainerUtils
 		}
 		return res;
 	}
+
 }
