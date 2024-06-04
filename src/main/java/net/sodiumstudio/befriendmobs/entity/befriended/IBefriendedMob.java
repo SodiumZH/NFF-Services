@@ -640,6 +640,9 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 		return ForgeRegistries.ENTITY_TYPES.getKey(asMob().getType()).getNamespace();
 	}
 
+	/**
+	 * Get the capability for storage of additional data.
+	 */
 	public default CBefriendedMobData getData()
 	{
 		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
@@ -651,6 +654,15 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
 			return new CBefriendedMobData.Values(this);	
 		return res.get();
+	}
+	
+	/**
+	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID)
+	 */
+	@DontOverride
+	public default UUID getIdentifier()
+	{
+		return this.getData().getIdentifier();
 	}
 	
 	/* Behaviors */

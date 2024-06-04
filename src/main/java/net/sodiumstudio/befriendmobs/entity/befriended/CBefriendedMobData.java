@@ -5,6 +5,7 @@ import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -41,7 +42,7 @@ import net.sodiumstudio.befriendmobs.events.*;
  * A temporal module for storage of data in IBefriendedMob interface.
  */
 public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
-
+	
 	/**
 	 * Transform capability to value implementations.
 	 * In values transient data can be directly accessed.
@@ -98,6 +99,19 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		}
 	}
 	
+	/**
+	 * Get the UUID identifier of this mob. (Independent to the entity UUID. 
+	 * This is generated on befriended for identifying a mob even if it has respawned with a new UUID.)
+	 */
+	public UUID getIdentifier();
+	
+	/**
+	 * Generate UUID identifier of this mob. (Independent to the entity UUID. 
+	 * This is generated on befriended for identifying a mob even if it has respawned with a new UUID.)
+	 */
+	@DontCallManually
+	public void generateIdentifier();
+	
 	// Owner info related //
 	
 	/**
@@ -106,7 +120,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	public String getOwnerName();
 	
 	/**
-	 * Set the owner's display name.
+	 * Set the owner's display name stored.
 	 */
 	public void setOwnerName(@Nonnull Player owner);
 	
@@ -166,10 +180,10 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	@Nullable
 	public void setPreviousTarget(LivingEntity target);
 	
-	
 	 // Values of mob data, also as implementation of interface methods.
 	public static class Values implements CBefriendedMobData
 	{
+		private static final UUID EMPTY_UUID = new UUID(0l, 0l);
 		private IBefriendedMob mob;
 		private CompoundTag tag = new CompoundTag();
 		public Values(IBefriendedMob mob)
@@ -182,6 +196,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		private boolean hasInit = false;
 		private LivingEntity previousTarget = null;
 		private Vec3 anchor;
+		@Nullable
+		private UUID identifier = null;	
 		
 		// BefriendedUndeadMob data
 		private MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -232,7 +248,33 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		public void removeTempObject(String key) {
 			tempObjects.remove(key);
 		}
+		
+		
+		@Override
+		public UUID getIdentifier()
+		{
+			if (this.identifier != null && !this.identifier.equals(EMPTY_UUID))
+				return this.identifier;
+			else if (this.tag.hasUUID("identifier") && !this.tag.getUUID("identifier").equals(EMPTY_UUID))
+				return this.tag.getUUID("identifier");
+			else
+			{
+				LogUtils.getLogger().error(String.format("Befriended mob %s missing identifier. Trying to regenerate.", this.getMob().asMob().getName().getString()));
+				this.generateIdentifier();
+				return this.identifier;
+			}
+		}
 
+		@Override
+		public void generateIdentifier()
+		{
+			if (this.identifier == null || this.identifier.equals(EMPTY_UUID))
+			{
+				this.identifier = UUID.randomUUID();
+				this.tag.putUUID("identifier", this.identifier);
+			}
+		}
+		
 		@Override
 		public String getOwnerName() {
 			if (!tag.contains("owner_name", NbtHelper.TAG_STRING_ID))
