@@ -1,6 +1,13 @@
 package net.sodiumstudio.nautils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.sodiumstudio.nautils.containers.ArrayIterationHelper;
 import net.sodiumstudio.nautils.object.CastableObject;
 
 public class NaReflectionUtils
@@ -176,5 +183,51 @@ public class NaReflectionUtils
 	public static <T> CastableObject forceInvokeRetVal(T obj, Class<? super T> declaredClass, String methodNameSrg, Object... paramTypesThenValues)
 	{
 		return forceInvokeRetVal(obj, declaredClass, false, methodNameSrg, paramTypesThenValues);
+	}
+
+	/**
+	 * Get all fields (including fields in parent classes, ignoring accessibility, no setting accessible)
+	 */
+	public static List<Field> getAllFields(Object obj, boolean includesStatic)
+	{
+		List<Field> allFlds = new ArrayList<>();
+		Class<?> currentClz = obj.getClass();
+		try {
+			do {
+				List<Field> flds = (NaContainerUtils.iterableToList(ArrayIterationHelper.of(currentClz.getDeclaredFields())));
+				allFlds.addAll(flds);
+				if (currentClz != Object.class)
+					currentClz = currentClz.getSuperclass();
+			}
+			while (currentClz != Object.class);
+		} catch (Throwable e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		if (!includesStatic)
+			allFlds = allFlds.stream().filter(f -> !Modifier.isStatic(f.getModifiers())).toList();
+		return allFlds;
+	}
+	
+	/**
+	 * Do an operation to all fields (including fields in parent classes, ignoring accessibility) of an object.
+	 */
+	public static void forAllFields(Object obj, Consumer<Object> operation, boolean includesStatic)
+	{
+		List<Field> flds = getAllFields(obj, includesStatic);
+		for (Field fld: flds)
+		{
+			try {
+				fld.setAccessible(true);
+				operation.accept(fld.get(obj));
+			} 
+			catch (Throwable t) {
+				t.printStackTrace();
+			}
+			finally {
+				fld.setAccessible(false);
+			}
+		} 
 	}
 }
