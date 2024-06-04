@@ -138,4 +138,10 @@ public class AppendedMap<K, V> implements Map<K, V>
 		return res;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "AppendedMap: EXTERNAL = \n" + this.externalPart.toString() + ",\nINTERNAL = \n" + this.internalPart.toString();
+	}
+	
 }
