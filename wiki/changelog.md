@@ -4,11 +4,25 @@
 
 ##### BefriendMobs
 
+Added `identifier` and `initialEntityType` fields to `CBefriendedMobData`. 
+
 ##### NaUtils
+
+Added `CompoundSet`. (Functions see the source code)
 
 Removed `StandardColor`. Use vanilla `DyeColor` instead.
 
-Replaced `WithStandardColor` with `WithDyeColor` in which the constructor was changed.
+Replaced `WithStandardColor` with `WithDyeColor` in which the constructor was changed from using previous `StandardColor` to vanilla `DyeColor`.
+
+Now `GuiPos` (previously `IntVec2`) is immutable.
+
+Added `CastableObject` for reflection output to simplify subsequent casting operations.
+
+Renamed class: 
+
+-`IntVec2` => `GuiPos`
+
+-`ReflectHelper` => `NaReflectionUtils`
 
 ### 0.x.22
 
