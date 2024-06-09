@@ -94,9 +94,9 @@ public class BefriendedAIState {
 	protected static final HashMap<BefriendedAIState, MutableComponent> DISPLAY_INFO = new HashMap<BefriendedAIState, MutableComponent>();
 	static
 	{
-		DISPLAY_INFO.put(WAIT, InfoHelper.createTrans("info.befriendmobs.mob_wait"));
-		DISPLAY_INFO.put(FOLLOW, InfoHelper.createTrans("info.befriendmobs.mob_follow"));
-		DISPLAY_INFO.put(WANDER, InfoHelper.createTrans("info.befriendmobs.mob_wander"));
+		DISPLAY_INFO.put(WAIT, InfoHelper.createTranslatable("info.befriendmobs.mob_wait"));
+		DISPLAY_INFO.put(FOLLOW, InfoHelper.createTranslatable("info.befriendmobs.mob_follow"));
+		DISPLAY_INFO.put(WANDER, InfoHelper.createTranslatable("info.befriendmobs.mob_wander"));
 	}
 	
 	public static void putDisplayInfo(BefriendedAIState state, MutableComponent info)
