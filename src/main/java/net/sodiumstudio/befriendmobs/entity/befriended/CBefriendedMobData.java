@@ -15,6 +15,9 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -22,6 +25,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
@@ -101,6 +105,24 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	@DontCallManually
 	public void generateIdentifier();
 	
+	
+	/**
+	 * Get the registry key of the entity type of this mob on befriended.
+	 * <p>
+	 * This allows to read the mob's "initial" type after it converts to other
+	 * types somehow.
+	 */
+	public ResourceLocation getInitialEntityType();
+	
+	/**
+	 * Record the registry key of the entity type of this mob on befriended.
+	 * <p>
+	 * This allows to read the mob's "initial" type after it converts to other
+	 * types somehow.
+	 */
+	public void recordEntityType();
+	
+	
 	// Owner info related //
 	
 	/**
@@ -175,6 +197,12 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		private static final UUID EMPTY_UUID = new UUID(0l, 0l);
 		private IBefriendedMob mob;
 		private CompoundTag tag = new CompoundTag();
+		private boolean hasInit = false;
+		private LivingEntity previousTarget = null;
+		private Vec3 anchor;
+		private UUID identifier = null;	
+		
+
 		public Values(IBefriendedMob mob)
 		{
 			this.mob = mob;
@@ -182,11 +210,6 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			this.tag = new CompoundTag();
 		}
 		
-		private boolean hasInit = false;
-		private LivingEntity previousTarget = null;
-		private Vec3 anchor;
-		@Nullable
-		private UUID identifier = null;	
 		
 		// BefriendedUndeadMob data
 		private MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -262,6 +285,20 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 				this.identifier = UUID.randomUUID();
 				this.tag.putUUID("identifier", this.identifier);
 			}
+		}
+		
+		@Override
+		public ResourceLocation getInitialEntityType()
+		{
+			if (!tag.contains("initial_entity_type", NbtHelper.TAG_STRING_ID))
+				recordEntityType();
+			return new ResourceLocation(this.tag.getString("initial_entity_type"));
+		}
+		
+		@Override
+		public void recordEntityType()
+		{
+			this.tag.putString("initial_entity_type", ForgeRegistries.ENTITY_TYPES.getKey(this.getMob().asMob().getType()).toString());
 		}
 		
 		@Override
