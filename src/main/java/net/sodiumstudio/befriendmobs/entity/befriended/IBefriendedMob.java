@@ -3,6 +3,7 @@ package net.sodiumstudio.befriendmobs.entity.befriended;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
@@ -45,6 +47,51 @@ import net.sodiumstudio.nautils.object.ItemOrKey;
 
 public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 
+	/* Common */
+	/**
+	 * Check if an object has a BM interface.
+	 * <p>
+	 * As IBefriendedMob could also be implemented in capabilities instead of the mob class in the future,
+	 * always use this instead of {@code instanceof} check.
+	 */
+	public static boolean isBM(Object o)
+	{
+		if (o instanceof IBefriendedMob bm)
+			return true;
+		else return false;
+	}
+	
+	/**
+	 * Cast an object to the BM interface. Null if failed.
+	 * <p>
+	 * As IBefriendedMob could also be implemented in capabilities instead of the mob class in the future,
+	 * always use this to cast a mob to BM.
+	 */
+	@Nullable
+	public static IBefriendedMob getBM(Object o)
+	{
+		if (o instanceof IBefriendedMob bm)
+			return bm;
+		else return null;
+	}
+	
+	/**
+	 * Do an action if an object has a BM interface.
+	 * <p>
+	 * As IBefriendedMob could also be implemented in capabilities instead of the mob class in the future,
+	 * you can use this to safely cast and do things to BM.
+	 * @return Whether the action is invoked.
+	 */
+	public static boolean ifBM(Object o, Consumer<IBefriendedMob> action)
+	{
+		if (IBefriendedMob.isBM(o))
+		{
+			action.accept(IBefriendedMob.getBM(o));
+			return true;
+		}
+		else return false;
+	}
+	
 	/* Initialization */
 	
 	/** Initialize a mob.
