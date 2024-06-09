@@ -62,7 +62,8 @@ public abstract class BefriendingHandler
 		newBefMob.init(player.getUUID(), target);
 		newBefMob.setInventoryFromMob();
 		newBefMob.getData().generateIdentifier();
-		Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
+		newBefMob.getData().recordEntityType();
+		//Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
 		BMHooks.Befriending.onMobBefriended(target, newBefMob);
 		newBefMob.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
