@@ -179,11 +179,11 @@ public abstract class BefriendedGuiScreen extends AbstractContainerScreen<Befrie
 		String maxHp = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH)));
 		String atk = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		String def = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ARMOR)));
-		Component hpcomp = InfoHelper.createTrans("info.befriendmobs.gui_health")
+		Component hpcomp = InfoHelper.createTranslatable("info.befriendmobs.gui_health")
 				.append(InfoHelper.createText(": " + hp + " / " + maxHp));
-		Component atkcomp = InfoHelper.createTrans("info.befriendmobs.gui_atk")
+		Component atkcomp = InfoHelper.createTranslatable("info.befriendmobs.gui_atk")
 				.append(InfoHelper.createText(": " + atk));
-		Component defcomp = InfoHelper.createTrans("info.befriendmobs.gui_armor")
+		Component defcomp = InfoHelper.createTranslatable("info.befriendmobs.gui_armor")
 				.append(InfoHelper.createText(": " + def));
 		graphics.drawString(font, hpcomp, pos.x, pos.y, color, false);
 		pos = pos.addY(textRowWidth);
