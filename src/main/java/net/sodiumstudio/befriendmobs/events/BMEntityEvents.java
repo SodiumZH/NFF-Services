@@ -226,14 +226,14 @@ public class BMEntityEvents
 	        if (mob instanceof IBefriendedMob bm)
 	        {
 	        	// Befriended mob should never attack the owner
-	        	if (target == bef.getOwner())
-	        		mob.setTarget(bef.getPreviousTarget());
+	        	if (target == bm.getOwner())
+	        		mob.setTarget(bm.getPreviousTarget());
 	        	// Befriended mob shouldn't attack owner's other befriended mobs
 	        	else if (target instanceof IBefriendedMob tbef)
 	        	{
 	        		if (bm.getOwner() != null && tbef.getOwner() != null && bm.getOwner() == tbef.getOwner())
 	        		{
-	        			mob.setTarget(bef.getPreviousTarget());
+	        			mob.setTarget(bm.getPreviousTarget());
 	        		}
 	        	}
 	        	// Befriended mob shouldn't attack owner's tamable animals
@@ -241,7 +241,7 @@ public class BMEntityEvents
 	        	{
 	        		if (bm.getOwner() != null && ta.getOwner() != null && bm.getOwner() == ta.getOwner())
 	        		{
-	        			event.setNewTarget(bm.getPreviousTarget());
+	        			bm.asMob().setTarget(bm.getPreviousTarget());
 	        		}
 	        	}
 	        	else

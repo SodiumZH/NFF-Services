@@ -1,13 +1,10 @@
 package net.sodiumstudio.nautils.math;
 
-import java.util.Collection;
 import java.util.Random;
-
-import net.minecraft.util.RandomSource;
 
 public class RndUtil {
 	
-	protected static final RandomSource RND = RandomSource.create();
+	protected static final Random RND = new Random();
 	
 	public static double rndRangedDouble(double min, double max)
 	{

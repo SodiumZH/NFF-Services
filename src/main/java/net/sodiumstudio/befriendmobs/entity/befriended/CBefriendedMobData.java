@@ -307,7 +307,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		@Override
 		public void recordEntityType()
 		{
-			this.tag.putString("initial_entity_type", ForgeRegistries.ENTITY_TYPES.getKey(this.getMob().asMob().getType()).toString());
+			this.tag.putString("initial_entity_type", ForgeRegistries.ENTITIES.getKey(this.getMob().asMob().getType()).toString());
 		}
 		
 		@Override

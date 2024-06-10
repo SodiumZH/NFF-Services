@@ -23,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.FishingRodItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -34,7 +33,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumstudio.nautils.ReflectHelper;
+import net.sodiumstudio.nautils.NaReflectionUtils;
 
 /**
  * A wrapped vanilla FishingHook in 1.18.2 for support of subclasses.
@@ -84,7 +83,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 	 */
 	protected int getLuck()
 	{
-		return (int) ReflectHelper.forceGet(this, FishingHook.class, "f_37096_");	// FishingHook#luck
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37096_").cast();	// FishingHook#luck
 	}
 	
 	/**
@@ -92,7 +91,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 	 */
 	protected int getNibble()
 	{
-		return (int) ReflectHelper.forceGet(this, FishingHook.class, "f_37089_");	// FishingHook#nibble
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37089_").cast();	// FishingHook#nibble
 	}
 	
 	/**
@@ -191,37 +190,37 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 
 	protected void setHookedEntity(@Nullable Entity entity)
 	{
-		ReflectHelper.forceInvoke(this, FishingHook.class, "m_150157_", Entity.class, entity);
+		NaReflectionUtils.forceInvoke(this, FishingHook.class, "m_150157_", Entity.class, entity);
 	}
 	
 	protected int getLife()
 	{
-		return (Integer) ReflectHelper.forceGet(this, FishingHook.class, "f_37103_");
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37103_").cast();
 	}
 	
 	protected void setLife(int value)
 	{
-		ReflectHelper.forceSet(this, FishingHook.class, "f_37103_", value);
+		NaReflectionUtils.forceSet(this, FishingHook.class, "f_37103_", value);
 	}
 	
 	protected boolean getOpenWater()
 	{
-		return (Boolean) ReflectHelper.forceGet(this, FishingHook.class, "f_37093_");
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37093_").cast();
 	}
 	
 	protected void setOpenWater(boolean value)
 	{
-		ReflectHelper.forceSet(this, FishingHook.class, "f_37093_", value);
+		NaReflectionUtils.forceSet(this, FishingHook.class, "f_37093_", value);
 	}
 	
 	protected int getTimeUntilHooked()
 	{
-		return (Integer) ReflectHelper.forceGet(this, FishingHook.class, "f_37091_");
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37091_").cast();
 	}
 	
 	protected boolean getBiting()
 	{
-		return (Boolean) ReflectHelper.forceGet(this, FishingHook.class, "f_37099_");	
+		return NaReflectionUtils.forceGet(this, FishingHook.class, "f_37099_").cast();	
 	}
 	
 	/**
@@ -275,7 +274,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 					return;
 				}
 
-				ReflectHelper.forceInvoke(this, FishingHook.class, "m_37171_");	// this.checkCollision();
+				NaReflectionUtils.forceInvoke(this, FishingHook.class, "m_37171_");	// this.checkCollision();
 				
 			} else
 			{
@@ -313,7 +312,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 					} else
 					{
 						this.setOpenWater(this.getOpenWater() && this.outOfWaterTime < 10 && 
-								(Boolean) ReflectHelper.forceInvokeRetVal(this, FishingHook.class, "m_37158_", BlockPos.class, blockpos));//this.calculateOpenWater(blockpos);
+								NaReflectionUtils.forceInvokeRetVal(this, FishingHook.class, "m_37158_", BlockPos.class, blockpos).castTo(Boolean.class));//this.calculateOpenWater(blockpos);
 					}
 
 					if (flag)
@@ -329,7 +328,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 
 						if (!this.level.isClientSide)
 						{
-							ReflectHelper.forceInvoke(this, FishingHook.class, "m_37145_", BlockPos.class, blockpos);//this.catchingFish(blockpos);
+							NaReflectionUtils.forceInvoke(this, FishingHook.class, "m_37145_", BlockPos.class, blockpos);//this.catchingFish(blockpos);
 						}
 					} else
 					{
@@ -360,22 +359,22 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 	
 	protected boolean getHasBeenShot()
 	{
-		return (Boolean) ReflectHelper.forceGet(this, Projectile.class, "f_150164_");
+		return NaReflectionUtils.forceGet(this, Projectile.class, "f_150164_").cast();
 	}
 	
 	protected void setHasBeenShot(boolean value)
 	{
-		ReflectHelper.forceSet(this, Projectile.class, "f_150164_", value);
+		NaReflectionUtils.forceSet(this, Projectile.class, "f_150164_", value);
 	}
 	
 	protected boolean getLeftOwner()
 	{
-		return (Boolean) ReflectHelper.forceGet(this, Projectile.class, "f_37246_");
+		return NaReflectionUtils.forceGet(this, Projectile.class, "f_37246_").cast();
 	}
 	
 	protected void setLeftOwner(boolean value)
 	{
-		ReflectHelper.forceSet(this, Projectile.class, "f_37246_", value);
+		NaReflectionUtils.forceSet(this, Projectile.class, "f_37246_", value);
 	}
 	
 	protected void projectileTick()
@@ -386,7 +385,7 @@ public abstract class AbstractFishingHookEntity extends FishingHook
 	       }
 
 	       if (!this.getLeftOwner()) {
-	          this.setLeftOwner((Boolean)ReflectHelper.forceInvokeRetVal(this, Projectile.class, "m_37276_")/*this.checkLeftOwner()*/);
+	          this.setLeftOwner(NaReflectionUtils.forceInvokeRetVal(this, Projectile.class, "m_37276_").cast()/*this.checkLeftOwner()*/);
 	       }
 	       // Entity#tick
 	       this.baseTick();

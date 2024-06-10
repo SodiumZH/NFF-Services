@@ -3,15 +3,13 @@ package net.sodiumstudio.nautils.math;
 import java.util.ArrayList;
 import java.util.Random;
 
-import net.minecraft.util.RandomSource;
-
 /**
  * A {@code RandomSelection} is a series of objects that will be randomly selected.
  */
 public class RandomSelection<T>
 {
 
-	protected static final RandomSource RND = RandomSource.create();
+	protected static final Random RND = new Random();
 	protected ArrayList<Double> probSequence = new ArrayList<Double>();
 	protected ArrayList<T> valSequence = new ArrayList<T>();
 	protected T defaultVal = null;
@@ -59,7 +57,7 @@ public class RandomSelection<T>
 		return this;
 	}
 
-	public T getValue(RandomSource rnd) {
+	public T getValue(Random rnd) {
 		double rnddouble = rnd.nextDouble();
 		for (int i = 0; i < probSequence.size(); ++i)
 		{
