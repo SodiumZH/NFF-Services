@@ -24,6 +24,10 @@ Renamed class:
 
 -`ReflectHelper` => `NaReflectionUtils`
 
+`ContainerHelper` => `NaContainerUtils`
+
+`ReflectHelper` => `NaReflectionUtils`
+
 ### 0.x.22
 
 ##### BefriendMobs
