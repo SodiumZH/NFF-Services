@@ -44,7 +44,7 @@ public class RepeatableAttributeModifier
 		// The first element (index == 0) is zero, so max length should be (max + 1).
 		while (modifiers.size() <= index + 1)
 		{
-			modifiers.add(new AttributeModifier(UUID.randomUUID(), Integer.toString(modifiers.size()), this.value * index, this.operation));
+			modifiers.add(new AttributeModifier(UUID.randomUUID(), Integer.toString(modifiers.size()), this.value * modifiers.size(), this.operation));
 		}
 		return modifiers.get(index);
 	}
