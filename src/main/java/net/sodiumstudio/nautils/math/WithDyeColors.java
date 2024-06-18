@@ -15,6 +15,7 @@ public class WithDyeColors<T>
 	
 	private final HashMap<DyeColor, T> map = new HashMap<>();
 	
+	@SuppressWarnings("unchecked")
 	public WithDyeColors(Object... keysAndValues)
 	{
 		DyeColor active = null;
@@ -94,5 +95,19 @@ public class WithDyeColors<T>
 		return otherCollection.ofColor(this.getColor(object));
 	}
 
-	
+	/**
+	 * Get an array of all objects.
+	 */
+	@SuppressWarnings("unchecked")
+	public T[] objectArray()
+	{
+		Object[] res = new Object[map.entrySet().size()];
+		int i = 0;
+		for (var entry: map.entrySet())
+		{
+			res[i] = entry.getValue();
+			i++;
+		}
+		return (T[]) res;
+	}
 }
