@@ -3,6 +3,7 @@ package net.sodiumstudio.nautils.item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +25,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class NaUtilsItem extends Item
 {
-	protected List<MutableComponent> descriptions = new ArrayList<MutableComponent>();
+	protected List<Supplier<MutableComponent>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	
 	public NaUtilsItem(Properties pProperties)
@@ -33,11 +34,20 @@ public class NaUtilsItem extends Item
 	}
 
 	/**
+	 * Add a description {@code Component} supplier to hovering text. 
+	 */
+	public NaUtilsItem description(Supplier<MutableComponent> desc)
+	{
+		descriptions.add(desc);
+		return this;
+	}
+	
+	/**
 	 * Add a description {@code Component} to hovering text. 
 	 */
 	public NaUtilsItem description(MutableComponent desc)
 	{
-		descriptions.add(desc);
+		descriptions.add(() -> desc);
 		return this;
 	}
 	
@@ -92,9 +102,9 @@ public class NaUtilsItem extends Item
 	{
 		super.appendHoverText(stack, level, list, tooltipFlag);
 		this.beforeAddingHoveringDescriptions(stack, level, list, tooltipFlag);
-		for (MutableComponent c: descriptions)
+		for (var c: descriptions)
 		{
-			list.add(c);
+			list.add(c.get());
 		}
 	}
 	
