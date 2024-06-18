@@ -7,6 +7,9 @@ import net.minecraft.util.RandomSource;
 
 /**
  * A {@code RandomSelection} is a series of objects that will be randomly selected.
+ * <p>Usage example:
+ * <p>{@code new RandomSelection<Integer>(0).add(1, 0.1d).add(2, 0.3d).add(3, 0.5d)}
+ * <p>Then the probabilities are: 1:10%; 2:30%; 3:50%; 0:10% (1-10%-30%-50%).
  */
 public class RandomSelection<T>
 {
@@ -16,26 +19,26 @@ public class RandomSelection<T>
 	protected ArrayList<T> valSequence = new ArrayList<T>();
 	protected T defaultVal = null;
 
-	protected RandomSelection(T defaultValue)
+	/**
+	 * Create with given fallback value.
+	 */
+	public RandomSelection(T fallback)
 	{
-		defaultVal = defaultValue;
+		defaultVal = fallback;
 	}
 
 	/**
-	 * Create a {@code RandomSelection} with given default value.
-	 * @param defaultValue Value if none of the added values are chosen.
+	 * @deprecated Use the constructor instead.
 	 */
-	public static <T> RandomSelection<T> create(T defaultValue) {
-		return new RandomSelection<T>(defaultValue);
+	@Deprecated
+	public static <T> RandomSelection<T> create(T fallback) {
+		return new RandomSelection<T>(fallback);
 	}
 
-	/**
-	 * Create a {@code RandomSelection} of double.
-	 * @param defaultValue Value if none of the added values are chosen.
-	 */
-	public static DoubleRandomSelection createDouble(double defaultValue)
+	@Deprecated
+	public static DoubleRandomSelection createDouble(double fallback)
 	{
-		return new DoubleRandomSelection(defaultValue);
+		return new DoubleRandomSelection(fallback);
 	}
 	
 	/**
@@ -54,12 +57,36 @@ public class RandomSelection<T>
 		return this;
 	}
 	
+	/**
+	 * Set the default value i.e. the value if none of the added values are selected.
+	 */
 	public RandomSelection<T> defaultValue(T value) {
 		defaultVal = value;
 		return this;
 	}
 
-	public T getValue(RandomSource rnd) {
+	/**
+	 * @deprecated use {@code select} instead.
+	 */
+	@Deprecated
+	public T getValue(RandomSource rnd)
+	{
+		return this.select(rnd);
+	}
+	
+	/**
+	 * @deprecated use {@code select} instead.
+	 */
+	@Deprecated
+	public T getValue()
+	{
+		return this.select();
+	}
+	
+	/**
+	 * Random pick an element with given random source.
+	 */
+	public T select(RandomSource rnd) {
 		double rnddouble = rnd.nextDouble();
 		for (int i = 0; i < probSequence.size(); ++i)
 		{
@@ -69,8 +96,11 @@ public class RandomSelection<T>
 		return defaultVal;
 	}
 	
-	public T getValue() {
-		return this.getValue(RND);
+	/**
+	 * Random pick an element with internal random source.
+	 */
+	public T select() {
+		return this.select(RND);
 	}
 	
 	/**
