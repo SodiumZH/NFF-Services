@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins.mixins;
+package net.sodiumstudio.nautils.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +11,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.LivingEntitySweepHurtEvent;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(Player.class)
 public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
@@ -24,9 +23,13 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 	private boolean acceptSweepDamage(Player caller, Entity entity, double amount, Operation<Boolean> original)
 	{
 		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
-		if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
-			return false;
+		if (original.call(caller, entity, amount))
+		{
+			if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
+				return false;
+			else return true;
+		}
 		// If originally false, it shouldn't take sweep hurt at all, so no posting and return false
-		else return original.call(caller, entity, amount);
+		else return false;
 	}
 }

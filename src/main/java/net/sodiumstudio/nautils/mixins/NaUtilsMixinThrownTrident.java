@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins.mixins;
+package net.sodiumstudio.nautils.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,7 +8,6 @@ import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.ThrownTridentSetBaseDamageEvent;
 import net.sodiumstudio.nautils.events.ThrownTridentSetFinalDamageEvent;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(ThrownTrident.class)
 public class NaUtilsMixinThrownTrident implements NaUtilsMixin<ThrownTrident>

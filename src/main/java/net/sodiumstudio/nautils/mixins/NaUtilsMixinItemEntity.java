@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins.mixins;
+package net.sodiumstudio.nautils.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -12,7 +12,6 @@ import net.sodiumstudio.nautils.events.ItemEntityHurtEvent;
 import net.sodiumstudio.nautils.events.ItemEntityOutOfWorldEvent;
 import net.sodiumstudio.nautils.events.NonLivingEntityHurtEvent;
 import net.sodiumstudio.nautils.events.NonLivingEntityOutOfWorldEvent;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(ItemEntity.class)
 public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {

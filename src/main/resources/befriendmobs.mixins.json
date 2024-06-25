@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.sodiumstudio.nautils.mixins.mixins",
+	"package": "net.sodiumstudio.nautils.mixins",
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "befriendmobs.refmap.json",
 	"mixins": [
@@ -9,7 +9,8 @@
 		"NaUtilsMixinMob",
 		"NaUtilsMixinPlayer",
 		"NaUtilsMixinProjectile",
-		"NaUtilsMixinThrownTrident"
+		"NaUtilsMixinThrownTrident",
+		"NaUtilsMixinLivingEntity"
 	],
 	"client": [
 	],

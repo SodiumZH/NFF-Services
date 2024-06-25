@@ -4,9 +4,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.EntityEvent;
 
 /**
- * An utility class as a templated {@link EntityEvent) that can automatically cast the entity to given class.
+ * An utility class as a templated {@link EntityEvent} that can automatically cast the entity to given class.
  */
-public class NaUtilsEntityEvent<T extends Entity> extends EntityEvent
+public abstract class NaUtilsEntityEvent<T extends Entity> extends EntityEvent
 {
 	public NaUtilsEntityEvent(T entity)
 	{
