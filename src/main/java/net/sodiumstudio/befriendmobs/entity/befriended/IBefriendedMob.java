@@ -4,23 +4,23 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -91,6 +91,18 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 		}
 		else return false;
 	}
+	
+	/**
+	 * Check if a mob has a Dwmg BM interface and satisfied the given condition.
+	 * <p>
+	 * As IBefriendedMob could also be implemented in capabilities instead of the mob class in the future,
+	 * always use this instead of {@code instanceof} check and followed checks of the cast BM.
+	 */
+	public static boolean isBMAnd(Object o, Predicate<IBefriendedMob> cond)
+	{
+		if (!isBM(o)) return false;
+		return cond.test(getBM(o));
+	}	
 	
 	/* Initialization */
 	
