@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins.mixins;
+package net.sodiumstudio.nautils.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,7 +9,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumstudio.nautils.events.ProjectileHitEvent;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(Projectile.class)
 public class NaUtilsMixinProjectile implements NaUtilsMixin<Projectile>

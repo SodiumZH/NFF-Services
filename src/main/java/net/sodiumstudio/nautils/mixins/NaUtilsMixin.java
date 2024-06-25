@@ -34,7 +34,7 @@ public interface NaUtilsMixin<T> {
 	{
 		try
 		{
-			return (U)((Object)this);
+			return (U)(this.get());
 		} catch (ClassCastException e)
 		{
 			LogUtils.getLogger().error("NaUtils Mixin error: class mismatch.");

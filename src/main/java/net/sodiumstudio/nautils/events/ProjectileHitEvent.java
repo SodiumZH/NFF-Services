@@ -8,7 +8,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.sodiumstudio.nautils.mixins.mixins.NaUtilsMixinProjectile;
+import net.sodiumstudio.nautils.mixins.NaUtilsMixinProjectile;
 
 /**
  * Fired when any projectile hit something, either block or entity.
