@@ -10,7 +10,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
  * Fired when a non-living entity gets hurt only on server. 
  * <p> NOTE: This event will <b>NOT</b> be fired if it's falling out of world to prevent possible infinite falling. 
  * Instead an {@link NonLivingEntityOutOfWorldEvent} will fire.
- * <p> Note: {@link ItemEntity} will <b>NOT</b> be fired this but {@link ItemEntityHurtEvent}.
+ * <p> Note: {@link ItemEntity} will <b>NOT</b> fire this but {@link ItemEntityHurtEvent}.
  * <p> For LivingEntity, use {@link LivingHurtEvent}.
  */
 public class NonLivingEntityHurtEvent extends EntityEvent {

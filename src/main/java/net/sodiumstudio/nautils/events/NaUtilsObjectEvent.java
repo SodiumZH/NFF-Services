@@ -5,7 +5,7 @@ import net.minecraftforge.eventbus.api.Event;
 /**
  * An utility class of a simple event with a specified object.
  */
-public class NaUtilsObjectEvent<T> extends Event
+public abstract class NaUtilsObjectEvent<T> extends Event
 {
 	protected final T object;
 	

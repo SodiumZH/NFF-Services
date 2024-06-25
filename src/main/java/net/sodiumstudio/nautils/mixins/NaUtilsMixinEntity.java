@@ -1,8 +1,9 @@
-package net.sodiumstudio.nautils.mixins.mixins;
+package net.sodiumstudio.nautils.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.world.damagesource.DamageSource;
@@ -10,10 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
+import net.sodiumstudio.nautils.events.EntityTickEvent;
 import net.sodiumstudio.nautils.events.NonLivingEntityHurtEvent;
 import net.sodiumstudio.nautils.events.NonLivingEntityOutOfWorldEvent;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixinHooks;
 
 @Mixin(Entity.class)
 public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
@@ -25,4 +25,10 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 			callback.setReturnValue(false);
 	}
 	
+	@Inject(at = @At("HEAD"), method = "tick()V", cancellable = true)
+	private void tick(CallbackInfo callback)
+	{
+		if (MinecraftForge.EVENT_BUS.post(new EntityTickEvent(get())))
+			callback.cancel();
+	}
 }
