@@ -86,7 +86,7 @@ public class NaUtilsItem extends Item
 	}
 	
 	/**
-	 * Fixed here because the input {@code ItemStack} is a copy which may confuse the developers
+	 * Final here because the input {@code ItemStack} is a copy which may confuse the developers
 	 * and cause bugs hard to find when attempting to modify the ItemStack NBT.
 	 * <p> Override the version without {@code ItemStack} instead. To access the copy, use {@code player.getItemInHand(hand).copy()} instead.
 	 */

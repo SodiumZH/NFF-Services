@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.function.MutablePredicate;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixinMob;
+import net.sodiumstudio.nautils.mixins.mixins.NaUtilsMixinMob;
 import net.sodiumstudio.befriendmobs.events.BMEntityEvents;
 /**
  * This is an interface handling sun immunity for sun-sensitive mobs.

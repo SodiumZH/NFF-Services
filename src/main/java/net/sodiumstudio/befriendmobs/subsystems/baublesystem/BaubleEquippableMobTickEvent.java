@@ -1,6 +1,7 @@
 package net.sodiumstudio.befriendmobs.subsystems.baublesystem;
 
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.sodiumstudio.nautils.events.NaUtilsLivingEvent;
 
 
@@ -9,7 +10,7 @@ import net.sodiumstudio.nautils.events.NaUtilsLivingEvent;
  * <p><b>Note: DO NOT directly listen to this event!</b> It will post 4 times each tick, 
  * including pre-tick, pre-slot-tick, post-slot-tick, post-tick successively. Listen to specific events instead.
  */
-public class BaubleEquippableMobTickEvent extends NaUtilsLivingEvent<Mob>
+public abstract class BaubleEquippableMobTickEvent extends NaUtilsLivingEvent<Mob>
 {
 	public final CBaubleEquippableMob capability;
 	
@@ -51,6 +52,21 @@ public class BaubleEquippableMobTickEvent extends NaUtilsLivingEvent<Mob>
 	{
 
 		public PostSlotTick(Mob mob, CBaubleEquippableMob cap)
+		{
+			super(mob, cap);
+		}
+
+	}
+	
+	/**
+	 * Posted on each slots ticks.
+	 * <p>Cancellable. If cancelled, the slot tick will be omitted.
+	 */
+	@Cancelable
+	public static class SlotTick extends BaubleEquippableMobTickEvent
+	{
+
+		public SlotTick(Mob mob, CBaubleEquippableMob cap)
 		{
 			super(mob, cap);
 		}
