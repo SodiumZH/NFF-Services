@@ -60,7 +60,7 @@ import net.sodiumstudio.befriendmobs.registry.BMTags;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
-import net.sodiumstudio.nautils.events.MobSunBurnTickEvent;
+import net.sodiumstudio.nautils.events.entity.MobSunBurnTickEvent;
 
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = BefriendMobs.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
