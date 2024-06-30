@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins;
+package net.sodiumstudio.nautils.mixins.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumstudio.nautils.events.LivingEntitySweepHurtEvent;
+import net.sodiumstudio.nautils.events.entity.LivingEntitySweepHurtEvent;
+import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(Player.class)
 public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>

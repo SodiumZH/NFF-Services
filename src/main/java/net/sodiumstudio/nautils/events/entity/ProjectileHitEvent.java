@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.events;
+package net.sodiumstudio.nautils.events.entity;
 
 import javax.annotation.Nullable;
 
@@ -8,14 +8,15 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.sodiumstudio.nautils.mixins.NaUtilsMixinProjectile;
+import net.sodiumstudio.nautils.events.NaUtilsEntityEvent;
+import net.sodiumstudio.nautils.mixins.mixins.NaUtilsMixinProjectile;
 
 /**
  * Fired when any projectile hit something, either block or entity.
  * It's fired on any projectile calling {@link Projectile#onHit} and the hit result isn't {@code MISS}.
  * Usually it's not fired if {@link ProjectileImpactEvent} is cancelled.
  * <p>This event is implemented via {@link NaUtilsMixinProjectile}.
- * <p>Note: if in subclasses {@link Projectile#onHit} is overridden and something is invoked before {@code super.onHit()}, these actions won't be cancelled. 
+ * <p>Note: if in subclasses {@link Projectile#onHit} is overridden and something is done before {@code super.onHit()}, these actions won't be cancelled. 
  */
 @Cancelable
 public class ProjectileHitEvent extends NaUtilsEntityEvent<Projectile>

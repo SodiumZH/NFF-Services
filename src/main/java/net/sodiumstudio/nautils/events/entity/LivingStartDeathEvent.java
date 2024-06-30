@@ -1,7 +1,8 @@
-package net.sodiumstudio.nautils.events;
+package net.sodiumstudio.nautils.events.entity;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.sodiumstudio.nautils.events.NaUtilsLivingEvent;
 
 /**
  * Posted when a {@code LivingEntity} dies after {@code LivingDeathEvent}, before it <b>really</b> dies.

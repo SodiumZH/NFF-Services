@@ -1,12 +1,13 @@
-package net.sodiumstudio.nautils.events;
+package net.sodiumstudio.nautils.events.entity;
 
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.sodiumstudio.nautils.events.NaUtilsEntityEvent;
 
-public class ThrownTridentSetFinalDamageEvent extends NaUtilsEntityEvent<ThrownTrident>
+public class ThrownTridentSetBaseDamageEvent extends NaUtilsEntityEvent<ThrownTrident>
 {
 	private float dmg;
 	private final float originalDmg;
-	public ThrownTridentSetFinalDamageEvent(ThrownTrident entity, float originalDmg)
+	public ThrownTridentSetBaseDamageEvent(ThrownTrident entity, float originalDmg)
 	{
 		super(entity);
 		this.dmg = originalDmg;
