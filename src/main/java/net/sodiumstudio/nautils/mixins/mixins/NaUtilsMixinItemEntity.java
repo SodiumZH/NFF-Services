@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.mixins;
+package net.sodiumstudio.nautils.mixins.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -8,10 +8,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumstudio.nautils.events.ItemEntityHurtEvent;
-import net.sodiumstudio.nautils.events.ItemEntityOutOfWorldEvent;
-import net.sodiumstudio.nautils.events.NonLivingEntityHurtEvent;
-import net.sodiumstudio.nautils.events.NonLivingEntityOutOfWorldEvent;
+import net.sodiumstudio.nautils.events.entity.ItemEntityHurtEvent;
+import net.sodiumstudio.nautils.events.entity.ItemEntityOutOfWorldEvent;
+import net.sodiumstudio.nautils.events.entity.NonLivingEntityHurtEvent;
+import net.sodiumstudio.nautils.events.entity.NonLivingEntityOutOfWorldEvent;
+import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(ItemEntity.class)
 public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {

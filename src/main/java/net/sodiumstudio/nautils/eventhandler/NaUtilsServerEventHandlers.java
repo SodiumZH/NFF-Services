@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumstudio.nautils.entity.ConditionalAttributeModifier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class NaUtilsEventHandlers {
+public class NaUtilsServerEventHandlers {
 
 	@SubscribeEvent
 	public static void onServerTick(ServerTickEvent event)
