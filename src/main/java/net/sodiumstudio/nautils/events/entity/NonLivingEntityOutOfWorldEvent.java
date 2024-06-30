@@ -1,4 +1,4 @@
-package net.sodiumstudio.nautils.events;
+package net.sodiumstudio.nautils.events.entity;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.EntityEvent;

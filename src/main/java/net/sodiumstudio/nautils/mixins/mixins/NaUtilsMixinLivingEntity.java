@@ -1,8 +1,10 @@
-package net.sodiumstudio.nautils.mixins;
+package net.sodiumstudio.nautils.mixins.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -13,20 +15,19 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumstudio.nautils.events.LivingStartDeathEvent;
-import net.sodiumstudio.nautils.events.LootCheckPlayerKillEvent;
+import net.sodiumstudio.nautils.events.entity.LivingStartDeathEvent;
+import net.sodiumstudio.nautils.events.entity.LootCheckPlayerKillEvent;
+import net.sodiumstudio.nautils.mixins.NaUtilsMixin;
 
 @Mixin(LivingEntity.class)
 public class NaUtilsMixinLivingEntity implements NaUtilsMixin<LivingEntity>
 {
-	@WrapOperation(method = "die(Lnet/minecraft/world/damagesource/DamageSource;)V",
+	@Inject(method = "die(Lnet/minecraft/world/damagesource/DamageSource;)V",
 			at = @At(value = "INVOKE",
-				target = "Lnet/minecraft/world/damagesource/DamageSource;getEntity()Lnet/minecraft/world/entity/Entity;",
-				shift = At.Shift.BEFORE))
-	private Entity startDie(DamageSource source, Operation<Entity> original)
+				target = "Lnet/minecraft/world/damagesource/DamageSource;getEntity()Lnet/minecraft/world/entity/Entity;"))
+	private void startDie(DamageSource dmgSource, CallbackInfo callback)
 	{
-		MinecraftForge.EVENT_BUS.post(new LivingStartDeathEvent(get(), source));
-		return original.call(source);
+		MinecraftForge.EVENT_BUS.post(new LivingStartDeathEvent(get(), dmgSource));
 	}
 	
 	@ModifyVariable(method = "dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V",

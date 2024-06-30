@@ -1,9 +1,10 @@
-package net.sodiumstudio.nautils.events;
+package net.sodiumstudio.nautils.events.entity;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
+import net.sodiumstudio.nautils.events.NaUtilsLivingEvent;
 
 /**
  * Fired before a mob is calculated to be on a sun-burn tick.
