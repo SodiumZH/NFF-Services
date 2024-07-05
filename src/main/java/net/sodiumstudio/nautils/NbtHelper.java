@@ -25,18 +25,31 @@ import net.minecraft.world.phys.Vec3;
 
 public class NbtHelper {
 
+	@Deprecated
 	public static final int TAG_BYTE_ID = 1;
+	@Deprecated
 	public static final int TAG_SHORT_ID = 2;
+	@Deprecated
 	public static final int TAG_INT_ID = 3;
+	@Deprecated
 	public static final int TAG_LONG_ID = 4;
+	@Deprecated
 	public static final int TAG_FLOAT_ID = 5;
+	@Deprecated
 	public static final int TAG_DOUBLE_ID = 6;
+	@Deprecated
 	public static final int TAG_BYTE_ARRAY_ID = 7;
+	@Deprecated
 	public static final int TAG_STRING_ID = 8;
+	@Deprecated
 	public static final int TAG_LIST_ID = 9;
+	@Deprecated
 	public static final int TAG_COMPOUND_ID = 10;
+	@Deprecated
 	public static final int TAG_INT_ARRAY_ID = 11;
+	@Deprecated
 	public static final int TAG_LONG_ARRAY_ID = 12;
+	@Deprecated
 	public static final int TAG_ANY_NUMERIC_ID = 99;
 	
 	
