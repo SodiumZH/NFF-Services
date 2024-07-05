@@ -13,12 +13,15 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
  * It's recommended to create a static instance for each {@code RepeatableAttributeModifier} in each class.
  * <p>Note: The complexity of the {@code apply} operation is O(times) because it must iterate through the whole modifier list
  * to find which modifier it's previously applying. Take care if you need to update on tick.
+ * <p>Note: {@code AttributeModifier}s added by this object is always transient. The actual modifier uuids inside this object
+ * is random, permanent attribute modifiers will cause duplicate applying on restarting the game.
  */
 public class RepeatableAttributeModifier
 {
 	protected double value;
 	protected AttributeModifier.Operation operation;
 	protected ArrayList<AttributeModifier> modifiers = new ArrayList<>();
+	protected long seed;
 	/** If the modifier count is larger than this value, it will throw an exception.
 	 * This limitation is to prevent the ArrayList from getting too large because it will auto-expand and generate 
 	 * more {@code AttributeModifier} instances when accessing the index larger than its size.
@@ -49,27 +52,19 @@ public class RepeatableAttributeModifier
 		return modifiers.get(index);
 	}
 	
-	public void apply(LivingEntity target, Attribute attribute, int times, boolean isPermanent)
+	public void apply(LivingEntity target, Attribute attribute, int times)
 	{
 		AttributeInstance inst = target.getAttribute(attribute);
 		// Check if it's already applying the same modifier. This could prevent iteration on tick.
 		if (inst.hasModifier(this.get(times)))
 		{
-			inst.removeModifier(this.get(times));
-			if (isPermanent)
-				inst.addPermanentModifier(this.get(times));
-			else inst.addTransientModifier(this.get(times));
 			return;
 		}
 		for (var modifier: modifiers)
 		{
 			inst.removeModifier(modifier);
 		}
-		if (isPermanent)
-		{
-			inst.addPermanentModifier(this.get(times));
-		}
-		else inst.addTransientModifier(this.get(times));
+		inst.addTransientModifier(this.get(times));
 	}
 
 	public void clear(LivingEntity target, Attribute attribute)
