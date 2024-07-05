@@ -28,8 +28,8 @@ public final class ConditionalAttributeModifier {
 	private final Attribute attribute;
 	private final AttributeModifier modifier;
 	private final Predicate<LivingEntity> condition;
-	@Deprecated	// Invalid
-	private final boolean isPermanent = false;
+	
+	
 	
 	public ConditionalAttributeModifier(Attribute attribute, AttributeModifier modifier, Predicate<LivingEntity> condition)
 	{
