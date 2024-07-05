@@ -772,7 +772,7 @@ public class EntityHelper
 		if (level.getPlayerByUUID(uuid) != null)
 			return level.getPlayerByUUID(uuid);
 		@SuppressWarnings("unchecked")
-		Iterable<Entity> entities = ((LevelEntityGetter<Entity>) NaReflectionUtils.forceInvokeRetVal(level, Level.class, "m_142425_")).getAll();	// Level#getEntities
+		Iterable<Entity> entities = NaReflectionUtils.forceInvokeRetVal(level, Level.class, "m_142425_").castTo(LevelEntityGetter.class).getAll();	// Level#getEntities
 		for (Entity e: entities)
 		{
 			if (e.getUUID().equals(uuid))
