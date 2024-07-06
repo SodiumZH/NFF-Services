@@ -115,7 +115,6 @@ public interface IBaubleRegistryEntry
 	
 	/**
 	 * Check if this entry is for multi-item.
-	 * @return
 	 */
 	@DontOverride
 	public default boolean isMulti()

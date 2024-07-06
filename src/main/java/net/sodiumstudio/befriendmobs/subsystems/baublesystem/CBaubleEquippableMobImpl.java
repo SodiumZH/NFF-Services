@@ -239,8 +239,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		MinecraftForge.EVENT_BUS.post(new BaubleEquippableMobTickEvent.PreSlotTick(mob, this));
 		for (String key: accessors.getAccessors().keySet())
 		{
-			if (!MinecraftForge.EVENT_BUS.post(new BaubleEquippableMobTickEvent.PostSlotTick(mob, this)))
-				this.slotTick(new BaubleProcessingArgs(accessors.getItemStack(key), this, key));
+			this.slotTick(new BaubleProcessingArgs(accessors.getItemStack(key), this, key));
 		}
 		MinecraftForge.EVENT_BUS.post(new BaubleEquippableMobTickEvent.PostSlotTick(mob, this));
 		this.postTick();
