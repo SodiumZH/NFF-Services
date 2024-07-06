@@ -1,8 +1,10 @@
 package net.sodiumstudio.nautils.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -14,14 +16,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
  * <p>Note: The complexity of the {@code apply} operation is O(times) because it must iterate through the whole modifier list
  * to find which modifier it's previously applying. Take care if you need to update on tick.
  * <p>Note: {@code AttributeModifier}s added by this object is always transient. The actual modifier uuids inside this object
- * is random, permanent attribute modifiers will cause duplicate applying on restarting the game.
+ * are random, permanent attribute modifiers will cause duplicate applying on restarting the game.
  */
 public class RepeatableAttributeModifier
 {
 	protected double value;
 	protected AttributeModifier.Operation operation;
 	protected ArrayList<AttributeModifier> modifiers = new ArrayList<>();
-	protected long seed;
 	/** If the modifier count is larger than this value, it will throw an exception.
 	 * This limitation is to prevent the ArrayList from getting too large because it will auto-expand and generate 
 	 * more {@code AttributeModifier} instances when accessing the index larger than its size.
@@ -37,7 +38,7 @@ public class RepeatableAttributeModifier
 	
 	public RepeatableAttributeModifier(double value, AttributeModifier.Operation operation)
 	{
-		this(value, operation, 20);
+		this(value, operation, 100000);
 	}
 	
 	public AttributeModifier get(int index)
@@ -74,6 +75,15 @@ public class RepeatableAttributeModifier
 		{
 			inst.removeModifier(modifier);
 		}
+	}
+	
+	/**
+	 * Pre-allocate a size (usually on construction) to prevent jam on first applying.
+	 */
+	public RepeatableAttributeModifier initSize(int size)
+	{
+		this.get(size);
+		return this;
 	}
 	
 }
