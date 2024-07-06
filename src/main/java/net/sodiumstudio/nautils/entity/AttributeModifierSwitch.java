@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import com.mojang.logging.LogUtils;
+
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -11,8 +13,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 public class AttributeModifierSwitch
 {
 	protected HashMap<Integer, HashSet<Entry>> map = new HashMap<>();
+	private boolean hasGenerated = false;
 	
 	/**
+	 * Put an {@code AttributeModifier} with a <b>certain</b> UUID.
+	 * <p>Note: <b>DO NOT use random UUID by this!</b> Otherwise modifier duplication will occur on restarting
+	 * the game if permanent attributes are applied, as the random UUIDs change on each launch, the old modifiers will
+	 * be left in entity nbt on close which cannot be removed after restarting, causing duplicate application of the same modifiers.
 	 * @param phase Integer indicating the mob's state.
 	 * @param mod Attribute modifier.
 	 */
@@ -30,10 +37,15 @@ public class AttributeModifierSwitch
 	
 	/**
 	 * Put an automatically-generated modifier with random name and UUID.
+	 * <p>Note: If randomized UUID is added by this method, this will not allow permanent modifiers anymore as the UUIDs
+	 * will change on each launch. Modifier duplication will occur on restarting
+	 * the game if permanent attributes are applied, as the random UUIDs change on each launch, the old modifiers will
+	 * be left in entity nbt on close which cannot be removed after restarting, causing duplicate application of the same modifiers.
 	 */
 	public AttributeModifierSwitch putGenerated(int phase, Attribute attr, double value, AttributeModifier.Operation operation)
 	{
 		UUID uuid = UUID.randomUUID();
+		this.hasGenerated = true;
 		return put(phase, attr, new AttributeModifier(uuid, uuid.toString(), value, operation));
 	}
 	
@@ -52,8 +64,12 @@ public class AttributeModifierSwitch
 				for (var entry: map.get(i))
 				{
 					mob.getAttribute(entry.attr).removeModifier(entry.mod);
-					if (isPermanent)
+					if (isPermanent && !this.hasGenerated)
 						mob.getAttribute(entry.attr).addPermanentModifier(entry.mod);
+					else if (isPermanent)
+					{
+						throw new UnsupportedOperationException("AttributeModifierSwitch: Permanent modifier is not allowed if generated random UUID is used.");
+					}
 					else mob.getAttribute(entry.attr).addTransientModifier(entry.mod);
 				}
 			}
@@ -69,7 +85,7 @@ public class AttributeModifierSwitch
 	
 	public void apply(Mob mob, int phase)
 	{
-		apply(mob, phase, true);
+		apply(mob, phase, false);
 	}
 	
 	protected static record Entry(Attribute attr, AttributeModifier mod)
