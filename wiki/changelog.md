@@ -1,5 +1,19 @@
 # Change Log
 
+### 0.x.24
+
+##### NaUtils
+
+Added Mixin-based events:
+
+-`EntityTickEvent`: posted before the whole entity tick.
+
+-`LivingStartDeathEvent`: posted after `LivingDeathEvent` before the `LivingEntity` really starts to die.
+
+-`LootCheckPlayerKillEvent`: Posted on mob killed before checking if the mob is killed by a player.
+
+Fixed `RepeatableAttributeModifier` errors.
+
 ### 0.x.23
 
 ##### BefriendMobs
