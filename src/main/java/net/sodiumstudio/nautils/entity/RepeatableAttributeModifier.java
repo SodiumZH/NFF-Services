@@ -1,10 +1,8 @@
 package net.sodiumstudio.nautils.entity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;

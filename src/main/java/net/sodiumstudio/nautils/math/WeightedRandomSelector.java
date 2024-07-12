@@ -2,10 +2,11 @@ package net.sodiumstudio.nautils.math;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.RandomSource;
 
 /**
  * A {@code WeightedRandomSelector} contains a set of objects with probability weights. It will randomly pick one of the elements with
@@ -19,7 +20,7 @@ import net.minecraft.util.RandomSource;
  */
 public class WeightedRandomSelector<T>
 {
-	private static final RandomSource RND = RandomSource.create();
+	private static final Random RND = new Random();
 	private final Map<T, Double> objs = new HashMap<>();
 	private final double nullWeight = 0d;
 	
@@ -39,7 +40,7 @@ public class WeightedRandomSelector<T>
 		return nullWeight > 0;
 	}
 	
-	public T select(RandomSource rnd)
+	public T select(Random rnd)
 	{
 		double weightSum = 0d;
 		for (var entry: objs.entrySet())
