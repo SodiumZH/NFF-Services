@@ -81,20 +81,20 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 			return null;
 		if (this.type == null)
 			return null;
-		if (player.level.isClientSide)
+		if (player.level().isClientSide)
 			return null;
 		if (this.beforeRespawn(player, pos, direction))
 			return null;
-		BlockState blockstate = player.level.getBlockState(pos);
+		BlockState blockstate = player.level().getBlockState(pos);
 		BlockPos pos1;
-		if (blockstate.getCollisionShape(player.level, pos).isEmpty())
+		if (blockstate.getCollisionShape(player.level(), pos).isEmpty())
 		{
 			pos1 = pos;
 		} else
 		{
 			pos1 = pos.relative(direction);
 		}
-		Mob mob = EntityHelper.spawnDefaultMob(this.type, (ServerLevel) (player.level), null,
+		Mob mob = EntityHelper.spawnDefaultMob(this.type, (ServerLevel) (player.level()), null,
 				this.getCustomName() != null ? this.getCustomName() : null,
 				player, pos1, true, !pos.equals(pos1) && direction == Direction.UP);
 		if (mob != null)
