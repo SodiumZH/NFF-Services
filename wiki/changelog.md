@@ -12,6 +12,10 @@ Added Mixin-based events:
 
 -`LootCheckPlayerKillEvent`: Posted on mob killed before checking if the mob is killed by a player.
 
+-`MobPickUpItemEvent`: Posted before mob picking up item, cancellable.
+
+-`MobFinalizePickingUpEvent`: Posted after mob picking up item.
+
 Fixed `RepeatableAttributeModifier` errors.
 
 ### 0.x.23
