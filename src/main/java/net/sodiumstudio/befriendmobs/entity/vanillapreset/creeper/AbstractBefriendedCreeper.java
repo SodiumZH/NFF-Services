@@ -58,8 +58,8 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.BOOLEAN);
 	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Integer> DATA_AISTATE = SynchedEntityData
-			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
+	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
+			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.STRING);
 	protected static final EntityDataAccessor<Integer> DATA_SWELL = SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
 	protected static final EntityDataAccessor<Integer> DATA_SWELL_LAST_TICK= SynchedEntityData
@@ -71,7 +71,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	}
 
 	@Override
-	public EntityDataAccessor<Integer> getAIStateData() {
+	public EntityDataAccessor<String> getAIStateData() {
 		return DATA_AISTATE;
 	}
 	
@@ -156,7 +156,7 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		this.entityData.define(DATA_IS_POWERED, false);
 		this.entityData.define(DATA_IS_IGNITED, false);
 		this.entityData.define(DATA_OWNERUUID, Optional.empty());
-		this.entityData.define(DATA_AISTATE, 0);
+		this.entityData.define(DATA_AISTATE, "");
 		this.entityData.define(DATA_SWELL, 0);
 		this.entityData.define(DATA_SWELL_LAST_TICK, 0);
 		//this.entityData.define();
@@ -556,11 +556,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	}
 
 	// AI related
-
-	@Override
-	public BefriendedAIState getAIState() {
-		return BefriendedAIState.fromID(entityData.get(DATA_AISTATE));
-	}
 
 	protected LivingEntity PreviousTarget = null;
 

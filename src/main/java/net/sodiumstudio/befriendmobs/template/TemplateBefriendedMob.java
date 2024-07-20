@@ -41,15 +41,15 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	// It's recommended to always keep these two values as synched data
 	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
 			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Integer> DATA_AISTATE = SynchedEntityData
-			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.INT);
+	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
+			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.STRING);
 	/* More data to sync... */
 
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		entityData.define(DATA_OWNERUUID, Optional.empty());
-		entityData.define(DATA_AISTATE, 0);
+		entityData.define(DATA_AISTATE, "");
 		/* More data to sync */
 	}
 
@@ -59,7 +59,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	}
 
 	@Override
-	public EntityDataAccessor<Integer> getAIStateData() {
+	public EntityDataAccessor<String> getAIStateData() {
 		return DATA_AISTATE;
 	}
 

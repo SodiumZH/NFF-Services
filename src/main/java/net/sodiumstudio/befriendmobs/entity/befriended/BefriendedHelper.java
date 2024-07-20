@@ -7,8 +7,10 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -63,14 +65,16 @@ public class BefriendedHelper
 	/**
 	 *  This will read owner, AI state and additional inventory
 	 *  <p>读取拥有者信息、AI状态及附加道具栏
+	 * @deprecated Use {@link CBefriendedMobData} instead
 	*/
+	@Deprecated
 	public static void addBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt)
 	{
 		nbt.put("bm_common", new CompoundTag());
 		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
 		if (mob.getOwnerUUID() != null)
 			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
-		nbt.getCompound("bm_common").putInt("ai_state", mob.getAIState().id);
+		nbt.getCompound("bm_common").putString("ai_state", mob.getAIState().getId().toString());
 		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");
 		
 		/*String modId = mob.getModId();
@@ -97,8 +101,9 @@ public class BefriendedHelper
 	/**
 	 * Read mob's Mod Id, owner, AI state and additional inventory information.
 	 * <p>读取生物所属的Mod ID、拥有者信息、AI状态及附加道具栏
+	 * @deprecated Use {@link CBefriendedMobData} instead
 	 */
-	
+	@Deprecated
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
 		
 		/** 0.x.15: new format collects all bm data to "bm_common" entry. */
@@ -111,7 +116,9 @@ public class BefriendedHelper
 			}
 			mob.setOwnerUUID(nbt.getCompound("bm_common").getUUID("owner"));
 			mob.init(mob.getOwnerUUID(), null);
-			mob.setAIState(BefriendedAIState.fromID(nbt.getCompound("bm_common").getInt("ai_state")), false);
+			if (nbt.getCompound("bm_common").contains("ai_state", Tag.TAG_STRING))
+				mob.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getCompound("bm_common").getString("ai_state"))), false);
+			else mob.setAIState(BefriendedAIState.WAIT, false);
 			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
 		}
 		
@@ -142,7 +149,8 @@ public class BefriendedHelper
 			}
 			mob.setOwnerUUID(uuid);
 			mob.init(mob.getOwnerUUID(), null);
-			mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
+			//mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
+			mob.setAIState(BefriendedAIState.WAIT, false);
 			mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
 			
 		}
@@ -223,11 +231,11 @@ public class BefriendedHelper
 	public static String getModIdFromNbt(CompoundTag nbt)
 	{
 		// 0.x.15+ solution
-		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
+		if (nbt.contains("bm_common", Tag.TAG_COMPOUND))
 			return nbt.getCompound("bm_common").getString("mod_id");
 		
 		// LEGACY
-		else return nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID) ?
+		else return nbt.contains("befriended_mod_id", Tag.TAG_COMPOUND) ?
 				nbt.getString("befriended_mod_id") : null;
 	}
 	
