@@ -107,8 +107,8 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BOOLEAN);
 	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Integer> DATA_AISTATE = SynchedEntityData
-			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.INT);	
+	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
+			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.STRING);	
 
 	@Override
 	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
@@ -116,7 +116,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 	}
 
 	@Override
-	public EntityDataAccessor<Integer> getAIStateData() {
+	public EntityDataAccessor<String> getAIStateData() {
 		return DATA_AISTATE;
 	}
 
@@ -181,7 +181,7 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		this.entityData.define(DATA_CREEPY, false);
 		this.entityData.define(DATA_STARED_AT, false);
 		this.entityData.define(DATA_OWNERUUID, Optional.empty());
-		this.entityData.define(DATA_AISTATE, 0);
+		this.entityData.define(DATA_AISTATE, "");
 	}
 
 	@Override

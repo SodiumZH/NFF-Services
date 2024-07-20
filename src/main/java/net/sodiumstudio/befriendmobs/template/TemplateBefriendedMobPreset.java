@@ -47,14 +47,14 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 
 	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
 			.defineId(TemplateBefriendedMobPreset.class/* CHANGE TO YOUR CLASS */, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<Integer> DATA_AISTATE = SynchedEntityData
-			.defineId(TemplateBefriendedMobPreset.class/* CHANGE TO YOUR CLASS */, EntityDataSerializers.INT);
+	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
+			.defineId(TemplateBefriendedMobPreset.class/* CHANGE TO YOUR CLASS */, EntityDataSerializers.STRING);
 
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		entityData.define(DATA_OWNERUUID, Optional.empty());
-		entityData.define(DATA_AISTATE, 0);
+		entityData.define(DATA_AISTATE, "");
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	}
 
 	@Override
-	public EntityDataAccessor<Integer> getAIStateData() {
+	public EntityDataAccessor<String> getAIStateData() {
 		return DATA_AISTATE;
 	}
 

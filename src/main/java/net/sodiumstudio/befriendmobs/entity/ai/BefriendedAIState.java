@@ -6,39 +6,24 @@ import java.util.HashMap;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.nautils.InfoHelper;
 
 public class BefriendedAIState {
 	
-	private static final HashMap<Integer, BefriendedAIState> STATES = new HashMap<Integer, BefriendedAIState>();
+	private static final HashMap<ResourceLocation, BefriendedAIState> STATES = new HashMap<ResourceLocation, BefriendedAIState>();
 	
-	public static final BefriendedAIState WAIT = new BefriendedAIState(0);
-	public static final BefriendedAIState FOLLOW = new BefriendedAIState(1);
-	public static final BefriendedAIState WANDER = new BefriendedAIState(2);
+	public static final BefriendedAIState WAIT = new BefriendedAIState(BefriendMobs.MOD_ID, "wait");
+	public static final BefriendedAIState FOLLOW = new BefriendedAIState(BefriendMobs.MOD_ID, "follow");
+	public static final BefriendedAIState WANDER = new BefriendedAIState(BefriendMobs.MOD_ID, "wander");
+
+	/**
+	 * ID for the state. Must be unique.
+	 */
+	private final ResourceLocation id;
 	
-	/**
-	 * @deprecated Use custom-defined new ai state instead. Create with {@code newState(id)}.
-	 */
-	@Deprecated
-	public static final BefriendedAIState CUSTOM_0 = new BefriendedAIState(99);
-	/**
-	 * @deprecated Use custom-defined new ai state instead. Create with {@code newState(id)}.
-	 */
-	@Deprecated
-	public static final BefriendedAIState CUSTOM_1 = new BefriendedAIState(98);
-	/**
-	 * @deprecated Use custom-defined new ai state instead. Create with {@code newState(id)}.
-	 */
-	@Deprecated
-	public static final BefriendedAIState CUSTOM_2 = new BefriendedAIState(97);
-	
-	/**
-	 * Integer ID for the state
-	 */
-	public final int id;
-	
-	private BefriendedAIState(int id)
+	private BefriendedAIState(ResourceLocation id)
 	{
 		this.id = id;
 		if (STATES.containsValue(this))
@@ -51,44 +36,28 @@ public class BefriendedAIState {
 			
 		STATES.put(id, this);
 	}
-	
-	/**
-	 * Create a new AI state.
-	 * The ID must be unique among all states, so it's recommended to make it unlikely to collide with other mods. 
-	 */
-	public BefriendedAIState newState(int id)
+
+	private BefriendedAIState(String modId, String key)
 	{
-		return new BefriendedAIState(id);
+		this(new ResourceLocation(modId, key));
 	}
 	
-	/**
-	 * Use id property instead
-	 */
-	@Deprecated
-	public int id()
+	/** Unique ID */
+	public ResourceLocation getId()
 	{
 		return this.id;
 	}
 	
 	@Nullable
-	public static BefriendedAIState fromID(int id)
+	public static BefriendedAIState fromID(ResourceLocation id)
 	{
 		return STATES.get(id);		
 	}
 	
-	@Deprecated
-	public static BefriendedAIState fromID(byte id)
+	@Nullable
+	public static BefriendedAIState fromID(String modid, String key)
 	{
-		return fromID((int)id);
-	}
-	
-	/**
-	 * This function is unreliable. Use if-else blocks instead.
-	 */
-	@Deprecated
-	public BefriendedAIState defaultSwitch()
-	{
-		return fromID(id + 1 ) != null ? fromID(id + 1) : fromID(0);
+		return fromID(new ResourceLocation(modid, key));
 	}
 	
 	protected static final HashMap<BefriendedAIState, MutableComponent> DISPLAY_INFO = new HashMap<BefriendedAIState, MutableComponent>();
