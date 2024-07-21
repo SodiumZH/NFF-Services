@@ -38,6 +38,7 @@ import net.sodiumstudio.befriendmobs.bmevents.BMHooks;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
+import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob.DeathRespawnerGenerationType;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedSunSensitiveMob;
@@ -491,6 +492,8 @@ public class BMEntityEvents
 			event.getEntity().getCapability(BMCaps.CAP_ITEM_STACK_MONITOR).ifPresent(CItemStackMonitor::tick);
 			// Tick delay action handler
 			event.getEntity().getCapability(BMCaps.CAP_DELAYED_ACTION_HANDLER).ifPresent(CLivingEntityDelayedActionHandler::tick);
+			// Tick data
+			// event.getEntity().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent(CBefriendedMobData::tick);
 			if (event.getEntity() instanceof Mob mob)
 			{
 				// update befriendable mobs

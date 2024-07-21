@@ -37,33 +37,14 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	
 	// Data sync 
 
-	// By default owner uuid and ai state need to sync
-	// It's recommended to always keep these two values as synched data
-	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
-			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
-			.defineId(TemplateBefriendedMob.class/* This class */, EntityDataSerializers.STRING);
-	/* More data to sync... */
-
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		entityData.define(DATA_OWNERUUID, Optional.empty());
-		entityData.define(DATA_AISTATE, "");
+		/*entityData.define(DATA_OWNERUUID, Optional.empty());
+		entityData.define(DATA_AISTATE, "");*/
 		/* More data to sync */
 	}
-
-	@Override
-	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
-		return DATA_OWNERUUID;
-	}
-
-	@Override
-	public EntityDataAccessor<String> getAIStateData() {
-		return DATA_AISTATE;
-	}
-
-
+	
 	// Initialization
 	
 	public TemplateBefriendedMob/* Your mob class */ (EntityType<? extends PathfinderMob /* Your mob class */ > pEntityType, Level pLevel) {
@@ -99,22 +80,13 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	
 	// Inventory related
 	// Generally no need to modify unless noted
+
+	@Override
+	public BefriendedInventory createAdditionalInventory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
-	protected BefriendedInventory befriendedInventory = new BefriendedInventory(getInventorySize());
-
-	@Override
-	public BefriendedInventory getAdditionalInventory()
-	{
-		return befriendedInventory;
-	}
-
-	@Override
-	public int getInventorySize()
-	{
-		/* Change to your size */
-		return 0;
-	}
-
 	@Override
 	public void updateFromInventory() {
 		if (!this.level.isClientSide) {
@@ -191,7 +163,6 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	protected boolean shouldDespawnInPeaceful() {
 		return false;
 	}
-
 
 	// ========================= General Settings end ========================= //
 	// ======================================================================== //

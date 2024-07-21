@@ -13,22 +13,23 @@ import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandler;
 import net.sodiumstudio.befriendmobs.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumstudio.befriendmobs.item.capability.CItemStackMonitor;
 import net.sodiumstudio.befriendmobs.level.CBMLevelModule;
+import net.sodiumstudio.nautils.capability.CEntityTickingCapability;
 
 public class BMCaps {
 
 	// Functional caps
-	public static Capability<CBefriendableMob> CAP_BEFRIENDABLE_MOB = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CHealingHandler> CAP_HEALING_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CAttributeMonitor> CAP_ATTRIBUTE_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CBefriendableMob> CAP_BEFRIENDABLE_MOB = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CHealingHandler> CAP_HEALING_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CAttributeMonitor> CAP_ATTRIBUTE_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// Caps for data storage only
-	public static Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CEntityTickingCapability.createHolder();
 	
 	// General functional capabilities
-	public static Capability<CBMPlayerModule> CAP_BM_PLAYER = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CBMLevelModule> CAP_BM_LEVEL = CapabilityManager.get(new CapabilityToken<>(){});
-	public static Capability<CLivingEntityDelayedActionHandler> CAP_DELAYED_ACTION_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CBMPlayerModule> CAP_BM_PLAYER = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CBMLevelModule> CAP_BM_LEVEL = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<CLivingEntityDelayedActionHandler> CAP_DELAYED_ACTION_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	@SubscribeEvent
 	public static void register(RegisterCapabilitiesEvent event)

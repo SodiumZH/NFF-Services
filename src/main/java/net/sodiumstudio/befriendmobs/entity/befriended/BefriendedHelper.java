@@ -64,19 +64,17 @@ public class BefriendedHelper
 	}
 
 	/**
-	 *  This will read owner, AI state and additional inventory
-	 *  <p>读取拥有者信息、AI状态及附加道具栏
-	 * @deprecated Use {@link CBefriendedMobData} instead
-	*/
+	 * @deprecated No longer used, moved to data
+	 */
 	@Deprecated
 	public static void addBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt)
 	{
-		nbt.put("bm_common", new CompoundTag());
+		/*nbt.put("bm_common", new CompoundTag());
 		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
 		if (mob.getOwnerUUID() != null)
 			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
 		nbt.getCompound("bm_common").putString("ai_state", mob.getAIState().getId().toString());
-		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");
+		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");*/
 		
 		/*String modId = mob.getModId();
 		String ownerKey = modId + ":befriended_owner";
@@ -102,12 +100,11 @@ public class BefriendedHelper
 	/**
 	 * Read mob's Mod Id, owner, AI state and additional inventory information.
 	 * <p>读取生物所属的Mod ID、拥有者信息、AI状态及附加道具栏
-	 * @deprecated Use {@link CBefriendedMobData} instead
+	 * @since 0.x.25
+	 * TODO Remove in 0.x.30. Before 30 it's left to port legacy.
 	 */
-	@Deprecated
 	public static void readBefriendedCommonSaveData(IBefriendedMob mob, CompoundTag nbt) {
 		
-		/** 0.x.15: new format collects all bm data to "bm_common" entry. */
 		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
 		{
 			if (nbt.getCompound("bm_common").getUUID("owner") == null)
@@ -121,39 +118,6 @@ public class BefriendedHelper
 				mob.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getCompound("bm_common").getString("ai_state"))), false);
 			else mob.setAIState(BefriendedAIState.WAIT, false);
 			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
-		}
-		
-		/** If not saved into "bm_common" entry, read from old format */
-		else {
-			
-			String modid = null;
-			if (nbt.contains("befriended_mod_id", NbtHelper.TAG_STRING_ID))
-			{
-				modid = nbt.getString("befriended_mod_id");
-			}		
-			
-			else modid = "dwmg";	// Porting from 1.18.2-s6 & 1.18.2-s7. Later it will be "befriendmobs".
-			
-			String ownerKey = modid + ":befriended_owner";
-			String aiStateKey = modid + ":befriended_ai_state";
-			String inventoryKey = modid + ":befriended_additional_inventory";
-			UUID uuid = nbt.contains(ownerKey) ? nbt.getUUID(ownerKey) : null;	
-			try {
-			if (uuid == null)
-				throw new IllegalStateException(
-						"Reading befriended mob data error: invalid owner. Was IBefriendedMob.init() not called?");
-			}
-			catch(IllegalStateException e)
-			{
-				e.printStackTrace();
-				return;
-			}
-			mob.setOwnerUUID(uuid);
-			mob.init(mob.getOwnerUUID(), null);
-			//mob.setAIState(BefriendedAIState.fromID(nbt.getInt(aiStateKey)), false);
-			mob.setAIState(BefriendedAIState.WAIT, false);
-			mob.getAdditionalInventory().readFromTag(nbt.getCompound(inventoryKey));
-			
 		}
 	}
 
@@ -217,7 +181,6 @@ public class BefriendedHelper
 			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
 			if (sp.containerMenu == null)
 				return;
-			BMChannels.BM_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
 			sp.initMenu(sp.containerMenu);
 			MinecraftForge.EVENT_BUS.post(
 					new net.minecraftforge.event.entity.player.PlayerContainerEvent.Open(player, player.containerMenu));
