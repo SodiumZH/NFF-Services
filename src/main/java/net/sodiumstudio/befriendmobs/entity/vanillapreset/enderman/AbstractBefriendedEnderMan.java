@@ -107,20 +107,6 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BOOLEAN);
 	protected static final EntityDataAccessor<Boolean> DATA_STARED_AT = SynchedEntityData
 			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.BOOLEAN);
-	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
-			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
-			.defineId(AbstractBefriendedEnderMan.class, EntityDataSerializers.STRING);	
-
-	@Override
-	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
-		return DATA_OWNERUUID;
-	}
-
-	@Override
-	public EntityDataAccessor<String> getAIStateData() {
-		return DATA_AISTATE;
-	}
 
 	@SuppressWarnings("deprecation")
 	public AbstractBefriendedEnderMan(EntityType<? extends AbstractBefriendedEnderMan> pEntityType, Level pLevel)
@@ -131,7 +117,6 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		this.xpReward = 0;
 		Arrays.fill(this.armorDropChances, 0f);
 		Arrays.fill(this.handDropChances, 0f);
-		befriendedInventory = new BefriendedInventory(getInventorySize());
 	}
 
 	@Override
@@ -182,8 +167,6 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 		this.entityData.define(DATA_CARRY_STATE, Optional.empty());
 		this.entityData.define(DATA_CREEPY, false);
 		this.entityData.define(DATA_STARED_AT, false);
-		this.entityData.define(DATA_OWNERUUID, Optional.empty());
-		this.entityData.define(DATA_AISTATE, "");
 	}
 
 	@Override
@@ -611,13 +594,6 @@ public abstract class AbstractBefriendedEnderMan extends Monster implements IBef
 
 	// Inventory related
 	// Generally no need to modify unless noted
-
-	protected BefriendedInventory befriendedInventory;
-
-	@Override
-	public BefriendedInventory getAdditionalInventory() {
-		return befriendedInventory;
-	}
 
 	@Override
 	public void updateFromInventory() {

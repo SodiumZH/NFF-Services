@@ -45,28 +45,6 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 
 	/* Data sync */
 
-	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
-			.defineId(TemplateBefriendedMobPreset.class/* CHANGE TO YOUR CLASS */, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
-			.defineId(TemplateBefriendedMobPreset.class/* CHANGE TO YOUR CLASS */, EntityDataSerializers.STRING);
-
-	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		entityData.define(DATA_OWNERUUID, Optional.empty());
-		entityData.define(DATA_AISTATE, "");
-	}
-	
-	@Override
-	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
-		return DATA_OWNERUUID;
-	}
-
-	@Override
-	public EntityDataAccessor<String> getAIStateData() {
-		return DATA_AISTATE;
-	}
-
 	/* Initialization */
 
 	public TemplateBefriendedMobPreset(EntityType<? extends TemplateBefriendedMobPreset> pEntityType, Level pLevel) {
@@ -142,27 +120,16 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	
 	/* Inventory */
 
-	// This enables mob armor and hand items by default.
-	// If not needed, use BefriendedInventory class instead.
-	protected BefriendedInventoryWithEquipment additionalInventory = new BefriendedInventoryWithEquipment(getInventorySize(), this);
-
 	@Override
-	public BefriendedInventory getAdditionalInventory()
-	{
-		return additionalInventory;
-	}
-	
-	@Override
-	public int getInventorySize()
-	{
-		return 8;
+	public BefriendedInventory createAdditionalInventory() {
+		return new BefriendedInventoryWithEquipment(8, this);
 	}
 
 	@Override
 	public void updateFromInventory() {
 		if (!this.level().isClientSide) {
 			// Sync inventory with mob equipments. If it's not BefriendedInventoryWithEquipment, remove it
-			additionalInventory.setMobEquipment(this);
+			this.getAdditionalInventory().cast(BefriendedInventoryWithEquipment.class).setMobEquipment(this);
 		}
 	}
 
@@ -171,7 +138,7 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	{
 		if (!this.level().isClientSide) {
 			// Sync inventory with mob equipments. If it's not BefriendedInventoryWithEquipment, remove it
-			additionalInventory.getFromMob(this);
+			this.getAdditionalInventory().cast(BefriendedInventoryWithEquipment.class).getFromMob(this);
 		}
 		return;
 	}

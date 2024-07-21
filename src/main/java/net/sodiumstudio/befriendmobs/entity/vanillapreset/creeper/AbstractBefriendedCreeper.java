@@ -56,25 +56,11 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.BOOLEAN);
 	protected static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.BOOLEAN);
-	protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID = SynchedEntityData
-			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.OPTIONAL_UUID);
-	protected static final EntityDataAccessor<String> DATA_AISTATE = SynchedEntityData
-			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.STRING);
 	protected static final EntityDataAccessor<Integer> DATA_SWELL = SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
 	protected static final EntityDataAccessor<Integer> DATA_SWELL_LAST_TICK= SynchedEntityData
 			.defineId(AbstractBefriendedCreeper.class, EntityDataSerializers.INT);
 
-	@Override
-	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor() {
-		return DATA_OWNERUUID;
-	}
-
-	@Override
-	public EntityDataAccessor<String> getAIStateData() {
-		return DATA_AISTATE;
-	}
-	
 	public int maxSwell = 30;
 
 	protected int explosionRadius = 3;
@@ -155,8 +141,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 		this.entityData.define(DATA_SWELL_DIR, -1);
 		this.entityData.define(DATA_IS_POWERED, false);
 		this.entityData.define(DATA_IS_IGNITED, false);
-		this.entityData.define(DATA_OWNERUUID, Optional.empty());
-		this.entityData.define(DATA_AISTATE, "");
 		this.entityData.define(DATA_SWELL, 0);
 		this.entityData.define(DATA_SWELL_LAST_TICK, 0);
 		//this.entityData.define();
@@ -487,21 +471,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	// Inventory related
 	// Generally no need to modify unless noted
 
-	protected BefriendedInventory befriendedInventory = new BefriendedInventoryWithEquipment(getInventorySize());
-
-	@Override
-	public BefriendedInventory getAdditionalInventory()
-	{
-		return befriendedInventory;
-	}
-
-	@Override
-	public int getInventorySize()
-	{
-		/* Change to your size */
-		return 8;
-	}
-
 	@Override
 	public void updateFromInventory() {
 		if (!this.level().isClientSide) {
@@ -543,16 +512,6 @@ public abstract class AbstractBefriendedCreeper extends Monster implements IBefr
 	public void setInit()
 	{
 		initialized = true;
-	}
-
-	@Override
-	public UUID getOwnerUUID() {
-		return entityData.get(DATA_OWNERUUID).orElse(null);
-	}
-
-	@Override
-	public void setOwnerUUID(UUID ownerUUID) {
-		entityData.set(DATA_OWNERUUID, Optional.of(ownerUUID));
 	}
 
 	// AI related

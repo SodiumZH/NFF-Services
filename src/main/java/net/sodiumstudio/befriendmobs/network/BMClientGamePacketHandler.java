@@ -7,9 +7,11 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.sodiumstudio.befriendmobs.client.gui.screens.BefriendedGuiScreenMaker;
+import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
+import net.sodiumstudio.befriendmobs.registry.BMCaps;
 
 public class BMClientGamePacketHandler
 {
@@ -45,5 +47,17 @@ public class BMClientGamePacketHandler
 			mob.setYBodyRot(packet.yBodyRot);
 			mob.setYHeadRot(packet.yHeadRot);
 		}
+	}
+	
+	public static void handleBefriendedModifySynchableData(CBefriendedMobData.ClientboundDataSyncPacket packet, ClientGamePacketListener listener)
+	{
+		@SuppressWarnings("resource")
+		Minecraft mc = Minecraft.getInstance();
+		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
+		Entity e = mc.level.getEntity(packet.entityId);
+		e.getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
+			for (var entry: packet.objects.entrySet())
+				c.setSynchedDataClient(entry.getKey(), entry.getValue());
+		});
 	}
 }

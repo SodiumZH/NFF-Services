@@ -43,7 +43,6 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.inventory.BefriendedInventoryMenu;
 import net.sodiumstudio.befriendmobs.item.MobRespawnerItem;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
-import net.sodiumstudio.nautils.Wrapped;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.annotation.DontOverride;
 import net.sodiumstudio.nautils.containers.CyclicSwitch;
@@ -51,8 +50,8 @@ import net.sodiumstudio.nautils.object.ItemOrKey;
 
 public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 
-	public static final CyclicSwitch<BefriendedAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>(BefriendedAIState.WAIT, BefriendedAIState.FOLLOW,
-			BefriendedAIState.WANDER);
+	public static final CyclicSwitch<BefriendedAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>
+		(BefriendedAIState.WAIT, BefriendedAIState.FOLLOW, BefriendedAIState.WANDER);
 	
 	/* Common */
 	/**
@@ -178,7 +177,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setInit()
 	{
-		this.getData().setInitState(true);;
+		this.getData().setInitState(true);
 	}
 
 	/** Label a mob not finished initialization.
@@ -259,21 +258,14 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	
 	/** 
 	 * Get owner as UUID.
-	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
 	* <p>获取拥有者的UUID。
-	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
 	*/
 	@Override
 	@DontOverride
-	@Nullable
+	@Nonnull
 	public default UUID getOwnerUUID()
 	{
-		if (!asMob().getEntityData().get(getOwnerUUIDAccessor()).isPresent())
-		{
-			BefriendMobs.LOGGER.error("Befriended mob \"" + this.asMob().getName().getString() + "\" missing owner. If this happens not on initialization phase, maybe IBefriendedMob#init() wasn't called on init.");
-			return null;
-		}
-		return asMob().getEntityData().get(getOwnerUUIDAccessor()).get();
+		return this.getData().getOwnerUUID();
 	}
 	
 	/** Set owner from player entity.
@@ -292,15 +284,9 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
-		asMob().getEntityData().set(getOwnerUUIDAccessor(), Optional.of(ownerUUID));
+		this.getData().setOwnerUUID(ownerUUID);
 	}
-	
-	/**
-	 * Get owner UUID as {@link EntityDataAccessor}. Attach this to accessor defined in mob class.
-	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取拥有者UUID。在生物类中将该方法关联到相应访问器上。
-	 */
-	public EntityDataAccessor<Optional<UUID>> getOwnerUUIDAccessor();
-	
+
 	/**
 	 * Check if owner is in the level.
 	 * @deprecated Use {@code isOwnerInDimension} or {@code isOwnerInWorld} instead.
@@ -332,13 +318,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	
 	/* -------------------------------------------------------- */
 	/* AI configs */
-	
-	/** 
-	 * Get the AI state as {@link EntityDataAccessor}. Attach this to accessor defined in mob class.
-	 * <p>以实体数据访问器（{@link EntityDataAccessor}）的形式获取AI状态。在生物类中将该方法关联到相应访问器上。
-	*/
-	public EntityDataAccessor<String> getAIStateData();
-	
+
 	/** 
 	 * Get current AI state as enum.
 	 * <p>以枚举类的形式获取当前AI状态。
@@ -346,7 +326,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default BefriendedAIState getAIState()
 	{
-		return BefriendedAIState.fromID(new ResourceLocation(this.asMob().getEntityData().get(getAIStateData())));
+		return this.getData().getAIState();
 	}
 	
 	/** A preset action when switching AI e.g. on right click.
@@ -391,11 +371,11 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setAIState(BefriendedAIState state, boolean postEvent)
 	{
-		if (state == getAIState())
+		if (state == this.getAIState())
 			return;
 		if (postEvent && MinecraftForge.EVENT_BUS.post(new BefriendedChangeAiStateEvent(this, getAIState(), state)))
 			return;
-		asMob().getEntityData().set(getAIStateData(), state.getId().toString());
+		this.getData().setAIState(state);
 	}
 	
 	/** Get if a target mob can be attacked by this mob.
@@ -428,7 +408,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontCallManually
 	public default void setPreviousTarget(LivingEntity target)
 	{
-		this.getData().setPreviousTarget(target);;
+		this.getData().setPreviousTarget(target);
 	}
 	
 	/** Get the anchor pos that the mob won't stroll too far from it
@@ -491,9 +471,18 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	
 	/* Inventory */
 	
-	public BefriendedInventory getAdditionalInventory();
-
-	public int getInventorySize();
+	public default BefriendedInventory getAdditionalInventory() {return this.getData().getAdditionalInventory();}
+	
+	/**
+	 * @deprecated Use {@code createAdditionalInventory} to override inventory.
+	 */
+	@Deprecated
+	public default int getInventorySize() {return getAdditionalInventory().getContainerSize();}
+	
+	/**
+	 * Method to create additional inventory. Invoked on befriended or loaded.
+	 */
+	public BefriendedInventory createAdditionalInventory();
 	
 	// Set mob data from befriendedInventory.
 	public void updateFromInventory();
@@ -502,15 +491,17 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	public void setInventoryFromMob();
 	
 	// Get item stack from position in inventory tag
+	@Deprecated
 	@DontOverride
 	public default ItemStack getInventoryItemStack(int pos)
 	{
-		if (pos < 0 || pos >= getInventorySize())
+		if (pos < 0 || pos >= getAdditionalInventory().getContainerSize())
 			throw new IndexOutOfBoundsException();
 		return this.getAdditionalInventory().getItem(pos);
 	}
 	
 	// Get item (type) from position in inventory tag
+	@Deprecated
 	@DontOverride
 	public default Item getInventoryItem(int pos)
 	{
@@ -692,15 +683,15 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	 */
 	public default CBefriendedMobData getData()
 	{
-		Wrapped<CBefriendedMobData> res = new Wrapped<CBefriendedMobData>(null);
+		MutableObject<CBefriendedMobData> res = new MutableObject<CBefriendedMobData>(null);
 		asMob().getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
 		{
-			res.set(cap);
+			res.setValue(cap);
 		});
-		if (res.get() == null)
+		if (res.getValue() == null)
 			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
 			return new CBefriendedMobData.Values(this);	
-		return res.get();
+		return res.getValue();
 	}
 	
 	/**

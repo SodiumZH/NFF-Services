@@ -51,7 +51,8 @@ public class BefriendedAIState {
 	@Nullable
 	public static BefriendedAIState fromID(ResourceLocation id)
 	{
-		return STATES.get(id);		
+		BefriendedAIState res = STATES.get(id);	
+		return res != null ? res : BefriendedAIState.WAIT;
 	}
 	
 	@Nullable

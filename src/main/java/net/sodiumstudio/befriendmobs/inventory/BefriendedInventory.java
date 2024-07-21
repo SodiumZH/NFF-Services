@@ -219,4 +219,14 @@ public class BefriendedInventory extends SimpleContainer
 		}
 		this.setChanged();
 	}
+	
+	/**
+	 * Cast this to given subclass. 
+	 * <p>WARNING: This method wraps an unchecked cast. Make sure the class matches.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends BefriendedInventory> T cast(Class<T> clazz)
+	{
+		return (T) this;
+	}
 }
