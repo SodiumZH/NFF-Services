@@ -14,7 +14,9 @@ import net.minecraftforge.common.util.LazyOptional;
  * A default template {@link CapabilityProvider} for serializable capabilities.
  * @param <S> Serializing NBT type.
  * @param <T> Corresponding serializable capability type.
+ * @deprecated Use {@code NaUtilsEntitySerializableCapProvider} instead.
  */
+@Deprecated
 public class SerializableCapabilityProvider<S extends Tag, T extends INBTSerializable<S>> implements ICapabilitySerializable<S>
 {
 	private T cap;

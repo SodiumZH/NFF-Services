@@ -20,7 +20,8 @@ public class NaUtils
 
 	// TODO: change to "nautils" after separation
 	public static final String MOD_ID = "befriendmobs";
-	private static MinecraftServer server;
+	public static final String MOD_ID_FINAL = "nautils";
+	private static MinecraftServer server = null;
 	
 	public NaUtils()
 	{
