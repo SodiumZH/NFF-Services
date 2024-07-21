@@ -2,67 +2,63 @@ package net.sodiumstudio.befriendmobs.entity.befriended;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
+import net.sodiumstudio.befriendmobs.entity.befriending.BefriendingHandler;
+import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
+import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.nautils.NaUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
-import net.sodiumstudio.nautils.annotation.DontOverride;
+import net.sodiumstudio.nautils.capability.CEntityTickingCapability;
+import net.sodiumstudio.nautils.containers.Tuple3;
 import net.sodiumstudio.nautils.function.MutablePredicate;
-import net.sodiumstudio.befriendmobs.events.*;
+import net.sodiumstudio.nautils.network.NaUtilsSynchableDataType;
+
 
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
  */
-public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
-	
-	/**
-	 * Transform capability to value implementations.
-	 * In values transient data can be directly accessed.
-	 * If permanent (serializable) data is needed, use wrapped methods in IBefriendedMob instead.
-	 */
-	public default Values values()
-	{
-		return (Values)this;
-	}
+public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEntityTickingCapability<Mob> {
 	
 	// General //
 	
 	/** Get the befriended mob owning this data. */
 	public IBefriendedMob getMob();
-	
-	/** Get the whole NBT as compound tag.*/
-	public CompoundTag getNbt();
 
+	/** Get the whole additional NBT as compound tag.*/
+	public CompoundTag getNbt();
+	
 	/** Get sun immunity. It only works when the mob is an {@link IBefriendedSunSensitiveMob}, otherwise throws exception. */
 	public MutablePredicate<IBefriendedSunSensitiveMob> getSunImmunity();
 	
@@ -83,7 +79,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	
 	/**
 	 * Force access a value with casted class.
-	 * If it's absent, return null. If class mismatches, throw exception.
+	 * If it's absent, return null. If class mismatches, log error and return null.
 	 * @return Value with casted class, or null if absent or class mismatching.
 	 */
 	@SuppressWarnings("unchecked")
@@ -113,15 +109,14 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	 */
 	@DontCallManually
 	public void generateIdentifier();
-	
-	
+
 	/**
 	 * Get the registry key of the entity type of this mob on befriended.
 	 * <p>
 	 * This allows to read the mob's "initial" type after it converts to other
 	 * types somehow.
 	 */
-	public ResourceLocation getInitialEntityType();
+	public EntityType<? extends Mob> getInitialEntityType();
 	
 	/**
 	 * Record the registry key of the entity type of this mob on befriended.
@@ -130,7 +125,6 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	 * types somehow.
 	 */
 	public void recordEntityType();
-	
 	
 	// Owner info related //
 	
@@ -142,10 +136,11 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	/**
 	 * Set the owner's display name stored.
 	 */
-	public void setOwnerName(@Nonnull Player owner);
+	public void setOwnerName(String val);
 	
 	/**
 	 * Get the date player encountered it, including befriended, or took ownership from another player.
+	 * @since 0.x.20
 	 * @return An int[3] indicating year, month and day, or null if not recorded (legacy).
 	 */
 	@Nullable
@@ -157,7 +152,11 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	@DontCallManually
 	public void recordBefriendedInfo(Player owner);
 	
-	// Anchor related //
+	public UUID getOwnerUUID();
+	
+	public void setOwnerUUID(UUID value);
+	
+	// Behavior related //
 	
 	/**
 	 * Get random stroll anchor point as vector.
@@ -168,6 +167,40 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	* Set random stroll anchor point.
 	*/ 
 	public void setAnchor(Vec3 anchor);
+
+	public BefriendedAIState getAIState();
+	
+	public void setAIState(BefriendedAIState state); 
+	
+	/**
+	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#getPreviousTarget}.
+	 */
+	@DontCallManually
+	@Nullable
+	public LivingEntity getPreviousTarget();
+	
+	/**
+	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#setPreviousTarget}.
+	 */
+	@DontCallManually
+	@Nullable
+	public void setPreviousTarget(LivingEntity target);
+	
+	// Inventory related //
+	
+	public BefriendedInventory getAdditionalInventory();
+	
+	// Synched Data related //
+	
+	public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsSynchableDataType<T> dataType, T initValue);	
+	
+	public <T> T getSynchedData(String key, Class<T> dataType);
+	
+	public <T> T getSynchedDataUnchecked(String key);
+	
+	public <T> void setSynchedData(String key, Class<T> dataType, T value);
+
+	public void setSynchedDataClient(String key, Object value);
 	
 	// Misc //
 	
@@ -185,40 +218,54 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 	 */
 	@DontCallManually
 	public void setInitState(boolean value);
+
+	// ********************************************************************************* //
+	// ********************************************************************************* //
 	
-	/**
-	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#getPreviousTarget}.
-	 */
-	@DontCallManually
-	@Nullable
-	public LivingEntity getPreviousTarget();
-	
-	/**
-	 * <b> Don't call manually! </b> This method is only called in {@link IBefriendedMob#setPreviousTarget}.
-	 */
-	@DontCallManually
-	@Nullable
-	public void setPreviousTarget(LivingEntity target);
-	
-	 // Values of mob data, also as implementation of interface methods.
+	// Values of mob data, also as implementation of interface methods.
 	public static class Values implements CBefriendedMobData
 	{
 		private static final UUID EMPTY_UUID = new UUID(0l, 0l);
 		private IBefriendedMob mob;
+
+		//** Serialized data cache **//
+		// General
+		private static final String IDENTIFIER_SYNCHED_KEY = "identifier";
+		private EntityType<? extends Mob> initialType = null;
 		private CompoundTag tag = new CompoundTag();
-		private boolean hasInit = false;
+		// Owner
+		private UUID ownerUUID = EMPTY_UUID;
+		private static final String OWNER_NAME_SYNCHED_KEY = "ownerName";
+		private static final String ENCOUNTERED_DATE_SYNCHED_KEY = "encounteredDate";
+		// Behavior
 		private LivingEntity previousTarget = null;
 		private Vec3 anchor;
-		private UUID identifier = null;	
+		private static final String AI_STATE_SYNCHED_KEY = "aiState";
+		// Inventory
+		private BefriendedInventory inventory = this.getMob().createAdditionalInventory();
+		// Misc
+		private boolean hasInit = false;
 		
+		
+		// Synched data map. On client in the tuple3 only the object is valid.
+		private Map<String, Tuple3<Class<?>, NaUtilsSynchableDataType<?>, Object>> synchedData = new HashMap<>();
 
 		public Values(IBefriendedMob mob)
 		{
 			this.mob = mob;
 			this.anchor = mob.asMob().position();
 			this.tag = new CompoundTag();
+			
+			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, NaUtilsSynchableDataType.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, NaUtilsSynchableDataType.STRING, "");
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, NaUtilsSynchableDataType.INT_ARRAY, new int[] {0, 0, 0});
+			this.createSynchedData(AI_STATE_SYNCHED_KEY, String.class, NaUtilsSynchableDataType.STRING, BefriendedAIState.WAIT.getId().toString());
 		}
-		
+	
+		private Level getLevel()
+		{
+			return this.getMob().asMob().getLevel();
+		}
 		
 		// BefriendedUndeadMob data
 		private MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -227,15 +274,74 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		
 		@Override
 		public CompoundTag serializeNBT() {
-			// TODO: remove this in release. This is only for porting old data to new one.
-			if (!tag.contains("owner_name", NbtHelper.TAG_STRING_ID) && mob.getOwnerInDimension() != null)
-				this.setOwnerName(mob.getOwnerInDimension());
-			return tag;
+			CompoundTag save = new CompoundTag();
+			// General
+			save.putBoolean("25+", true);	// This is a label that the data format is 0.x.25+. Remove this after 0.x.30.
+			save.put("additionalNBT", this.getNbt());
+			save.putUUID("identifier", this.getIdentifier());
+			save.putString("initialEntityType", ForgeRegistries.ENTITY_TYPES.getKey(this.getInitialEntityType()).toString());
+			save.putString("modId", ForgeRegistries.ENTITY_TYPES.getKey(this.getEntity().getType()).getNamespace());	// This field is not directly accessible, but only for reading mod id from entity saved data NBT.
+			// Owner
+			save.putString("ownerName", this.getOwnerName());	// TODO: Remove after 0.x.30
+			save.putUUID("ownerUUID", this.getOwnerUUID());
+			if (this.getEncounteredDate() != null) save.putIntArray("encounteredDate", getEncounteredDate()); 
+			else save.putIntArray("encounteredDate", new int[] {0, 0, 0});	// TODO: remove after 0.x.30
+			// Behavior
+			NbtHelper.putVec3(save, "randomStrollAnchor", this.getAnchor());
+			save.putString("aiState", this.getAIState().getId().toString());
+			// Inventory
+			this.getAdditionalInventory().saveToTag(save, "additionalInventory");
+			return save;
 		}
 
 		@Override
 		public void deserializeNBT(CompoundTag nbt) {
-			tag = nbt;
+			// 0.x.25+: normal reading
+			if (nbt.getBoolean("25+"))
+			{
+				this.tag = nbt.getCompound("additionalNBT").copy();
+				this.setIdentifier(nbt.getUUID("identifier"));
+				this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
+				this.setOwnerName(nbt.getString("ownerName"));
+				this.setOwnerUUID(nbt.getUUID("ownerUUID"));
+				this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
+				this.setAnchor(NbtHelper.getVec3(nbt, "randomStrollAnchor"));
+				this.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
+				this.inventory = BefriendedInventory.makeFromTag(nbt.getCompound("additionalInventory"), mob);
+			}
+			// Port legacy
+			else 
+			{
+				tag = nbt.copy();
+				tag.remove("mod_id");
+				
+				UUID identifier = tag.getUUID("identifier");
+				if (identifier == null || identifier.equals(EMPTY_UUID)) this.generateIdentifier();
+				else this.setIdentifier(identifier);
+				tag.remove("identifier");
+				
+				String entityTypeKey = tag.getString("initial_entity_type");
+				if (entityTypeKey != null && ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)) != null)
+					this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)));
+				else this.recordEntityType();
+				tag.remove("initial_entity_type");
+				
+				String ownerName = tag.getString("owner_name");
+				if (ownerName != null) this.setOwnerName(ownerName);
+				else this.setOwnerName("");
+				tag.remove("owner_name");
+				
+				// owner uuid is set in BefriendedHelper
+				int[] encounteredDate = tag.getIntArray("encountered_date");
+				if (encounteredDate != null && encounteredDate.length >= 3) 
+					this.setEncounteredDate(new int[] {encounteredDate[0], encounteredDate[1], encounteredDate[2]});
+				else this.setEncounteredDate(new int[] {0, 0, 0});
+				tag.remove("encountered_date");
+				
+				this.anchor = this.getEntity().position();
+				
+				// AI state, owner uuid and inventory is loaded from BefriendedHelper
+			}
 		}
 
 		@Override
@@ -248,6 +354,12 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			return mob;
 		}
 
+		@Override
+		public Mob getEntity()
+		{
+			return getMob().asMob();
+		}
+		
 		@Override
 		public MutablePredicate<IBefriendedSunSensitiveMob> getSunImmunity() {
 			if (mob instanceof IBefriendedSunSensitiveMob)
@@ -270,56 +382,74 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			tempObjects.remove(key);
 		}
 		
-		
 		@Override
 		public UUID getIdentifier()
 		{
-			if (this.identifier != null && !this.identifier.equals(EMPTY_UUID))
-				return this.identifier;
-			else if (this.tag.hasUUID("identifier") && !this.tag.getUUID("identifier").equals(EMPTY_UUID))
-				return this.tag.getUUID("identifier");
-			else
-			{
-				LogUtils.getLogger().error(String.format("Befriended mob %s missing identifier. Trying to regenerate.", this.getMob().asMob().getName().getString()));
+			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
+			if (id != null && !id.equals(EMPTY_UUID))
+				return id;
+			else {
+				LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing identifier. Regenerated.", this.getEntity().getName().getString()));
 				this.generateIdentifier();
-				return this.identifier;
+				return this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
 			}
 		}
 
 		@Override
 		public void generateIdentifier()
 		{
-			if (this.identifier == null || this.identifier.equals(EMPTY_UUID))
+			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
+			if (id != null && !id.equals(EMPTY_UUID))
 			{
-				this.identifier = UUID.randomUUID();
-				this.tag.putUUID("identifier", this.identifier);
+				this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, UUID.randomUUID());
+			}
+			else throw new UnsupportedOperationException("CBefriendedMobData#generateIdentifier: Identifier is valid, not supported to regenerate.");
+		}
+		
+		// Directly set, not safe
+		private void setIdentifier(UUID val)
+		{
+			this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, val);
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public EntityType<? extends Mob> getInitialEntityType()
+		{
+			if (this.initialType != null) return this.initialType;
+			else {
+				LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing initial type. Reset to current type.", this.getEntity().getName().getString()));
+				this.recordEntityType();
+				return this.initialType;
 			}
 		}
 		
-		@Override
-		public ResourceLocation getInitialEntityType()
-		{
-			if (!tag.contains("initial_entity_type", NbtHelper.TAG_STRING_ID))
-				recordEntityType();
-			return new ResourceLocation(this.tag.getString("initial_entity_type"));
-		}
-		
+		@SuppressWarnings("unchecked")
 		@Override
 		public void recordEntityType()
 		{
-			this.tag.putString("initial_entity_type", ForgeRegistries.ENTITIES.getKey(this.getMob().asMob().getType()).toString());
+			this.initialType = (EntityType<? extends Mob>) this.getEntity().getType();
+		}
+		
+		@SuppressWarnings("unchecked")
+		private void setInitialEntityType(@Nonnull EntityType<?> entityType)
+		{
+			this.initialType = (EntityType<? extends Mob>) entityType;
 		}
 		
 		@Override
 		public String getOwnerName() {
-			if (!tag.contains("owner_name", NbtHelper.TAG_STRING_ID))
+			String str = this.getSynchedData(OWNER_NAME_SYNCHED_KEY, String.class);
+			if (str != null && str != "") return str;
+			else {
+				LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing owner name. Return \"Unknown\". It will be updated once the owner entered the level", this.getEntity().getName().getString()));
 				return "Unknown";
-			else return tag.getString("owner_name");
+			}
 		}
 
 		@Override
-		public void setOwnerName(Player owner) {
-			tag.putString("owner_name", owner.getName().getString());
+		public void setOwnerName(String val) {
+			this.setSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, val);
 		}		
 		
 		@Override
@@ -329,14 +459,48 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			else return tag.getIntArray("encountered_date");
 		}
 
+		private void setEncounteredDate(int[] val)
+		{
+			this.setSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, val);
+		}
+		
 		@Override
 		public void recordBefriendedInfo(Player owner) {
 			if (!mob.asMob().level.isClientSide)
 			{
-				this.setOwnerName(owner);
+				this.setOwnerName(owner.getName().getString());
 				LocalDate now = LocalDate.now();
 				this.tag.putIntArray("encountered_date", new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)});
 			}
+		}
+
+		@Nonnull
+		@Override
+		public UUID getOwnerUUID()
+		{
+			if (this.ownerUUID == null || this.ownerUUID.equals(EMPTY_UUID)) 
+				throw new RuntimeException(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
+			return this.ownerUUID;
+		}
+		
+		@Override
+		public void setOwnerUUID(@Nonnull UUID value)
+		{
+			if (value == null || value.equals(EMPTY_UUID))
+				throw new IllegalArgumentException(String.format("CBefriendedMobData#setOwnerUUID: requires non-null and non-zero.", this.getEntity().getName().getString()));
+			this.ownerUUID = value;
+		}
+		
+		@Override
+		public BefriendedAIState getAIState()
+		{
+			return BefriendedAIState.fromID(new ResourceLocation(this.getSynchedData(AI_STATE_SYNCHED_KEY, String.class)));
+		}
+		
+		@Override
+		public void setAIState(BefriendedAIState state)
+		{
+			this.setSynchedData(AI_STATE_SYNCHED_KEY, String.class, state.getId().toString());
 		}
 
 		@Override
@@ -369,7 +533,87 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 			this.previousTarget = target;
 		}
 		
+		@Override
+		public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsSynchableDataType<T> dataType, T defaultValue)
+		{
+			if (this.getMob().asMob().getLevel().isClientSide)
+				return;
+			if (this.synchedData.containsKey(key))
+				throw new IllegalArgumentException("CBefriendedMobData synched data: duplicated data key.");
+			this.synchedData.put(key, new Tuple3<>(dataClass, dataType, defaultValue));
+		}
+
+		@SuppressWarnings("resource")
+		@Override
+		public <T> void setSynchedData(String key, Class<T> dataType, T value)
+		{
+			if (this.getMob().asMob().getLevel().isClientSide)
+				throw new IllegalStateException("CBefriendedMobData synched data: set data only on server. On client it's auto-synched. Use setSynchedDataClient to force set only on client.");
+			if (!this.synchedData.containsKey(key))
+				throw new IllegalArgumentException("CBefriendedMobData synched data: data not found. Use createSynchedData first.");
+			if (this.synchedData.get(key).a != dataType || value.getClass() != dataType)
+				throw new IllegalArgumentException("CBefriendedMobData synched data: data type not matching.");
+			this.synchedData.get(key).c = value;
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T> T getSynchedData(String key, Class<T> dataType)
+		{
+			if (!this.synchedData.containsKey(key))
+				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
+			if (this.synchedData.get(key).getClass() != dataType)
+				throw new IllegalArgumentException("CBefriendedMobData synched data: data type not matching.");
+			return (T) this.synchedData.get(key);
+		}
 		
+		@SuppressWarnings("resource")
+		@Override
+		public void setSynchedDataClient(String key, Object value)
+		{
+			if (!this.getMob().asMob().getLevel().isClientSide)
+				throw new IllegalStateException("CBefriendedMobData synched data: setSynchedDataClient only on client. On server use setSynchedData() instead.");
+			if (!this.synchedData.containsKey(key))
+				this.synchedData.put(key, new Tuple3<>(null, null, value));
+			else this.synchedData.get(key).c = value;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> T getSynchedDataUnchecked(String key) {
+			if (!this.synchedData.containsKey(key))
+				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
+			return (T) this.synchedData.get(key);
+		}
+
+		@SuppressWarnings("resource")
+		@Override
+		public void tick()
+		{
+			if (!this.getLevel().isClientSide)
+			{
+				if (!this.synchedData.isEmpty())
+				{
+					ClientboundDataSyncPacket packet = new ClientboundDataSyncPacket(this);
+					List<? extends Player> players = this.getLevel().players();
+					for (Player player: players)
+					{
+						if (player instanceof ServerPlayer sp)
+						{
+							BMChannels.BM_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
+						}
+					}
+				}
+				// TODO remove this. It's for porting legacy format.
+				if (this.getOwnerName() == "" && this.getMob().isOwnerInDimension())
+					this.setOwnerName(this.getMob().getOwnerInDimension().getName().getString());
+			}
+		}
+
+		@Override
+		public BefriendedInventory getAdditionalInventory() {
+			return this.inventory;
+		}
 		
 	}
 	
@@ -399,5 +643,53 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag> {
 		public void deserializeNBT(CompoundTag nbt) {
 			values.deserializeNBT(nbt);
 		}
+	}
+	
+	public static class ClientboundDataSyncPacket implements Packet<ClientGamePacketListener> 
+	{
+		public final CBefriendedMobData.Values dataCap;	// Only on server
+		public final int entityId;
+		public final Map<String, Object> objects; // Only on client
+		
+		public ClientboundDataSyncPacket(CBefriendedMobData.Values v)
+		{
+			this.dataCap = v;
+			this.entityId = v.getMob().asMob().getId();
+			this.objects = null;
+		}
+		
+		public ClientboundDataSyncPacket(FriendlyByteBuf buf)
+		{
+			this.dataCap = null;
+			this.objects = new HashMap<>();
+			this.entityId = buf.readInt();
+			int size = buf.readInt();
+			for (int i = 0; i < size; ++i)
+			{
+				String key = buf.readUtf();
+				NaUtilsSynchableDataType<?> type = NaUtilsSynchableDataType.fromId(new ResourceLocation(buf.readUtf()));
+				Object obj = type.read(buf);
+				objects.put(key, obj);
+			}
+		}
+		
+		@Override
+		public void write(FriendlyByteBuf buf) 
+		{
+			buf.writeInt(entityId);
+			buf.writeInt(dataCap.synchedData.size());
+			for (var entry: dataCap.synchedData.entrySet())
+			{
+				buf.writeUtf(entry.getKey());
+				buf.writeUtf(entry.getValue().b.toString());
+				NaUtilsSynchableDataType.writeUnchecked(entry.getValue().b, buf, entry.getValue().c);
+			}
+		}
+
+		@Override
+		public void handle(ClientGamePacketListener pHandler) {
+			
+		}
+
 	}
 }
