@@ -43,7 +43,7 @@ import net.sodiumstudio.nautils.annotation.DontCallManually;
 import net.sodiumstudio.nautils.capability.CEntityTickingCapability;
 import net.sodiumstudio.nautils.containers.Tuple3;
 import net.sodiumstudio.nautils.function.MutablePredicate;
-import net.sodiumstudio.nautils.network.NaUtilsSynchableDataType;
+import net.sodiumstudio.nautils.network.NaUtilsDataSerializer;
 
 /**
  * A temporal module for storage of data in IBefriendedMob interface.
@@ -191,7 +191,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	
 	// Synched Data related //
 	
-	public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsSynchableDataType<T> dataType, T initValue);	
+	public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsDataSerializer<T> dataType, T initValue);	
 	
 	public <T> T getSynchedData(String key, Class<T> dataType);
 	
@@ -247,7 +247,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		
 		
 		// Synched data map. On client in the tuple3 only the object is valid.
-		private Map<String, Tuple3<Class<?>, NaUtilsSynchableDataType<?>, Object>> synchedData = new HashMap<>();
+		private Map<String, Tuple3<Class<?>, NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
 
 		public Values(IBefriendedMob mob)
 		{
@@ -255,10 +255,10 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			this.anchor = mob.asMob().position();
 			this.tag = new CompoundTag();
 			
-			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, NaUtilsSynchableDataType.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, NaUtilsSynchableDataType.STRING, "");
-			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, NaUtilsSynchableDataType.INT_ARRAY, new int[] {0, 0, 0});
-			this.createSynchedData(AI_STATE_SYNCHED_KEY, String.class, NaUtilsSynchableDataType.STRING, BefriendedAIState.WAIT.getId().toString());
+			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, NaUtilsDataSerializer.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, "");
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, NaUtilsDataSerializer.INT_ARRAY, new int[] {0, 0, 0});
+			this.createSynchedData(AI_STATE_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, BefriendedAIState.WAIT.getId().toString());
 		}
 	
 		private Level getLevel()
@@ -533,7 +533,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		}
 		
 		@Override
-		public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsSynchableDataType<T> dataType, T defaultValue)
+		public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsDataSerializer<T> dataType, T defaultValue)
 		{
 			if (this.getMob().asMob().getLevel().isClientSide)
 				return;
@@ -666,7 +666,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			for (int i = 0; i < size; ++i)
 			{
 				String key = buf.readUtf();
-				NaUtilsSynchableDataType<?> type = NaUtilsSynchableDataType.fromId(new ResourceLocation(buf.readUtf()));
+				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
 				objects.put(key, obj);
 			}
@@ -681,7 +681,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			{
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().b.toString());
-				NaUtilsSynchableDataType.writeUnchecked(entry.getValue().b, buf, entry.getValue().c);
+				NaUtilsDataSerializer.writeUnchecked(entry.getValue().b, buf, entry.getValue().c);
 			}
 		}
 
