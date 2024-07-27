@@ -61,11 +61,19 @@ public interface NaUtilsDataSerializer<T>
 	
 	public static NaUtilsDataSerializer<?> fromId(ResourceLocation key)
 	{
-		return TYPES.get(key);
+		NaUtilsDataSerializer<?> res = TYPES.get(key);
+		if (res == null)
+			throw new IllegalStateException(String.format("NaUtilsDataSerializer: missing instance \"%s\". Is it loaded on mod initialization?"));
+		return res;
 	}
 	
 	// Construction Utils //
 	
+	/**
+	 * Create an instance with serialization/deserialization methods.
+	 * <p>Note: {@code NaUtilsDataSerializer} is auto-registered on create, thus needs to create before . <u>Ensure the class where the
+	 * serializers are defined is loaded on mod initialization!</u> 
+	 */
 	public static <O, T extends Tag> NaUtilsDataSerializer<O> create(ResourceLocation key, Class<O> objClass, Class<T> tagClass, 
 			BiConsumer<FriendlyByteBuf, O> write, Function<FriendlyByteBuf, O> read,
 			Function<O, T> toTag, Function<T, O> fromTag)
@@ -111,6 +119,12 @@ public interface NaUtilsDataSerializer<T>
 		return res;
 	}
 	
+	/**
+	 * Create a list serializer from element serializer.
+	 * <p>Note: {@code NaUtilsDataSerializer} requires a registry. <u>Ensure the class where the
+	 * serializers are defined is loaded on mod initialization!</u> 
+	 * (E.g. by calling the class owning the instances somehow in the mod main class constructor)
+	 */
 	@SuppressWarnings("unchecked")
 	public static <O> NaUtilsDataSerializer<List<O>> listOf(ResourceLocation key, final NaUtilsDataSerializer<O> original)
 	{
