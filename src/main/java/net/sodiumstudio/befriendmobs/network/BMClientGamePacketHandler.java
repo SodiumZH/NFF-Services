@@ -57,7 +57,7 @@ public class BMClientGamePacketHandler
 		Entity e = mc.level.getEntity(packet.entityId);
 		e.getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
 			for (var entry: packet.objects.entrySet())
-				c.setSynchedDataClient(entry.getKey(), entry.getValue());
+				c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
 		});
 	}
 }
