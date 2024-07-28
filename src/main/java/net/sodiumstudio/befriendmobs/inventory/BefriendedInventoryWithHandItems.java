@@ -19,14 +19,16 @@ public class BefriendedInventoryWithHandItems extends BefriendedInventory
 		super(size, owner);
 	}
 	
-	public void getFromMob(Mob mob)
+	@Override
+	public void updateFromMob(Mob mob)
 	{
 		this.setItem(0, mob.getItemBySlot(EquipmentSlot.MAINHAND));
 		this.setItem(1, mob.getItemBySlot(EquipmentSlot.OFFHAND));
 		updateOwner();		
 	}
 	
-	public void setMobEquipment(Mob mob)
+	@Override
+	public void syncToMob(Mob mob)
 	{
 		mob.setItemSlot(EquipmentSlot.MAINHAND, this.getItem(0));
 		mob.setItemSlot(EquipmentSlot.OFFHAND, this.getItem(1));

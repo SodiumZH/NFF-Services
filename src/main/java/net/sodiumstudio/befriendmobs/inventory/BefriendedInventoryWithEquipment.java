@@ -22,7 +22,8 @@ public class BefriendedInventoryWithEquipment extends BefriendedInventory
 		super(size, owner);
 	}
 	
-	public void getFromMob(Mob mob)
+	@Override
+	public void syncToMob(Mob mob)
 	{
 		this.setItem(0, mob.getItemBySlot(EquipmentSlot.HEAD));
 		this.setItem(1, mob.getItemBySlot(EquipmentSlot.CHEST));
@@ -33,7 +34,8 @@ public class BefriendedInventoryWithEquipment extends BefriendedInventory
 		updateOwner();		
 	}
 	
-	public void setMobEquipment(Mob mob)
+	@Override
+	public void updateFromMob(Mob mob)
 	{
 		mob.setItemSlot(EquipmentSlot.HEAD, this.getItem(0));
 		mob.setItemSlot(EquipmentSlot.CHEST, this.getItem(1));
@@ -75,5 +77,5 @@ public class BefriendedInventoryWithEquipment extends BefriendedInventory
 		}
 		throw new IllegalArgumentException();
 	}
-	
+
 }

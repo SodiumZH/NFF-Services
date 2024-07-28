@@ -83,22 +83,7 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 
 	@Override
 	public BefriendedInventory createAdditionalInventory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void updateFromInventory() {
-		if (!this.level.isClientSide) {
-			/* If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory, set here */
-		}
-	}
-
-	@Override
-	public void setInventoryFromMob() {
-		if (!this.level.isClientSide) {
-			/* If inventory needs to be set from mob's properties on initialization, set here */
-		}
+		return new BefriendedInventory(1, this);
 	}
 
 	@Override
@@ -109,13 +94,6 @@ public class TemplateBefriendedMob /* Your mob class */ extends PathfinderMob /*
 	// Inventory end
 
 	// save&load
-
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-		super.addAdditionalSaveData(nbt);
-		BefriendedHelper.addBefriendedCommonSaveData(this, nbt);
-		/* Add more save data... */
-	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
