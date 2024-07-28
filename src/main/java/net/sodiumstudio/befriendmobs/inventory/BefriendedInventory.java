@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
@@ -50,13 +51,7 @@ public class BefriendedInventory extends SimpleContainer
 		if (owner != null)
 			this.addListener(owner);
 	}
-	
-	@Deprecated
-	public void set(ItemStack stack, int index)
-	{	
-		this.setItem(index, stack);
-	}
-	
+
 	@Override
 	public void setItem(int index, ItemStack stack)
 	{
@@ -218,6 +213,20 @@ public class BefriendedInventory extends SimpleContainer
 			this.setItem(i, ItemStack.EMPTY);
 		}
 		this.setChanged();
+	}
+	
+	/**
+	 * Use information in this inventory to update the mob state (hand items, armor, etc.)
+	 */
+	public void syncToMob(Mob mob)
+	{
+	}
+	
+	/**
+	 * Use mob state to update this inventroy. Usually used only on initialization.
+	 */
+	public void updateFromMob(Mob mob)
+	{
 	}
 	
 	/**
