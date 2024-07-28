@@ -10,6 +10,7 @@ import java.util.function.BiConsumer;
 import com.google.common.base.Function;
 
 import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.IntTag;
@@ -20,8 +21,10 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumstudio.nautils.NaUtils;
+import net.sodiumstudio.nautils.math.LinearColor;
 
 /**
  * Defines a data type that can serialized both into nbt and FriendlyByteBuf.
@@ -71,12 +74,13 @@ public interface NaUtilsDataSerializer<T>
 	
 	/**
 	 * Create an instance with serialization/deserialization methods.
-	 * <p>Note: {@code NaUtilsDataSerializer} is auto-registered on create, thus needs to create before . <u>Ensure the class where the
+	 * <p>Note: {@code NaUtilsDataSerializer} is auto-registered on create. <u>Ensure the class where the
 	 * serializers are defined is loaded on mod initialization!</u> 
+	 * (E.g. by calling the class owning the instances somehow in the mod main class constructor)
 	 */
-	public static <O, T extends Tag> NaUtilsDataSerializer<O> create(ResourceLocation key, Class<O> objClass, Class<T> tagClass, 
+	public static <O> NaUtilsDataSerializer<O> create(ResourceLocation key, Class<O> objClass,
 			BiConsumer<FriendlyByteBuf, O> write, Function<FriendlyByteBuf, O> read,
-			Function<O, T> toTag, Function<T, O> fromTag)
+			Function<O, Tag> toTag, Function<Tag, O> fromTag)
 	{
 		NaUtilsDataSerializer<O> res = new NaUtilsDataSerializer<O>()
 		{
@@ -108,20 +112,24 @@ public interface NaUtilsDataSerializer<T>
 			@Override
 			public O fromTag(Tag t)
 			{
-				if (tagClass.isAssignableFrom(t.getClass()))
-				{
-					return fromTag.apply((T)t);
-				}
-				else throw new RuntimeException("NaUtilsDataSerializer: serialization and deserialization NBT type error.");
+				return fromTag.apply(t);
 			}
 		};
 		TYPES.put(key, res);
 		return res;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static <O, T extends Tag> NaUtilsDataSerializer<O> create(ResourceLocation key, Class<O> objClass, Class<T> tagClass,
+			BiConsumer<FriendlyByteBuf, O> write, Function<FriendlyByteBuf, O> read,
+			Function<O, T> toTag, Function<T, O> fromTag)
+	{
+		return create(key, objClass, write, read, o -> toTag.apply(o), t -> fromTag.apply((T)t));
+	}
+	
 	/**
 	 * Create a list serializer from element serializer.
-	 * <p>Note: {@code NaUtilsDataSerializer} requires a registry. <u>Ensure the class where the
+	 * <p>Note: {@code NaUtilsDataSerializer} is auto-registered on create. <u>Ensure the class where the
 	 * serializers are defined is loaded on mod initialization!</u> 
 	 * (E.g. by calling the class owning the instances somehow in the mod main class constructor)
 	 */
@@ -129,7 +137,7 @@ public interface NaUtilsDataSerializer<T>
 	public static <O> NaUtilsDataSerializer<List<O>> listOf(ResourceLocation key, final NaUtilsDataSerializer<O> original)
 	{
 		Class<?> clazz = List.class;
-		return NaUtilsDataSerializer.create(key, (Class<List<O>>)clazz, ListTag.class, 
+		return NaUtilsDataSerializer.create(key, (Class<List<O>>)clazz, ListTag.class,
 				(b, o) -> {
 					b.writeInt(o.size());
 					for (int i = 0; i < o.size(); ++i)
@@ -153,9 +161,14 @@ public interface NaUtilsDataSerializer<T>
 				});
 	}
 	
-	public static <O> NaUtilsDataSerializer<List<O>> listOf(final NaUtilsDataSerializer<O> original)
+	public static <A, B> NaUtilsDataSerializer<B> castTo(ResourceLocation key, Class<B> clazzB, 
+			NaUtilsDataSerializer<A> original, Function<A, B> aToB, Function<B, A> bToA)
 	{
-		return listOf(new ResourceLocation(original.getKey().getNamespace(), original.getKey().getPath() + "_list"), original);
+		return NaUtilsDataSerializer.create(key, clazzB, 
+				(buf, b) -> original.write(buf, bToA.apply(b)),
+				(buf) -> aToB.apply(original.read(buf)),
+				b -> original.toTag(bToA.apply(b)),
+				t -> aToB.apply(original.fromTag(t)));
 	}
 	
 	public static final NaUtilsDataSerializer<Boolean> BOOLEAN = NaUtilsDataSerializer.create(
@@ -176,6 +189,9 @@ public interface NaUtilsDataSerializer<T>
 	public static final NaUtilsDataSerializer<String> STRING = NaUtilsDataSerializer.create(
 			new ResourceLocation(NaUtils.MOD_ID_FINAL, "string"), String.class, StringTag.class,
 			FriendlyByteBuf::writeUtf, FriendlyByteBuf::readUtf, StringTag::valueOf, StringTag::getAsString);
+	public static final NaUtilsDataSerializer<ResourceLocation> RESOURCE_LOCATION = NaUtilsDataSerializer.castTo(
+			new ResourceLocation(NaUtils.MOD_ID_FINAL, "resource_location"), ResourceLocation.class,
+			STRING, ResourceLocation::new, ResourceLocation::toString);
 	public static final NaUtilsDataSerializer<int[]> INT_ARRAY = NaUtilsDataSerializer.create(
 			new ResourceLocation(NaUtils.MOD_ID_FINAL, "int_array"), int[].class, IntArrayTag.class,
 			(b, o) -> {
@@ -223,4 +239,17 @@ public interface NaUtilsDataSerializer<T>
 				listtag.add(DoubleTag.valueOf(o.z));
 				return listtag;
 			}, (t) -> new Vec3(t.getDouble(0), t.getDouble(1), t.getDouble(2)));
+	public static final NaUtilsDataSerializer<LinearColor> LINEAR_COLOR = NaUtilsDataSerializer.castTo(
+			new ResourceLocation(NaUtils.MOD_ID_FINAL, "linear_color"), LinearColor.class, VEC3,
+			LinearColor::fromNormalized, c -> new Vec3(c.r, c.g, c.b));
+	public static final NaUtilsDataSerializer<ItemStack> ITEM_STACK = NaUtilsDataSerializer.create(
+			new ResourceLocation(NaUtils.MOD_ID_FINAL, "item_stack"), ItemStack.class, CompoundTag.class,
+			FriendlyByteBuf::writeItem, FriendlyByteBuf::readItem, 
+			(i) -> {CompoundTag res = new CompoundTag(); i.save(res); return res;},
+			ItemStack::of);
+	public static final NaUtilsDataSerializer<ItemStack> ITEM_STACK_FULL_TAG = NaUtilsDataSerializer.create(
+			new ResourceLocation(NaUtils.MOD_ID_FINAL, "item_stack_full_tag"), ItemStack.class, CompoundTag.class,
+			(b, i) -> b.writeItemStack(i, false), FriendlyByteBuf::readItem, 
+			(i) -> {CompoundTag res = new CompoundTag(); i.save(res); return res;},
+			ItemStack::of);
 }

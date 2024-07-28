@@ -126,24 +126,6 @@ public class TemplateBefriendedMobPreset extends Monster implements IBefriendedM
 	}
 
 	@Override
-	public void updateFromInventory() {
-		if (!this.level().isClientSide) {
-			// Sync inventory with mob equipments. If it's not BefriendedInventoryWithEquipment, remove it
-			this.getAdditionalInventory().cast(BefriendedInventoryWithEquipment.class).setMobEquipment(this);
-		}
-	}
-
-	@Override
-	public void setInventoryFromMob()
-	{
-		if (!this.level().isClientSide) {
-			// Sync inventory with mob equipments. If it's not BefriendedInventoryWithEquipment, remove it
-			this.getAdditionalInventory().cast(BefriendedInventoryWithEquipment.class).getFromMob(this);
-		}
-		return;
-	}
-
-	@Override
 	public BefriendedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container) {
 		return null; // new YourInventoryMenuClass(containerId, playerInventory, container, this);
 		// You can keep it null, but in this case never call openBefriendedInventory() or it will crash.

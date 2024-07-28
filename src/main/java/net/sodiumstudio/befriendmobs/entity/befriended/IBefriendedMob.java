@@ -131,7 +131,6 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 			this.asMob().setHealth(from.getHealth());
 		}
 		this.setInventoryFromMob();
-		this.updateAttributes();
 		if (this.getAnchorPos() != null)
 		{
 			this.setAnchorPos(this.asMob().position());
@@ -484,28 +483,25 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	 */
 	public BefriendedInventory createAdditionalInventory();
 	
-	// Set mob data from befriendedInventory.
-	public void updateFromInventory();
-	
-	// Set befriendedInventory from mob data, usually for initializing
-	public void setInventoryFromMob();
-	
-	// Get item stack from position in inventory tag
-	@Deprecated
+	/**
+	 *  Set mob data from befriendedInventory.
+	 *  <p><u>DO NOT override this.</u> Create subclasses of {@link BefriendedInventory} and override {@link BefriendedInventory#syncToMob} instead.
+	 */
 	@DontOverride
-	public default ItemStack getInventoryItemStack(int pos)
+	public default void updateFromInventory()
 	{
-		if (pos < 0 || pos >= getAdditionalInventory().getContainerSize())
-			throw new IndexOutOfBoundsException();
-		return this.getAdditionalInventory().getItem(pos);
+		if (!this.asMob().level.isClientSide)
+			this.getAdditionalInventory().syncToMob(this.asMob());
 	}
 	
-	// Get item (type) from position in inventory tag
-	@Deprecated
+	/** Set befriendedInventory from mob data, usually for initializing
+	 * <p><u>DO NOT override this.</u> Create subclasses of {@link BefriendedInventory} and override {@link BefriendedInventory#updateFromMob} instead.
+	 */
 	@DontOverride
-	public default Item getInventoryItem(int pos)
+	public default void setInventoryFromMob()
 	{
-		return this.getInventoryItemStack(pos).getItem();
+		if (!this.asMob().level.isClientSide)
+			this.getAdditionalInventory().updateFromMob(this.asMob());
 	}
 
 	@Nullable
@@ -521,7 +517,6 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 			throw new UnsupportedOperationException("IBefriendedMob container only receives BefriendedInventory.");
 		if (hasInit())
 			updateFromInventory();
-		updateAttributes();
 		onInventoryChanged();
 	}
 
@@ -565,17 +560,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	{
 		return null;
 	}
-	
-	/**
-	 * @deprecated No longer used. Use {@link HealingItemTable#noConsume()} instead on {@link HealingItemTable} construction in {@code getHealingItems}. 
-	 */
-	@Nullable
-	@Deprecated
-	public default Set<ItemOrKey> getNonconsumingHealingItems()
-	{	
-		return null;
-	}
-	
+
 	@DontOverride
 	public default InteractionResult tryApplyHealingItems(ItemStack stack)
 	{
@@ -648,9 +633,6 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	}
 	
 	/* Misc */
-	
-	@Deprecated	// Update in tick() or in bauble handler
-	public default void updateAttributes() {};
 
 	/**
 	 * Get this as Mob.
@@ -665,7 +647,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	 * Get this as IBefriendedMob.
 	 */
 	@DontOverride
-	public default IBefriendedMob get()
+	public default IBefriendedMob getBM()
 	{
 		return this;
 	}
