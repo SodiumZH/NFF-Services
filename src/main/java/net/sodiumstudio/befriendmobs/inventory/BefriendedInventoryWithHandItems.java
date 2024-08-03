@@ -7,6 +7,8 @@ import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 
 public class BefriendedInventoryWithHandItems extends BefriendedInventory
 {
+	private boolean shouldKeepArmorEmpty = false;
+	
 	public BefriendedInventoryWithHandItems(int size)
 	{
 		super(size);
@@ -19,19 +21,35 @@ public class BefriendedInventoryWithHandItems extends BefriendedInventory
 		super(size, owner);
 	}
 	
+	/**
+	 * Set whether this inventory ensures mob armor slots always empty.
+	 */
+	public BefriendedInventoryWithHandItems setShouldKeepArmorEmpty()
+	{
+		shouldKeepArmorEmpty = true;
+		return this;
+	}
+	
 	@Override
-	public void updateFromMob(Mob mob)
+	public void getFromMob(Mob mob)
 	{
 		this.setItem(0, mob.getItemBySlot(EquipmentSlot.MAINHAND));
 		this.setItem(1, mob.getItemBySlot(EquipmentSlot.OFFHAND));
-		updateOwner();		
+		updateOwner();
 	}
 	
 	@Override
 	public void syncToMob(Mob mob)
 	{
 		mob.setItemSlot(EquipmentSlot.MAINHAND, this.getItem(0));
-		mob.setItemSlot(EquipmentSlot.OFFHAND, this.getItem(1));
+		mob.setItemSlot(EquipmentSlot.OFFHAND, this.getItem(1));	
+		if (shouldKeepArmorEmpty)
+		{
+			mob.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+			mob.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
+			mob.setItemSlot(EquipmentSlot.LEGS, ItemStack.EMPTY);
+			mob.setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
+		}
 	}
 	
 	public ItemStack getItemFromSlot(EquipmentSlot slot)

@@ -9,9 +9,10 @@ import net.sodiumstudio.nautils.math.LinearColor;
 
 public class NaUtilsEntityDataSerializers
 {
-	public static final DeferredRegister<EntityDataSerializer<?>> REG = DeferredRegister.create(ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, NaUtils.MOD_ID);
+	public static final DeferredRegister<EntityDataSerializer<?>> SERIALIZERS = 
+			DeferredRegister.create(ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, NaUtils.MOD_ID);
 
-	public static final RegistryObject<EntityDataSerializer<LinearColor>> LINEAR_COLOR = REG.register("linear_color", () -> 
+	public static final RegistryObject<EntityDataSerializer<LinearColor>> LINEAR_COLOR = SERIALIZERS.register("linear_color", () -> 
 		EntityDataSerializer.simple((buf, color) -> {
 			buf.writeDouble(color.r);
 			buf.writeDouble(color.g);

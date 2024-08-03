@@ -223,9 +223,9 @@ public class BefriendedInventory extends SimpleContainer
 	}
 	
 	/**
-	 * Use mob state to update this inventroy. Usually used only on initialization.
+	 * Use mob state to update this inventory. Usually used only on initialization.
 	 */
-	public void updateFromMob(Mob mob)
+	public void getFromMob(Mob mob)
 	{
 	}
 	
