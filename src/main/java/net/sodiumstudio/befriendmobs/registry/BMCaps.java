@@ -24,12 +24,16 @@ public class BMCaps {
 	public static final Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// Caps for data storage only
-	public static final Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CEntityTickingCapability.createHolder();
+	public static final Capability<CBefriendedMobData> CAP_BEFRIENDED_MOB_DATA = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	// General functional capabilities
 	public static final Capability<CBMPlayerModule> CAP_BM_PLAYER = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<CBMLevelModule> CAP_BM_LEVEL = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<CLivingEntityDelayedActionHandler> CAP_DELAYED_ACTION_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
+	
+	static {
+		CEntityTickingCapability.registerTicking(CAP_BEFRIENDED_MOB_DATA);
+	}
 	
 	@SubscribeEvent
 	public static void register(RegisterCapabilitiesEvent event)

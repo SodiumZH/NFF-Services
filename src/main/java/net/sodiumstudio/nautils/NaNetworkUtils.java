@@ -12,7 +12,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-public class NetworkHelper
+public class NaNetworkUtils
 {
 	
 	public static SimpleChannel newChannel(String modId, String key, String version)
@@ -52,7 +52,7 @@ public class NetworkHelper
 					}
 					catch (Exception e)
 					{
-						throw new IllegalArgumentException("NetworkHelper::registerDefaultPacket packet class missing constructor.");
+						throw new IllegalArgumentException("NaNetworkUtils::registerDefaultPacket packet class missing constructor.", e);
 					}
                 },
                 (pack, ctx) -> {
@@ -66,9 +66,22 @@ public class NetworkHelper
 	}
 	
 	/**
+	 * Send a packet from server to a given player.
+	 */
+	public static void sendToPlayer(SimpleChannel channel, Packet<?> msg, Player target)
+	{
+		if (target.level.isClientSide)
+			return;
+		if (target instanceof ServerPlayer sp)
+		{
+			channel.send(PacketDistributor.PLAYER.with(() -> sp), msg);
+		}
+	}
+	
+	/**
 	 * Send packet from server to all players in a level.
 	 */
-	public static <MSG extends Packet<?>> void sendToAllPlayers(Level level, SimpleChannel channel, MSG message)
+	public static void sendToAllPlayers(Level level, SimpleChannel channel, Packet<?> message)
 	{
 		if (level.isClientSide)
 			return;

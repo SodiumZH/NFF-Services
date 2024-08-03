@@ -60,6 +60,7 @@ public abstract class BefriendingHandler
 		if(!(newMob instanceof IBefriendedMob))
 			throw new RuntimeException("Befriending: Entity type after befriending not implementing IBefriendedMob interface.");
 		IBefriendedMob newBefMob = (IBefriendedMob)newMob;
+		newBefMob.setOwner(player);
 		newBefMob.init(player.getUUID(), target);
 		newBefMob.setInventoryFromMob();
 		newBefMob.getData().generateIdentifier();
@@ -68,7 +69,7 @@ public abstract class BefriendingHandler
 		BMHooks.Befriending.onMobBefriended(target, newBefMob);
 		newBefMob.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
-		//NetworkHelper.sendToAllPlayers(newBefMob.asMob().level, BMChannels.BM_CHANNEL, packet);
+		//NaNetworkUtils.sendToAllPlayers(newBefMob.asMob().level, BMChannels.BM_CHANNEL, packet);
 		return newBefMob;
 	}
 	
@@ -247,12 +248,12 @@ public abstract class BefriendingHandler
 	
 	public static final <T> T getFromProbabilityTable(Map<T, Double> probabilityTable, T defaultValue)
 	{
-		RandomSelection<T> rs = RandomSelection.create(defaultValue);
+		RandomSelection<T> rs = new RandomSelection<>(defaultValue);
 		for (T t: probabilityTable.keySet())
 		{
 			rs.add(t, probabilityTable.get(t));
 		}
-		return rs.getValue();
+		return rs.select();
 	}
 
 }

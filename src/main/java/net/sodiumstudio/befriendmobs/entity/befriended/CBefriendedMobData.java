@@ -18,6 +18,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
@@ -202,7 +203,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	public <T> T getSynchedDataUnchecked(String key);
 	
 	public <T> void setSynchedData(String key, Class<T> dataType, T value);
-
+	
 	public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value);
 	
 	public void setDataSyncInterval(int ticks);
@@ -238,7 +239,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		private EntityType<? extends Mob> initialType = null;
 		private CompoundTag nbt = new CompoundTag();
 		// Owner
-		private UUID ownerUUID = EMPTY_UUID;
+		private static final String OWNER_UUID_SYNCHED_KEY = "ownerUUID";
 		private static final String OWNER_NAME_SYNCHED_KEY = "ownerName";
 		private static final String ENCOUNTERED_DATE_SYNCHED_KEY = "encounteredDate";
 		// Behavior
@@ -246,7 +247,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		private Vec3 anchor;
 		private static final String AI_STATE_SYNCHED_KEY = "aiState";
 		// Inventory
-		private BefriendedInventory inventory = this.getBM().createAdditionalInventory();
+		private BefriendedInventory inventory;
 		// Misc
 		private boolean hasInit = false;
 		// Syncher
@@ -262,13 +263,15 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			this.mob = mob;
 			this.anchor = mob.asMob().position();
 			this.nbt = new CompoundTag();
-			
+			this.inventory = this.getBM().createAdditionalInventory();
 			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, NaUtilsDataSerializer.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class, NaUtilsDataSerializer.UUID, EMPTY_UUID);
 			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, "");
 			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, NaUtilsDataSerializer.INT_ARRAY, new int[] {0, 0, 0});
 			this.createSynchedData(AI_STATE_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, BefriendedAIState.WAIT.getId().toString());
 			
 			MinecraftForge.EVENT_BUS.post(new BefriendedMobDataConstructEvent(this));
+			this.sync();
 		}
 	
 		private Level getLevel()
@@ -276,6 +279,11 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			return this.getBM().asMob().getLevel();
 		}
 
+		@SuppressWarnings("resource")
+		private boolean isClientSide()
+		{
+			return this.getLevel().isClientSide;
+		}
 		
 		@Override
 		public CompoundTag serializeNBT() {
@@ -312,7 +320,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
 				this.setAnchor(NbtHelper.getVec3(nbt, "randomStrollAnchor"));
 				this.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
-				this.inventory = BefriendedInventory.makeFromTag(nbt.getCompound("additionalInventory"), mob);
+				this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
 			}
 			// Port legacy
 			else 
@@ -345,8 +353,12 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				
 				this.anchor = this.getEntity().position();
 				
-				// AI state, owner uuid and inventory is loaded from BefriendedHelper
+				// AI state, owner uuid and inventory are loaded from BefriendedHelper
 			}
+			
+			this.getBM().updateFromInventory();
+			this.getBM().init(this.getOwnerUUID(), null);
+			this.getBM().setInit();
 		}
 
 		@Override
@@ -404,9 +416,13 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		public void generateIdentifier()
 		{
 			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
-			if (id != null && !id.equals(EMPTY_UUID))
+			if (id == null || id.equals(EMPTY_UUID))
 			{
-				this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, UUID.randomUUID());
+				if (!this.getEntity().level.isClientSide)
+				{
+					this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, UUID.randomUUID());
+					this.sync();
+				}
 			}
 			else throw new UnsupportedOperationException("CBefriendedMobData#generateIdentifier: Identifier is valid, not supported to regenerate.");
 		}
@@ -417,7 +433,6 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, val);
 		}
 		
-		@SuppressWarnings("unchecked")
 		@Override
 		public EntityType<? extends Mob> getInitialEntityType()
 		{
@@ -454,12 +469,13 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 
 		@Override
 		public void setOwnerName(String val) {
+			
 			this.setSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, val);
 		}		
 		
 		@Override
 		public int[] getEncounteredDate() {
-			if (!nbt.contains("encountered_date", NbtHelper.TAG_INT_ARRAY_ID))
+			if (!nbt.contains("encountered_date", Tag.TAG_INT_ARRAY))
 				return null;
 			else return nbt.getIntArray("encountered_date");
 		}
@@ -483,9 +499,15 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public UUID getOwnerUUID()
 		{
-			if (this.ownerUUID == null || this.ownerUUID.equals(EMPTY_UUID)) 
-				throw new RuntimeException(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
-			return this.ownerUUID;
+			UUID uuid = this.getSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class);
+			if (uuid == null || uuid.equals(EMPTY_UUID)) 
+				if (this.getLevel().isClientSide)
+				{
+					LogUtils.getLogger().error("CBefriendedMobData: mob %s missing owner on client. Not initialized?");
+					return EMPTY_UUID;
+				}
+				else throw new RuntimeException(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
+			return uuid;
 		}
 		
 		@Override
@@ -493,7 +515,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		{
 			if (value == null || value.equals(EMPTY_UUID))
 				throw new IllegalArgumentException(String.format("CBefriendedMobData#setOwnerUUID: requires non-null and non-zero.", this.getEntity().getName().getString()));
-			this.ownerUUID = value;
+			this.setSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class, value);
 		}
 		
 		@Override
@@ -556,7 +578,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				throw new IllegalStateException("CBefriendedMobData synched data: set data only on server. On client it's auto-synched. Use setSynchedDataClient to force set only on client.");
 			if (!this.synchedData.containsKey(key))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: data not found. Use createSynchedData first.");
-			if (!this.synchedData.get(key).a.isAssignableFrom(dataType) || dataType.isAssignableFrom(value.getClass()))
+			if (!this.synchedData.get(key).a.isAssignableFrom(dataType) || !dataType.isAssignableFrom(value.getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: wrong data type.");
 			this.synchedData.get(key).c = value;
 		}
@@ -569,7 +591,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
 			if (!dataType.isAssignableFrom(this.synchedData.get(key).c.getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: data type and serializer don't match.");
-			return (T) this.synchedData.get(key);
+			return (T) this.synchedData.get(key).c;
 		}
 		
 		@SuppressWarnings("resource")
@@ -588,7 +610,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		public <T> T getSynchedDataUnchecked(String key) {
 			if (!this.synchedData.containsKey(key))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
-			return (T) this.synchedData.get(key);
+			return (T) this.synchedData.get(key).c;
 		}
 
 		@Override
@@ -607,15 +629,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			{
 				if (!this.synchedData.isEmpty())
 				{
-					ClientboundDataSyncPacket packet = new ClientboundDataSyncPacket(this);
-					List<? extends Player> players = this.getLevel().players();
-					for (Player player: players)
-					{
-						if (player instanceof ServerPlayer sp)
-						{
-							BMChannels.BM_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
-						}
-					}
+					this.sync();
 				}
 				// TODO remove this. It's for porting legacy format.
 				if (this.getOwnerName() == "" && this.getBM().isOwnerInDimension())
@@ -628,6 +642,18 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			return this.inventory;
 		}
 		
+		private void sync()
+		{
+			ClientboundDataSyncPacket packet = new ClientboundDataSyncPacket(this);
+			List<? extends Player> players = this.getLevel().players();
+			for (Player player: players)
+			{
+				if (player instanceof ServerPlayer sp)
+				{
+					BMChannels.BM_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
+				}
+			}
+		}
 	}
 	
 	public static class Prvd implements ICapabilitySerializable<CompoundTag>
@@ -694,15 +720,15 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			for (var entry: dataCap.synchedData.entrySet())
 			{
 				buf.writeUtf(entry.getKey());
-				buf.writeUtf(entry.getValue().b.toString());
+				buf.writeUtf(entry.getValue().b.getKey().toString());
 				NaUtilsDataSerializer.writeUnchecked(entry.getValue().b, buf, entry.getValue().c);
 			}
 		}
 
 		@Override
 		public void handle(ClientGamePacketListener pHandler) {
-			BMClientGamePacketHandler.handleBefriendedModifySynchableData(this, pHandler);
+			BMClientGamePacketHandler.handleBefriendedDataSync(this, pHandler);
 		}
-
 	}
+
 }

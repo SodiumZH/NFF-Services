@@ -8,7 +8,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
-import net.sodiumstudio.nautils.NetworkHelper;
+import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
+import net.sodiumstudio.nautils.NaNetworkUtils;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BMChannels {
@@ -22,9 +23,10 @@ public class BMChannels {
 
     public static void registerMessage() {
     	
-    	BM_CHANNEL = NetworkHelper.newChannel(BefriendMobs.MOD_ID, "bm_channel", VERSION);
-    	NetworkHelper.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendedGuiOpenPacket.class);
-    	NetworkHelper.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendingInitPacket.class);
+    	BM_CHANNEL = NaNetworkUtils.newChannel(BefriendMobs.MOD_ID, "bm_channel", VERSION);
+    	NaNetworkUtils.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendedGuiOpenPacket.class);
+    	NaNetworkUtils.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundBefriendingInitPacket.class);
+    	NaNetworkUtils.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, CBefriendedMobData.ClientboundDataSyncPacket.class);
     	/*BM_CHANNEL = NetworkRegistry.newSimpleChannel(
                 new ResourceLocation(BefriendMobs.MOD_ID, "bm_channel"),
                 () -> {

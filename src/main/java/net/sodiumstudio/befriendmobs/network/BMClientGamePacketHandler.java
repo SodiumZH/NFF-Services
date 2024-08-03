@@ -49,7 +49,7 @@ public class BMClientGamePacketHandler
 		}
 	}
 	
-	public static void handleBefriendedModifySynchableData(CBefriendedMobData.ClientboundDataSyncPacket packet, ClientGamePacketListener listener)
+	public static void handleBefriendedDataSync(CBefriendedMobData.ClientboundDataSyncPacket packet, ClientGamePacketListener listener)
 	{
 		@SuppressWarnings("resource")
 		Minecraft mc = Minecraft.getInstance();

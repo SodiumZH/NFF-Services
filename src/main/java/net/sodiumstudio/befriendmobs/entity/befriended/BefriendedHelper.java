@@ -28,6 +28,7 @@ import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.ClientboundBefriendedGuiOpenPacket;
 import net.sodiumstudio.nautils.NaContainerUtils;
+import net.sodiumstudio.nautils.NaNetworkUtils;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.NbtHelper;
 
@@ -178,6 +179,7 @@ public class BefriendedHelper
 			sp.nextContainerCounter();
 			ClientboundBefriendedGuiOpenPacket packet = new ClientboundBefriendedGuiOpenPacket(sp.containerCounter,
 					mob.getAdditionalInventory().getContainerSize(), living.getId());
+			NaNetworkUtils.sendToPlayer(BMChannels.BM_CHANNEL, packet, sp);
 			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
 			if (sp.containerMenu == null)
 				return;
