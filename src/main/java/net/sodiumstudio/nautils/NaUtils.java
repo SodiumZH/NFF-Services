@@ -10,6 +10,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sodiumstudio.befriendmobs.registry.BMItems;
+import net.sodiumstudio.nautils.registries.NaUtilsEntityDataSerializers;
 import net.sodiumstudio.nautils.registries.NaUtilsItemRegistry;
 
 public class NaUtils
@@ -28,6 +29,7 @@ public class NaUtils
 		IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 		
 		NaUtilsItemRegistry.NAUTILS_ITEMS.register(modEventBus);
+		NaUtilsEntityDataSerializers.SERIALIZERS.register(modEventBus);
 	}
 
 	public static MinecraftServer getServer()

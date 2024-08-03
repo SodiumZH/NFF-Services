@@ -23,7 +23,7 @@ public class BefriendedInventoryWithEquipment extends BefriendedInventory
 	}
 	
 	@Override
-	public void syncToMob(Mob mob)
+	public void getFromMob(Mob mob)
 	{
 		this.setItem(0, mob.getItemBySlot(EquipmentSlot.HEAD));
 		this.setItem(1, mob.getItemBySlot(EquipmentSlot.CHEST));
@@ -35,7 +35,7 @@ public class BefriendedInventoryWithEquipment extends BefriendedInventory
 	}
 	
 	@Override
-	public void updateFromMob(Mob mob)
+	public void syncToMob(Mob mob)
 	{
 		mob.setItemSlot(EquipmentSlot.HEAD, this.getItem(0));
 		mob.setItemSlot(EquipmentSlot.CHEST, this.getItem(1));

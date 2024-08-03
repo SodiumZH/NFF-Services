@@ -99,7 +99,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	}
 	
 	/**
-	 * Check if a mob has a Dwmg BM interface and satisfied the given condition.
+	 * Check if a mob has a BM interface and satisfied the given condition.
 	 * <p>
 	 * As IBefriendedMob could also be implemented in capabilities instead of the mob class in the future,
 	 * always use this instead of {@code instanceof} check and followed checks of the cast BM.
@@ -125,17 +125,20 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
-		this.setOwnerUUID(playerUUID);
-		if (from != null)
+		if (!this.asMob().level.isClientSide)
 		{
-			this.asMob().setHealth(from.getHealth());
+			this.setOwnerUUID(playerUUID);
+			if (from != null)
+			{
+				this.asMob().setHealth(from.getHealth());
+			}
+			//this.setInventoryFromMob();
+			if (this.getAnchorPos() != null)
+			{
+				this.setAnchorPos(this.asMob().position());
+			}
+			this.onInit(playerUUID, from);
 		}
-		this.setInventoryFromMob();
-		if (this.getAnchorPos() != null)
-		{
-			this.setAnchorPos(this.asMob().position());
-		}
-		this.onInit(playerUUID, from);
 	}
 
 	/**
@@ -283,7 +286,8 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
-		this.getData().setOwnerUUID(ownerUUID);
+		if (!this.asMob().level.isClientSide)
+			this.getData().setOwnerUUID(ownerUUID);
 	}
 
 	/**
@@ -501,7 +505,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	public default void setInventoryFromMob()
 	{
 		if (!this.asMob().level.isClientSide)
-			this.getAdditionalInventory().updateFromMob(this.asMob());
+			this.getAdditionalInventory().getFromMob(this.asMob());
 	}
 
 	@Nullable

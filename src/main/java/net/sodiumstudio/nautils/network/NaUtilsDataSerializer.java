@@ -114,6 +114,11 @@ public interface NaUtilsDataSerializer<T>
 			{
 				return fromTag.apply(t);
 			}
+			@Override
+			public String toString()
+			{
+				return String.format("NaUtilsDataSerializer<%s>", this.getKey().toString());
+			}
 		};
 		TYPES.put(key, res);
 		return res;
