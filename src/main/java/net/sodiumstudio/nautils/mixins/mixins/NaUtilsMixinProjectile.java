@@ -18,7 +18,7 @@ public class NaUtilsMixinProjectile implements NaUtilsMixin<Projectile>
 	@Inject(method = "onHit(Lnet/minecraft/world/phys/HitResult;)V", at = @At("HEAD"), cancellable = true)
 	private void onHit(HitResult hitResult, CallbackInfo callback)
 	{
-		if (hitResult.getType() != HitResult.Type.MISS && MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent(get(), hitResult)))
+		if (hitResult.getType() != HitResult.Type.MISS && MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent(caller(), hitResult)))
 		{
 			callback.cancel();
 		}

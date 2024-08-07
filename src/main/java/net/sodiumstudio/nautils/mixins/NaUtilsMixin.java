@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 
 /**
  * Base interface for all mixins in NaUtils containing some common utilities.
- * <p> Note: multi-class mixin can also use this interface, but the {@code get()} can get only as the template class. 
+ * <p>Note: multi-class mixin can also use this interface, but the {@code caller()} can get only as the template class. 
  * If class mismatches it will throw exception. Use {@code cast()} to cast to any classes (mismatch = exception).
  * @param <T> Mixin target class.
  */
@@ -14,7 +14,7 @@ public interface NaUtilsMixin<T> {
 	 * Get the caller object.
 	 */
 	@SuppressWarnings("unchecked")
-	public default T get()
+	public default T caller()
 	{
 		try
 		{
@@ -34,7 +34,7 @@ public interface NaUtilsMixin<T> {
 	{
 		try
 		{
-			return (U)(this.get());
+			return (U)(this.caller());
 		} catch (ClassCastException e)
 		{
 			LogUtils.getLogger().error("NaUtils Mixin error: class mismatch.");
