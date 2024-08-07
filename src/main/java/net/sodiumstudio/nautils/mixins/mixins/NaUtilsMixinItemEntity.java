@@ -19,7 +19,7 @@ public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {
 	@Inject(at = @At("HEAD"), method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", cancellable = true)
 	private void hurt(DamageSource src, float amount, CallbackInfoReturnable<Boolean> callback)
 	{
-		if (get().level.isClientSide || get().isRemoved()) //Forge: Fixes MC-53850
+		if (caller().level.isClientSide || caller().isRemoved()) //Forge: Fixes MC-53850
 		{
 			callback.setReturnValue(false);
 		}
@@ -27,12 +27,12 @@ public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {
 		{
 			if (src == DamageSource.OUT_OF_WORLD && amount != Integer.MAX_VALUE)
 			{
-				if (MinecraftForge.EVENT_BUS.post(new ItemEntityOutOfWorldEvent(get(), amount)))
+				if (MinecraftForge.EVENT_BUS.post(new ItemEntityOutOfWorldEvent(caller(), amount)))
 					callback.setReturnValue(false);
 			}
 			else
 			{
-				if (MinecraftForge.EVENT_BUS.post(new ItemEntityHurtEvent(get(), src, amount)))
+				if (MinecraftForge.EVENT_BUS.post(new ItemEntityHurtEvent(caller(), src, amount)))
 					callback.setReturnValue(false);
 			}
 		}

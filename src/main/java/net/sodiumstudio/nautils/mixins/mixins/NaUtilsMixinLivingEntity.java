@@ -27,14 +27,14 @@ public class NaUtilsMixinLivingEntity implements NaUtilsMixin<LivingEntity>
 				target = "Lnet/minecraft/world/damagesource/DamageSource;getEntity()Lnet/minecraft/world/entity/Entity;"))
 	private void startDie(DamageSource dmgSource, CallbackInfo callback)
 	{
-		MinecraftForge.EVENT_BUS.post(new LivingStartDeathEvent(get(), dmgSource));
+		MinecraftForge.EVENT_BUS.post(new LivingStartDeathEvent(caller(), dmgSource));
 	}
 	
 	@ModifyVariable(method = "dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V",
 			at = @At("STORE"), ordinal = 0)
 	private boolean canDropPlayerKill(boolean original, @Local(ordinal = 0) DamageSource dmg)
 	{
-		var event = new LootCheckPlayerKillEvent(this.get(), dmg, original);
+		var event = new LootCheckPlayerKillEvent(this.caller(), dmg, original);
 		MinecraftForge.EVENT_BUS.post(event);
 		if (event.getResult() == Event.Result.DEFAULT) return original;
 		else if (event.getResult() == Event.Result.ALLOW) return true;

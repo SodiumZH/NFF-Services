@@ -18,7 +18,7 @@ public class NaUtilsMixinThrownTrident implements NaUtilsMixin<ThrownTrident>
 			at = @At("STORE"), ordinal = 0)
 	private float modifyInitialDamage(float original)
 	{
-		var event = new ThrownTridentSetBaseDamageEvent(get(), original);
+		var event = new ThrownTridentSetBaseDamageEvent(caller(), original);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getDamage();
 	}
@@ -29,7 +29,7 @@ public class NaUtilsMixinThrownTrident implements NaUtilsMixin<ThrownTrident>
 			ordinal = 0)
 	private float modifyFinalDamage(float original)
 	{
-		var event = new ThrownTridentSetFinalDamageEvent(get(), original);
+		var event = new ThrownTridentSetFinalDamageEvent(caller(), original);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getDamage();
 	}
