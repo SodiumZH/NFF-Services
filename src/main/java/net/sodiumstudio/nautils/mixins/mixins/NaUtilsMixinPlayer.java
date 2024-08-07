@@ -26,7 +26,7 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
 		if (original.call(caller, entity, amount))
 		{
-			if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
+			if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.caller())))
 				return false;
 			else return true;
 		}
