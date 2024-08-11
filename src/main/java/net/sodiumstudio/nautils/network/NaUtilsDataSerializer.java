@@ -49,7 +49,12 @@ public interface NaUtilsDataSerializer<T>
 	@SuppressWarnings("unchecked")
 	public static <O> void writeUnchecked(NaUtilsDataSerializer<O> type, FriendlyByteBuf buf, Object obj)
 	{
-		type.write(buf, (O)obj);
+		try {
+			type.write(buf, (O)obj);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException(String.format("NaUtilsDataSerializer#writeUnchecked: cast failed. Attempting to cast \"%s\" to \"%s\".", 
+					obj.getClass().getSimpleName(), type.getClass().getSimpleName()), e);
+		}
 	}
 	
 	/**
@@ -59,14 +64,20 @@ public interface NaUtilsDataSerializer<T>
 	@SuppressWarnings("unchecked")
 	public static <O> Tag toTagUnchecked(NaUtilsDataSerializer<O> type, Object obj)
 	{
-		return type.toTag((O)obj);
+		try {
+			return type.toTag((O)obj);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException(String.format("NaUtilsDataSerializer#toTagUnchecked: cast failed. Attempting to cast \"%s\" to \"%s\".", 
+					obj.getClass().getSimpleName(), type.getClass().getSimpleName()), e);
+		}
 	}
 	
 	public static NaUtilsDataSerializer<?> fromId(ResourceLocation key)
 	{
 		NaUtilsDataSerializer<?> res = TYPES.get(key);
 		if (res == null)
-			throw new IllegalStateException(String.format("NaUtilsDataSerializer: missing instance \"%s\". Is it loaded on mod initialization?"));
+			throw new IllegalStateException(String.format("NaUtilsDataSerializer: missing serializer \"%s\". If you are using custom data serializers, ensure the related classes are loaded on mod initialization!", 
+					key.toString()));
 		return res;
 	}
 	
@@ -176,6 +187,11 @@ public interface NaUtilsDataSerializer<T>
 				t -> aToB.apply(original.fromTag(t)));
 	}
 	
+	public static void register(ResourceLocation key, NaUtilsDataSerializer<?> value)
+	{
+		TYPES.put(key, value);
+	}
+	
 	public static final NaUtilsDataSerializer<Boolean> BOOLEAN = NaUtilsDataSerializer.create(
 			new ResourceLocation(NaUtils.MOD_ID_FINAL, "boolean"), Boolean.class, ByteTag.class,
 			FriendlyByteBuf::writeBoolean, FriendlyByteBuf::readBoolean, ByteTag::valueOf, t -> t.getAsByte() != 0);
@@ -257,4 +273,5 @@ public interface NaUtilsDataSerializer<T>
 			(b, i) -> b.writeItemStack(i, false), FriendlyByteBuf::readItem, 
 			(i) -> {CompoundTag res = new CompoundTag(); i.save(res); return res;},
 			ItemStack::of);
+
 }

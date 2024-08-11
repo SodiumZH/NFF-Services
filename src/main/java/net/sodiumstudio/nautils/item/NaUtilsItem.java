@@ -2,6 +2,7 @@ package net.sodiumstudio.nautils.item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -25,7 +26,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class NaUtilsItem extends Item
 {
-	protected List<Supplier<MutableComponent>> descriptions = new ArrayList<>();
+	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	
 	public NaUtilsItem(Properties pProperties)
@@ -34,20 +35,29 @@ public class NaUtilsItem extends Item
 	}
 
 	/**
-	 * Add a description {@code Component} supplier to hovering text. 
+	 * Add an {@code ItemStack}-depending {@code Component} supplier to hovering text.
 	 */
-	public NaUtilsItem description(Supplier<MutableComponent> desc)
+	public NaUtilsItem description(Function<ItemStack, ? extends Component> desc)
 	{
 		descriptions.add(desc);
 		return this;
 	}
 	
 	/**
+	 * Add a description {@code Component} supplier to hovering text. 
+	 */
+	public NaUtilsItem description(Supplier<? extends Component> desc)
+	{
+		descriptions.add(i -> desc.get());
+		return this;
+	}
+	
+	/**
 	 * Add a description {@code Component} to hovering text. 
 	 */
-	public NaUtilsItem description(MutableComponent desc)
+	public NaUtilsItem description(Component desc)
 	{
-		descriptions.add(() -> desc);
+		descriptions.add(i -> desc);
 		return this;
 	}
 	
@@ -104,7 +114,9 @@ public class NaUtilsItem extends Item
 		this.beforeAddingHoveringDescriptions(stack, level, list, tooltipFlag);
 		for (var c: descriptions)
 		{
-			list.add(c.get());
+			Component cpnt = c.apply(stack);
+			if (cpnt != null)
+				list.add(cpnt);
 		}
 	}
 	
