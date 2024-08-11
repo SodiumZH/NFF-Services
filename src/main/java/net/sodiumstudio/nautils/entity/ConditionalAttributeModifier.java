@@ -73,17 +73,10 @@ public final class ConditionalAttributeModifier {
 	{
 		for (ConditionalAttributeModifier cam: ALL_MODIFIERS)
 		{
-			// Collection of living entities that have been removed
-			ArrayList<LivingEntity> invalid = new ArrayList<>();
+			cam.usingLivings.removeIf(l -> !l.isAlive());
 			for (LivingEntity living: cam.usingLivings)
 			{
-				// For invalid entities, label invalid to remove
-				if (living == null || !living.isAlive())
-				{
-					invalid.add(living);
-				}
-				// Otherwise check condition
-				else if (cam.condition.test(living))
+				if (cam.condition.test(living))
 				{
 					if (!living.getAttribute(cam.attribute).hasModifier(cam.modifier))
 					{
@@ -91,11 +84,6 @@ public final class ConditionalAttributeModifier {
 					}
 				}
 				else living.getAttribute(cam.attribute).removeModifier(cam.modifier);
-			}
-			// Remove invalid entities
-			for (LivingEntity living: invalid)
-			{
-				cam.remove(living);
 			}
 		}
 	}
