@@ -15,4 +15,10 @@ public class Tuple3<A, B, C>
 		this.b = b;
 		this.c = c;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "Tuple3{a=" + this.a.toString() + ", b=" + this.b.toString() + ", c=" + this.c.toString() + "}";
+	}
 }

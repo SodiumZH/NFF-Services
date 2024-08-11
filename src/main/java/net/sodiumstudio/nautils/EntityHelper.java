@@ -841,4 +841,19 @@ public class EntityHelper
 		}
 	}
 	
+	/**
+	 * Get entity name from entity save data nbt.
+	 * @param nbt NBT saved by {@link Entity#save}
+	 * @param type Entity type
+	 * @return Entity name as {@link Component}
+	 */
+	public static Component getNameFromNbt(CompoundTag nbt, EntityType<?> type)
+	{
+		if (nbt.contains("CustomName", 8)) {
+            String s = nbt.getString("CustomName");
+            return Component.Serializer.fromJson(s);
+        }
+		else return type.getDescription();
+	}
+	
 }
