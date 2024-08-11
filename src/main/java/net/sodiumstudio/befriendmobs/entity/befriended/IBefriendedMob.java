@@ -33,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.BefriendMobs;
+import net.sodiumstudio.befriendmobs.bmevents.entity.BefriendedMobDataConstructEvent;
 import net.sodiumstudio.befriendmobs.bmevents.entity.ai.BefriendedChangeAiStateEvent;
 import net.sodiumstudio.befriendmobs.entity.ai.BefriendedAIState;
 import net.sodiumstudio.befriendmobs.entity.capability.CHealingHandlerImpl;
@@ -679,6 +680,12 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 			return new CBefriendedMobData.Values(this);	
 		return res.getValue();
 	}
+	
+	/**
+	 * Invoked after data capability initialized (constructor done), before {@link BefriendedMobDataConstructEvent}.
+	 * <p>Mainly for creating additional synched data fields.
+	 */
+	public default void onDataInit(CBefriendedMobData dataCap) {}
 	
 	/**
 	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID)

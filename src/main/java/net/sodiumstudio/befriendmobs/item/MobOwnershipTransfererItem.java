@@ -100,8 +100,9 @@ public class MobOwnershipTransfererItem extends NaUtilsItem
 		if (stack.getOrCreateTag().getBoolean("mot_locked"))
 			return InteractionResult.PASS;
 		mob.setOwnerUUID(player.getUUID());
-		mob.getData().recordBefriendedInfo(player);
-		return InteractionResult.sidedSuccess(player.level().isClientSide);
+		mob.getData().setOwnerName(player.getName().getString());
+		mob.getData().recordEncounteredDate();
+		return InteractionResult.sidedSuccess(player.level.isClientSide);
 	}
 	
 	@Override

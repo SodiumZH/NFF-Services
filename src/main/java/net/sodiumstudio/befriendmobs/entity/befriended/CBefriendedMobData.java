@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -42,6 +43,7 @@ import net.sodiumstudio.befriendmobs.inventory.BefriendedInventory;
 import net.sodiumstudio.befriendmobs.network.BMChannels;
 import net.sodiumstudio.befriendmobs.network.BMClientGamePacketHandler;
 import net.sodiumstudio.befriendmobs.registry.BMCaps;
+import net.sodiumstudio.nautils.NaReflectionUtils;
 import net.sodiumstudio.nautils.NaUtils;
 import net.sodiumstudio.nautils.NbtHelper;
 import net.sodiumstudio.nautils.annotation.DontCallManually;
@@ -60,7 +62,9 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	/** Get the befriended mob owning this data. */
 	public IBefriendedMob getBM();
 
-	/** Get the whole additional NBT as compound nbt.*/
+	/** Get the whole additional NBT as {@link CompoundTag}.
+	 * <p>Use this if the additional data needs to be saved but not synched. If needs to be synched, use the synched data system.
+	 */
 	public CompoundTag getAdditionalNBT();
 	
 	/** Get sun immunity. It only works when the mob is an {@link IBefriendedSunSensitiveMob}, otherwise throws exception. */
@@ -145,7 +149,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	/**
 	 * Get the date player encountered it, including befriended, or took ownership from another player.
 	 * @since 0.x.20
-	 * @return An int[3] indicating year, month and day, or null if not recorded (legacy).
+	 * @return An int[3] indicating year, month and day, or (0,0,0) if not recorded (legacy).
 	 */
 	@Nullable
 	public int[] getEncounteredDate();
@@ -154,7 +158,14 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	 * Record info about befriending time and location. Invoked in {@link BefriendingHandler#befriend}.
 	 */
 	@DontCallManually
-	public void recordBefriendedInfo(Player owner);
+	public void setEncounteredDate(int[] val);
+	
+	public default void recordEncounteredDate()
+	{
+		LocalDate now = LocalDate.now();
+		int[] date = new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)};
+		this.setEncounteredDate(date);
+	}
 	
 	public UUID getOwnerUUID();
 	
@@ -196,18 +207,33 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	
 	// Synched Data related //
 	
-	public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsDataSerializer<T> dataType, T initValue);	
-	
-	public <T> T getSynchedData(String key, Class<T> dataType);
+	/**
+	 * Create a synched data. Synched data must be created before other any operations.
+	 * @param <T>Data class. Exactly same to the data class in {@code dataSerialzier}.
+	 * @param key Data key as string.
+	 * @param dataSerialzier Data serializer applied.
+	 * @param initValue Default value if not set.
+	 */
+	public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerialzier, T initValue);	
+
+	public <T> boolean hasSynchedData(String key, Class<T> dataType);
+
+	public <T> T getSynchedData(String key, Class<T> dataClass);
 	
 	public <T> T getSynchedDataUnchecked(String key);
 	
-	public <T> void setSynchedData(String key, Class<T> dataType, T value);
+	/**
+	 * Set synched data value. Only on server.
+	 * @param key Synched data key
+	 * @param dataClass Expected data class. <i>This is a salt to ensure you know what class this field expects to receive.</i>
+	 * @param value New value.
+	 */
+	public <T> void setSynchedData(String key, Class<T> dataClass, T value);
 	
 	public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value);
 	
 	public void setDataSyncInterval(int ticks);
-	
+
 	// Misc //
 	
 	/**
@@ -251,7 +277,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		// Misc
 		private boolean hasInit = false;
 		// Syncher
-		private Map<String, Tuple3<Class<?>, NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
+		private Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
 		private MutablePredicate<IBefriendedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -264,12 +290,13 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			this.anchor = mob.asMob().position();
 			this.nbt = new CompoundTag();
 			this.inventory = this.getBM().createAdditionalInventory();
-			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, NaUtilsDataSerializer.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class, NaUtilsDataSerializer.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, "");
-			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, NaUtilsDataSerializer.INT_ARRAY, new int[] {0, 0, 0});
-			this.createSynchedData(AI_STATE_SYNCHED_KEY, String.class, NaUtilsDataSerializer.STRING, BefriendedAIState.WAIT.getId().toString());
+			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NaUtilsDataSerializer.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NaUtilsDataSerializer.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializer.STRING, "");
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializer.INT_ARRAY, new int[] {0, 0, 0});
+			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializer.STRING, BefriendedAIState.WAIT.getId().toString());
 			
+			this.getBM().onDataInit(this);
 			MinecraftForge.EVENT_BUS.post(new BefriendedMobDataConstructEvent(this));
 			this.sync();
 		}
@@ -279,10 +306,15 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			return this.getBM().asMob().getLevel();
 		}
 
-		@SuppressWarnings("resource")
+		@SuppressWarnings({ "resource", "unused" })
 		private boolean isClientSide()
 		{
 			return this.getLevel().isClientSide;
+		}
+		
+		private boolean isEntityFirstTick()
+		{
+			return NaReflectionUtils.forceGet(this.getBM().asMob(), Entity.class, "f_19803_").cast();
 		}
 		
 		@Override
@@ -291,17 +323,18 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			// General
 			save.putBoolean("25+", true);	// This is a label that the data format is 0.x.25+. Remove this after 0.x.30.
 			save.put("additionalNBT", this.getAdditionalNBT());
-			save.putUUID("identifier", this.getIdentifier());
+			save.put("synchedData", this.saveSynchedData());
+			//save.putUUID("identifier", this.getIdentifier());
 			save.putString("initialEntityType", ForgeRegistries.ENTITY_TYPES.getKey(this.getInitialEntityType()).toString());
 			save.putString("modId", ForgeRegistries.ENTITY_TYPES.getKey(this.getEntity().getType()).getNamespace());	// This field is not directly accessible, but only for reading mod id from entity saved data NBT.
 			// Owner
-			save.putString("ownerName", this.getOwnerName());	// TODO: Remove after 0.x.30
-			save.putUUID("ownerUUID", this.getOwnerUUID());
-			if (this.getEncounteredDate() != null) save.putIntArray("encounteredDate", getEncounteredDate()); 
-			else save.putIntArray("encounteredDate", new int[] {0, 0, 0});	// TODO: remove after 0.x.30
+			//save.putString("ownerName", this.getOwnerName());	// TODO: Remove after 0.x.30
+			//save.putUUID("ownerUUID", this.getOwnerUUID());
+			//if (this.getEncounteredDate() != null) save.putIntArray("encounteredDate", getEncounteredDate()); 
+			//else save.putIntArray("encounteredDate", new int[] {0, 0, 0});	// TODO: remove after 0.x.30
 			// Behavior
 			NbtHelper.putVec3(save, "randomStrollAnchor", this.getAnchor());
-			save.putString("aiState", this.getAIState().getId().toString());
+			//save.putString("aiState", this.getAIState().getId().toString());
 			// Inventory
 			this.getAdditionalInventory().saveToTag(save, "additionalInventory");
 			return save;
@@ -313,54 +346,81 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			if (nbt.getBoolean("25+"))
 			{
 				this.nbt = nbt.getCompound("additionalNBT").copy();
-				this.setIdentifier(nbt.getUUID("identifier"));
+				this.readSynchedData(nbt.getCompound("synchedData"));
+				//this.setIdentifier(nbt.getUUID("identifier"));
 				this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
-				this.setOwnerName(nbt.getString("ownerName"));
-				this.setOwnerUUID(nbt.getUUID("ownerUUID"));
-				this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
+				//this.setOwnerName(nbt.getString("ownerName"));
+				//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
+				//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
 				this.setAnchor(NbtHelper.getVec3(nbt, "randomStrollAnchor"));
-				this.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
+				//this.setAIState(BefriendedAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
 				this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
 			}
 			// Port legacy
 			else 
 			{
-				nbt = nbt.copy();
-				nbt.remove("mod_id");
+				CompoundTag nbtCpy = nbt.copy();
+				nbtCpy.remove("mod_id");
 				
-				UUID identifier = nbt.getUUID("identifier");
+				UUID identifier = nbtCpy.getUUID("identifier");
 				if (identifier == null || identifier.equals(EMPTY_UUID)) this.generateIdentifier();
 				else this.setIdentifier(identifier);
-				nbt.remove("identifier");
+				nbtCpy.remove("identifier");
 				
-				String entityTypeKey = nbt.getString("initial_entity_type");
+				String entityTypeKey = nbtCpy.getString("initial_entity_type");
 				if (entityTypeKey != null && ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)) != null)
 					this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)));
 				else this.recordEntityType();
-				nbt.remove("initial_entity_type");
+				nbtCpy.remove("initial_entity_type");
 				
-				String ownerName = nbt.getString("owner_name");
+				String ownerName = nbtCpy.getString("owner_name");
 				if (ownerName != null) this.setOwnerName(ownerName);
 				else this.setOwnerName("");
-				nbt.remove("owner_name");
+				nbtCpy.remove("owner_name");
 				
 				// owner uuid is set in BefriendedHelper
-				int[] encounteredDate = nbt.getIntArray("encountered_date");
+				int[] encounteredDate = nbtCpy.getIntArray("encountered_date");
 				if (encounteredDate != null && encounteredDate.length >= 3) 
 					this.setEncounteredDate(new int[] {encounteredDate[0], encounteredDate[1], encounteredDate[2]});
 				else this.setEncounteredDate(new int[] {0, 0, 0});
-				nbt.remove("encountered_date");
+				nbtCpy.remove("encountered_date");
 				
 				this.anchor = this.getEntity().position();
-				
+				this.nbt = nbtCpy;
 				// AI state, owner uuid and inventory are loaded from BefriendedHelper
 			}
-			
+			if (this.getEncounteredDate()[0] == 0)
+				this.recordEncounteredDate();
+			// TODO Remove from TempPortingEvent and restore this
+			/*
 			this.getBM().updateFromInventory();
 			this.getBM().init(this.getOwnerUUID(), null);
-			this.getBM().setInit();
+			this.getBM().setInit();*/
 		}
 
+		private CompoundTag saveSynchedData()
+		{
+			CompoundTag nbt = new CompoundTag();
+			for (var entry: this.synchedData.entrySet())
+			{
+				CompoundTag entryNBT = new CompoundTag();
+				entryNBT.putString("serializer", entry.getValue().getA().getKey().toString());
+				entryNBT.put("value", NaUtilsDataSerializer.toTagUnchecked(entry.getValue().getA(), entry.getValue().getB()));
+				nbt.put(entry.getKey(), entryNBT);
+			}
+			return nbt;
+		}
+		
+		private void readSynchedData(CompoundTag nbt)
+		{
+			for (String key: nbt.getAllKeys())
+			{
+				CompoundTag entryNBT = nbt.getCompound(key);
+				NaUtilsDataSerializer<?> s = NaUtilsDataSerializer.fromId(new ResourceLocation(entryNBT.getString("serializer")));
+				this.synchedData.put(key, new Tuple<>(s, s.fromTag(entryNBT.get("value"))));
+			}
+		}
+		
 		@Override
 		public CompoundTag getAdditionalNBT() {
 			return nbt;
@@ -381,7 +441,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		public MutablePredicate<IBefriendedSunSensitiveMob> getSunImmunity() {
 			if (mob instanceof IBefriendedSunSensitiveMob)
 				return sunImmunity;
-			else throw new UnsupportedOperationException("CBefriendedMobData only supports IBefriendedSunSensitiveMob. Attempted class: " + mob.getClass().toString());
+			else throw new UnsupportedOperationException("CBefriendedMobData only supports IBefriendedSunSensitiveMob. "
+					+ "Attempted class: " + mob.getClass().toString());
 		}
 
 		@Override
@@ -462,8 +523,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			String str = this.getSynchedData(OWNER_NAME_SYNCHED_KEY, String.class);
 			if (str != null && str != "") return str;
 			else {
-				LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing owner name. Return \"Unknown\". It will be updated once the owner entered the level", this.getEntity().getName().getString()));
-				return "Unknown";
+				LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing owner name. Return \"(Unknown)\". It will be updated once the owner entered the level", this.getEntity().getName().getString()));
+				return "(Unknown)";
 			}
 		}
 
@@ -475,24 +536,13 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		
 		@Override
 		public int[] getEncounteredDate() {
-			if (!nbt.contains("encountered_date", Tag.TAG_INT_ARRAY))
-				return null;
-			else return nbt.getIntArray("encountered_date");
+			return this.getSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class);
 		}
 
-		private void setEncounteredDate(int[] val)
+		@Override
+		public void setEncounteredDate(int[] val)
 		{
 			this.setSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class, val);
-		}
-		
-		@Override
-		public void recordBefriendedInfo(Player owner) {
-			if (!mob.asMob().level().isClientSide)
-			{
-				this.setOwnerName(owner.getName().getString());
-				LocalDate now = LocalDate.now();
-				this.nbt.putIntArray("encountered_date", new int[] {now.get(ChronoField.YEAR), now.get(ChronoField.MONTH_OF_YEAR), now.get(ChronoField.DAY_OF_MONTH)});
-			}
 		}
 
 		@Nonnull
@@ -506,7 +556,12 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 					LogUtils.getLogger().error("CBefriendedMobData: mob %s missing owner on client. Not initialized?");
 					return EMPTY_UUID;
 				}
-				else throw new RuntimeException(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
+				//else throw new RuntimeException(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
+				else {
+					// TODO Change it to exception after 0.x.30
+					LogUtils.getLogger().error(String.format("CBefriendedMobData: mob %s missing owner.", this.getEntity().getName().getString()));
+					return EMPTY_UUID;
+				}
 			return uuid;
 		}
 		
@@ -561,37 +616,46 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		}
 		
 		@Override
-		public <T> void createSynchedData(String key, Class<T> dataClass, NaUtilsDataSerializer<T> dataType, T defaultValue)
+		public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerializer, T defaultValue)
 		{
 			if (this.getBM().asMob().getLevel().isClientSide)
 				return;
 			if (this.synchedData.containsKey(key))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: duplicated data key.");
-			this.synchedData.put(key, new Tuple3<>(dataClass, dataType, defaultValue));
+			this.synchedData.put(key, new Tuple<>(dataSerializer, defaultValue));
 		}
 
+		@Override
+		public <T> boolean hasSynchedData(String key, Class<T> dataType)
+		{
+			return this.synchedData.containsKey(key) && dataType.isAssignableFrom(this.synchedData.get(key).getClass());
+		}
+		
 		@SuppressWarnings("resource")
 		@Override
 		public <T> void setSynchedData(String key, Class<T> dataType, T value)
 		{
 			if (this.getBM().asMob().getLevel().isClientSide)
-				throw new IllegalStateException("CBefriendedMobData synched data: set data only on server. On client it's auto-synched. Use setSynchedDataClient to force set only on client.");
+				throw new IllegalStateException("CBefriendedMobData synched data: set data only on server. "
+						+ "On client it's auto-synched. Use setSynchedDataClient to set only on client.");
 			if (!this.synchedData.containsKey(key))
-				throw new IllegalArgumentException("CBefriendedMobData synched data: data not found. Use createSynchedData first.");
-			if (!this.synchedData.get(key).a.isAssignableFrom(dataType) || !dataType.isAssignableFrom(value.getClass()))
-				throw new IllegalArgumentException("CBefriendedMobData synched data: wrong data type.");
-			this.synchedData.get(key).c = value;
+				throw new IllegalArgumentException(String.format("CBefriendedMobData synched data: missing field key \"%s\". "
+						+ "Use createSynchedData to define fields first.", key));
+			if (!this.synchedData.get(key).getA().getObjectClass().isAssignableFrom(value.getClass()))
+				throw new IllegalArgumentException(String.format("CBefriendedMobData#setSynchedData: putting data type %s to key \"%s\"."
+						+ "Requires type %s.", value.getClass().getSimpleName(), key, this.synchedData.get(key).getA().getObjectClass()));
+			this.synchedData.get(key).setB(value);
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public <T> T getSynchedData(String key, Class<T> dataType)
+		public <T> T getSynchedData(String key, Class<T> dataClass)
 		{
 			if (!this.synchedData.containsKey(key))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
-			if (!dataType.isAssignableFrom(this.synchedData.get(key).c.getClass()))
+			if (!dataClass.isAssignableFrom(this.synchedData.get(key).getB().getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: data type and serializer don't match.");
-			return (T) this.synchedData.get(key).c;
+			return (T) this.synchedData.get(key).getB();
 		}
 		
 		@SuppressWarnings("resource")
@@ -602,15 +666,15 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				throw new IllegalStateException("CBefriendedMobData synched data: setSynchedDataClient only on client. On server use setSynchedData() instead.");
 			if (!serializer.getObjectClass().isAssignableFrom(value.getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data#setSynchedDataClient: data type and serializer don't match.");
-			this.synchedData.put(key, new Tuple3<>(serializer.getClass(), serializer, value));
+			this.synchedData.put(key, new Tuple<>(serializer, value));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T getSynchedDataUnchecked(String key) {
 			if (!this.synchedData.containsKey(key))
-				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
-			return (T) this.synchedData.get(key).c;
+				throw new IllegalArgumentException(String.format("CBefriendedMobData#getSynchedDataUnchecked: Field \"%s\" not defined.", key));
+			return (T) this.synchedData.get(key).getB();
 		}
 
 		@Override
@@ -625,8 +689,9 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public void tick()
 		{
-			if (!this.getLevel().isClientSide && this.getEntity().tickCount % this.syncInterval == 0)
+			if (!this.getLevel().isClientSide && this.getEntity().tickCount % this.syncInterval == 0 && !this.isEntityFirstTick())	// Don't update on the first tick to prevent some unexpected uninitialized problems
 			{
+				// Sync data
 				if (!this.synchedData.isEmpty())
 				{
 					this.sync();
@@ -634,6 +699,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				// TODO remove this. It's for porting legacy format.
 				if (this.getOwnerName() == "" && this.getBM().isOwnerInDimension())
 					this.setOwnerName(this.getBM().getOwnerInDimension().getName().getString());
+				// Sync inventory. This is to prevent cases when inventory is not correctly synched to mob.
+				this.getAdditionalInventory().syncToMob(this.getEntity());
 			}
 		}
 
@@ -720,8 +787,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			for (var entry: dataCap.synchedData.entrySet())
 			{
 				buf.writeUtf(entry.getKey());
-				buf.writeUtf(entry.getValue().b.getKey().toString());
-				NaUtilsDataSerializer.writeUnchecked(entry.getValue().b, buf, entry.getValue().c);
+				buf.writeUtf(entry.getValue().getA().getKey().toString());
+				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
 			}
 		}
 
@@ -731,4 +798,53 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		}
 	}
 
+	// Utils //
+	
+	/**
+	 * Get this capability's save data from the whole entity save data.
+	 * @param mobTag Entity nbt saved by {@link Entity#save}
+	 * @return This capability's save data, saved by {@code serializeNBT}
+	 */
+	public static CompoundTag getCapFromMobTag(CompoundTag mobTag)
+	{
+		return mobTag.getCompound("ForgeCaps").getCompound("cap_befriended_mob_temp_data");
+	}
+	
+	/**
+	 * Get the owner UUID stored in this cap's save data from the whole entity save data.
+	 * @param mobTag Entity nbt saved by {@link Entity#save}
+	 * @return Owner UUID saved in this cap
+	 */
+	public static UUID getOwnerUUIDFromMobTag(CompoundTag mobTag)
+	{
+		CompoundTag capTag = getCapFromMobTag(mobTag);
+		if (capTag == null) return null;
+		return capTag.getUUID("ownerUUID");
+	}
+	
+	/**
+	 * Get the owner name stored in this cap's save data from the whole entity save data.
+	 * @param mobTag Entity nbt saved by {@link Entity#save}
+	 * @return Owner name saved in this cap
+	 */
+	public static String getOwnerNameFromMobTag(CompoundTag mobTag)
+	{
+		CompoundTag capTag = getCapFromMobTag(mobTag);
+		if (capTag == null) return null;
+		String res = capTag.getString("ownerName");
+		if (res != null) return res;
+		else return "(Unknown)";
+	}
+	
+	/**
+	 * Get the owner name stored in this cap's save data from the whole entity save data.
+	 * @param mobTag Entity nbt saved by {@link Entity#save}
+	 * @return Mod id saved in this cap
+	 */
+	public static String getModIdFromMobTag(CompoundTag mobTag)
+	{
+		CompoundTag capTag = getCapFromMobTag(mobTag);
+		if (capTag == null) return null;
+		return capTag.getString("modId");
+	}
 }

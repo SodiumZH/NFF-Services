@@ -59,18 +59,20 @@ public abstract class BefriendingHandler
 		Mob newMob = EntityHelper.replaceMob(newType, target);
 		if(!(newMob instanceof IBefriendedMob))
 			throw new RuntimeException("Befriending: Entity type after befriending not implementing IBefriendedMob interface.");
-		IBefriendedMob newBefMob = (IBefriendedMob)newMob;
-		newBefMob.setOwner(player);
-		newBefMob.init(player.getUUID(), target);
-		newBefMob.setInventoryFromMob();
-		newBefMob.getData().generateIdentifier();
-		newBefMob.getData().recordEntityType();
+		IBefriendedMob bm = (IBefriendedMob)newMob;
+		bm.setOwner(player);
+		bm.getData().setOwnerName(player.getName().getString());
+		bm.init(player.getUUID(), target);
+		bm.setInventoryFromMob();
+		bm.getData().generateIdentifier();
+		bm.getData().recordEntityType();
+		bm.getData().recordEncounteredDate();
 		//Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
-		BMHooks.Befriending.onMobBefriended(target, newBefMob);
-		newBefMob.setInit();
+		BMHooks.Befriending.onMobBefriended(target, bm);
+		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
 		//NaNetworkUtils.sendToAllPlayers(newBefMob.asMob().level, BMChannels.BM_CHANNEL, packet);
-		return newBefMob;
+		return bm;
 	}
 	
 	public abstract BefriendableMobInteractionResult handleInteract(BefriendableMobInteractArguments args);

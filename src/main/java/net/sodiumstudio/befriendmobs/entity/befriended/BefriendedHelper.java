@@ -192,21 +192,29 @@ public class BefriendedHelper
 	/**
 	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
 	 * <p>使用一个用于读档的NBT标签，在未实际生成生物前获取生物所属的MOD ID
+	 * @deprecated Use {@link CBefriendedMobData#getModIdFromMobTag} instead
 	 */
+	@Deprecated
 	public static String getModIdFromNbt(CompoundTag nbt)
 	{
-		// 0.x.15+ solution
+		/*// 0.x.15+ solution
 		if (nbt.contains("bm_common", Tag.TAG_COMPOUND))
 			return nbt.getCompound("bm_common").getString("mod_id");
 		
 		// LEGACY
 		else return nbt.contains("befriended_mod_id", Tag.TAG_COMPOUND) ?
-				nbt.getString("befriended_mod_id") : null;
+				nbt.getString("befriended_mod_id") : null;*/
+		return CBefriendedMobData.getModIdFromMobTag(nbt);
 	}
 	
+	/**
+	 * @deprecated Use {@link CBefriendedMobData#getOwnerUUIDFromMobTag} instead
+	 */
+	@Deprecated
 	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
 	{
 		// 0.x.15+ solution
+		/*
 		if (nbt.contains("bm_common", NbtHelper.TAG_COMPOUND_ID))
 			return nbt.getCompound("bm_common").getUUID("owner");
 		
@@ -217,19 +225,18 @@ public class BefriendedHelper
 			if (modid == null)
 				return null;
 			return nbt.contains(modid + ":befriended_owner", NbtHelper.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
-		}
+		}*/
+		return CBefriendedMobData.getOwnerUUIDFromMobTag(nbt);
+		
 	}
 	
-	public static MutableComponent getNameFromNbt(CompoundTag nbt, EntityType<?> type)
+	/**
+	 * @deprecated Use {@link EntityHelper#getNameFromNbt} instead
+	 */
+	@Deprecated
+	public static Component getNameFromNbt(CompoundTag nbt, EntityType<?> type)
 	{
-		String modid = getModIdFromNbt(nbt);
-		if (modid == null)
-			return null;
-		if (nbt.contains("CustomName", 8)) {
-            String s = nbt.getString("CustomName");
-            return Component.Serializer.fromJson(s);
-        }
-		else return (MutableComponent)(type.getDescription());
+		return EntityHelper.getNameFromNbt(nbt, type);
 	}
 	
 	/**
@@ -241,7 +248,7 @@ public class BefriendedHelper
 	 */
 	public static Optional<Player> getOwnerInArea(IBefriendedMob mob, double radius, boolean sphericalArea)
 	{
-		if (!mob.isOwnerPresent())
+		if (!mob.isOwnerInDimension())
 			return Optional.empty();
 		List<Entity> list = mob.asMob().level().getEntities(mob.asMob(), EntityHelper.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
 		if (list.isEmpty())

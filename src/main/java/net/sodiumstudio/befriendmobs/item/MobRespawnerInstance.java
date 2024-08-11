@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumstudio.befriendmobs.entity.befriended.BefriendedHelper;
+import net.sodiumstudio.befriendmobs.entity.befriended.CBefriendedMobData;
 import net.sodiumstudio.befriendmobs.entity.befriended.IBefriendedMob;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerFinishRespawnEvent;
 import net.sodiumstudio.befriendmobs.item.event.MobRespawnerStartRespawnEvent;
@@ -192,17 +194,17 @@ public class MobRespawnerInstance
 
 	public UUID getOwnerUUID()
 	{
-		return BefriendedHelper.getOwnerUUIDFromNbt(getMobNbt());
+		return CBefriendedMobData.getOwnerUUIDFromMobTag(getMobNbt());
 	}
 	
 	public String getModId()
 	{
-		return BefriendedHelper.getModIdFromNbt(getMobNbt());
+		return CBefriendedMobData.getModIdFromMobTag(getMobNbt());
 	}
 	
-	public MutableComponent getName()
+	public Component getName()
 	{
-		return BefriendedHelper.getNameFromNbt(getMobNbt(), getType());
+		return EntityHelper.getNameFromNbt(getMobNbt(), getType());
 	}
 	
 	public UUID getUUID()
