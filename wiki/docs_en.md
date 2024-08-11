@@ -14,27 +14,47 @@ The tutorial below is a minimal description. For more examples of application, s
 
 **WARNING: This lib is still in development. Version updates will make it incompatible to the old versions. It's recommended to specify the lib version in mod.toml instead of providing a version range.** 
 
-## Key terms
+## `CBefriendedMobData`
 
-### Befriending
+`CBefriendedMobData` is an additional Capability attached on all mobs which implement `IBefriendedMob`. It contains all common data for befriended mobs.
 
-A process for acquire ownership of a certain mob. This concept is more commonly called "Taming", but as I designed this system primarily for humanoid mobs (more specifically, mobs in some monster girl mods), let's use the word "Befriending" instead in this system.
+It allows to add custom data. For non-serialized data, use Temp Objects. For serialized but non-synched data, use Additional NBT. For synched data, use Synched Data.
 
-### Befriendable Mobs
+### Fields
 
-Existing mobs that can be befriended. Usually they belong to existing classes, generally not providing any methods to allow players to own them.
+#### General
 
-### Befriended Mobs
+##### Identifier
 
-The class of a mob after befriending, usually inheriting the corresponding befriendable mob class. It should have a player as owner, and performs more like "tamed" mobs e.g. wolves.
+The mob's additional UUID as BM identifier other than its entity UUID. If the mob dies and respawns, the entity UUID may change but this identifier will not. It's generated on befriending and keeps unchanged.
 
-The term Befriended Mob is actually not limited to mobs after befriending. It can be simply created as a friendly mob inheriting mobs of classes you need.
+Read-only (getter: `getIdentifier`). If missing, a random new identifier will be generated using `generateIdentifier`.
 
-For creating Befriended Mobs, see below. Simply creating a Befriended Mob class are not related to any Befriendable Mobs.
+##### Initial Type
 
-### Befriending Process
+The mob's type as `EntityType` when it's befriended. It will keep unchanged when the mob converts to another type.
 
-A procedure to befriend a mob, i.e. convert a befriendable mob into the corresponding befriended mob. It's highly customizable (see below).
+Read only (getter: `getInitialEntityType`). If missing, the current type will be recorded using `recordInitialType`.
+
+##### Additional NBT
+
+An additional NBT for this mob, allowing to add/remove custom serializable data.
+
+Getter: `getAdditionalNBT`
+
+##### Temp Objects
+
+An object map (`String` -> generic `Object` ) for non-serialized data, allowing to add/remove custom non-serialized data.
+
+Not directly accessible, but can be operated by `getTempData`, `addTempData` and `removeTempData`.
+
+##### Synched Data
+
+A map for data that should be synched to the clients every several ticks (every tick by default).
+
+It requires to define methods for serialization/deserialization in NBT and `FriendlyByteBuf` using `NaUtilsDataSerializer`. 
+
+#### Owner related
 
 
 

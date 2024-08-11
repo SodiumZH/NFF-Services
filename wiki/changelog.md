@@ -1,5 +1,25 @@
 # Change Log
 
+### 0.x.25
+
+##### BefriendMobs
+
+`CBefriendedMobData` refactor.
+
+​	-Now owner UUID, additional inventory and AI state are stored in `CBefriendedMobData`.
+
+​	-Now `CBefriendedModData` supports auto-synched data (from server to client, every tick), using `NaUtilsDataSerializer`. Owner UUID and AI state are synched by this instead of `EntityDataSerializer`.
+
+​	-Fixed encountered date not correctly recorded. Now in older save data it will be set to the date the data is first loaded.
+
+##### NaUtils
+
+Added `NaUtilsDataSerializer`, representing data types that can serialized into both NBT and ByteBuf.
+
+Added `CEntityTickingCapability`. This allows to auto-register capabilities that should be ticked together with entities.
+
+Added Mixin events: `MobInteractEvent`, `EntityLoadEvent`, `EntityFinalizeLoadingEvent`.
+
 ### 0.x.24
 
 ##### NaUtils
