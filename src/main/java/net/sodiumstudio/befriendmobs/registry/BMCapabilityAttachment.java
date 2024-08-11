@@ -78,21 +78,26 @@ public class BMCapabilityAttachment {
 			}
 		}
 
-		if (event.getObject() instanceof IBefriendedMob bef)
+		if (event.getObject() instanceof IBefriendedMob bm)
 		{
 			// Temp data (CBefriendedMobData)
-			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_mob_temp_data"),
-					new CBefriendedMobData.Prvd(bef));
+			// Renamed key in 0.x.25 from "cap_befriended_mob_temp_data" to "cap_befriended_mob_data"
+			/*event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_mob_temp_data"),
+					new CBefriendedMobData.Prvd(bef));*/
+			event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_befriended_mob_data"),
+					new CBefriendedMobData.Prvd(bm));
+			
+			
 			// CHealingHandler
-			if (bef.healingHandlerClass() != null)
+			if (bm.healingHandlerClass() != null)
 			{
 				try
 				{
 					event.addCapability(new ResourceLocation(BefriendMobs.MOD_ID, "cap_healing_handler"), 
 						new CHealingHandlerProvider(
 							// Implementation class defined in IBefriendedMob implementation
-							bef.healingHandlerClass().getDeclaredConstructor(LivingEntity.class).newInstance(bef.asMob()), 
-							bef.asMob()));
+							bm.healingHandlerClass().getDeclaredConstructor(LivingEntity.class).newInstance(bm.asMob()), 
+							bm.asMob()));
 				} 
 				catch (Exception e)
 				{
