@@ -16,8 +16,7 @@ public class TempPortingEvents
 	@SubscribeEvent
 	public static void beforeLoad(EntityLoadEvent event)
 	{
-		if (event.getNBT().getCompound("ForgeCaps") != null && 
-				event.getNBT().getCompound("ForgeCaps").getCompound(BefriendMobs.MOD_ID + ":cap_befriended_mob_temp_data") != null)
+		if (!event.getNBT().getCompound("ForgeCaps").getCompound(BefriendMobs.MOD_ID + ":cap_befriended_mob_temp_data").isEmpty())
 		{
 			event.getNBT().getCompound("ForgeCaps").put(BefriendMobs.MOD_ID + ":" + "cap_befriended_mob_data", 
 					event.getNBT().getCompound("ForgeCaps").getCompound(BefriendMobs.MOD_ID + ":cap_befriended_mob_temp_data").copy());

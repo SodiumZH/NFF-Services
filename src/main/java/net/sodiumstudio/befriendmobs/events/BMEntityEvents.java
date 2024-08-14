@@ -60,6 +60,7 @@ import net.sodiumstudio.befriendmobs.registry.BMTags;
 import net.sodiumstudio.nautils.EntityHelper;
 import net.sodiumstudio.nautils.TagHelper;
 import net.sodiumstudio.nautils.Wrapped;
+import net.sodiumstudio.nautils.events.entity.MobCheckDespawnEvent;
 import net.sodiumstudio.nautils.events.entity.MobSunBurnTickEvent;
 
 @SuppressWarnings("removal")
@@ -600,21 +601,14 @@ public class BMEntityEvents
 		}
 	}
 	
-	@SubscribeEvent
-	public static void onCheckDespawn(AllowDespawn event)
+	/*@SubscribeEvent
+	public static void onDespawn(AllowDespawn event)
 	{
 		event.getEntity().getCapability(BMCaps.CAP_BEFRIENDABLE_MOB).ifPresent(cap ->
 		{
 			if (cap.isForcePersistent())
 				event.setResult(Result.DENY);
 		});
-	}
-	
-	@SubscribeEvent
-	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
-	{
-		if (event.getEntity() instanceof IBefriendedSunSensitiveMob bssm && bssm.isSunImmune())
-			event.setCanceled(true);
-	}
+	}*/
 	
 }
