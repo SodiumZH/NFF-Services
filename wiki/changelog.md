@@ -12,13 +12,19 @@
 
 ​	-Fixed encountered date not correctly recorded. Now in older save data it will be set to the date the data is first loaded.
 
+`IBefriendedMob` refactor.
+
+​	-Now owner UUID and AI state are synched by `CBefriendedMobData` synched data instead of vanilla `EntityDataSerializer`.
+
+​	-Now inventory synching between BM additional inventory and the mob is handled in subclasses of `BefriendedInventory` by override of `BefriendedInventory#syncToMob` and `BefriendedInventory#getFromMob`. 
+
 ##### NaUtils
 
 Added `NaUtilsDataSerializer`, representing data types that can serialized into both NBT and ByteBuf.
 
 Added `CEntityTickingCapability`. This allows to auto-register capabilities that should be ticked together with entities.
 
-Added Mixin events: `MobInteractEvent`, `EntityLoadEvent`, `EntityFinalizeLoadingEvent`.
+Added Mixin events: `MobInteractEvent`, `EntityLoadEvent`, `EntityFinalizeLoadingEvent`, `MobCheckDespawnEvent`, `MonsterPreventSleepEvent`.
 
 ### 0.x.24
 

@@ -13,6 +13,7 @@ A capability template that will be ticked together with entities.
 To use this capability, add a static block under the capability declaration:
 
 ```java
+// Assume YourCapabilityInterface extends CEntityTickingCapability
 public static final Capability<YourCapabilityInterface> YOUR_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
 static {
@@ -20,7 +21,7 @@ static {
 }
 ```
 
-Then the capability will be auto ticked by calling `CEntityTickingCapability#tick` in an `EntityTickEvent` (see Mixin Events) listener.
+Then the capability will be auto ticked by calling `CEntityTickingCapability#tick` in an `EntityTickEvent` (see Mixin Events) listener. Override `tick()` to define what to do on tick.
 
 **Note**: This ticking will *NOT* be cancelled by cancelling `LivingTickEvent` (1.19.2+) or `LivingUpdateEvent` (1.18.2).
 
@@ -40,7 +41,7 @@ Posted at the head of `Entity#tick`, before `Entity#baseTick`.
 
 Not cancellable.
 
-**Note:** If in the subclass override something is done before `super.tick()`, these actions will be done *before* this event.
+**Note:** If something is done before `super.tick()` in the subclass override, these actions will be done *before* this event.
 
 ##### `NonLivingEntityHurtEvent`
 
@@ -159,9 +160,21 @@ Posted after a `Mob` picks up an `ItemEntity`.
 
 ##### `MobInteractEvent`
 
-Posted before `Mob#mobInteract`. If the interaction is cancelled before `mobInteract` is called, this event will not be posted.
+Posted before `Mob#mobInteract`. If the interaction is cancelled before `Mob#mobInteract` is called, this event will not be posted.
 
 This event is not cancellable or having an event result (`Event.Result`), but holds an `InteractionResult` as result. If the result is set to "consumes action" i.e. `SUCCESS`, `CONSUME` or `CONSUME_PARTIAL`, the following `mobInteract` will be skipped.
+
+##### `MobCheckDespawnEvent`
+
+Posted when a mob starts to check if it should despawn. This event will be always posted despite of the results of `Entity#shouldDespawnInPeaceful`, `Mob#requiresCustomPersistence` and `AllowDespawn` event.
+
+Cancellable. If cancelled, the whole despawn check will be skipped and this mob will not despawn, despite of the results above, and `AllowDespawn` event will not be posted.
+
+##### `MonsterPreventSleepEvent`
+
+Posted before a `Monster` is preventing player sleep.
+
+Cancellable. If cancelled, this monster will not prevent sleep.
 
 ## Utility Method Libs
 
