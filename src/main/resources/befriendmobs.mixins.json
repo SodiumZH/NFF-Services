@@ -10,7 +10,8 @@
 		"NaUtilsMixinPlayer",
 		"NaUtilsMixinProjectile",
 		"NaUtilsMixinThrownTrident",
-		"NaUtilsMixinLivingEntity"
+		"NaUtilsMixinLivingEntity",
+		"NaUtilsMixinServerPlayer"
 	],
 	"client": [
 	],
