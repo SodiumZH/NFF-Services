@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
@@ -751,4 +752,11 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 		return false;
 	}
 	
+	/**
+	 * If true, the mob can prevent other player's sleep. It never prevents the owner's sleep.
+	 */
+	public default boolean canPreventOtherPlayersSleep(ServerPlayer player)
+	{
+		return false;
+	}
 }
