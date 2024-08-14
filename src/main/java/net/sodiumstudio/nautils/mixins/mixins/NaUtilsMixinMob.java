@@ -3,6 +3,7 @@ package net.sodiumstudio.nautils.mixins.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
+import net.sodiumstudio.nautils.events.entity.MobCheckDespawnEvent;
 import net.sodiumstudio.nautils.events.entity.MobFinalizePickingUpItemEvent;
 import net.sodiumstudio.nautils.events.entity.MobInteractEvent;
 import net.sodiumstudio.nautils.events.entity.MobPickUpItemEvent;
@@ -53,5 +55,15 @@ public class NaUtilsMixinMob implements NaUtilsMixin<Mob>
 		if (event.getInteractionResult().consumesAction())
 			return event.getInteractionResult();
 		else return original.call(caller, player, hand);
+	}
+	
+	@Inject(method = "checkDespawn()V", at = @At("HEAD"), cancellable = true)
+	private void beforeCheckingDespawn(CallbackInfo callback)
+	{
+		if (MinecraftForge.EVENT_BUS.post(new MobCheckDespawnEvent(this.caller())))
+		{
+			callback.cancel();
+		}
+			
 	}
 }
