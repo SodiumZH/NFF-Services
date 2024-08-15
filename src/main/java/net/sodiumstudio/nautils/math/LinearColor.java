@@ -2,17 +2,25 @@ package net.sodiumstudio.nautils.math;
 
 import java.util.function.Supplier;
 
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.DataSerializerEntry;
+import net.sodiumstudio.nautils.registries.NaUtilsEntityDataSerializers;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 
+/**
+ * A {@code LinearColor} is a representation of a color by three 0-1 double values (i.e. normalized values) of RGB. 
+ */
 public class LinearColor
 {
 
+	@SuppressWarnings("unchecked")
 	public static EntityDataSerializer<LinearColor> getEntityDataSerializer() {
-		return NaUtilsEntityDataSerializers.LINEAR_COLOR.get();
+		return (EntityDataSerializer<LinearColor>) NaUtilsEntityDataSerializers.LINEAR_COLOR.get().getSerializer();
 	};
 
 	public final double r;
@@ -144,7 +152,7 @@ public class LinearColor
 		if (hue < 0d)
 			hue += 6d;
 		if (hue >= 6d)
-			hue =- 6d;
+			hue -= 6d;
 		hue *= (Math.PI / 3d);
 		return new Vec3(hue, lightness, saturation); 
 	}
