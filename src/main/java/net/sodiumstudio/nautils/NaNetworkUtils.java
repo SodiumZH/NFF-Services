@@ -70,7 +70,7 @@ public class NaNetworkUtils
 	 */
 	public static void sendToPlayer(SimpleChannel channel, Packet<?> msg, Player target)
 	{
-		if (target.level.isClientSide)
+		if (target.level().isClientSide)
 			return;
 		if (target instanceof ServerPlayer sp)
 		{

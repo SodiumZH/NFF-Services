@@ -30,7 +30,7 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 	{
 		if (entity instanceof LivingEntity living
 				&& original.call(caller, entity) < Mth.square(caller.getEntityReach())
-				&& MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.get())))
+				&& MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.caller())))
 			return Double.MAX_VALUE;
 		else return original.call(caller, entity);
 	}

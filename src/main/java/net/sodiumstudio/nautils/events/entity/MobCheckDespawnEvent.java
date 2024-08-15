@@ -2,7 +2,7 @@ package net.sodiumstudio.nautils.events.entity;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent.AllowDespawn;
+import net.minecraftforge.event.entity.living.MobSpawnEvent.AllowDespawn;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.sodiumstudio.nautils.events.NaUtilsLivingEvent;
 

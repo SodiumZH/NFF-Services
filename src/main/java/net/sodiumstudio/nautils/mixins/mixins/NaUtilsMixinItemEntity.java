@@ -20,7 +20,7 @@ public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {
 	@Inject(at = @At("HEAD"), method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", cancellable = true)
 	private void hurt(DamageSource src, float amount, CallbackInfoReturnable<Boolean> callback)
 	{
-		if (caller().level.isClientSide || caller().isRemoved()) //Forge: Fixes MC-53850
+		if (caller().level().isClientSide || caller().isRemoved()) //Forge: Fixes MC-53850
 		{
 			callback.setReturnValue(false);
 		}

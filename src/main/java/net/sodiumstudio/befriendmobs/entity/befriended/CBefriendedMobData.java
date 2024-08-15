@@ -303,7 +303,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	
 		private Level getLevel()
 		{
-			return this.getBM().asMob().getLevel();
+			return this.getEntity().level();
 		}
 
 		@SuppressWarnings({ "resource", "unused" })
@@ -479,7 +479,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
 			if (id == null || id.equals(EMPTY_UUID))
 			{
-				if (!this.getEntity().level.isClientSide)
+				if (!this.isClientSide())
 				{
 					this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, UUID.randomUUID());
 					this.sync();
@@ -551,7 +551,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		{
 			UUID uuid = this.getSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class);
 			if (uuid == null || uuid.equals(EMPTY_UUID)) 
-				if (this.getLevel().isClientSide)
+				if (this.isClientSide())
 				{
 					LogUtils.getLogger().error("CBefriendedMobData: mob %s missing owner on client. Not initialized?");
 					return EMPTY_UUID;
@@ -618,7 +618,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerializer, T defaultValue)
 		{
-			if (this.getBM().asMob().getLevel().isClientSide)
+			if (this.isClientSide())
 				return;
 			if (this.synchedData.containsKey(key))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: duplicated data key.");
@@ -635,7 +635,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public <T> void setSynchedData(String key, Class<T> dataType, T value)
 		{
-			if (this.getBM().asMob().getLevel().isClientSide)
+			if (this.isClientSide())
 				throw new IllegalStateException("CBefriendedMobData synched data: set data only on server. "
 						+ "On client it's auto-synched. Use setSynchedDataClient to set only on client.");
 			if (!this.synchedData.containsKey(key))
@@ -662,7 +662,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value)
 		{
-			if (!this.getBM().asMob().getLevel().isClientSide)
+			if (!this.isClientSide())
 				throw new IllegalStateException("CBefriendedMobData synched data: setSynchedDataClient only on client. On server use setSynchedData() instead.");
 			if (!serializer.getObjectClass().isAssignableFrom(value.getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data#setSynchedDataClient: data type and serializer don't match.");
@@ -689,7 +689,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		@Override
 		public void tick()
 		{
-			if (!this.getLevel().isClientSide && this.getEntity().tickCount % this.syncInterval == 0 && !this.isEntityFirstTick())	// Don't update on the first tick to prevent some unexpected uninitialized problems
+			if (!this.isClientSide() && this.getEntity().tickCount % this.syncInterval == 0 && !this.isEntityFirstTick())	// Don't update on the first tick to prevent some unexpected uninitialized problems
 			{
 				// Sync data
 				if (!this.synchedData.isEmpty())

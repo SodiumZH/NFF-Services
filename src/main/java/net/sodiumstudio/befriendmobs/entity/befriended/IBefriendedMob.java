@@ -127,7 +127,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
 	{
-		if (!this.asMob().level.isClientSide)
+		if (!this.asMob().level().isClientSide)
 		{
 			this.setOwnerUUID(playerUUID);
 			if (from != null)
@@ -288,7 +288,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
-		if (!this.asMob().level.isClientSide)
+		if (!this.asMob().level().isClientSide)
 			this.getData().setOwnerUUID(ownerUUID);
 	}
 
@@ -496,7 +496,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void updateFromInventory()
 	{
-		if (!this.asMob().level.isClientSide)
+		if (!this.asMob().level().isClientSide)
 			this.getAdditionalInventory().syncToMob(this.asMob());
 	}
 	
@@ -506,7 +506,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	@DontOverride
 	public default void setInventoryFromMob()
 	{
-		if (!this.asMob().level.isClientSide)
+		if (!this.asMob().level().isClientSide)
 			this.getAdditionalInventory().getFromMob(this.asMob());
 	}
 

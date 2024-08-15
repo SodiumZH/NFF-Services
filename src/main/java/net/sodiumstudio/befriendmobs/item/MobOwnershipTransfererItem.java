@@ -102,7 +102,7 @@ public class MobOwnershipTransfererItem extends NaUtilsItem
 		mob.setOwnerUUID(player.getUUID());
 		mob.getData().setOwnerName(player.getName().getString());
 		mob.getData().recordEncounteredDate();
-		return InteractionResult.sidedSuccess(player.level.isClientSide);
+		return InteractionResult.sidedSuccess(player.level().isClientSide);
 	}
 	
 	@Override
