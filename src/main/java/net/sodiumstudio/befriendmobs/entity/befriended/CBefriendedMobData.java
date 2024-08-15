@@ -326,8 +326,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			save.put("additionalNBT", this.getAdditionalNBT());
 			save.put("synchedData", this.saveSynchedData());
 			//save.putUUID("identifier", this.getIdentifier());
-			save.putString("initialEntityType", ForgeRegistries.ENTITY_TYPES.getKey(this.getInitialEntityType()).toString());
-			save.putString("modId", ForgeRegistries.ENTITY_TYPES.getKey(this.getEntity().getType()).getNamespace());	// This field is not directly accessible, but only for reading mod id from entity saved data NBT.
+			save.putString("initialEntityType", ForgeRegistries.ENTITIES.getKey(this.getInitialEntityType()).toString());
+			save.putString("modId", ForgeRegistries.ENTITIES.getKey(this.getEntity().getType()).getNamespace());	// This field is not directly accessible, but only for reading mod id from entity saved data NBT.
 			// Owner
 			//save.putString("ownerName", this.getOwnerName());	// TODO: Remove after 0.x.30
 			//save.putUUID("ownerUUID", this.getOwnerUUID());
@@ -349,7 +349,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				this.nbt = nbt.getCompound("additionalNBT").copy();
 				this.readSynchedData(nbt.getCompound("synchedData"));
 				//this.setIdentifier(nbt.getUUID("identifier"));
-				this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
+				this.setInitialEntityType(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
 				//this.setOwnerName(nbt.getString("ownerName"));
 				//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
 				//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
@@ -369,8 +369,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 				nbtCpy.remove("identifier");
 				
 				String entityTypeKey = nbtCpy.getString("initial_entity_type");
-				if (entityTypeKey != null && ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)) != null)
-					this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)));
+				if (entityTypeKey != null && ForgeRegistries.ENTITIES.getValue(new ResourceLocation(entityTypeKey)) != null)
+					this.setInitialEntityType(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(entityTypeKey)));
 				else this.recordEntityType();
 				nbtCpy.remove("initial_entity_type");
 				
