@@ -101,7 +101,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 			return (T) obj;
 		}
 		catch (ClassCastException e) {
-			LogUtils.getLogger().error("CBefriendedMobData#getTempObjectCasted: class mismatch found.");
+			LogUtils.getLogger().error("CBefriendedMobData#getTempObjectCasted: class cast mismatch found.");
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -653,7 +654,10 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 		public <T> T getSynchedData(String key, Class<T> dataClass)
 		{
 			if (!this.synchedData.containsKey(key))
-				throw new IllegalArgumentException("CBefriendedMobData synched data: Invalid key.");
+			{
+				LogUtils.getLogger().error(String.format("CBefriendedMobData synched data: Key \"%s\" not found.", key));
+				return null;
+			}
 			if (!dataClass.isAssignableFrom(this.synchedData.get(key).getB().getClass()))
 				throw new IllegalArgumentException("CBefriendedMobData synched data: data type and serializer don't match.");
 			return (T) this.synchedData.get(key).getB();
@@ -808,7 +812,26 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	 */
 	public static CompoundTag getCapFromMobTag(CompoundTag mobTag)
 	{
-		return mobTag.getCompound("ForgeCaps").getCompound("cap_befriended_mob_temp_data");
+		CompoundTag forgecaps = mobTag.getCompound("ForgeCaps");
+		if (!forgecaps.getCompound("befriendmobs:cap_befriended_mob_data").isEmpty())
+			return forgecaps.getCompound("befriendmobs:cap_befriended_mob_data");
+		else return forgecaps.getCompound("befriendmobs:cap_befriended_mob_temp_data");	// TODO Legacy format: remove later
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T getSynchedDataFromMobTag(CompoundTag mobTag, String key, Class<T> dataClass)
+	{
+		try {
+			CompoundTag synched = getCapFromMobTag(mobTag).getCompound("synchedData");
+			NaUtilsDataSerializer<?> serializer = NaUtilsDataSerializer.fromId(new ResourceLocation(synched.getCompound(key).getString("serializer")));
+			Object res = serializer.fromTag(synched.getCompound(key).get("value"));
+			return (T) res;
+		} catch (RuntimeException e)
+		{
+			LogUtils.getLogger().error("Error in CBefriendedMobData#getSynchedDataFromMobTag. Return null. Cause:");
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -818,9 +841,7 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	 */
 	public static UUID getOwnerUUIDFromMobTag(CompoundTag mobTag)
 	{
-		CompoundTag capTag = getCapFromMobTag(mobTag);
-		if (capTag == null) return null;
-		return capTag.getUUID("ownerUUID");
+		return getSynchedDataFromMobTag(mobTag, "ownerUUID", UUID.class);
 	}
 	
 	/**
@@ -830,11 +851,8 @@ public interface CBefriendedMobData extends INBTSerializable<CompoundTag>, CEnti
 	 */
 	public static String getOwnerNameFromMobTag(CompoundTag mobTag)
 	{
-		CompoundTag capTag = getCapFromMobTag(mobTag);
-		if (capTag == null) return null;
-		String res = capTag.getString("ownerName");
-		if (res != null) return res;
-		else return "(Unknown)";
+		String res = getSynchedDataFromMobTag(mobTag, "ownerName", String.class);
+		return res != null ? res : "(Unknown)";
 	}
 	
 	/**
