@@ -135,10 +135,11 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 				this.asMob().setHealth(from.getHealth());
 			}
 			//this.setInventoryFromMob();
-			if (this.getAnchorPos() != null)
+		/*	if (this.getAnchorPos() != null)
 			{
 				this.setAnchorPos(this.asMob().position());
-			}
+			}*/
+			this.asMob().setPersistenceRequired();
 			this.onInit(playerUUID, from);
 		}
 	}
@@ -661,6 +662,7 @@ public interface IBefriendedMob extends ContainerListener, OwnableEntity  {
 	/**
 	 * Specify the mod ID this mob belongs to.
 	 */
+	@Deprecated
 	public default String getModId()
 	{
 		return ForgeRegistries.ENTITIES.getKey(asMob().getType()).getNamespace();
