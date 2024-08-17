@@ -24,7 +24,11 @@ public class NaUtilsMixinServerPlayer implements NaUtilsMixin<ServerPlayer>
 	@WrapOperation(method = "startSleepInBed(Lnet/minecraft/core/BlockPos;)Lcom/mojang/datafixers/util/Either;",
 			at = @At(value = "INVOKE", target = "java/util/List.isEmpty()Z"))
 	private boolean hasSleepPreventingMobs(List<Monster> list, Operation<Boolean> original)
-	{
+	{	
+		// Not empty = should prevent sleep
+		// If it's originally empty, do nothing
+		if (original.call(list)) return true;
+		// Otherwise post event to each mob
 		MutableObject<Integer> cancelled = new MutableObject<>(0);
 		list.forEach(m -> {
 			if (MinecraftForge.EVENT_BUS.post(new MonsterPreventSleepEvent(m, caller())))
@@ -32,6 +36,7 @@ public class NaUtilsMixinServerPlayer implements NaUtilsMixin<ServerPlayer>
 				cancelled.setValue(cancelled.getValue() + 1);
 			}
 		});
-		return cancelled.getValue() < list.size() && original.call(list);
+		// If all mob are cancelled, don't prevent sleep i.e. regard as empty
+		return cancelled.getValue() == list.size();
 	}
 }
