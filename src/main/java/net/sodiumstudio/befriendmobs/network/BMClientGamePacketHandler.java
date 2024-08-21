@@ -1,5 +1,7 @@
 package net.sodiumstudio.befriendmobs.network;
 
+import com.mojang.logging.LogUtils;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.PacketUtils;
@@ -55,9 +57,12 @@ public class BMClientGamePacketHandler
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
 		Entity e = mc.level.getEntity(packet.entityId);
-		e.getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
-			for (var entry: packet.objects.entrySet())
-				c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
-		});
+		if (e != null)	// An unknown issue happens that e==null
+		{
+			e.getCapability(BMCaps.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
+				for (var entry: packet.objects.entrySet())
+					c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
+			});
+		}
 	}
 }
