@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/SodiumZH/nff-services"
 
 [[mods]]
 modId="nautils"
-version="0.2.26"
+version="0.2.26-snapshot.0"
 displayName="Sodium's Utilities"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
 credits="SodiumZH"
