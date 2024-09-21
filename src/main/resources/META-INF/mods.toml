@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[47,)" ==
+loaderVersion="[47,)"
 license="LGPL-3.0"
 issueTrackerURL="https://github.com/SodiumZH/nff-services"
 
