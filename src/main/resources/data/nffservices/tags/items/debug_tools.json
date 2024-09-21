@@ -1,0 +1,7 @@
+{
+  "replace" : false,
+  "values" : [
+  	"nffservices:debug_befriender",
+  	"nffservices:debug_ai_switch"
+  ]
+}

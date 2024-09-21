@@ -27,8 +27,8 @@ base {
 }
 
 mixin {
-    add sourceSets.main, "befriendmobs.refmap.json"
-    config 'befriendmobs.mixins.json'
+    add sourceSets.main, "nautils.refmap.json"
+    config 'nautils.mixins.json'
 }
 
 javadoc {
