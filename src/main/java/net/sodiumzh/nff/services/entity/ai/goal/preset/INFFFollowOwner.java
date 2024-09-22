@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nautils.exceptions.UnimplementedException;
 import net.sodiumzh.nautils.statics.NaUtilsLevelStatics;
-import net.sodiumzh.nff.girls.befriendmobs.entity.ai.AiMaths;
+import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 
 /**
@@ -118,7 +118,7 @@ public interface INFFFollowOwner
 	@DontOverride
 	public default Vec3 teleportOffsetDefault()
 	{
-		return AiMaths.randomOvalVector(3, 1, 3).scale(goal().getMob().asMob().getRandom().nextDouble());
+		return NaUtilsMathStatics.randomOvalVector(3, 1, 3).scale(goal().getMob().asMob().getRandom().nextDouble());
 	}
 	
 	/**

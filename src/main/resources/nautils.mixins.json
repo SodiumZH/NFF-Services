@@ -12,7 +12,7 @@
 		"NaUtilsMixinThrownTrident",
 		"NaUtilsMixinLivingEntity",
 		"NaUtilsMixinServerPlayer",
-		"NaUtilsMixinWorldCapabilityData",
+		"NaUtilsMixinLevelCapabilityData",
 		"NaUtilsMixinEntityType",
 		"NaUtilsMixinItemStack"
 	],

@@ -3,7 +3,6 @@ package net.sodiumzh.nautils.statics;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
+import net.sodiumzh.nautils.Wrapped;
+
 
 public class NaUtilsMiscStatics {
 	
@@ -29,21 +30,23 @@ public class NaUtilsMiscStatics {
 		return target != null ? target.getName().getString() : "null";
 	}
 
+	@Deprecated
 	public static void printToScreen(Component text, Player receiver, Entity sender)
 	{
-		receiver.sendMessage(text, sender.getUUID());
+		printToScreen(text, receiver);
 	}
 	
+	@Deprecated
 	public static void printToScreen(String text, Player receiver, Entity sender)
 	{
-		receiver.sendMessage(NaUtilsInfoStatics.createText(text), sender.getUUID());
+		printToScreen(text, receiver);
 	}
 	
 	public static void printToScreen(Component text, Player receiver)
 	{
 		if (receiver == null)
 			return;
-		receiver.sendMessage(text, receiver.getUUID());
+		receiver.sendSystemMessage(text);
 	}
 	
 	public static void printToScreen(String text, Player receiver)
@@ -109,11 +112,11 @@ public class NaUtilsMiscStatics {
 	@Nullable
 	public static <T> T getValue(LazyOptional<T> optional)
 	{
-		MutableObject<T> wrp = new MutableObject<>(null);
+		Wrapped<T> wrp = new Wrapped<>(null);
 		optional.ifPresent(t -> {
-			wrp.setValue(t);
+			wrp.set(t);
 		});
-		return wrp.getValue();
+		return wrp.get();
 	}
 	
 	/**
@@ -167,20 +170,4 @@ public class NaUtilsMiscStatics {
 	{
 		return getValueFromCapability(target, holder, access, null);
 	}
-	
-	/** Try an action with boolean result for given times. Once the action returns true, it will break and return true. 
-	 Otherwise if the action returns all false for given times, it returns false. */
-	public static boolean tryFor(int times, Supplier<Boolean> action)
-	{
-		if (times <= 0)
-			return false;
-		for (int i = 0; i < times; ++i)
-		{
-			boolean res = action.get();
-			if (res)
-				return true;
-		}
-		return false;
-	}
-
 }

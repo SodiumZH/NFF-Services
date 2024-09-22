@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.LivingEntitySweepHurtEvent;
+import net.sodiumzh.nautils.mixin.events.entity.LivingEntitySweepHurtEvent;
 
 @Mixin(Player.class)
 public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>

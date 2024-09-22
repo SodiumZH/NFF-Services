@@ -16,8 +16,8 @@ public class NaUtilsTagStatics
 {
 	public static boolean hasTag(Entity obj, ResourceLocation tag)
 	{
-		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITIES.tags().createTagKey(tag);
-		return ForgeRegistries.ENTITIES.tags().getTag(tagKey).contains(obj.getType());
+		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITY_TYPES.tags().createTagKey(tag);
+		return ForgeRegistries.ENTITY_TYPES.tags().getTag(tagKey).contains(obj.getType());
 	}
 	
 	public static boolean hasTag(Entity obj, String tag)
@@ -83,8 +83,8 @@ public class NaUtilsTagStatics
 	
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(ResourceLocation tag)
 	{
-		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITIES.tags().createTagKey(tag);
-		return NaUtilsContainerStatics.iterableToList(ForgeRegistries.ENTITIES.tags().getTag(tagKey));
+		TagKey<EntityType<?>> tagKey = ForgeRegistries.ENTITY_TYPES.tags().createTagKey(tag);
+		return NaUtilsContainerStatics.iterableToList(ForgeRegistries.ENTITY_TYPES.tags().getTag(tagKey));
 	}
 	
 	public static ArrayList<EntityType<?>> getAllEntityTypesUnderTag(String tag)

@@ -1,6 +1,8 @@
 {
 	"item.nautils.debug_ai_switch": "AI开关工具(调试用)",
 	"item.nautils.debug_target_setter": "攻击目标设置工具(调试用)",
+	"info.nautils.debug_ai_switch_on": "生物 %1$s AI已启用",
+	"info.nautils.debug_ai_switch_off": "生物 %1$s AI已禁用",
 	
 	"color.nautils.html.alice_blue": "爱丽丝蓝",
 	"color.nautils.html.antique_white": "古董白",

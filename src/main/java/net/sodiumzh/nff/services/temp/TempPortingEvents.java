@@ -18,7 +18,7 @@ public class TempPortingEvents
 	{
 		if (!event.getNBT().getCompound("ForgeCaps").getCompound(NFFServices.MOD_ID + ":cap_befriended_mob_temp_data").isEmpty())
 		{
-			event.getNBT().getCompound("ForgeCaps").register(NFFServices.MOD_ID + ":" + "cap_befriended_mob_data", 
+			event.getNBT().getCompound("ForgeCaps").put(NFFServices.MOD_ID + ":" + "cap_befriended_mob_data", 
 					event.getNBT().getCompound("ForgeCaps").getCompound(NFFServices.MOD_ID + ":cap_befriended_mob_temp_data").copy());
 			event.getNBT().getCompound("ForgeCaps").remove(NFFServices.MOD_ID + ":" + "cap_befriended_mob_temp_data");
 		}

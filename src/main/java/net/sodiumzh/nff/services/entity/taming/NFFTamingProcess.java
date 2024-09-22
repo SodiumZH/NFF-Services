@@ -11,12 +11,13 @@ import javax.annotation.Nullable;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.containers.ArrayIterationHelper;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.math.RndUtil;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nff.services.event.BMHooks;
+import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 public abstract class NFFTamingProcess 
@@ -68,7 +69,7 @@ public abstract class NFFTamingProcess
 		bm.getData().recordEntityType();
 		bm.getData().recordEncounteredDate();
 		//Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
-		BMHooks.Befriending.onMobBefriended(target, bm);
+		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, bm));
 		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
 		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.CHANNEL, packet);

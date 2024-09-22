@@ -6,11 +6,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nautils.mixin.event.entity.ItemEntityHurtEvent;
-import net.sodiumzh.nautils.mixin.event.entity.ItemEntityOutOfWorldEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MobSunBurnTickEvent;
-import net.sodiumzh.nautils.mixin.event.entity.NonLivingEntityHurtEvent;
-import net.sodiumzh.nautils.mixin.event.entity.NonLivingEntityOutOfWorldEvent;
+import net.sodiumzh.nautils.mixin.events.entity.ItemEntityHurtEvent;
+import net.sodiumzh.nautils.mixin.events.entity.ItemEntityOutOfWorldEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nautils.mixin.events.entity.NonLivingEntityHurtEvent;
+import net.sodiumzh.nautils.mixin.events.entity.NonLivingEntityOutOfWorldEvent;
 
 public class NaUtilsMixinHooks
 {

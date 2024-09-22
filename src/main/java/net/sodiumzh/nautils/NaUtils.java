@@ -16,15 +16,11 @@ import net.sodiumzh.nautils.registries.NaUtilsItemRegistry;
 @Mod(NaUtils.MOD_ID)
 public class NaUtils
 {
-
-	@Deprecated
-	public static boolean isDebugMode = false;
-
+	
 	// TODO: change to "nautils" after separation
 	public static final String MOD_ID = "nautils";
 	@Deprecated
 	public static final String MOD_ID_FINAL = MOD_ID;
-	private static final String MOD_ID_LEGACY = "befriendmobs";
 	private static MinecraftServer server = null;
 	
 	public NaUtils()

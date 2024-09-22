@@ -39,7 +39,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 	
 	public Registering push(@Nonnull EntityType<?> key)
 	{
-		return this.push(ForgeRegistries.ENTITIES.getKey(key));
+		return this.push(ForgeRegistries.ENTITY_TYPES.getKey(key));
 	}
 	
 	public Registering push(@Nonnull RegistryObject<EntityType<?>> key)
@@ -177,7 +177,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		
 		public Registering linkListings(@Nonnull EntityType<?> type, @Nullable VillagerProfession profession)
 		{
-			return this.linkListings(ForgeRegistries.ENTITIES.getKey(type), profession);
+			return this.linkListings(ForgeRegistries.ENTITY_TYPES.getKey(type), profession);
 		}
 		
 		public Registering linkListings(@Nonnull ResourceLocation key)
@@ -211,7 +211,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		
 		public Registering mergeListings(@Nonnull EntityType<?> type, @Nullable VillagerProfession profession)
 		{
-			return this.mergeListings(ForgeRegistries.ENTITIES.getKey(type), profession);
+			return this.mergeListings(ForgeRegistries.ENTITY_TYPES.getKey(type), profession);
 		}
 	
 		public Registering mergeListings(@Nonnull ResourceLocation key)

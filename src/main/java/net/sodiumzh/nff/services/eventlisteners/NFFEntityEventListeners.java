@@ -40,8 +40,6 @@ import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
 import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed.DeathRespawnerGenerationType;
-import net.sodiumzh.nff.services.event.BMHooks;
-import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedSunSensitiveMob;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
@@ -49,6 +47,8 @@ import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import net.sodiumzh.nff.services.entity.taming.TamableHatredReason;
 import net.sodiumzh.nff.services.entity.taming.TamableInteractArguments;
 import net.sodiumzh.nff.services.entity.taming.TamableInteractionResult;
+import net.sodiumzh.nff.services.event.entity.NFFTamedDropRespawnerOnDyingEvent;
+import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
@@ -357,7 +357,7 @@ public class NFFEntityEventListeners
 								}
 								ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
 								ins.setNoExpire(bef.respawnerNoExpire());
-								if (!BMHooks.Befriended.onBefriendedGenerateRespawnerOnDying(bef, ins))
+								if (!MinecraftForge.EVENT_BUS.post(new NFFTamedDropRespawnerOnDyingEvent(bef, ins)))
 									event.getEntity().level.addFreshEntity(resp);
 							}
 						}

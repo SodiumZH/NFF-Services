@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.annotation.DontCallManually;
-import net.sodiumzh.nautils.mixin.event.entity.EntityLoadEvent;
-import net.sodiumzh.nautils.mixin.event.level.WorldCapabilityDataLoadEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
+import net.sodiumzh.nautils.mixin.events.level.LevelCapabilityDataLoadEvent;
 import net.sodiumzh.nautils.registries.NaUtilsConfigs;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
@@ -41,7 +41,7 @@ public class SaveDataLocationRedirectorEventListeners
 	}
 	
 	@SubscribeEvent
-	public static void doPortLevelCapabilities(WorldCapabilityDataLoadEvent event)
+	public static void doPortLevelCapabilities(LevelCapabilityDataLoadEvent event)
 	{
 		if (!NaUtilsConfigs.CACHED_ENABLES_SAVE_DATA_PORTER) return;
 		if (SaveDataLocationRedirectorRegistries.LEVEL_CAPABILITY_MAPPING.isEmpty() && SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return;

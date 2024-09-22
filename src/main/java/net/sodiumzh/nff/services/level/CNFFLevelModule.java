@@ -2,6 +2,8 @@ package net.sodiumzh.nff.services.level;
 
 import java.util.HashSet;
 
+import org.apache.commons.lang3.mutable.MutableObject;
+
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -14,11 +16,9 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.event.BMHooks;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickEndEvent;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickStartEvent;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
@@ -168,7 +168,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 		public void tick()
 		{			
 			tickCount += 1;
-			MinecraftForge.EVENT_BUS.post(new NFFLevelModuleTickStartEvent(level));;
+			MinecraftForge.EVENT_BUS.post(new NFFLevelModuleTickStartEvent(level));
 			
 			if (getTickCount() % 20 == 0)
 				updateSuspendedRespawners();

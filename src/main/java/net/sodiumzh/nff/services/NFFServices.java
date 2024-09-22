@@ -5,12 +5,9 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.sodiumzh.nautils.NaUtils;
-import net.sodiumzh.nautils.savedata.porter.NaSaveDataPorter;
 import net.sodiumzh.nautils.savedata.redirector.SaveDataLocationRedirector;
 import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;

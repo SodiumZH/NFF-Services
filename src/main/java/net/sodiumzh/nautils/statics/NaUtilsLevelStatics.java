@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.sodiumzh.nautils.Wrapped;
 
 public class NaUtilsLevelStatics
 {
@@ -110,13 +111,13 @@ public class NaUtilsLevelStatics
 	 */
 	public static ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
 	{
-		ArrayList<BlockPos> res = new ArrayList<>();
+		Wrapped<ArrayList<BlockPos>> wrapped = new Wrapped<>(new ArrayList<>());
 		BlockPos.betweenClosedStream(area).forEach((BlockPos b) -> 
 		{
 			if (filter == null || filter.test(b))
-				res.add(new BlockPos(b.getX(), b.getY(), b.getZ()));
+				wrapped.get().add(new BlockPos(b.getX(), b.getY(), b.getZ()));
 		});
-		return res;
+		return wrapped.get();
 	}
 	
 	/**

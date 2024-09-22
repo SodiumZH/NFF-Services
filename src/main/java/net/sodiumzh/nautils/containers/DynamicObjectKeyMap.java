@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.sodiumzh.nautils.object.ObjectOrKey;
 import net.sodiumzh.nautils.object.ObjectOrSupplier;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
@@ -24,7 +23,7 @@ import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
  * @param <V> Raw value type.
  * @param <W> {@link ObjectOrKey} wrapper type.
  */
-public class DynamicObjectKeyMap<K extends IForgeRegistryEntry<K>, V, W extends ObjectOrKey<K>>
+public class DynamicObjectKeyMap<K, V, W extends ObjectOrKey<K>>
 {
 
 	protected final HashMap<W, ObjectOrSupplier<V>> map = new HashMap<>();

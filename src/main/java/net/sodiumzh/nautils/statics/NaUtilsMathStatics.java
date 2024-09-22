@@ -6,12 +6,13 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class NaUtilsMathStatics
 {
-	private static final Random RND = new Random();
+	private static final RandomSource RND = RandomSource.create();
 	
 	public static double max(double... vals)
 	{

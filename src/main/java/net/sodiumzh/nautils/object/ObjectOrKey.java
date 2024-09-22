@@ -12,9 +12,8 @@ import javax.annotation.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T>
+public class ObjectOrKey<T> implements Supplier<T>
 {
 	private final T object;
 	private final ResourceLocation key;
@@ -78,7 +77,7 @@ public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T
 	/**
 	 * Get values from {@code Set} of {@code ObjectOrKey}. Null objects will be ignored.
 	 */
-	public static <T extends IForgeRegistryEntry<T>, U extends ObjectOrKey<T>> HashSet<T> getNonnull(Set<U> set)
+	public static <T, U extends ObjectOrKey<T>> HashSet<T> getNonnull(Set<U> set)
 	{
 		HashSet<T> res = new HashSet<>();
 		for (var obj: set)
@@ -93,7 +92,7 @@ public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T
 	/**
 	 * Get values from {@code Map} with {@code ObjectOrKey} values. Null objects will be ignored.
 	 */
-	public static <K, V extends IForgeRegistryEntry<V>, U extends ObjectOrKey<V>> HashMap<K, V> getNonnull(Map<K, U> map)
+	public static <K, V, U extends ObjectOrKey<V>> HashMap<K, V> getNonnull(Map<K, U> map)
 	{
 		HashMap<K, V> res = new HashMap<>();
 		for (var key: map.keySet())
@@ -110,7 +109,7 @@ public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T
 	/**
 	 * Get values from {@code Map} with {@code ObjectOrKey} keys. Null objects will be ignored.
 	 */
-	public static <K extends IForgeRegistryEntry<K>, V, U extends ObjectOrKey<K>> HashMap<K, V> getNonnullKeys(Map<U, V> map)
+	public static <K, V, U extends ObjectOrKey<K>> HashMap<K, V> getNonnullKeys(Map<U, V> map)
 	{
 		HashMap<K, V> res = new HashMap<>();
 		for (var key: map.keySet())
@@ -127,7 +126,7 @@ public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T
 	/**
 	 * Get values from {@code List} of {@code ObjectOrKey}. Null objects will still be added.
 	 */
-	public static <T extends IForgeRegistryEntry<T>, U extends ObjectOrKey<? extends T>> ArrayList<T> getNullable(List<U> list)
+	public static <T, U extends ObjectOrKey<? extends T>> ArrayList<T> getNullable(List<U> list)
 	{
 		ArrayList<T> res = new ArrayList<>(list.size());
 		for (var obj: list)
@@ -140,7 +139,7 @@ public class ObjectOrKey<T extends IForgeRegistryEntry<T>> implements Supplier<T
 	/**
 	 * Get values from {@code Map} with {@code ObjectOrKey} values. Null objects will still be added.
 	 */
-	public static <K, T extends IForgeRegistryEntry<T>, U extends ObjectOrKey<T>> HashMap<K, T> getNullable(Map<K, U> map)
+	public static <K, T, U extends ObjectOrKey<T>> HashMap<K, T> getNullable(Map<K, U> map)
 	{
 		HashMap<K, T> res = new HashMap<>();
 		for (var key: map.keySet())

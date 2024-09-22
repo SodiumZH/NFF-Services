@@ -9,8 +9,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.ItemEntityHurtEvent;
-import net.sodiumzh.nautils.mixin.event.entity.ItemEntityOutOfWorldEvent;
+import net.sodiumzh.nautils.mixin.events.entity.ItemEntityHurtEvent;
+import net.sodiumzh.nautils.mixin.events.entity.ItemEntityOutOfWorldEvent;
 
 @Mixin(ItemEntity.class)
 public class NaUtilsMixinItemEntity implements NaUtilsMixin<ItemEntity> {

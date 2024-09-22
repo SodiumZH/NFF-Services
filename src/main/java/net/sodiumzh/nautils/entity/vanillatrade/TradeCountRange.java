@@ -1,12 +1,11 @@
 package net.sodiumzh.nautils.entity.vanillatrade;
 
 import java.util.List;
-import java.util.Random;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
-import net.minecraft.world.level.levelgen.RandomSource;
+import net.minecraft.util.RandomSource;
 
 /**
  * A {@code TradeCountRange} is an integer range for generating
@@ -21,7 +20,7 @@ import net.minecraft.world.level.levelgen.RandomSource;
  */
 public class TradeCountRange
 {
-	private static final Random RND = new Random();
+	private static final RandomSource RND = RandomSource.create();
 	private final int minValue;	// Included
 	private final int maxValue;	// Included
 	private final double p;
@@ -99,7 +98,7 @@ public class TradeCountRange
 	/**
 	 * Get a random value using the given RandomSource.
 	 */
-	public int getValue(Random rnd)
+	public int getValue(RandomSource rnd)
 	{
 		switch (rndType)
 		{
@@ -200,7 +199,7 @@ public class TradeCountRange
 		{
 			return DataResult.error("TradeCountRange: invalid value.");
 		}
-	}, (TradeCountRange inst) ->
+	}, inst ->
 	{
 		switch (inst.rndType)
 		{

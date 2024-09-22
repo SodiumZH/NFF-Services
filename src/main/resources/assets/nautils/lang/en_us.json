@@ -1,7 +1,9 @@
 {   
 
  "item.nautils.debug_ai_switch": "Debug AI Switch",
- "item.nautils.debug_target_setter": "Debug Target Setter",
+ "item.nautils.debug_target_setter": "Debug Target Setter",   
+ "info.nautils.debug_ai_switch_on": "Mob %1$s AI enabled.",
+ "info.nautils.debug_ai_switch_off": "Mob %1$s AI disabled.",
 
  "color.nautils.html.alice_blue": "Alice Blue",
  "color.nautils.html.antique_white": "Antique White",
