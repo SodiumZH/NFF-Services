@@ -64,7 +64,7 @@ public abstract class NFFTamingProcess
 		bm.getData().generateIdentifier();
 		bm.getData().recordEntityType();
 		bm.getData().recordEncounteredDate();
-		//Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
+		//NaUtilsDebugStatics.debugPrintToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
 		BMHooks.Befriending.onMobBefriended(target, bm);
 		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
