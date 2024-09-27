@@ -30,7 +30,7 @@ public abstract class NFFTamingProcess
 	
 	/** If this method is overridden, it should invalidate the input target living mob.
 	 */
-	public INFFTamed befriend(Player player, Mob target)
+	public INFFTamed doTaming(Player player, Mob target)
 	{
 		// Don't execute on client
 		if (target.level().isClientSide())

@@ -54,7 +54,7 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 	public INFFTamed finalActions(Player player, Mob mob)
 	{
 		sendParticlesOnBefriended(mob);
-		return befriend(player, mob);
+		return doTaming(player, mob);
 	}
 	
 	public abstract int getItemGivingCooldownTicks();
