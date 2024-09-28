@@ -1,0 +1,13 @@
+{
+  "item.nffservices.instant_taming_tool": "立即驯服工具(调试用)",
+  "item.nffservices.mob_respawner": "重生刷怪蛋",
+  "item.nffservices.dummy_item": "占位道具（如果未使用/give时见到此道具，请报bug）",
+  "info.nffservices.gui_health": "生命",
+  "info.nffservices.gui_atk": "攻击",
+  "info.nffservices.gui_armor": "护甲" ,
+  "info.nffservices.mob_wait": "正在待机",
+  "info.nffservices.mob_follow": "正在跟随",
+  "info.nffservices.mob_wander": "正在游荡" ,
+  "info.nffservices.debug_ai_switch_on": "生物 %1$s AI已启用",
+  "info.nffservices.debug_ai_switch_off": "生物 %1$s AI已禁用"
+}

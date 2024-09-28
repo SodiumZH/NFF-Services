@@ -1,0 +1,13 @@
+{
+   "item.nffservices.instant_taming_tool": "Instant Taming Tool",
+   "item.nffservices.mob_respawner": "Respawner",
+   "item.nffservices.dummy_item": "Dummy Item (IF YOU SEE THIS WITHOUT USING /give, PLEASE REPORT BUGS.)",
+   "info.nffservices.gui_health": "HP",
+   "info.nffservices.gui_atk": "ATK",
+   "info.nffservices.gui_armor": "Armor" ,
+   "info.nffservices.mob_wait": "is waiting",
+   "info.nffservices.mob_follow": "is following",
+   "info.nffservices.mob_wander": "is wandering" ,
+   "info.nffservices.debug_ai_switch_on": "Mob %1$s AI enabled.",
+   "info.nffservices.debug_ai_switch_off": "Mob %1$s AI disabled."
+}

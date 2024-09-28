@@ -1,4 +1,8 @@
-{ 
+{   
+
+ "item.nautils.debug_ai_switch": "Debug AI Switch",
+ "item.nautils.debug_target_setter": "Debug Target Setter",
+
  "color.nautils.html.alice_blue": "Alice Blue",
  "color.nautils.html.antique_white": "Antique White",
  "color.nautils.html.aqua": "Aqua",

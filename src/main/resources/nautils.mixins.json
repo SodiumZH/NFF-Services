@@ -1,0 +1,24 @@
+{
+	"required": true,
+	"package": "net.sodiumzh.nautils.mixin.mixins",
+	"compatibilityLevel": "JAVA_17",
+	"refmap": "nautils.refmap.json",
+	"mixins": [
+		"NaUtilsMixinItemEntity",
+		"NaUtilsMixinEntity",
+		"NaUtilsMixinMob",
+		"NaUtilsMixinPlayer",
+		"NaUtilsMixinProjectile",
+		"NaUtilsMixinThrownTrident",
+		"NaUtilsMixinLivingEntity",
+		"NaUtilsMixinServerPlayer",
+		"NaUtilsMixinWorldCapabilityData",
+		"NaUtilsMixinEntityType",
+		"NaUtilsMixinItemStack"
+	],
+	"client": [
+		"NaUtilsMerchantMenuMixin",
+		"NaUtilsMerchantScreenMixin"
+	],
+	"minVersion": "0.8"
+}
