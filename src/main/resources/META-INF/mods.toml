@@ -1,31 +1,61 @@
 modLoader="javafml" #mandatory
 loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 license="LGPL-3.0"
-issueTrackerURL="https://github.com/SodiumZH/Befriend-Mobs"
-[[mods]] #mandatory
-modId="befriendmobs" #mandatory
-version="0.0.25"
-displayName="BefriendMobs API" #mandatory
+issueTrackerURL="https://github.com/SodiumZH/NFF-Services"
+
+[[mods]]
+modId="nautils" #mandatory
+version="0.0.26-snapshot.1"
+displayName="Sodium's Utilities" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/befriendmobs-api"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
 #logoFile="examplemod.png" #optional
 credits="SodiumZH" #optional
 authors="SodiumZH" #optional
-description='''A toolkit for taming and friendly mobs.'''
+description='''Miscellaneous utility library by SodiumZH.'''
 
-[[dependencies.befriendmobs]] #optional
+[[dependencies.nautils]] #optional
     modId="forge" #mandatory
     mandatory=true #mandatory
-    versionRange="[40.2.4,)" #mandatory
+    versionRange="[40,)" #mandatory
     ordering="NONE"
     side="BOTH"
     
-[[dependencies.befriendmobs]]
+[[dependencies.nautils]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"
 
+[[mods]] #mandatory
+modId="nffservices" #mandatory
+version="0.0.26-snapshot.1"
+displayName="NFF Services" #mandatory
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
+#logoFile="examplemod.png" #optional
+credits="SodiumZH" #optional
+authors="SodiumZH" #optional
+description='''A toolkit for taming and friendly mobs.'''
+
+[[dependencies.nffservices]] #optional
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[40,)" #mandatory
+    ordering="NONE"
+    side="BOTH"
     
-    
+[[dependencies.nffservices]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.nffservices]]
+    modId="nautils"
+    mandatory=true
+    versionRange="[0.0.26-snapshot.1, 0.0.27)"
+    ordering="NONE"
+    side="BOTH"
