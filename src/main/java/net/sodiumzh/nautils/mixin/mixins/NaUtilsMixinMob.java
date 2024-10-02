@@ -63,7 +63,7 @@ public class NaUtilsMixinMob implements NaUtilsMixin<Mob>
 		if (MinecraftForge.EVENT_BUS.post(new MobCheckDespawnEvent(this.caller())))
 		{
 			callback.cancel();
-			caller().setNoActionTime(0);
+			caller().setNoActionTime(0);	// This action is done if despawn is cancelled in vanilla or forge ways
 		}
 			
 	}
