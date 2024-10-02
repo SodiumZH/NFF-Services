@@ -40,12 +40,14 @@ import net.sodiumzh.nautils.function.MutablePredicate;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
+import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nff.services.network.NFFClientGamePacketHandler;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
 
 /**
  * A temporal module for storage of data in INFFTamed interface.
@@ -807,9 +809,10 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public static CompoundTag getCapFromMobTag(CompoundTag mobTag)
 	{
 		CompoundTag forgecaps = mobTag.getCompound("ForgeCaps");
-		if (!forgecaps.getCompound("befriendmobs:cap_befriended_mob_data").isEmpty())
-			return forgecaps.getCompound("befriendmobs:cap_befriended_mob_data");
-		else return forgecaps.getCompound("befriendmobs:cap_befriended_mob_temp_data");	// TODO Legacy format: remove later
+		CompoundTag data = forgecaps.getCompound(new ResourceLocation(NFFServices.MOD_ID, NFFCapabilityAttachments.KEY_NFF_MOB_COMMON_DATA).toString());
+		if (!data.isEmpty())
+			return data;
+		else return forgecaps.getCompound("befriendmobs:cap_befriended_mob_data");	// TODO Legacy format: remove later
 	}
 	
 	@SuppressWarnings("unchecked")
