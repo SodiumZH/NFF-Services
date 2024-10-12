@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/SodiumZH/NFF-Services"
 
 [[mods]]
 modId="nautils" #mandatory
-version="0.1.26-snapshot.1"
+version="0.1.26"
 displayName="Sodium's Utilities" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
@@ -30,7 +30,7 @@ description='''Miscellaneous utility library by SodiumZH.'''
 
 [[mods]] #mandatory
 modId="nffservices" #mandatory
-version="0.1.26-snapshot.1"
+version="0.1.26"
 displayName="NFF Services" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
@@ -56,6 +56,6 @@ description='''A toolkit for taming and friendly mobs.'''
 [[dependencies.nffservices]]
     modId="nautils"
     mandatory=true
-    versionRange="[0.1.26-snapshot.1, 0.1.27)"
+    versionRange="[0.1.26, 0.1.27)"
     ordering="NONE"
     side="BOTH"
