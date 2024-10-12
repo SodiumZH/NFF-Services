@@ -6,6 +6,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
+import net.minecraft.CrashReport;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -15,6 +19,7 @@ import net.sodiumzh.nautils.mixin.NaUtilsMixinHooks;
 import net.sodiumzh.nautils.mixin.events.entity.EntityFinalizeLoadingEvent;
 import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
 import net.sodiumzh.nautils.mixin.events.entity.EntityTickEvent;
+import net.sodiumzh.nautils.registries.NaUtilsConfigs;
 
 @Mixin(Entity.class)
 public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
@@ -43,5 +48,15 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 	private void afterLoad(CompoundTag nbt, CallbackInfo callback)
 	{
 		MinecraftForge.EVENT_BUS.post(new EntityFinalizeLoadingEvent(caller(), nbt));
+	}
+	
+	@WrapOperation(method = "load(Lnet/minecraft/nbt/CompoundTag;)V", at = 
+			@At(value = "INVOKE", target = "net/minecraft/CrashReport.forThrowable(Ljava/lang/Throwable;Ljava/lang/String;)Lnet/minecraft/CrashReport;"))
+	private CrashReport loadFailed(Throwable throwable, String info, Operation<CrashReport> original)
+	{
+		if (NaUtilsConfigs.CACHED_CRASHES_WHEN_ENTITY_LOAD_FAILED)
+			throw new RuntimeException(String.format("Entity load failed: \"%s\". This crash is caused by NaUtils for debug. You can set config \"crashesWhenEntityLoadFailed\""
+					+ " to false to prevent this crash, and the entity will be deleted like in vanilla.", caller().getName().getString()), throwable);
+		return original.call(throwable, info);
 	}
 }
