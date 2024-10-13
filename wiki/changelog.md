@@ -1,12 +1,126 @@
 # Change Log
 
+### 0.x.26
 
+##### NFF Services 
 
+Renamed project name from *BefriendMobs* to *NFF Services*.
 
+Renamed mod ID from `befriendmobs` to `nffservices`.
+
+Renamed tag: `befriendmobs:neutral_to_bm_mobs` -> `nffservices:neutral_to_nff_mobs`
+
+Renamed item: `befriendmobs:debug_befriender` -> `nffservices:instant_taming_tool`
+
+##### NaUtils
+
+Seperated NaUtils as a mod, but still embedded in *NFF Services* project.
+
+Fixed mob no-action time accumulating when `MobCheckDespawnEvent` is cancelled.
+
+Finally removed `Wrapped`.
+
+### 0.x.25
+
+##### BefriendMobs
+
+`CBefriendedMobData` refactor.
+
+​	-Now owner UUID, additional inventory and AI state are stored in `CBefriendedMobData`.
+
+​	-Now `CBefriendedModData` supports auto-synched data (from server to client, every tick), using `NaUtilsDataSerializer`. Owner UUID and AI state are synched by this instead of `EntityDataSerializer`.
+
+​	-Fixed encountered date not correctly recorded. Now in older save data it will be set to the date the data is first loaded.
+
+`IBefriendedMob` refactor.
+
+​	-Now owner UUID and AI state are synched by `CBefriendedMobData` synched data instead of vanilla `EntityDataSerializer`.
+
+​	-Now inventory synching between BM additional inventory and the mob is handled in subclasses of `BefriendedInventory` by override of `BefriendedInventory#syncToMob` and `BefriendedInventory#getFromMob`. 
+
+##### NaUtils
+
+Added `NaUtilsDataSerializer`, representing data types that can serialized into both NBT and ByteBuf.
+
+Added `CEntityTickingCapability`. This allows to auto-register capabilities that should be ticked together with entities.
+
+Added Mixin events: `MobInteractEvent`, `EntityLoadEvent`, `EntityFinalizeLoadingEvent`, `MobCheckDespawnEvent`, `MonsterPreventSleepEvent`.
+
+### 0.x.24
+
+##### NaUtils
+
+Added Mixin-based events:
+
+-`EntityTickEvent`: posted before the whole entity tick.
+
+-`LivingStartDeathEvent`: posted after `LivingDeathEvent` before the `LivingEntity` really starts to die.
+
+-`LootCheckPlayerKillEvent`: Posted on mob killed before checking if the mob is killed by a player.
+
+-`MobPickUpItemEvent`: Posted before mob picking up item, cancellable.
+
+-`MobFinalizePickingUpEvent`: Posted after mob picking up item.
+
+Fixed `RepeatableAttributeModifier` errors.
+
+### 0.x.23
+
+##### BefriendMobs
+
+Added `identifier` and `initialEntityType` fields to `CBefriendedMobData`. 
+
+##### NaUtils
+
+Added `CompoundSet`. (Functions see the source code)
+
+Removed `StandardColor`. Use vanilla `DyeColor` instead.
+
+Replaced `WithStandardColor` with `WithDyeColor` in which the constructor was changed from using previous `StandardColor` to vanilla `DyeColor`.
+
+Now `GuiPos` (previously `IntVec2`) is immutable.
+
+Added `CastableObject` for reflection output to simplify subsequent casting operations.
+
+Renamed class: 
+
+-`IntVec2` => `GuiPos`
+
+-`ReflectHelper` => `NaReflectionUtils`
+
+`ContainerHelper` => `NaContainerUtils`
+
+`ReflectHelper` => `NaReflectionUtils`
+
+### 0.x.22
+
+##### BefriendMobs
+
+Fully removed the old Bauble System.
+
+Removed Debug AI Switch (migrated to NaUtils).
+
+Refactored debug items.
+
+Now mobs befriended from falling-immune mobs will be also falling-immune. (1.20.1)
+
+##### NaUtils
+
+Added Debug AI Switch.
+
+Added Debug Target Setter.
+
+Added Mixin-based events: `ThrownTridentSetBaseDamageEvent` and `ThrownTridentSetFinalDamageEvent` for modifying damage of Thrown Trident. 
+
+Renamed classes:
+
+ -`ItemHelper` => `NaItemUtils`
 
 ### 0.x.21
 
+Bauble System remade. WARNING: it's probably very unstable! Keep your data backed-up!!!
 
+Added tag: `befriendmobs:neutral_to_bm_mobs`. Mobs with this tag will not proactively attack befriended mobs unless being attacked.
 
 ### 0.2.20.1
 
@@ -18,12 +132,6 @@ Fixed a wrong mixin in `NaUtilsMixinPlayer` which causes compat issues.
 
 ## 1.19.2
 
-### 0.1.20.1
-
-##### NaUtils
-
-Fixed a wrong mixin in `NaUtilsMixinPlayer` causing compat issues.
-
 ### 0.1.20
 
 ##### BefriendMobs
@@ -33,6 +141,10 @@ Labeled parameters in `CBefriendedMobData#Values` as private. Now they can be ac
 Now `CBefriendedMobData` will record the owner's name and encountered time.
 
 Now `BefriendedShootProjectileGoal` supports dynamic attack intervals.
+
+Added `IBefriendedMob#GolemAttitude` for configuring how golems should handle hostility to the mob.
+
+Deprecated `IBefriendedMob#getOwner` and `IBefriendedMob#isOwnerPresent`. Use `getOwnerInDimension`, `getOwnerInWorld`, `isOwnerInDimension` and `isOwnerInWorld` instead.
 
 Changed method names:
 
