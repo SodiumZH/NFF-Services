@@ -123,7 +123,6 @@ public class NFFEntityEventListeners
 
 				if (player.isShiftKeyDown() && player.getMainHandItem().getItem() == NFFItemRegistry.DEBUG_BEFRIENDER.get()) {
 					bef.init(player.getUUID(), null);
-					// NaUtilsDebugStatics.debugPrintToScreen("Befriended mob initialized", player, living);
 					result.setValue(InteractionResult.sidedSuccess(isClientSide));
 				}
 			}

@@ -102,8 +102,15 @@ public class NaUtilsLevelStatics
 	{
 		return getHeightToGround(NaUtilsMathStatics.getBlockPos(v), context);
 	}
-	
-	public ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
+
+	/**
+	 * Get all {@link BlockPos} in a given area fulfilling given conditions.
+	 * <p> WARNING: It would be slow if the area is too large! It will invoke {@link ArrayList#add(Object)} for times of the area volume at most.
+	 * @param area Searching area.
+	 * @param filter Condition.
+	 * @return ArrayList of BlockPos. If {@code filter} is null, return all positions. 
+	 */
+	public static ArrayList<BlockPos> getBlockPosInArea(AABB area, Predicate<BlockPos> filter)
 	{
 		MutableObject<ArrayList<BlockPos>> wrapped = new MutableObject<>(new ArrayList<>());
 		BlockPos.betweenClosedStream(area).forEach((BlockPos b) -> 
@@ -122,7 +129,7 @@ public class NaUtilsLevelStatics
 	 * @param power Explosion power.
 	 * @param causesFire If true, the explosion will cause fire.
 	 * @param breaksBlocks If true, the explosion will break blocks on hit.
-	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param alwaysDropsItemsOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
 	 * @param considersMobGriefingGameRule If true, it will consider MobGriefing game rule to determine whether to break blocks. If the source isn't a {@link Mob} it's ignored.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
@@ -148,7 +155,7 @@ public class NaUtilsLevelStatics
 	 * @param power Explosion power.
 	 * @param causesFire If true, the explosion will cause fire.
 	 * @param breaksBlocks If true, the explosion will break blocks on hit. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
-	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param alwaysDropsItemsOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
 	@Nullable
@@ -180,7 +187,7 @@ public class NaUtilsLevelStatics
 	 * @param power Explosion power.
 	 * @param causesFire If true, the explosion will cause fire.
 	 * @param breaksBlocks If true, the explosion will break blocks on hit. If the source is a {@link Mob} and MobGriefing game rule is false, it will be ignored.
-	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param alwaysDropsItemsOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
 	@Nullable
@@ -212,7 +219,7 @@ public class NaUtilsLevelStatics
 	 * @param power Explosion power.
 	 * @param causesFire If true, the explosion will cause fire.
 	 * @param breaksBlocks If true, the explosion will break blocks on hit.
-	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param alwaysDropsItemsOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
 	@Nullable
@@ -231,8 +238,7 @@ public class NaUtilsLevelStatics
 	 * @param position Explosion position in level.
 	 * @param power Explosion power.
 	 * @param causesFire If true, the explosion will cause fire.
-	 * @param breaksBlocks If true, the explosion will break blocks on hit. It will NOT always drop items on breaking blocks. 
-	 * @param alwaysDropsItemOnBreaking If true, it will always drop block items on breaking blocks just like TNT.
+	 * @param breaksBlock If true, the explosion will break blocks on hit. It will NOT always drop items on breaking blocks.
 	 * @return {@link Explosion} instance, or {@code null} on client.
 	 */
 	@Nullable

@@ -8,8 +8,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -161,7 +159,7 @@ public class NaUtilsMiscStatics {
 	
 	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access, T fallback)
 	{
-		MutableObject<T> res = new MutableObject<>(fallback);
+		org.apache.commons.lang3.mutable.MutableObject<T> res = new org.apache.commons.lang3.mutable.MutableObject<>(fallback);
 		target.getCapability(holder).ifPresent(cap -> res.setValue(access.apply(cap)));
 		return res.getValue();
 	}
