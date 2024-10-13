@@ -1,5 +1,25 @@
 # Change Log
 
+### 0.x.26
+
+##### NFF Services 
+
+Renamed project name from *BefriendMobs* to *NFF Services*.
+
+Renamed mod ID from `befriendmobs` to `nffservices`.
+
+Renamed tag: `befriendmobs:neutral_to_bm_mobs` -> `nffservices:neutral_to_nff_mobs`
+
+Renamed item: `befriendmobs:debug_befriender` -> `nffservices:instant_taming_tool`
+
+##### NaUtils
+
+Seperated NaUtils as a mod, but still embedded in *NFF Services* project.
+
+Fixed mob no-action time accumulating when `MobCheckDespawnEvent` is cancelled.
+
+Finally removed `Wrapped`.
+
 ### 0.x.25
 
 ##### BefriendMobs
