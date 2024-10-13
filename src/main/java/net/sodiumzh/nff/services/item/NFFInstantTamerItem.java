@@ -8,7 +8,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
+import net.sodiumzh.nautils.exceptions.UnimplementedException;
+import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import net.sodiumzh.nautils.statics.NaUtilsParticleStatics;
 import net.sodiumzh.nautils.exceptions.UnimplementedException;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
@@ -32,7 +33,7 @@ public class NFFInstantTamerItem extends Item
 			if (target instanceof INFFTamed bef)
 			{
 				bef.init(player.getUUID(), null);
-				NaUtilsMiscStatics.printToScreen("Mob " + target.getName().getString() + " initialized", player);
+				NaUtilsDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " initialized", player);
 			}
 			else 
 			{
@@ -42,7 +43,7 @@ public class NFFInstantTamerItem extends Item
 					if (bef != null)
 					{
 						NaUtilsParticleStatics.sendHeartParticlesToEntityDefault(bef.asMob());
-						NaUtilsMiscStatics.printToScreen("Mob " + target.getName().getString() + " befriended", player);
+						NaUtilsDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " befriended", player);
 					} else
 						throw new UnimplementedException(
 								"Entity type befriend method unimplemented: " + target.getType().toShortString()
