@@ -7,7 +7,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumzh.nautils.Wrapped;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 /**
@@ -33,12 +32,12 @@ public interface CNFFPlayerModule extends INBTSerializable<CompoundTag>
 	@Deprecated
 	public static boolean hasOneTickTag(Player player, String key)
 	{
-		Wrapped<Boolean> res = new Wrapped<>(false);
+		MutableObject<Boolean> res = new MutableObject<>(false);
 		player.getCapability(NFFCapRegistry.CAP_BM_PLAYER).ifPresent((c) -> 
 		{
-			res.set(c.hasOneTickTag(key));
+			res.setValue(c.hasOneTickTag(key));
 		});
-		return res.get();
+		return res.getValue();
 	}
 	
 	/**
@@ -192,12 +191,12 @@ public interface CNFFPlayerModule extends INBTSerializable<CompoundTag>
 	
 	public static CNFFPlayerModule get(Player player)
 	{
-		Wrapped<CNFFPlayerModule> wrp = new Wrapped<>(null);
+		MutableObject<CNFFPlayerModule> wrp = new MutableObject<>(null);
 		player.getCapability(NFFCapRegistry.CAP_BM_PLAYER).ifPresent(c -> 
 		{
-			wrp.set(c);
+			wrp.setValue(c);
 		});
-		return wrp.get();
+		return wrp.getValue();
 	}
 
 }

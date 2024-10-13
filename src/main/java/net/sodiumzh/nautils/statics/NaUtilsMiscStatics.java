@@ -7,15 +7,12 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
-import net.sodiumzh.nautils.Wrapped;
 
 
 public class NaUtilsMiscStatics {
@@ -112,11 +109,11 @@ public class NaUtilsMiscStatics {
 	@Nullable
 	public static <T> T getValue(LazyOptional<T> optional)
 	{
-		Wrapped<T> wrp = new Wrapped<>(null);
+		MutableObject<T> wrp = new MutableObject<>(null);
 		optional.ifPresent(t -> {
-			wrp.set(t);
+			wrp.setValue(t);
 		});
-		return wrp.get();
+		return wrp.getValue();
 	}
 	
 	/**
@@ -161,7 +158,7 @@ public class NaUtilsMiscStatics {
 	
 	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access, T fallback)
 	{
-		MutableObject<T> res = new MutableObject<>(fallback);
+		org.apache.commons.lang3.mutable.MutableObject<T> res = new org.apache.commons.lang3.mutable.MutableObject<>(fallback);
 		target.getCapability(holder).ifPresent(cap -> res.setValue(access.apply(cap)));
 		return res.getValue();
 	}

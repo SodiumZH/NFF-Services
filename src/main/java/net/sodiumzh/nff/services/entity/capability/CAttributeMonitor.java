@@ -6,7 +6,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nautils.Wrapped;
 import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
@@ -72,14 +71,14 @@ public interface CAttributeMonitor {
 	@DontOverride
 	public static CAttributeMonitor listen(LivingEntity living, Attribute attr)
 	{
-		Wrapped<CAttributeMonitor> cap = new Wrapped<CAttributeMonitor>(null);
+		MutableObject<CAttributeMonitor> cap = new MutableObject<CAttributeMonitor>(null);
 		living.getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent((c) -> 
 		{
-			cap.set(c);
+			cap.setValue(c);
 			c.listen(attr);
 		});
-		if (cap.get() != null)
-			return cap.get();
+		if (cap.getValue() != null)
+			return cap.getValue();
 		else throw new IllegalStateException("Living entity missing attribute monitor capability.");
 	}
 	

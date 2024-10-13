@@ -32,7 +32,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.Wrapped;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
@@ -68,10 +67,10 @@ public class NFFEntityEventListeners
 			return;
 		Entity target = event.getTarget();
 		Player player = event.getEntity();
-		Wrapped<InteractionResult> result = new Wrapped<InteractionResult>(InteractionResult.PASS);
+		MutableObject<InteractionResult> result = new MutableObject<InteractionResult>(InteractionResult.PASS);
 		boolean isClientSide = event.getSide() == LogicalSide.CLIENT;
 		boolean isMainHand = event.getHand() == InteractionHand.MAIN_HAND;
-		Wrapped<Boolean> shouldPostInteractEvent = new Wrapped<Boolean>(Boolean.FALSE);
+		MutableObject<Boolean> shouldPostInteractEvent = new MutableObject<Boolean>(Boolean.FALSE);
 
 		// Mob interaction start //
 		if (target != null && target instanceof Mob) 
@@ -108,8 +107,8 @@ public class NFFEntityEventListeners
 					} else if (res.handled)
 					{
 						event.setCanceled(true);
-						result.set(InteractionResult.sidedSuccess(isClientSide));
-						shouldPostInteractEvent.set(true);
+						result.setValue(InteractionResult.sidedSuccess(isClientSide));
+						shouldPostInteractEvent.setValue(true);
 					}
 					
 				});
@@ -123,7 +122,7 @@ public class NFFEntityEventListeners
 				if (player.isShiftKeyDown() && player.getMainHandItem().getItem() == NFFItemRegistry.DEBUG_BEFRIENDER.get()) {
 					bef.init(player.getUUID(), null);
 					// Debug.printToScreen("Befriended mob initialized", player, living);
-					result.set(InteractionResult.sidedSuccess(isClientSide));
+					result.setValue(InteractionResult.sidedSuccess(isClientSide));
 				}
 			}
 			// Handle befriended mob end //
@@ -135,8 +134,8 @@ public class NFFEntityEventListeners
 		else {
 		}
 		// Client events end //
-		event.setCanceled(result.get().equals(InteractionResult.sidedSuccess(isClientSide)));
-		event.setCancellationResult(result.get());
+		event.setCanceled(result.getValue().equals(InteractionResult.sidedSuccess(isClientSide)));
+		event.setCancellationResult(result.getValue());
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)

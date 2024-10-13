@@ -15,7 +15,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.sodiumzh.nautils.Wrapped;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.eventlisteners.TamableAddHatredEvent;
@@ -140,20 +139,20 @@ public interface CNFFTamable extends INBTSerializable<CompoundTag> {
 	
 	public static CNFFTamable getCap(Mob mob)
 	{
-		Wrapped<CNFFTamable> cap = new Wrapped<CNFFTamable>(null);
+		MutableObject<CNFFTamable> cap = new MutableObject<CNFFTamable>(null);
 		mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
-			cap.set(l);
+			cap.setValue(l);
 		});
-		return cap.get();
+		return cap.getValue();
 	}
 	
 	public static CompoundTag getCapNbt(Mob mob)
 	{
-		Wrapped<CompoundTag> tag = new Wrapped<CompoundTag>(null);
+		MutableObject<CompoundTag> tag = new MutableObject<CompoundTag>(null);
 		mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
-			tag.set(l.getNbt());
+			tag.setValue(l.getNbt());
 		});
-		return tag.get();
+		return tag.getValue();
 	}
 	
 	/** Try adding hatred with given reason. This function will check in befriending handler whether this reason is accepted,

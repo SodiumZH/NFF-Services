@@ -16,7 +16,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.Wrapped;
 import net.sodiumzh.nautils.containers.Tuple4;
 import net.sodiumzh.nautils.exceptions.DuplicatedRegistryEntryException;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
@@ -195,7 +194,7 @@ class BaubleRegistries
 	static boolean canEquipOn(ItemStack itemstack, Mob mob, String slot)
 	{
 		if (itemstack.getItem() == null) return false;
-		Wrapped<Boolean> res = new Wrapped<>(false);
+		MutableObject<Boolean> res = new MutableObject<>(false);
 		mob.getCapability(BaubleSystemCapabilities.CAP_BAUBLE_EQUIPPABLE_MOB).ifPresent(cap -> {
 			if (cap.isValid())
 			{
@@ -207,7 +206,7 @@ class BaubleRegistries
 					{
 						if (isRelatedEntry(itemstack, entry) && entry.getEquippingCondition().test(new BaubleProcessingArgs(itemstack, cap, slot)))
 						{
-							res.set(true);
+							res.setValue(true);
 							return;
 						}
 					}
@@ -219,14 +218,14 @@ class BaubleRegistries
 					{
 						if (entry.getEquippingCondition().test(new BaubleProcessingArgs(itemstack, cap, slot)))
 						{
-							res.set(true);
+							res.setValue(true);
 							return;
 						}
 					}
 				}
 			}
 		});
-		return res.get();
+		return res.getValue();
 	}
 	
 	/**
