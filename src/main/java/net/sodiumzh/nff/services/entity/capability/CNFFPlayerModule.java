@@ -8,6 +8,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 /**
  * An additional serializable module attached on players provided by NFF.

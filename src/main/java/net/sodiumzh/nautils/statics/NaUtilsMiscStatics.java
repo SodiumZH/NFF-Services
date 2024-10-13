@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 
 public class NaUtilsMiscStatics {

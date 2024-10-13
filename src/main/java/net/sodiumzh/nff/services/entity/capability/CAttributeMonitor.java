@@ -10,6 +10,8 @@ import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.commons.lang3.mutable.MutableObject;
+
 // A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor {
 

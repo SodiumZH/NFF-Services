@@ -55,6 +55,7 @@ import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

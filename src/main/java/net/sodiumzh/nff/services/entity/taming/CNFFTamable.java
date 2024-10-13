@@ -19,6 +19,7 @@ import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.eventlisteners.TamableAddHatredEvent;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 public interface CNFFTamable extends INBTSerializable<CompoundTag> {
 
