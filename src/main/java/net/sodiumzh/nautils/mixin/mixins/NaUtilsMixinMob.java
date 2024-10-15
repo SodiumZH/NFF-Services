@@ -1,6 +1,8 @@
 package net.sodiumzh.nautils.mixin.mixins;
 
+import net.sodiumzh.nautils.mixin.events.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,10 +23,17 @@ import net.sodiumzh.nautils.mixin.event.entity.MobCheckDespawnEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobFinalizePickingUpItemEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobInteractEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobPickUpItemEvent;
-
 @Mixin(Mob.class)
 public class NaUtilsMixinMob implements NaUtilsMixin<Mob>
 {
+	@WrapOperation(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V",
+	at = @At(value = "INVOKE", target = "net/minecraft/world/entity/Mob.registerGoals()V"))
+	private void onRegisterGoals(Mob caller, Operation<Void> original)
+	{
+		original.call(caller);
+		MinecraftForge.EVENT_BUS.post(new MobRegisterGoalsEvent(caller));
+	}
+
 	@Inject(method = "isSunBurnTick()Z", at = @At("RETURN"), cancellable = true)
 	private void isSunBurnTick(CallbackInfoReturnable<Boolean> callback)
 	{
