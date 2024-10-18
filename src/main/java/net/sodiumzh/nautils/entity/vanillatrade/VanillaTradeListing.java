@@ -11,16 +11,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
+import net.sodiumzh.nautils.math.RangedRandomInt;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 
 public class VanillaTradeListing implements IVanillaTradeListing
 {
 	protected ArrayList<ItemStack> baseCostA = new ArrayList<>();	// If there're more than one, it will randomly pick one with the same probability.
-	protected TradeCountRange aCount = TradeCountRange.fixed(1);
+	protected RangedRandomInt aCount = RangedRandomInt.fixed(1);
 	protected ArrayList<ItemStack> costB = new ArrayList<>();
-	protected TradeCountRange bCount =  TradeCountRange.fixed(1);
+	protected RangedRandomInt bCount =  RangedRandomInt.fixed(1);
 	protected ArrayList<ItemStack> result = new ArrayList<>();
-	protected TradeCountRange resCount = TradeCountRange.fixed(1);
+	protected RangedRandomInt resCount = RangedRandomInt.fixed(1);
 	protected int xpReward = 0;
 	protected int maxUses = 12;
 	protected float priceMultiplier = 0f;
@@ -141,7 +142,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setACountRange(int min, int max)
 	{
-		this.aCount = TradeCountRange.uniform(min, max);
+		this.aCount = RangedRandomInt.uniform(min, max);
 		return this;
 	}
 
@@ -150,7 +151,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setACount(int count)
 	{
-		this.aCount = TradeCountRange.fixed(count);
+		this.aCount = RangedRandomInt.fixed(count);
 		return this;
 	}
 
@@ -188,7 +189,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setBCountRange(int min, int max)
 	{
-		this.bCount = TradeCountRange.uniform(min, max);
+		this.bCount = RangedRandomInt.uniform(min, max);
 		return this;
 	}
 
@@ -197,7 +198,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setBCount(int count)
 	{
-		this.bCount = TradeCountRange.fixed(count);
+		this.bCount = RangedRandomInt.fixed(count);
 		return this;
 	}
 	
@@ -235,7 +236,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setResultCountRange(int min, int max)
 	{
-		this.resCount = TradeCountRange.uniform(min, max);
+		this.resCount = RangedRandomInt.uniform(min, max);
 		return this;
 	}
 
@@ -244,7 +245,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	 */
 	public VanillaTradeListing setResultCount(int count)
 	{
-		this.resCount = TradeCountRange.fixed(count);
+		this.resCount = RangedRandomInt.fixed(count);
 		return this;
 	}
 	
