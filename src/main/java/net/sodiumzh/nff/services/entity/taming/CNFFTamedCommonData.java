@@ -38,6 +38,7 @@ import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.capability.CEntityTickingCapability;
 import net.sodiumzh.nautils.function.MutablePredicate;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
+import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
@@ -154,7 +155,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public int[] getEncounteredDate();
 	
 	/**
-	 * Record info about befriending time and location. Invoked in {@link NFFTamingProcess#befriend}.
+	 * Record info about befriending time and location. Invoked in {@link NFFTamingProcess#doTaming}.
 	 */
 	@DontCallManually
 	public void setEncounteredDate(int[] val);
@@ -289,11 +290,11 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			this.anchor = mob.asMob().position();
 			this.nbt = new CompoundTag();
 			this.inventory = this.getBM().createAdditionalInventory();
-			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NaUtilsDataSerializer.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NaUtilsDataSerializer.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializer.STRING, "");
-			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializer.INT_ARRAY, new int[] {0, 0, 0});
-			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializer.STRING, NFFTamedMobAIState.WAIT.getId().toString());
+			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializers.STRING, "");
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializers.INT_ARRAY, new int[] {0, 0, 0});
+			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString());
 			
 			this.getBM().onDataInit(this);
 			MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
