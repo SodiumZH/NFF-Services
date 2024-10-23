@@ -3,10 +3,12 @@ package net.sodiumzh.nautils.math;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.RandomSource;
+import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
 
 import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A random double generator with a given range.
@@ -14,7 +16,7 @@ import java.util.Optional;
  * It now supports 3 types of distribution: fixed (always outputing the same value), uniform
  * distribution and truncated normal distribution.
  */
-public class RangedRandomDouble {
+public class RangedRandomDouble implements Supplier<Double> {
     private static final RandomSource RND = RandomSource.create();
     private final double minValue;
     private final double maxValue;
@@ -165,7 +167,12 @@ public class RangedRandomDouble {
         return String.format("[%d, %d]%s", this.minValue, this.maxValue, this.rndType.getName());
     }
 
-    private static enum RandomizationType
+    @Override
+    public Double get() {
+        return this.getValue();
+    }
+
+    public static enum RandomizationType
     {
         FIXED_VALUE("Fixed"),
         TRUNCATED_NORMAL("truncated_normal"),
@@ -180,6 +187,27 @@ public class RangedRandomDouble {
         public String getName()
         {
             return name;
+        }
+    }
+
+    public double[] toArrayRepresentation()
+    {
+        switch (this.rndType)
+        {
+            case FIXED_VALUE: return new double[] {this.minValue};
+            case UNIFORM: return new double[] {this.minValue, this.maxValue};
+            case TRUNCATED_NORMAL: return new double[] {this.minValue, this.maxValue, this.limitFactor};
+            default: throw new IllegalArgumentException("Invalid randomization type");
+        }
+    }
+
+    public static RangedRandomDouble fromArrayRepresentation(double[] array)
+    {
+        switch (array.length) {
+            case 1: return RangedRandomDouble.fixed(array[0]);
+            case 2: return RangedRandomDouble.uniform(array[0], array[1]);
+            case 3: return RangedRandomDouble.truncatedNormal(array[0], array[1], array[2]);
+            default: throw new IllegalArgumentException("Invalid array length");
         }
     }
 
@@ -218,5 +246,4 @@ public class RangedRandomDouble {
         }
         throw new RuntimeException();
     });
-
 }

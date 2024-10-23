@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.math;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -16,7 +17,7 @@ import net.minecraft.util.RandomSource;
  * probability to be picked) and <i>Poisson</i> (the probabilities following the
  * Poisson distribution with specified parameter p).
  */
-public class RangedRandomInt
+public class RangedRandomInt implements Supplier<Integer>
 {
     private static final RandomSource RND = RandomSource.create();
     private final int minValue;	// Included
@@ -157,7 +158,33 @@ public class RangedRandomInt
         return String.format("[%d, %d]%s", this.minValue, this.maxValue, this.rndType.getName());
     }
 
-    private static enum RandomizationType
+    @Override
+    public Integer get() {
+        return this.getValue();
+    }
+
+    public double[] toArrayRepresentation()
+    {
+        switch (this.rndType)
+        {
+            case FIXED_VALUE: return new double[] {this.minValue};
+            case UNIFORM: return new double[] {this.minValue, this.maxValue};
+            case POISSON: return new double[] {this.minValue, this.maxValue, this.p};
+            default: throw new IllegalArgumentException("Invalid randomization type");
+        }
+    }
+
+    public static RangedRandomInt fromArrayRepresentation(double[] array)
+    {
+        switch (array.length) {
+            case 1: return RangedRandomInt.fixed((int)(array[0]));
+            case 2: return RangedRandomInt.uniform((int)(array[0]), (int)(array[1]));
+            case 3: return RangedRandomInt.poisson((int)(array[0]), (int)(array[1]), array[2]);
+            default: throw new IllegalArgumentException("Invalid array length");
+        }
+    }
+
+    public static enum RandomizationType
     {
         FIXED_VALUE("Fixed"),
         POISSON("Poisson"),

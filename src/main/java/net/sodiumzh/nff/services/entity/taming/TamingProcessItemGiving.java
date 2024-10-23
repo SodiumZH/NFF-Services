@@ -13,15 +13,8 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 	
 	protected Random rnd = new Random();
 	
-	/** Check if the mob accepts the item.
-	 * @deprecated Use ItemStack sensitive version instead
-	 */
-	@Deprecated
-	public final boolean isItemAcceptable(Item item) {
-		return isItemAcceptable(item.getDefaultInstance());
-	}
-	
-	/** Check if the mob accepts the item.
+	/**
+	 * Check if the mob accepts the item.
 	 */
 	public abstract boolean isItemAcceptable(ItemStack itemstack);
 	

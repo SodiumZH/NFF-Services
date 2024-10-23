@@ -1,15 +1,25 @@
-package net.sodiumzh.nff.services.entity.capability;
+package net.sodiumzh.nautils.entity;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
@@ -17,22 +27,27 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.data.ServerSideRegistry;
 
 /**
- * A {@code HealingItemTable} is a collection of information about if an {@link ItemStack} is usable in {@link CHealingHandler} and its usage result.
+ * An {@code ItemApplyingToMobTable} is a collection of information about if an {@link ItemStack}
+ * is usable to a {@link Mob} and its usage result, including a double "amount" value for e.g. healing,
+ * a cool-down time, whether the item should be consumed, and extra actions of the mob.
  */
-public class HealingItemTable
+@ServerSideRegistry
+public class ItemApplyingToMobTable
 {
 
-	public static final HealingItemTable EMPTY = new HealingItemTable();
+	public static final ItemApplyingToMobTable EMPTY = new ItemApplyingToMobTable();
 	
 	private HashMap<Input, OutputGetter> entries = new HashMap<>();
 	
-	protected HealingItemTable()
+	protected ItemApplyingToMobTable()
 	{
 	}
 	
-	protected HealingItemTable(HashMap<Input, OutputGetter> entries)
+	protected ItemApplyingToMobTable(HashMap<Input, OutputGetter> entries)
 	{
 		this.entries = entries;
 	}
@@ -41,14 +56,14 @@ public class HealingItemTable
 	 * Create a new builder.
 	 * <p> Note: for a new builder, always call any of {@code add()} first, otherwise it will crash.
 	 */
-	public static HealingItemTable.Builder builder() {
-		return new HealingItemTable.Builder();
+	public static ItemApplyingToMobTable.Builder builder() {
+		return new ItemApplyingToMobTable.Builder();
 	}
 	
 	/** @deprecated use {@code builder()} instead */
 	@Deprecated
-	public static HealingItemTable.Builder create() {
-		return new HealingItemTable.Builder();
+	public static ItemApplyingToMobTable.Builder create() {
+		return new ItemApplyingToMobTable.Builder();
 	}
 	
 	public boolean isEmpty()
@@ -76,9 +91,9 @@ public class HealingItemTable
 	/**
 	 * Only for debug mode, transform it to a visualized map.
 	 */
-	public HashMap<String, Float> toDebugMap(Mob mob)
+	public HashMap<String, Double> toDebugMap(Mob mob)
 	{
-		HashMap<String, Float> map = new HashMap<>();
+		HashMap<String, Double> map = new HashMap<>();
 		int i = 0;
 		for (var input: entries.keySet())
 		{
@@ -106,114 +121,114 @@ public class HealingItemTable
 	{
 		private HashMap<Input, OutputGetter> entries = new HashMap<>();
 		private Input buildingActiveEntry = null;
-		
+		private DataReader reader = null;
+
+		public ItemApplyingToMobTable.Builder addRaw(Input in, OutputGetter out)
+		{
+			entries.put(in, out);
+			buildingActiveEntry = in;
+			return this;
+		}
 		/**
 		 * Put a new entry.
 		 * @param input Raw input object.
-		 * @param amount Healing amount (fixed value).
+		 * @param amount Result amount (fixed value).
 		 */
-		public HealingItemTable.Builder add(Input input, float amount)
+		public ItemApplyingToMobTable.Builder add(Input input, double amount)
 		{
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(input, new OutputGetter(amount));
 		}
 		
 		/**
 		 * Put a new entry.
-		 * @param input Raw input object.
-		 * @param amount Healing amount (fixed value).
+		 * @param item Input item.
+		 * @param amount Result amount (fixed value).
 		 */
-		public HealingItemTable.Builder add(Item item, float amount)
+		public ItemApplyingToMobTable.Builder add(Item item, double amount)
 		{
-			Input input = Input.create(item);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(item), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(Predicate<ItemStack> predicate, float amount)
+		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, double amount)
 		{
-			Input input = Input.create(predicate);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(predicate), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(TagKey<Item> tag, float amount)
+		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, double amount)
 		{
-			Input input = Input.create(tag);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(tag), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(ResourceLocation key, float amount)
+		public ItemApplyingToMobTable.Builder add(ResourceLocation key, double amount)
 		{
-			Input input = Input.create(key);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
 
-		public HealingItemTable.Builder add(String key, float amount)
+		public ItemApplyingToMobTable.Builder add(String key, double amount)
 		{
-			Input input = Input.create(key);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(key), new OutputGetter(amount));
+
 		}
 		
-		public HealingItemTable.Builder add(Item item, Function<Mob, Float> amount)
+		public ItemApplyingToMobTable.Builder add(Item item, Function<Mob, Double> amount)
 		{
-			Input input = Input.create(item);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(item), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(Predicate<ItemStack> predicate, Function<Mob, Float> amount)
+		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, Function<Mob, Double> amount)
 		{
-			Input input = Input.create(predicate);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(predicate), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(TagKey<Item> tag, Function<Mob, Float> amount)
+		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, Function<Mob, Double> amount)
 		{
-			Input input = Input.create(tag);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(tag), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(ResourceLocation key, Function<Mob, Float> amount)
+		public ItemApplyingToMobTable.Builder add(ResourceLocation key, Function<Mob, Double> amount)
 		{
-			Input input = Input.create(key);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
 		
-		public HealingItemTable.Builder add(String key, Function<Mob, Float> amount)
+		public ItemApplyingToMobTable.Builder add(String key, Function<Mob, Double> amount)
 		{
-			Input input = Input.create(key);
-			entries.put(input, new OutputGetter(amount));
-			buildingActiveEntry = input;
-			return this;
+			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
-		
-		public HealingItemTable.Builder addPredicate(@Nonnull Predicate<ItemStack> predicate)
+
+		public ItemApplyingToMobTable.Builder add(Item item, Supplier<Double> amount)
+		{
+			return addRaw(Input.create(item), new OutputGetter(mob -> amount.get()));
+		}
+
+		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, Supplier<Double> amount)
+		{
+			return addRaw(Input.create(predicate), new OutputGetter(mob -> amount.get()));
+		}
+
+		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, Supplier<Double> amount)
+		{
+			return addRaw(Input.create(tag), new OutputGetter(mob -> amount.get()));
+		}
+
+		public ItemApplyingToMobTable.Builder add(ResourceLocation key, Supplier<Double> amount)
+		{
+			return addRaw(Input.create(key), new OutputGetter(mob -> amount.get()));
+		}
+
+		public ItemApplyingToMobTable.Builder add(String key, Supplier<Double> amount)
+		{
+			return addRaw(Input.create(key), new OutputGetter(mob -> amount.get()));
+		}
+
+		public ItemApplyingToMobTable.Builder addPredicate(@Nonnull Predicate<ItemStack> predicate)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
 			buildingActiveEntry.addPredicate(predicate);
 			return this;
 		}
-		
-		
-		public HealingItemTable.Builder cooldown(int value)
+
+		public ItemApplyingToMobTable.Builder cooldown(int value)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -221,7 +236,7 @@ public class HealingItemTable
 			return this;
 		}
 		
-		public HealingItemTable.Builder cooldown(@Nonnull Function<Mob, Integer> getter)
+		public ItemApplyingToMobTable.Builder cooldown(@Nonnull Function<Mob, Integer> getter)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -229,7 +244,7 @@ public class HealingItemTable
 			return this;
 		}
 		
-		public HealingItemTable.Builder noConsume()
+		public ItemApplyingToMobTable.Builder noConsume()
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -237,24 +252,36 @@ public class HealingItemTable
 			return this;
 		}
 		
-		public HealingItemTable.Builder extraAction(Consumer<Mob> action)
+		public ItemApplyingToMobTable.Builder extraAction(Consumer<Mob> action)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
 			entries.get(buildingActiveEntry).extraAction(action);
 			return this;
 		}
-		
-		public HealingItemTable build()
+
+		/**
+		 * Define a resource location and a method (parser) to read data and merge into the table on building.
+		 * @Param loc
+		 */
+		public ItemApplyingToMobTable.Builder readData(@Nonnull ResourceLocation loc,
+				@Nonnull BiConsumer<JsonElement, ItemApplyingToMobTable.Builder> parser)
 		{
-			MinecraftForge.EVENT_BUS.post(new HealingItemTable.BuildEvent(this));
-			return new HealingItemTable(this.entries);
+			this.reader = new DataReader(this, loc, parser);
+			return this;
+		}
+
+		public ItemApplyingToMobTable build()
+		{
+			if (this.reader != null) reader.read();
+			MinecraftForge.EVENT_BUS.post(new ItemApplyingToMobTable.BuildEvent(this));
+			return new ItemApplyingToMobTable(this.entries);
 		}
 	}
 	
 	/**
 	 * An {@code Input} is a check for given {@link ItemStack}. 
-	 * If the input {@link ItemStack} satisfies a specific {@code Input}, the {@code HealingItemTable} will return corresponding {@code OutputGetter}.
+	 * If the input {@link ItemStack} satisfies a specific {@code Input}, the {@code ItemApplyingToMobTable} will return corresponding {@code OutputGetter}.
 	 * <p> It now accepts 4 types of checks: 
 	 * <p> a) {@link Item}, to check if the given {@link ItemStack} is this type of {@link Item}.
 	 * <p> b) {@link ResourceLocation} of item, browsing {@link Item} from registry and check if the {@link ItemStack} is the found {@link Item}.
@@ -282,7 +309,7 @@ public class HealingItemTable
 		}
 		
 		/** Create a raw {@code Input}. Not recommended unless you know what you're doing. */
-		public static Input create(Item item, Predicate<ItemStack> stackCheck, TagKey<Item> tag, ResourceLocation key)
+		public static Input createRaw(Item item, Predicate<ItemStack> stackCheck, TagKey<Item> tag, ResourceLocation key)
 		{
 			return new Input(item, stackCheck, tag, key);
 		}
@@ -381,19 +408,19 @@ public class HealingItemTable
 	 */
 	public static class OutputGetter
 	{
-		protected Optional<Float> amountStatic = Optional.of(5f);
-		protected Function<Mob, Float> amountGetter = null;
+		protected Optional<Double> amountStatic = Optional.of(5d);
+		protected Function<Mob, Double> amountGetter = null;
 		protected Optional<Integer> cooldownStatic = Optional.of(40);
 		protected Function<Mob, Integer> cooldownGetter = null;
 		protected boolean noConsume = false;
 		protected Consumer<Mob> extraAction = mob -> {};
 		
-		public OutputGetter(float amount)
+		public OutputGetter(double amount)
 		{
 			amountStatic = Optional.of(amount);
 		}
 		
-		public OutputGetter(@Nonnull Function<Mob, Float> amountGetter)
+		public OutputGetter(@Nonnull Function<Mob, Double> amountGetter)
 		{
 			amountStatic = Optional.empty();
 			this.amountGetter = amountGetter;
@@ -423,9 +450,9 @@ public class HealingItemTable
 	}
 	
 	/**
-	 * An {@code Output} is a collections of results applying an {@code OutputGetter} to a {@link Mob}. It's directly used in {@link CHealingHandler}.
+	 * An {@code Output} is a collections of results applying an {@code OutputGetter} to a {@link Mob}.
 	 */
-	public static record Output(float amount, int cooldown, boolean noConsume, Consumer<Mob> action)
+	public static record Output(Double amount, int cooldown, boolean noConsume, Consumer<Mob> action)
 	{
 		
 		public static Output getOutput(Mob mob, OutputGetter getter)
@@ -440,12 +467,47 @@ public class HealingItemTable
 	
 	public static class BuildEvent extends Event
 	{
-		public final HealingItemTable.Builder builder;
+		public final ItemApplyingToMobTable.Builder builder;
 		
-		public BuildEvent(HealingItemTable.Builder builder)
+		public BuildEvent(ItemApplyingToMobTable.Builder builder)
 		{
 			this.builder = builder;
 		}
 	}
-	
+
+	private static class DataReader
+	{
+		private ResourceLocation location;
+		private ItemApplyingToMobTable.Builder builder;
+		private BiConsumer<JsonElement, Builder> parser;
+
+		public DataReader(ItemApplyingToMobTable.Builder builder, ResourceLocation location, BiConsumer<JsonElement, Builder> parser)
+		{
+			this.location = location;
+			this.builder = builder;
+			this.parser = parser;
+		}
+
+		public void read()
+		{
+			if (builder == null || location == null) return;
+			MinecraftServer server = NaUtils.getServer();
+			if (server == null) return;
+			ResourceManager mgr = server.getResourceManager();
+			List<Resource> resources = mgr.getResourceStack(location);
+			for (Resource r: resources)
+			{
+				try {
+					InputStream input = r.open();
+					Reader reader = new InputStreamReader(input);
+					JsonElement json = JsonParser.parseReader(reader);
+					parser.accept(json, builder);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
 }
