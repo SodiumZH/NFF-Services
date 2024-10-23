@@ -34,7 +34,7 @@ import net.sodiumzh.nautils.containers.CyclicSwitch;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
-import net.sodiumzh.nff.services.entity.capability.HealingItemTable;
+import net.sodiumzh.nautils.entity.ItemApplyingToMobTable;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
@@ -495,7 +495,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** Set befriendedInventory from mob data, usually for initializing
-	 * <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#updateFromMob} instead.
+	 * <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#getFromMob} instead.
 	 */
 	@DontOverride
 	public default void setInventoryFromMob()
@@ -556,7 +556,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
 	@Nullable
-	public default HealingItemTable getHealingItems()
+	public default ItemApplyingToMobTable getHealingItems()
 	{
 		return null;
 	}
@@ -566,15 +566,15 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	{
 		if (stack.isEmpty())
 			return InteractionResult.PASS;
-		HealingItemTable table = getHealingItems();
+		ItemApplyingToMobTable table = getHealingItems();
 		if (table == null) 
 		{
 			return InteractionResult.PASS;
 		}
-		HealingItemTable.Output output = table.getOutput(this.asMob(), stack);
+		ItemApplyingToMobTable.Output output = table.getOutput(this.asMob(), stack);
 		if (output != null)
 		{
-			return applyHealingItem(stack, output.amount(), !output.noConsume(), output.cooldown()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			return applyHealingItem(stack, output.amount().floatValue(), !output.noConsume(), output.cooldown()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 		}
 		return InteractionResult.PASS;
 	}

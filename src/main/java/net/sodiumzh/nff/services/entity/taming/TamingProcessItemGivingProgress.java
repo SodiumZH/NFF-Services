@@ -1,5 +1,7 @@
 package net.sodiumzh.nff.services.entity.taming;
 
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Random;
 
 import net.minecraft.core.particles.ParticleTypes;
@@ -8,11 +10,14 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.sodiumzh.nautils.entity.ItemApplyingToMobTable;
 import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsItemStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+
+import javax.annotation.Nullable;
 
 
 public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving{
@@ -28,7 +33,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 		args.execServer((l) -> {
 
 			if (!player.isShiftKeyDown() 
-					&& (isItemAcceptable(player.getMainHandItem()) || player.getMainHandItem().is(Items.DEBUG_STICK)) 
+					&& (isItemAcceptableInternal(player.getMainHandItem(), player, l.getOwner()) || player.getMainHandItem().is(Items.DEBUG_STICK))
 					&& args.isMainHand() 
 					&& !(target.isPassenger() && this.shouldBlockOnRiding())
 					&& additionalConditions(player, target)) {
@@ -72,7 +77,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 					}
 					else
 					{
-						procValue += getProcValueToAdd(mainhand, player, target, lastProcValue);
+						procValue += getProgressGainInternal(mainhand, player, target, lastProcValue);
 						if (procValue <= 0)
 							procValue = 0;
 						if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
@@ -116,9 +121,43 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 		// ==============================
 		return result;
 	}
-	
+
+	/**
+	 * Get progress gain from item input. If you're using {@code ItemApplyingToMobTable}, this will be
+	 * skipped, and you can just override it to 0.
+	 * @param item Item given.
+	 * @param player Player doing this giving action.
+	 * @param mob Target item.
+	 * @param oldProc The progress value before giving.
+	 * @return Progress gain for this giving action.
+	 */
 	protected abstract double getProcValueToAdd(ItemStack item, Player player, Mob mob, double oldProc);
-	
+
+	private boolean isItemAcceptableInternal(ItemStack item, Player player, Mob mob)
+	{
+		return Optional.ofNullable(this.getItemProcValueTable())
+				.map(table -> (table.getOutput(mob, item) != null))
+				.orElse(this.isItemAcceptable(item));
+	}
+
+	private double getProgressGainInternal(ItemStack item, Player player, Mob mob, double oldProc) {
+		var table = this.getItemProcValueTable();
+		if (table != null)
+		{
+			var output = table.getOutput(mob, item);
+			return output != null ? output.amount() : 0d;
+		}
+		else return this.getProcValueToAdd(item, player, mob, oldProc);
+	}
+
+	/**
+	 * Define progress gain for each item from table. If this method returns non-null, the progress value
+	 * will be taken from the table and {@code getProcValueToAdd} will be skipped.
+	 * @return Table to define progress gain for given items.
+	 */
+	@Nullable
+	protected ItemApplyingToMobTable getItemProcValueTable() { return null; }
+
 	protected void sendProgressHeart(Mob target, double procBefore, double procAfter, double deltaProcPerHeart)
 	{
 		int times = (int)(procAfter / deltaProcPerHeart) - (int)(procBefore / deltaProcPerHeart);
@@ -128,6 +167,9 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 		}
 	}
 
+	/**
+	 * Get how many progress it represents for each heart particle.
+	 */
 	protected double deltaProcPerHeart()
 	{
 		return 0.2d;
@@ -179,7 +221,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	}
 	
 	/**
-	 * Get progress value for a player.
+	 * Get current progress value for a player.
 	 * @return Progress value, or -1 if player is not in process.
 	 */
 	public double getProgressValue(Mob mob, Player player)
