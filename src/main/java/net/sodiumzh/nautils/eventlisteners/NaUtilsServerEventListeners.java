@@ -25,7 +25,7 @@ public class NaUtilsServerEventListeners {
 		for (var registry: NaUtilsRegistry.allRegistries().values())
 		{
 			if (registry.shouldGenerateOnSetup()
-					&& registry.getValueClass().isAnnotationPresent(ServerSideRegistry.class))
+					&& registry.getGenerateOnSetupPhase() == 1)
 				registry.regenerateAllValues();
 		}
 	}

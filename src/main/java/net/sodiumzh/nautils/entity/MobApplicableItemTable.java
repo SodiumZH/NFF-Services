@@ -1,6 +1,5 @@
 package net.sodiumzh.nautils.entity;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -13,11 +12,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
@@ -28,26 +25,24 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nautils.NaUtils;
-import net.sodiumzh.nautils.data.ServerSideRegistry;
 
 /**
- * An {@code ItemApplyingToMobTable} is a collection of information about if an {@link ItemStack}
+ * A {@code MobApplicableItemTable} is a collection of information about if an {@link ItemStack}
  * is usable to a {@link Mob} and its usage result, including a double "amount" value for e.g. healing,
  * a cool-down time, whether the item should be consumed, and extra actions of the mob.
  */
-@ServerSideRegistry
-public class ItemApplyingToMobTable
+public class MobApplicableItemTable
 {
 
-	public static final ItemApplyingToMobTable EMPTY = new ItemApplyingToMobTable();
+	public static final MobApplicableItemTable EMPTY = new MobApplicableItemTable();
 	
 	private HashMap<Input, OutputGetter> entries = new HashMap<>();
 	
-	protected ItemApplyingToMobTable()
+	protected MobApplicableItemTable()
 	{
 	}
 	
-	protected ItemApplyingToMobTable(HashMap<Input, OutputGetter> entries)
+	protected MobApplicableItemTable(HashMap<Input, OutputGetter> entries)
 	{
 		this.entries = entries;
 	}
@@ -56,14 +51,14 @@ public class ItemApplyingToMobTable
 	 * Create a new builder.
 	 * <p> Note: for a new builder, always call any of {@code add()} first, otherwise it will crash.
 	 */
-	public static ItemApplyingToMobTable.Builder builder() {
-		return new ItemApplyingToMobTable.Builder();
+	public static MobApplicableItemTable.Builder builder() {
+		return new MobApplicableItemTable.Builder();
 	}
 	
 	/** @deprecated use {@code builder()} instead */
 	@Deprecated
-	public static ItemApplyingToMobTable.Builder create() {
-		return new ItemApplyingToMobTable.Builder();
+	public static MobApplicableItemTable.Builder create() {
+		return new MobApplicableItemTable.Builder();
 	}
 	
 	public boolean isEmpty()
@@ -123,7 +118,7 @@ public class ItemApplyingToMobTable
 		private Input buildingActiveEntry = null;
 		private DataReader reader = null;
 
-		public ItemApplyingToMobTable.Builder addRaw(Input in, OutputGetter out)
+		public MobApplicableItemTable.Builder addRaw(Input in, OutputGetter out)
 		{
 			entries.put(in, out);
 			buildingActiveEntry = in;
@@ -134,7 +129,7 @@ public class ItemApplyingToMobTable
 		 * @param input Raw input object.
 		 * @param amount Result amount (fixed value).
 		 */
-		public ItemApplyingToMobTable.Builder add(Input input, double amount)
+		public MobApplicableItemTable.Builder add(Input input, double amount)
 		{
 			return addRaw(input, new OutputGetter(amount));
 		}
@@ -144,83 +139,83 @@ public class ItemApplyingToMobTable
 		 * @param item Input item.
 		 * @param amount Result amount (fixed value).
 		 */
-		public ItemApplyingToMobTable.Builder add(Item item, double amount)
+		public MobApplicableItemTable.Builder add(Item item, double amount)
 		{
 			return addRaw(Input.create(item), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, double amount)
+		public MobApplicableItemTable.Builder add(Predicate<ItemStack> predicate, double amount)
 		{
 			return addRaw(Input.create(predicate), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, double amount)
+		public MobApplicableItemTable.Builder add(TagKey<Item> tag, double amount)
 		{
 			return addRaw(Input.create(tag), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(ResourceLocation key, double amount)
+		public MobApplicableItemTable.Builder add(ResourceLocation key, double amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
 
-		public ItemApplyingToMobTable.Builder add(String key, double amount)
+		public MobApplicableItemTable.Builder add(String key, double amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(amount));
 
 		}
 		
-		public ItemApplyingToMobTable.Builder add(Item item, Function<Mob, Double> amount)
+		public MobApplicableItemTable.Builder add(Item item, Function<Mob, Double> amount)
 		{
 			return addRaw(Input.create(item), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, Function<Mob, Double> amount)
+		public MobApplicableItemTable.Builder add(Predicate<ItemStack> predicate, Function<Mob, Double> amount)
 		{
 			return addRaw(Input.create(predicate), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, Function<Mob, Double> amount)
+		public MobApplicableItemTable.Builder add(TagKey<Item> tag, Function<Mob, Double> amount)
 		{
 			return addRaw(Input.create(tag), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(ResourceLocation key, Function<Mob, Double> amount)
+		public MobApplicableItemTable.Builder add(ResourceLocation key, Function<Mob, Double> amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
 		
-		public ItemApplyingToMobTable.Builder add(String key, Function<Mob, Double> amount)
+		public MobApplicableItemTable.Builder add(String key, Function<Mob, Double> amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(amount));
 		}
 
-		public ItemApplyingToMobTable.Builder add(Item item, Supplier<Double> amount)
+		public MobApplicableItemTable.Builder add(Item item, Supplier<Double> amount)
 		{
 			return addRaw(Input.create(item), new OutputGetter(mob -> amount.get()));
 		}
 
-		public ItemApplyingToMobTable.Builder add(Predicate<ItemStack> predicate, Supplier<Double> amount)
+		public MobApplicableItemTable.Builder add(Predicate<ItemStack> predicate, Supplier<Double> amount)
 		{
 			return addRaw(Input.create(predicate), new OutputGetter(mob -> amount.get()));
 		}
 
-		public ItemApplyingToMobTable.Builder add(TagKey<Item> tag, Supplier<Double> amount)
+		public MobApplicableItemTable.Builder add(TagKey<Item> tag, Supplier<Double> amount)
 		{
 			return addRaw(Input.create(tag), new OutputGetter(mob -> amount.get()));
 		}
 
-		public ItemApplyingToMobTable.Builder add(ResourceLocation key, Supplier<Double> amount)
+		public MobApplicableItemTable.Builder add(ResourceLocation key, Supplier<Double> amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(mob -> amount.get()));
 		}
 
-		public ItemApplyingToMobTable.Builder add(String key, Supplier<Double> amount)
+		public MobApplicableItemTable.Builder add(String key, Supplier<Double> amount)
 		{
 			return addRaw(Input.create(key), new OutputGetter(mob -> amount.get()));
 		}
 
-		public ItemApplyingToMobTable.Builder addPredicate(@Nonnull Predicate<ItemStack> predicate)
+		public MobApplicableItemTable.Builder addPredicate(@Nonnull Predicate<ItemStack> predicate)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -228,7 +223,7 @@ public class ItemApplyingToMobTable
 			return this;
 		}
 
-		public ItemApplyingToMobTable.Builder cooldown(int value)
+		public MobApplicableItemTable.Builder cooldown(int value)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -236,7 +231,7 @@ public class ItemApplyingToMobTable
 			return this;
 		}
 		
-		public ItemApplyingToMobTable.Builder cooldown(@Nonnull Function<Mob, Integer> getter)
+		public MobApplicableItemTable.Builder cooldown(@Nonnull Function<Mob, Integer> getter)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -244,7 +239,7 @@ public class ItemApplyingToMobTable
 			return this;
 		}
 		
-		public ItemApplyingToMobTable.Builder noConsume()
+		public MobApplicableItemTable.Builder noConsume()
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -252,7 +247,7 @@ public class ItemApplyingToMobTable
 			return this;
 		}
 		
-		public ItemApplyingToMobTable.Builder extraAction(Consumer<Mob> action)
+		public MobApplicableItemTable.Builder extraAction(Consumer<Mob> action)
 		{
 			if (buildingActiveEntry == null)
 				throw new UnsupportedOperationException("Illegal operation for empty table. Call add() first!");
@@ -264,18 +259,18 @@ public class ItemApplyingToMobTable
 		 * Define a resource location and a method (parser) to read data and merge into the table on building.
 		 * @Param loc
 		 */
-		public ItemApplyingToMobTable.Builder readData(@Nonnull ResourceLocation loc,
-				@Nonnull BiConsumer<JsonElement, ItemApplyingToMobTable.Builder> parser)
+		public MobApplicableItemTable.Builder readData(@Nonnull ResourceLocation loc,
+													   @Nonnull BiConsumer<JsonElement, MobApplicableItemTable.Builder> parser)
 		{
 			this.reader = new DataReader(this, loc, parser);
 			return this;
 		}
 
-		public ItemApplyingToMobTable build()
+		public MobApplicableItemTable build()
 		{
 			if (this.reader != null) reader.read();
-			MinecraftForge.EVENT_BUS.post(new ItemApplyingToMobTable.BuildEvent(this));
-			return new ItemApplyingToMobTable(this.entries);
+			MinecraftForge.EVENT_BUS.post(new MobApplicableItemTable.BuildEvent(this));
+			return new MobApplicableItemTable(this.entries);
 		}
 	}
 	
@@ -364,9 +359,15 @@ public class ItemApplyingToMobTable
 			}
 			if (stackCheck != null)
 			{
-				retval = retval && stackCheck.test(stack);
-				valid = true;
-				if (!retval) return false;
+				try {
+					retval = retval && stackCheck.test(stack);
+					valid = true;
+					if (!retval) return false;
+				} catch (RuntimeException | NoSuchFieldError | NoSuchMethodError e)
+				{
+					e.printStackTrace();
+					return false;
+				}
 			}
 			if (tag != null)
 			{
@@ -467,9 +468,9 @@ public class ItemApplyingToMobTable
 	
 	public static class BuildEvent extends Event
 	{
-		public final ItemApplyingToMobTable.Builder builder;
+		public final MobApplicableItemTable.Builder builder;
 		
-		public BuildEvent(ItemApplyingToMobTable.Builder builder)
+		public BuildEvent(MobApplicableItemTable.Builder builder)
 		{
 			this.builder = builder;
 		}
@@ -478,10 +479,10 @@ public class ItemApplyingToMobTable
 	private static class DataReader
 	{
 		private ResourceLocation location;
-		private ItemApplyingToMobTable.Builder builder;
+		private MobApplicableItemTable.Builder builder;
 		private BiConsumer<JsonElement, Builder> parser;
 
-		public DataReader(ItemApplyingToMobTable.Builder builder, ResourceLocation location, BiConsumer<JsonElement, Builder> parser)
+		public DataReader(MobApplicableItemTable.Builder builder, ResourceLocation location, BiConsumer<JsonElement, Builder> parser)
 		{
 			this.location = location;
 			this.builder = builder;

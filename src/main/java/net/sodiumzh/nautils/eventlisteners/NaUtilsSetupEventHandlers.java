@@ -7,8 +7,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.sodiumzh.nautils.NaUtils;
-import net.sodiumzh.nautils.data.ClientSideRegistry;
-import net.sodiumzh.nautils.data.ServerSideRegistry;
 import net.sodiumzh.nautils.registries.NaUtilsRegistry;
 
 @Mod.EventBusSubscriber(modid = NaUtils.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -16,7 +14,7 @@ public class NaUtilsSetupEventHandlers {
 
     /**
      * Generate registry values if needed.
-     * @See {@link NaUtilsRegistry}
+     * @see NaUtilsRegistry
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void generateRegistries(FMLCommonSetupEvent event)
@@ -25,12 +23,8 @@ public class NaUtilsSetupEventHandlers {
             for (var registry: NaUtilsRegistry.allRegistries().values())
             {
                 if (registry.shouldGenerateOnSetup()
-                        && !registry.getValueClass().isAnnotationPresent(ClientSideRegistry.class)
-                        && !registry.getValueClass().isAnnotationPresent(ServerSideRegistry.class))
+                        && registry.getGenerateOnSetupPhase() == 0)
                     registry.regenerateAllValues();
-                else if (registry.getValueClass().isAnnotationPresent(ClientSideRegistry.class)
-                        && registry.getValueClass().isAnnotationPresent(ServerSideRegistry.class))
-                    throw new IllegalStateException("A Registry cannot be annotated both ClientSideRegistry and ServerSideRegistry.");
             }
         });
     }
