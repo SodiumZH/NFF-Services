@@ -18,7 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nautils.containers.Tuple4;
-import net.sodiumzh.nautils.exceptions.DuplicatedRegistryEntryException;
+import net.sodiumzh.nautils.exceptions.DuplicateRegistryEntryException;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -46,7 +46,7 @@ class BaubleRegistries
 	static void registerBaubleRaw(IBaubleRegistryEntry entry)
 	{
 		if (RAW_REGISTRY.containsKey(entry.getBaubleRegistryKey()))
-			throw new DuplicatedRegistryEntryException("Registering bauble: duplicated entry \"" + entry.getBaubleRegistryKey().toString() + "\"");
+			throw new DuplicateRegistryEntryException("Registering bauble: duplicated entry \"" + entry.getBaubleRegistryKey().toString() + "\"");
 		RAW_REGISTRY.put(entry.getBaubleRegistryKey(), new Tuple<>(entry, entry.getEquippingCondition()));
 	}
 	
