@@ -1,21 +1,38 @@
 package net.sodiumzh.nautils.entity.vanillatrade;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.swing.event.CellEditorListener;
 
+import com.google.gson.*;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.containers.Tuple3;
+import net.sodiumzh.nautils.registries.NaUtilsConfigs;
 
 public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTradeListing>
 {
@@ -356,7 +373,8 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			this.addListing(l);
 			return this;
 		}
-		
+
+		@Deprecated
 		public Registering addSellsEnchantmentBook(int priceMin, int priceMax, RandomEnchantmentSelector enchantmentSelector, int maxUses)
 		{
 			ItemStack book = Items.ENCHANTED_BOOK.getDefaultInstance();
@@ -366,9 +384,30 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			this.addListing(l);
 			return this;
 		}
-		
+
+		public Registering addEnchantsBook(int priceMin, int priceMax, Enchantment enc, int lvl, int maxUses)
+		{
+			ItemStack book = Items.ENCHANTED_BOOK.getDefaultInstance();
+			VanillaTradeListing l = new VanillaTradeListingEnchanted(enc, lvl).setACountRange(priceMin, priceMax).setResultCountRange(1, 1)
+					.addA(this.getCurrency()).addB(Items.BOOK).addResult(book).setMaxUses(maxUses);
+			if (this.usesPoisson()) l.setAllPoisson(this.getPoissonFactor());
+			this.addListing(l);
+			return this;
+		}
+
+		public Registering addEnchantsBook(int priceMin, int priceMax, RandomEnchantmentSelector enchantmentSelector, int maxUses)
+		{
+			ItemStack book = Items.ENCHANTED_BOOK.getDefaultInstance();
+			VanillaTradeListing l = new VanillaTradeListingEnchanted(enchantmentSelector).addB(Items.BOOK.getDefaultInstance())
+					.setACountRange(priceMin, priceMax).setResultCountRange(1, 1)
+					.addA(this.getCurrency()).addResult(book).setMaxUses(maxUses);
+			if (this.usesPoisson()) l.setAllPoisson(this.getPoissonFactor());
+			this.addListing(l);
+			return this;
+		}
+
 		/**
-		 * Add a listing that mobs receives some cost ({@code extraCost}) and converts some amount of an item to another.
+		 * Add a listing that the mob receives some cost ({@code extraCost}) and converts some amount of an item to another.
 		 * (e.g. vanilla paid cooking)
 		 */
 		public Registering addConverts(ItemStack extraCost, int costMin, int costMax, ItemStack from, ItemStack to, int convertsMin, int convertsMax, int maxUses)
@@ -418,7 +457,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			else LogUtils.getLogger().error("VanillaTradeRegistry#Registering#weight: no listing registered. Skipped.");
 			return this;
 		}
-		
+
 		/**
 		 * Set selection weight of the last added listing.
 		 */
@@ -437,6 +476,182 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		{
 			return this.registry;
 		}
+
+		public Registering readData(ResourceLocation location)
+		{
+			MinecraftServer server = NaUtils.getServer();
+			if (server == null) return this;
+			ResourceManager mgr = server.getResourceManager();
+			List<Resource> resources = mgr.getResourceStack(location);
+			for (Resource r: resources)
+			{
+				try {
+					InputStream input = r.open();
+					Reader reader = new InputStreamReader(input);
+					JsonElement json = JsonParser.parseReader(reader);
+
+					// Don't make settings change after reading json
+					// Record settings
+					boolean usesPoisson = this.registry.randomizeUsesPoisson;
+					double poissonFactor = this.registry.poissonFactor;
+					ItemStack currency = this.registry.currency;
+					int level = this.level;
+
+					// Read. Settings may be randomly changed during reading.
+					this.setRequiredLevel(1);	// In json it's 1 by default
+					this.readSingleJson(json, new Tuple3<>(usesPoisson, poissonFactor, currency), NaUtilsConfigs.CACHED_DEBUG_MODE);
+
+					// Set back, don't let json reading change the settings
+					this.setRandomizationDistribution(usesPoisson);
+					this.setPoissonFactor(poissonFactor);
+					this.setCurrency(currency);
+					this.setRequiredLevel(level);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
+
+		private void readSingleJson(JsonElement json, Tuple3<Boolean, Double, ItemStack> defaultSettings, boolean debug)
+		{
+			try {
+				for (JsonElement element: json.getAsJsonArray())
+				{
+					try {
+						// "action" field defines what this entry stands for
+						JsonObject jo = element.getAsJsonObject();
+						String action = jo.get("action").getAsString();
+						switch (action)
+						{
+							// Setting modifications
+							case "settings" : {	// Set currency
+								if (jo.has("currency")) {
+									ItemStack[] item = readItem(jo.get("currency"));
+									if (item.length != 1)
+										throw new JsonParseException("set currency failed: missing or duplicate item.");
+									this.setCurrency(!item[0].isEmpty() ? item[0] : Items.EMERALD.getDefaultInstance());
+								}
+								if (jo.has("poisson"))
+									this.setRandomizationDistribution(jo.get("poisson").getAsBoolean());
+								if (jo.has("p"))
+									this.setPoissonFactor(jo.get("p").getAsDouble());
+								if (jo.has("level"))
+									this.setRequiredLevel(jo.get("level").getAsInt());
+								break;
+							}
+							case "reset" : {
+								this.setCurrency(defaultSettings.c);
+								this.setRandomizationDistribution(defaultSettings.a);
+								this.setPoissonFactor(defaultSettings.b);
+								break;
+							}
+							// Trade entry definitions
+							case "buy" : {
+								ItemStack[] buys = readItem(jo.get("item"));
+								int[] price = readAmountRange(jo.get("price"));
+								int[] amount = readAmountRange(jo.get("amount"));
+								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
+								this.addBuys(buys, amount[0], amount[1], price[0], price[1], maxUses);
+								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
+								break;
+							}
+							case "sell" : {
+								ItemStack[] sells = readItem(jo.get("item"));
+								int[] price = readAmountRange(jo.get("price"));
+								int[] amount = readAmountRange(jo.get("amount"));
+								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
+								this.addSells(price[0], price[1], sells, amount[0], amount[1], maxUses);
+								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
+								break;
+							}
+							case "convert" : {
+								ItemStack[] from = readItem(jo.get("item"));
+								ItemStack[] to = readItem(jo.get("result"));
+								if (from.length != 1 || to.length != 1)
+									throw new UnsupportedOperationException("VanillaTradeRegistry converting doesn't support multi-item.");
+								int[] price = readAmountRange(jo.get("price"));
+								int[] amount = readAmountRange(jo.get("amount"));
+								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
+								this.addConverts(price[0], price[1], from[0], to[0], amount[0], amount[1], maxUses);
+								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
+								break;
+							}
+							case "enchantmentBook" : {
+								int[] price = readAmountRange(jo.get("price"));
+								var enchantment = readEnchantment(jo.get("enchantment"));
+								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
+								if (enchantment != null) {
+									this.addEnchantsBook(price[0], price[1], enchantment.getA(), enchantment.getB(), maxUses);
+									if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
+								}
+								break;
+							}
+
+						}
+					} catch (Exception | NoSuchMethodError | NoSuchFieldError e) {
+						if (debug) e.printStackTrace();
+					}
+				}
+			} catch (Exception e){
+				if (debug) e.printStackTrace();
+			}
+		}
+
+		private static ItemStack[] readItem(JsonElement element) {
+			if (element.isJsonPrimitive())
+				return new ItemStack[] {ForgeRegistries.ITEMS.getValue(new ResourceLocation(element.getAsString())).getDefaultInstance()};
+			else if (element.isJsonObject())
+				return new ItemStack[] {CraftingHelper.getItemStack(element.getAsJsonObject(), true, true)};
+			else if (element.isJsonArray())
+			{
+				ItemStack[] res = new ItemStack[element.getAsJsonArray().size()];
+				int i = 0;
+				for (JsonElement e: element.getAsJsonArray())
+				{
+					if (e.isJsonArray()) throw new JsonParseException("JsonObject for item stack representation expected.");
+					else res[i] = readItem(e)[0];
+					++i;
+				}
+				return res;
+			}
+			else throw new JsonParseException("Read item failed.");
+		}
+
+		private static int[] readAmountRange(JsonElement element) {
+			if (element == null)
+				return new int[]{1, 1};
+
+			if (element.isJsonPrimitive())
+				return new int[] {element.getAsInt(), element.getAsInt()};
+			else if (element.isJsonArray())
+			{
+				JsonArray array = element.getAsJsonArray();
+				switch (array.size()) {
+					case 1:
+						return new int[]{array.get(0).getAsInt(), array.get(0).getAsInt()};
+					case 2:
+						return new int[]{array.get(0).getAsInt(), array.get(1).getAsInt()};
+				}
+			}
+			throw new JsonParseException("invalid amount range");
+		}
+
+		@Nullable
+		private static Tuple<Enchantment, Integer> readEnchantment(JsonElement element)
+		{
+			if (element == null) return null;
+			if (element.isJsonObject())
+			{
+				Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(element.getAsJsonObject().get("key").getAsString()));
+				if (e == null) return null;
+				int lv = element.getAsJsonObject().has("level") ?
+						element.getAsJsonObject().get("level").getAsInt() : e.getMaxLevel();
+				return new Tuple<>(e, lv);
+			}
+			else throw new JsonParseException("invalid enchantment");
+		}
 	}
 	
 	// Utilities
@@ -446,5 +661,6 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 	{
 		return item != null ? item.getDefaultInstance() : ItemStack.EMPTY;
 	}
-	
+
+
 }
