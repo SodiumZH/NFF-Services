@@ -34,7 +34,7 @@ import net.sodiumzh.nautils.containers.CyclicSwitch;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
-import net.sodiumzh.nautils.entity.ItemApplyingToMobTable;
+import net.sodiumzh.nautils.entity.MobApplicableItemTable;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
@@ -556,7 +556,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
 	@Nullable
-	public default ItemApplyingToMobTable getHealingItems()
+	public default MobApplicableItemTable getHealingItems()
 	{
 		return null;
 	}
@@ -566,12 +566,12 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	{
 		if (stack.isEmpty())
 			return InteractionResult.PASS;
-		ItemApplyingToMobTable table = getHealingItems();
+		MobApplicableItemTable table = getHealingItems();
 		if (table == null) 
 		{
 			return InteractionResult.PASS;
 		}
-		ItemApplyingToMobTable.Output output = table.getOutput(this.asMob(), stack);
+		MobApplicableItemTable.Output output = table.getOutput(this.asMob(), stack);
 		if (output != null)
 		{
 			return applyHealingItem(stack, output.amount().floatValue(), !output.noConsume(), output.cooldown()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;

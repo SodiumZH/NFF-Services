@@ -6,7 +6,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.NaUtils;
-import net.sodiumzh.nautils.data.ServerSideRegistry;
 import net.sodiumzh.nautils.entity.ConditionalAttributeModifier;
 import net.sodiumzh.nautils.registries.NaUtilsRegistry;
 
@@ -26,7 +25,7 @@ public class NaUtilsServerEventHandlers {
 		for (var registry: NaUtilsRegistry.allRegistries().values())
 		{
 			if (registry.shouldGenerateOnSetup()
-					&& registry.getValueClass().isAnnotationPresent(ServerSideRegistry.class))
+					&& registry.getGenerateOnSetupPhase() == 1)
 				registry.regenerateAllValues();
 		}
 	}
