@@ -4,7 +4,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sodiumzh.nautils.NaUtils;
-import net.sodiumzh.nautils.data.ClientSideRegistry;
 import net.sodiumzh.nautils.registries.NaUtilsRegistry;
 
 @Mod.EventBusSubscriber(modid = NaUtils.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -16,7 +15,7 @@ public class NaUtilsClientSetupEventListeners {
         for (var registry: NaUtilsRegistry.allRegistries().values())
         {
             if (registry.shouldGenerateOnSetup()
-                    && registry.getValueClass().isAnnotationPresent(ClientSideRegistry.class))
+                    && registry.getGenerateOnSetupPhase() == 2)
                 registry.regenerateAllValues();
         }
     }

@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.registries;
 
 import com.google.common.collect.HashBiMap;
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.sodiumzh.nautils.eventhandler.NaUtilsSetupEventHandlers;
@@ -21,21 +22,16 @@ public class NaUtilsRegistry<T>
 {
     /** All declared registries. */
     private static final HashBiMap<ResourceLocation, NaUtilsRegistry<?>> REGISTRIES = HashBiMap.create();
-    private final HashMap<ResourceLocation, Entry<T>> table = new HashMap<>();
+    private final HashMap<ResourceLocation, Entry<? extends T>> table = new HashMap<>();
     private boolean shouldGenerateOnSetup = false;
-    private Class<?> valueClass;
+    private int generateOnSetupPhase = 0;   // 0 = common setup: 1 = server setup; 2 = client setup
 
     /**
-     *
-     * @param valueClass Expected class of the value. This class will not control the generic type of the registry,
-     *                   and you must make sure this class is the same as the generic type, otherwise some issues will
-     *                   happen (e.g. initialization phase).
      * @param registryKey Key of this registry in the table of all registries.
      */
-    public NaUtilsRegistry(Class<?> valueClass, ResourceLocation registryKey)
+    public NaUtilsRegistry(ResourceLocation registryKey)
     {
         REGISTRIES.put(registryKey, this);
-        this.valueClass = valueClass;
     }
 
     public static Map<ResourceLocation, NaUtilsRegistry<?>> allRegistries()
@@ -54,11 +50,6 @@ public class NaUtilsRegistry<T>
     public ResourceLocation getKeyOfRegistry()
     {
         return REGISTRIES.inverse().get(this);
-    }
-
-    public Class<?> getValueClass()
-    {
-        return valueClass;
     }
 
     public int size() {
@@ -87,7 +78,7 @@ public class NaUtilsRegistry<T>
      * it will not crash but print stacktrace and return null.
      */
     public T getValue(ResourceLocation key) {
-        Entry<T> entry = table.get(key);
+        Entry<? extends T> entry = table.get(key);
         if (entry == null) return null;
         return entry.get();
     }
@@ -111,10 +102,10 @@ public class NaUtilsRegistry<T>
      * <p>It's recommended to use {@link RegistryEntryCollection} instead (just like using {@link DeferredRegister}).
      * Directly registering may cause issues if the class in which you're registering objects is not loaded on setup phase.
      */
-    public Accessor<T> register(ResourceLocation key, Supplier<T> supplier)
+    public <U extends T> Accessor<U> register(ResourceLocation key, Supplier<U> supplier)
     {
         if (this.containsKey(key)) throw DuplicateRegistryEntryException.registeredTwice(key.toString());
-        Entry entry = new Entry<>(supplier);
+        Entry<U> entry = new Entry<>(supplier);
         this.table.put(key, entry);
         return new Accessor<>(entry);
     }
@@ -122,7 +113,7 @@ public class NaUtilsRegistry<T>
     /**
      * Only for {@link RegistryEntryCollection}.
      */
-    void registerRaw(ResourceLocation key, Entry<T> value)
+    void registerRaw(ResourceLocation key, Entry<? extends T> value)
     {
         this.table.put(key, value);
     }
@@ -144,7 +135,7 @@ public class NaUtilsRegistry<T>
      */
     public void regenerateAllValues()
     {
-        this.table.keySet().forEach(key -> this.regenerateValue(key));
+        this.table.keySet().forEach(this::regenerateValue);
     }
 
     /**
@@ -160,15 +151,43 @@ public class NaUtilsRegistry<T>
      * Registries with this label will generate values on {@link FMLCommonSetupEvent}.
      * @return {@code this}.
      */
-    public NaUtilsRegistry<T> setShouldGenerateOnSetup()
+    public NaUtilsRegistry<T> setShouldGenerateOnCommonSetup()
     {
         this.shouldGenerateOnSetup = true;
         return this;
     }
 
+    public NaUtilsRegistry<T> setShouldGenerateOnServerSetup()
+    {
+        this.shouldGenerateOnSetup = true;
+        this.generateOnSetupPhase = 1;
+        return this;
+    }
+
+    public NaUtilsRegistry<T> setShouldGenerateOnClientSetup()
+    {
+        this.shouldGenerateOnSetup = true;
+        this.generateOnSetupPhase = 2;
+        return this;
+    }
+
+    /**
+     * Get which phase should this registry generate values.
+     * 0 = common setup: 1 = client setup; 2 = server setup.
+     * Note that if it {@code shouldGenerateOnSetup()} is false,
+     * this value will be invalid.
+     */
+    public int getGenerateOnSetupPhase()
+    {
+        if (!this.shouldGenerateOnSetup())
+            LogUtils.getLogger().warn(String.format("NaUtilsRegistry %s calling getGenerateOnSetupPhase, " +
+                    "but shouldGenerateOnSetup() is false. Note that the result is invalid.", this.getKeyOfRegistry().toString()));
+        return this.generateOnSetupPhase;
+    }
+
     static class Entry<T>
     {
-        private Supplier<T> supplier;
+        private final Supplier<T> supplier;
         private T cachedValue;
 
         public Entry(@Nonnull Supplier<T> supplier)

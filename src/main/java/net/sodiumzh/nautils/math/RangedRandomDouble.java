@@ -3,11 +3,8 @@ package net.sodiumzh.nautils.math;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.RandomSource;
-import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -20,17 +17,22 @@ public class RangedRandomDouble implements Supplier<Double> {
     private static final RandomSource RND = RandomSource.create();
     private final double minValue;
     private final double maxValue;
-    // Limit divided by the normal distribution's standard deviation.
-    private final double limitFactor;
+    /**
+     * This indicates that the distribution is truncated from a standard normal distribution at the position of
+     * (concFactor * sigma) and mapped to range [min, max].
+     * Higher value means the probability is more concentrated at the center of the range i.e. (max - min) / 2.
+     * 1 recommended.
+     */
+    private final double concFactor;
     private final RangedRandomDouble.RandomizationType rndType;
     private double lastValue;
     private boolean lastValueValid = false;
 
-    private RangedRandomDouble(double min, double max, double limitFactor, RangedRandomDouble.RandomizationType type)
+    private RangedRandomDouble(double min, double max, double concFactor, RangedRandomDouble.RandomizationType type)
     {
         this.minValue = min;
         this.maxValue = max;
-        this.limitFactor = limitFactor;
+        this.concFactor = concFactor;
         this.rndType = type;
         this.lastValue = min;
     }
@@ -77,7 +79,7 @@ public class RangedRandomDouble implements Supplier<Double> {
 
     public RangedRandomDouble setUniform()
     {
-        return new RangedRandomDouble(this.minValue, this.maxValue, this.limitFactor, RangedRandomDouble.RandomizationType.UNIFORM);
+        return new RangedRandomDouble(this.minValue, this.maxValue, this.concFactor, RangedRandomDouble.RandomizationType.UNIFORM);
     }
 
     /**
@@ -91,7 +93,7 @@ public class RangedRandomDouble implements Supplier<Double> {
 
     public RangedRandomDouble setRange(int min, int max)
     {
-        return new RangedRandomDouble(min, max, this.limitFactor, this.rndType);
+        return new RangedRandomDouble(min, max, this.concFactor, this.rndType);
     }
 
     /**
@@ -117,7 +119,7 @@ public class RangedRandomDouble implements Supplier<Double> {
                 if (this.minValue == this.maxValue) return this.minValue;
                 double pos = RND.nextGaussian();
                 int ctrl = 0;   // To avoid the loop running too many times and lagging the game
-                while (pos > limitFactor || pos < -limitFactor)
+                while (pos > concFactor || pos < -concFactor)
                 {
                     pos = RND.nextGaussian();
                     if (ctrl > 100) {
@@ -128,7 +130,7 @@ public class RangedRandomDouble implements Supplier<Double> {
                     }
                     ctrl++;
                 }
-                pos = (pos / (2 * limitFactor)) + 0.5d;    // Normalize to [0, 1]
+                pos = (pos / (2 * concFactor)) + 0.5d;    // Normalize to [0, 1]
                 res = this.minValue + pos * (this.maxValue - this.minValue);
                 break;
             }
@@ -196,7 +198,7 @@ public class RangedRandomDouble implements Supplier<Double> {
         {
             case FIXED_VALUE: return new double[] {this.minValue};
             case UNIFORM: return new double[] {this.minValue, this.maxValue};
-            case TRUNCATED_NORMAL: return new double[] {this.minValue, this.maxValue, this.limitFactor};
+            case TRUNCATED_NORMAL: return new double[] {this.minValue, this.maxValue, this.concFactor};
             default: throw new IllegalArgumentException("Invalid randomization type");
         }
     }
@@ -242,7 +244,7 @@ public class RangedRandomDouble implements Supplier<Double> {
             case UNIFORM:
                 return List.of((double) inst.minValue, (double) inst.maxValue);
             case TRUNCATED_NORMAL:
-                return List.of((double) inst.minValue, (double) inst.maxValue, inst.limitFactor);
+                return List.of((double) inst.minValue, (double) inst.maxValue, inst.concFactor);
         }
         throw new RuntimeException();
     });

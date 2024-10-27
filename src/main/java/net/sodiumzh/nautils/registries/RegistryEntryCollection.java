@@ -24,7 +24,7 @@ public class RegistryEntryCollection<T>
 {
     private final NaUtilsRegistry<T> registry;
     private final String namespace;
-    private final HashMap<ResourceLocation, Tuple<NaUtilsRegistry.Entry<T>, NaUtilsRegistry.Accessor<T>>> table = new HashMap<>();
+    private final HashMap<ResourceLocation, Tuple<NaUtilsRegistry.Entry<? extends T>, NaUtilsRegistry.Accessor<? extends T>>> table = new HashMap<>();
     private RegistryEntryCollection(NaUtilsRegistry<T> registry, String namespace)
     {
         this.registry = registry;
@@ -41,10 +41,10 @@ public class RegistryEntryCollection<T>
      * This is the same as {@code put}, but returns the input value itself
      * so that you can assign the value to a static field together with registering.
      */
-    public NaUtilsRegistry.Accessor<T> register(@Nonnull String key, @Nonnull Supplier<T> value)
+    public <U extends T> NaUtilsRegistry.Accessor<U> register(@Nonnull String key, @Nonnull Supplier<U> value)
     {
-        NaUtilsRegistry.Entry<T> entry = new NaUtilsRegistry.Entry<>(value);
-        NaUtilsRegistry.Accessor<T> accessor = NaUtilsRegistry.Accessor.invalid(entry);
+        NaUtilsRegistry.Entry<U> entry = new NaUtilsRegistry.Entry<>(value);
+        NaUtilsRegistry.Accessor<U> accessor = NaUtilsRegistry.Accessor.invalid(entry);
         this.table.put(new ResourceLocation(namespace, key), new Tuple<>(entry, accessor));
         return new NaUtilsRegistry.Accessor<>(entry);
     }
