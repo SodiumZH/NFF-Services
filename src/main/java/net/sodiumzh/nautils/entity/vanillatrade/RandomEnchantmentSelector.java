@@ -1,15 +1,33 @@
 package net.sodiumzh.nautils.entity.vanillatrade;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.math.RandomSelection;
+import net.sodiumzh.nautils.registries.NaUtilsConfigs;
+import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 
 /**
  * A {@code RandomEnchantmentSelector} provides a set of enchantments for generating random offers of enchantment books.
@@ -131,6 +149,68 @@ public class RandomEnchantmentSelector
 		public RandomEnchantmentSelector getSelector()
 		{
 			return selector;
+		}
+	}
+
+	private RandomEnchantmentSelector readData(ResourceLocation location)
+	{
+		MinecraftServer server = NaUtils.getServer();
+		if (server == null) return this;
+		ResourceManager mgr = server.getResourceManager();
+		List<Resource> resources = mgr.getResourceStack(location);
+		for (Resource r: resources)
+		{
+			try {
+				InputStream input = r.open();
+				Reader reader = new InputStreamReader(input);
+				JsonElement json = JsonParser.parseReader(reader);
+				this.readSingleJson(json);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return this;
+	}
+
+	private void readSingleJson(JsonElement json) {
+		for (JsonElement element : json.getAsJsonArray()) {
+			try {
+				JsonObject jo = element.getAsJsonObject();
+				Enchantment enc = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(jo.get("enchantment").getAsString()));
+				if (enc == null) continue;
+
+				int[] levels;
+				JsonElement levelJson = jo.get("level");
+				if (levelJson == null) levels = NaUtilsContainerStatics.intRangeArray(enc.getMinLevel(), enc.getMaxLevel(), 1);
+				else if (levelJson.isJsonPrimitive()) levels = new int[] { levelJson.getAsInt() };
+				else if (levelJson.isJsonArray())
+				{
+					levels = new int[levelJson.getAsJsonArray().size()];
+					for (int i = 0; i < levels.length; ++i) {
+						levels[i] = levelJson.getAsJsonArray().get(i).getAsInt();
+					}
+				}
+				else throw new JsonParseException("invalid level");
+
+				double[] weights = new double[levels.length];
+				JsonElement weightsJson = jo.get("level");
+				if (weightsJson == null) Arrays.fill(weights, 1d);
+				else if (weightsJson.isJsonPrimitive())  Arrays.fill(weights, levelJson.getAsInt());
+				else if (weightsJson.isJsonArray() && weightsJson.getAsJsonArray().size() == levels.length)
+				{
+					for (int i = 0; i < weights.length; ++i) {
+						weights[i] = weightsJson.getAsJsonArray().get(i).getAsInt();
+					}
+				}
+				else throw new JsonParseException("invalid weights or weight array length");
+
+				for (int i = 0; i < levels.length; ++i)
+				{
+					this.add(enc, levels[i], weights[i]);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
