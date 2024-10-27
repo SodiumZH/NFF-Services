@@ -1,13 +1,5 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +12,14 @@ import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
-public abstract class NFFTamingProcess 
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+public abstract class NFFTamingProcess
 {
 	public NFFTamingProcess()
 	{	

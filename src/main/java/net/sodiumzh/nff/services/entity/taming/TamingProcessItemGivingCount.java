@@ -22,8 +22,9 @@ import net.sodiumzh.nff.services.registry.NFFCapRegistry;
  * (Player Data) overall_amount: the demanded count. It will not change for one player but varies for different players.
  * (Player Data) already_given: the items player already given. 
  * (Player Timer) item_cooldown: cooldown ticks before the next item can be given.
+ * @deprecated This class is not maintained and may have many issues. Avoid using this.
  */
-
+@Deprecated
 public abstract class TamingProcessItemGivingCount extends TamingProcessItemGiving
 {
 
@@ -182,6 +183,8 @@ public abstract class TamingProcessItemGivingCount extends TamingProcessItemGivi
 	{
 		NaUtilsEntityStatics.sendAngryParticlesToLivingDefault(target);
 	}
-	
+
+
+
 }
 

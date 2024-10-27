@@ -17,17 +17,7 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 	 * Check if the mob accepts the item.
 	 */
 	public abstract boolean isItemAcceptable(ItemStack itemstack);
-	
-	/**
-	 * If true, the item should consume after using
-	 * @deprecated Use ItemStack sensitive version instead
-	 */ 
-	@Deprecated
-	public final boolean shouldItemConsume(Item item) 
-	{
-		return shouldItemConsume(item.getDefaultInstance());
-	}
-	
+
 	/**
 	 * If true, the item should consume after using
 	 */
