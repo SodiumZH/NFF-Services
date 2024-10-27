@@ -1,8 +1,8 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.DoubleTag;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.sodiumzh.nautils.entity.ItemApplyingToMobTable;
+import net.sodiumzh.nautils.entity.MobApplicableItemTable;
 import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsItemStatics;
@@ -24,7 +24,8 @@ import javax.annotation.Nullable;
 public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving{
 
 	protected Random rnd = new Random();
-
+	@Nullable
+	protected Supplier<MobApplicableItemTable> tamingItemTableOverride = null;
 	@Override
 	public TamableInteractionResult handleInteract(TamableInteractArguments args) {
 		Mob target = args.getTarget();
@@ -81,8 +82,10 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 						procValue += getProgressGainInternal(mainhand, player, target, lastProcValue);
 						if (procValue <= 0)
 							procValue = 0;
-						if (!player.isCreative() && shouldItemConsume(player.getMainHandItem()))
+						if (!player.isCreative() && shouldItemConsumeInternal(player.getMainHandItem(), target)) {
 							player.getMainHandItem().shrink(1);
+							NaUtilsItemStatics.giveOrDrop(player, player.getMainHandItem().getCraftingRemainingItem());
+						}
 						NaUtilsItemStatics.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
 						if (procValue > 0)
 							NaUtilsNBTStatics.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
@@ -132,32 +135,46 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	 * @param oldProc The progress value before giving.
 	 * @return Progress gain for this giving action.
 	 */
-	protected abstract double getProcValueToAdd(ItemStack item, Player player, Mob mob, double oldProc);
+	protected double getProcValueToAdd(ItemStack item, Player player, Mob mob, double oldProc) {
+		throw new IllegalStateException("NFFServices-TamingProcessItemGivingProgress: missing acceptable item info. " +
+				"You must either use ItemApplyingToMobTable by calling setItemGivingTableOverride(), " +
+				"or override both isItemAcceptable() and getProcValueToAdd() to define it in code.");
+	};
+
+	/**
+	 * Don't force override here as sometimes we use item tables ({@code setItemGivingTableOverride})
+	 */
+	public boolean isItemAcceptable(ItemStack itemstack) {
+		throw new IllegalStateException("NFFServices-TamingProcessItemGivingProgress: missing acceptable item info. " +
+				"You must either use ItemApplyingToMobTable override by calling setItemGivingTableOverride(), " +
+				"or override both isItemAcceptable() and getProcValueToAdd() to define it in code.");
+	}
 
 	private boolean isItemAcceptableInternal(ItemStack item, Player player, Mob mob)
 	{
-		return Optional.ofNullable(this.getItemProcValueTable())
-				.map(table -> (table.getOutput(mob, item) != null))
+		return Optional.ofNullable(this.getItemGivingTableOverride())
+				.map(table -> (table.get().getOutput(mob, item) != null))
 				.orElse(this.isItemAcceptable(item));
 	}
 
 	private double getProgressGainInternal(ItemStack item, Player player, Mob mob, double oldProc) {
-		var table = this.getItemProcValueTable();
+		var table = this.getItemGivingTableOverride();
 		if (table != null)
 		{
-			var output = table.getOutput(mob, item);
+			var output = table.get().getOutput(mob, item);
 			return output != null ? output.amount() : 0d;
 		}
 		else return this.getProcValueToAdd(item, player, mob, oldProc);
 	}
 
-	/**
-	 * Define progress gain for each item from table. If this method returns non-null, the progress value
-	 * will be taken from the table and {@code getProcValueToAdd} will be skipped.
-	 * @return Table to define progress gain for given items.
-	 */
 	@Nullable
-	protected ItemApplyingToMobTable getItemProcValueTable() { return null; }
+	public final Supplier<MobApplicableItemTable> getItemGivingTableOverride() { return tamingItemTableOverride; }
+
+	public final TamingProcessItemGivingProgress setItemGivingTableOverride(Supplier<MobApplicableItemTable> override)
+	{
+		this.tamingItemTableOverride = override;
+		return this;
+	}
 
 	protected void sendProgressHeart(Mob target, double procBefore, double procAfter, double deltaProcPerHeart)
 	{
@@ -291,5 +308,21 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	 * @param procAfter Progress value after giving.
 	 */
 	public void onItemGiven(Player player, Mob mob, ItemStack itemGivenCopy, double procBefore, double procAfter) {}
-	
+
+	private boolean shouldItemConsumeInternal(ItemStack itemstack, Mob mob)
+	{
+		if (this.getItemGivingTableOverride() != null && this.getItemGivingTableOverride().get() != null)
+		{
+			var output = this.getItemGivingTableOverride().get().getOutput(mob, itemstack);
+			if (output != null)
+				return output.noConsume();
+			else return true;
+		}
+		else return shouldItemConsume(itemstack);
+	}
+
+	public boolean shouldItemConsume(ItemStack stack) {
+		return false;
+	}
+
 }
