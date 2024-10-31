@@ -2,14 +2,18 @@ package net.sodiumzh.nautils.registries;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.sodiumzh.nautils.NaUtils;
 
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = NaUtils.MOD_ID)
 public class NaUtilsConfigs
 {
 	protected static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 	public static ForgeConfigSpec CONFIG;
 	
 	public static final ForgeConfigSpec.BooleanValue SPEC_ENABLES_SAVE_DATA_PORTER;
+	public static final ForgeConfigSpec.BooleanValue SPEC_ENABLES_TAG_FIX;
 	public static final ForgeConfigSpec.BooleanValue SPEC_DEBUG_MODE;
 	public static final ForgeConfigSpec.BooleanValue SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED;
 
@@ -19,23 +23,30 @@ public class NaUtilsConfigs
 		SPEC_ENABLES_SAVE_DATA_PORTER = BUILDER.comment("If true, SaveDataLocationRedirector will take effect. Setting it false could improve the performance, "
 				+ "but it may cause objects (entities, items, blocks etc.) to disappear if you're using save data from an old version.")
 				.define("enablesSaveDataPorter", true);
+		SPEC_ENABLES_TAG_FIX = BUILDER.comment("If true, it will try fixing broken tags caused by missing entries. " +
+			"This may fix problems due to missing tags e.g. unable to dig blocks with pickaxes, but might cause unexpected issues.")
+			.comment("Experimental. Use at your own risk.")
+			.define("enablesTagFix", false);
 		BUILDER.pop();
+
 		BUILDER.push("debug");
 		SPEC_DEBUG_MODE = BUILDER.comment("If true, it will enable debug actions defined in NaUtilsDebugStatics, like debug output in the chatting box.")
 				.define("debugMode", false);
-		SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED = BUILDER.comment("If true, the game will crash if entity load failed instead of simply delete the entity.")
+		SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED = BUILDER.comment("If true, the game will crash if entity load failed.")
 				.define("crashesWhenEntityLoadFailed", false);
 		BUILDER.pop();
 		CONFIG = BUILDER.build();
 	}
 	
 	public static boolean CACHED_ENABLES_SAVE_DATA_PORTER = true;
+	public static boolean CACHED_ENABLES_TAG_FIX = false;
 	public static boolean CACHED_DEBUG_MODE = false;
 	public static boolean CACHED_CRASHES_WHEN_ENTITY_LOAD_FAILED = false;
 	
 	public static void refresh()
 	{
 		CACHED_ENABLES_SAVE_DATA_PORTER = SPEC_ENABLES_SAVE_DATA_PORTER.get();
+		CACHED_ENABLES_TAG_FIX = SPEC_ENABLES_TAG_FIX.get();
 		CACHED_DEBUG_MODE = SPEC_DEBUG_MODE.get();
 		CACHED_CRASHES_WHEN_ENTITY_LOAD_FAILED = SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED.get(); 
 	}
