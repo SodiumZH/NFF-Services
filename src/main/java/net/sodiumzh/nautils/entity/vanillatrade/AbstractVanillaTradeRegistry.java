@@ -2,6 +2,7 @@ package net.sodiumzh.nautils.entity.vanillatrade;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -29,57 +30,32 @@ public abstract class AbstractVanillaTradeRegistry<T extends IVanillaTradeListin
 		if (key == null) return null;
 		return table.get(key);
 	}
-	
-	@Nullable
-	public Map<VillagerProfession, VanillaTradeListings<T>> getAllListings(String key)
-	{
-		if (key == null) return null;
-		return getAllListings(new ResourceLocation(key));
-	}
-	
-	@Nullable
+
 	public Map<VillagerProfession, VanillaTradeListings<T>> getAllListings(EntityType<?> ofType)
 	{
-		if (ofType == null) return null;
-		return getAllListings(ForgeRegistries.ENTITY_TYPES.getKey(ofType));
+		if (ofType == null) return new HashMap<>();
+		return Optional.ofNullable(getAllListings(ForgeRegistries.ENTITY_TYPES.getKey(ofType))).orElseGet(HashMap::new);
 	}
-	
-	@Nullable
+
 	public VanillaTradeListings<T> getListings(ResourceLocation key, @Nullable VillagerProfession profession)
 	{
-		if (profession == null) profession = VillagerProfession.NONE;
+		VillagerProfession profNonnull = profession == null ? VillagerProfession.NONE : profession;
 		var allListings = this.getAllListings(key);
-		if (allListings == null) return null;
-		return allListings.get(profession);
+		if (allListings == null) return VanillaTradeListings.empty();
+		return Optional.ofNullable(allListings.get(profNonnull)).orElseGet(VanillaTradeListings::empty);
 	}
-	
-	@Nullable
-	public VanillaTradeListings<T> getListings(String key, @Nullable VillagerProfession profession)
-	{
-		if (key == null) return null;
-		return this.getListings(new ResourceLocation(key), profession);
-	}
-	
-	@Nullable
+
 	public VanillaTradeListings<T> getListings(EntityType<?> ofType, @Nullable VillagerProfession profession)
 	{
-		if (ofType == null) return null;
+		if (ofType == null) return VanillaTradeListings.empty();
 		return this.getListings(ForgeRegistries.ENTITY_TYPES.getKey(ofType), profession);
 	}
-	
-	@Nullable
+
 	public VanillaTradeListings<T> getListings(ResourceLocation key)
 	{
 		return this.getListings(key, null);
 	}
-	
-	@Nullable
-	public VanillaTradeListings<T> getListings(String key)
-	{
-		return this.getListings(key, null);
-	}
-	
-	@Nullable
+
 	public VanillaTradeListings<T> getListings(EntityType<?> ofType)
 	{
 		return this.getListings(ofType, null);
@@ -87,47 +63,30 @@ public abstract class AbstractVanillaTradeRegistry<T extends IVanillaTradeListin
 	
 	/**
 	 * Check if the listings exists for a given key and profession.
-	 * <p>
-	 * Note: this method returning true only represents the key/profession has a
-	 * Listings instance object, but not guarantees there're valid Listing instances
-	 * in the Listings.
 	 */
-	public boolean hasListings(ResourceLocation key, VillagerProfession prof)
+	public boolean hasListings(ResourceLocation key, @Nullable VillagerProfession prof)
 	{
-		return this.table.containsKey(key) && this.table.get(key).containsKey(prof);
+		VillagerProfession profNonnull = prof == null ? VillagerProfession.NONE : prof;
+		return this.table.containsKey(key)
+			&& this.table.get(key).containsKey(profNonnull)
+			&& !this.table.get(key).get(profNonnull).isEmpty();
 	}
 	
 	/**
 	 * Check if the listings exists for a given key and profession.
-	 * <p>
-	 * Note: this method returning true only represents the key/profession has a
-	 * Listings instance object, but not guarantees there're valid Listing instances
-	 * in the Listings.
 	 */
-	public boolean hasListings(String key, VillagerProfession prof)
-	{
-		return this.hasListings(new ResourceLocation(key), prof);
-	}
-	
-	/**
-	 * Check if the listings exists for a given key and profession.
-	 * <p>
-	 * Note: this method returning true only represents the key/profession has a
-	 * Listings instance object, but not guarantees there're valid Listing instances
-	 * in the Listings.
-	 */
-	public boolean hasListings(EntityType<?> type, VillagerProfession prof)
+	public boolean hasListings(EntityType<?> type, @Nullable VillagerProfession prof)
 	{
 		return this.hasListings(ForgeRegistries.ENTITY_TYPES.getKey(type), prof);
 	}
 	
 	public void putIfAbsent(ResourceLocation key, @Nullable VillagerProfession prof)
 	{
-		if (prof == null) prof = VillagerProfession.NONE;
+		VillagerProfession profNonnull = prof == null ? VillagerProfession.NONE : prof;
 		if (!this.table.containsKey(key))
 			this.table.put(key, new HashMap<>());
-		if (!this.table.get(key).containsKey(prof))
-			this.table.get(key).put(prof, new VanillaTradeListings<>());
+		if (!this.table.get(key).containsKey(profNonnull))
+			this.table.get(key).put(profNonnull, new VanillaTradeListings<>());
 	}
 	
 	public void putIfAbsent(ResourceLocation key)

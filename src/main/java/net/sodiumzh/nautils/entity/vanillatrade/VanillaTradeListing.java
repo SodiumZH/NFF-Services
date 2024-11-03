@@ -108,8 +108,8 @@ public class VanillaTradeListing implements IVanillaTradeListing
 			if (item != null && item != Items.AIR) 
 			{
 				costB.add(item.getDefaultInstance().copy());
-				hasB = true;
 			}
+		this.hasB = true;	// After invoking this, if actually added nothing, it should be accounted as invalid
 		return this;
 	}
 

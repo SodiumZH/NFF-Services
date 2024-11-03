@@ -20,7 +20,17 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 	private CompoundSet<T> set = new CompoundSet<>();
 	
 	public VanillaTradeListings() {}
-	
+
+	public static <T extends IVanillaTradeListing> VanillaTradeListings<T> empty()
+	{
+		return new VanillaTradeListings<>();
+	}
+
+	public boolean isEmpty()
+	{
+		return this.set.isEmpty();
+	}
+
 	public VanillaTradeListings<T> add(T t)
 	{
 		if (t != null && t.isValid())
