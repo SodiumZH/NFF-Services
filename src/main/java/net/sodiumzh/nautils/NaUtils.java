@@ -54,7 +54,7 @@ public class NaUtils {
 			server = event.getServer();
 		}
 
-		@SubscribeEvent
+		@SubscribeEvent(priority = EventPriority.LOWEST)
 		public static void onServerStopped(ServerStoppedEvent event) {
 			server = null;
 		}
