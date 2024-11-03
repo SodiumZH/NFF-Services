@@ -2,14 +2,17 @@ package net.sodiumzh.nautils.item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,6 +23,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumzh.nautils.NaUtils;
 
 /**
  * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
@@ -28,7 +33,9 @@ public class NaUtilsItem extends Item
 {
 	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
-	
+
+	protected Optional<Supplier<ItemStack>> defaultInstanceSupplier = Optional.empty();
+
 	public NaUtilsItem(Properties pProperties)
 	{
 		super(pProperties);
@@ -78,7 +85,65 @@ public class NaUtilsItem extends Item
 		shouldBeFoil = cond;
 		return this;
 	}
-	
+
+	/**
+	 * Set the default instance getter.
+	 * @param supplier Default instance getter. Leave {@code null} to use {@code new ItemStack(this)}.
+	 * @return {@code this}.
+	 */
+	public NaUtilsItem defaultInstanceOverride(@Nullable Supplier<ItemStack> supplier)
+	{
+		this.defaultInstanceSupplier = Optional.ofNullable(supplier);
+		return this;
+	}
+
+	/**
+	 * Set the default instance getter.
+	 * @param getter Default instance getter (input = {@code this}). Leave {@code null} to use {@code new ItemStack(this)}.
+	 * @return {@code this}.
+	 */
+	public NaUtilsItem defaultInstanceOverride(@Nullable Function<NaUtilsItem, ItemStack> getter)
+	{
+		if (getter == null) return this.defaultInstanceOverride((Supplier<ItemStack>) null);
+		return this.defaultInstanceOverride(() -> getter.apply(this));
+	}
+
+	/**
+	 * Declare that this item should use {@code ItemStack.EMPTY} as default instance.
+	 * @param suppressPrintInfo If true, when accessing default item, it will print info to log. Set false to prevent repeated output.
+	 */
+	public NaUtilsItem noDefaultInstance(boolean suppressPrintInfo)
+	{
+		return this.defaultInstanceOverride(() -> {
+			if (!suppressPrintInfo)
+				LogUtils.getLogger().info(String.format("Item class \"%s\" has no default instance.", this.getClass().getSimpleName()));
+			return ItemStack.EMPTY;
+		});
+	}
+
+	/**
+	 * Declare that this item should use another item's default instance as default instance.
+	 */
+	public NaUtilsItem redirectDefaultInstance(Supplier<? extends Item> other)
+	{
+		Item item = other.get();
+		return this.defaultInstanceOverride(() -> Optional.ofNullable(item).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
+	}
+
+	/**
+	 * Declare that this item should use another item's default instance as default instance. Input is the registry key.
+	 */
+	public NaUtilsItem redirectDefaultInstance(ResourceLocation itemKey)
+	{
+		Item item = ForgeRegistries.ITEMS.getValue(itemKey);
+		return this.defaultInstanceOverride(() -> Optional.ofNullable(item).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
+	}
+
+	public final ItemStack getDefaultInstance()
+	{
+		return this.defaultInstanceSupplier.map(Supplier::get).orElseGet(() -> super.getDefaultInstance());
+	}
+
 	/**
 	 * Fixed here. Invoke {@code foilCondition} instead.
 	 */
@@ -94,7 +159,7 @@ public class NaUtilsItem extends Item
 	{
 		return InteractionResult.PASS;
 	}
-	
+
 	/**
 	 * Final here because the input {@code ItemStack} is a copy which may confuse the developers
 	 * and cause bugs hard to find when attempting to modify the ItemStack NBT.
