@@ -3,10 +3,8 @@ package net.sodiumzh.nautils.entity.vanillatrade;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +37,8 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 	private ItemStack currency = Items.EMERALD.getDefaultInstance();	// Used on calling buys(), sells() and transforms().
 	private boolean randomizeUsesPoisson = false;	// If true, the randomization should use Poisson distribution.
 	private double poissonFactor = 0.5d;
-	
+	@Nonnull private String globalDefaultDataPath = "vanilla_trade_listings";
+
 	// Registration
 	
 	public Registering push(@Nonnull ResourceLocation key)
@@ -93,7 +92,11 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		this.poissonFactor = value;
 		return this;
 	}
-	
+
+	public void setGlobalDataPath(@Nonnull String globalDefaultDataPath) {
+		this.globalDefaultDataPath = globalDefaultDataPath;
+	}
+
 	public static class Registering
 	{
 		private VanillaTradeRegistry registry;
@@ -101,7 +104,8 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		private VillagerProfession profession = VillagerProfession.NONE;
 		private int level = 1;
 		private VanillaTradeListing lastListing = null;
-		
+		private Optional<String> defaultDataPath = Optional.empty();
+
 		private Registering(VanillaTradeRegistry registry, ResourceLocation key)
 		{
 			this.registry = registry;
@@ -468,13 +472,77 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			else LogUtils.getLogger().error("VanillaTradeRegistry#Registering#maxUses: no listing registered. Skipped.");
 			return this;
 		}
-		
+
 		/**
-		 * End registering under this key and return to the registry.
+		 * Set data reading default path for this registry key.
+		 * <p>Note: This method only sets the data path of this registry entry i.e. works only before next call of {@code pop()}.
+		 * To set global default data path for the whole registry, use {@code globalDataPath()}.
+		 * <p>Note: If this value is valid, it will prioritize this value. If the default path for this entry is null,
+		 * uses global one.
+		 * @param path New path. If this path input is {@code "path"}, registering resource location is {@code "some_mod:some_entity_type"},
+		 *             then the data reading path will be: {@code "some_mod:path/some_entity_type.json"}. Default value is {@code "vanilla_trade_listings"}.
+		 *             {@code null} means using global default path.
+		 *
+		 */
+		public Registering dataPath(@Nullable String path)
+		{
+			this.defaultDataPath = Optional.ofNullable(path);
+			return this;
+		}
+
+		/**
+		 * Set data reading default path for the whole registry.
+		 * <p>Note: If the default path is valid for this registry entry (i.e. {@code dataPath} is ever called with non-null input),
+		 * this global path will be overriden. To apply this value, call {@code dataPath(null)}.
+		 * @param path New path. If this path input is {@code "path"}, registering resource location is {@code "some_mod:some_entity_type"},
+		 *             then the data reading path will be: {@code "some_mod:path/some_entity_type.json"}. Default value is {@code "vanilla_trade_listings"}.
+		 *             {@code null} means using global default path.
+		 */
+		public Registering globalDataPath(@Nonnull String path)
+		{
+			this.defaultDataPath = Optional.ofNullable(path);
+			return this;
+		}
+
+		private ResourceLocation getDefaultDataPath()
+		{
+			String path = this.defaultDataPath.orElse(this.registry.globalDefaultDataPath);
+			return new ResourceLocation(this.key.getNamespace(), String.format("%s/%s.json", path, this.key.getPath()));
+		}
+
+		/**
+		 * End registering for this key and return to the registry. No data reading.
+		 * <p>If you need data reading, use a version of {@code readAndPop} to end instead, or call
+		 * a version of {@code readData} before {@code pop()}.
 		 */
 		public VanillaTradeRegistry pop()
 		{
 			return this.registry;
+		}
+
+		/**
+		 * End registering for this key, <b>read data of default path</b> and return to the registry.
+		 * See {@code dataPath(String)}.
+		 */
+		public VanillaTradeRegistry readAndPop()
+		{
+			this.readData();
+			return this.pop();
+		}
+
+		/**
+		 * End registering for this key, <b>read data of given path</b> and return to the registry.
+ 		 * Note: if input is {@code "path"}, current registering key is {@code "some_mod:some_key"},
+		 * then it will read data {@code "some_mod:path/some_key.json"}.
+		 * <p>If you need to specify the full data path, use {@code readData(yourPath).pop()} to finalize.
+		 */
+		public VanillaTradeRegistry readAndPop(String dataPath)
+		{
+			Optional<String> oldPath = this.defaultDataPath;
+			this.dataPath(dataPath);
+			this.readData();
+			this.dataPath(oldPath.orElse(null));
+			return this.pop();
 		}
 
 		public Registering readData(ResourceLocation location)
@@ -496,6 +564,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 					double poissonFactor = this.registry.poissonFactor;
 					ItemStack currency = this.registry.currency;
 					int level = this.level;
+					VillagerProfession prof = this.profession;
 
 					// Read. Settings may be randomly changed during reading.
 					this.setRequiredLevel(1);	// In json it's 1 by default
@@ -506,12 +575,46 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 					this.setPoissonFactor(poissonFactor);
 					this.setCurrency(currency);
 					this.setRequiredLevel(level);
+					this.profession = prof;
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 			return this;
+		}
+
+		/**
+		 * Read data under default directory. If the current registering
+		 * entity type is {@code "some_mod:some_entity"}, then the data path will be
+		 * {@code "some_mod:{default_path}/some_entity.json"}.
+		 * <p> The default path can be set by calling {@code dataPath()}. Default is {"vanilla_trade_listings"}.
+		 */
+		public Registering readData()
+		{
+			return this.readData(this.getDefaultDataPath());
+		}
+
+		/**
+		 * A wrapped data reading option that should read an extra optional {@code "currency"} field and temporarily set currency.
+		 */
+		private Consumer<JsonObject> withCurrencyOption(Consumer<JsonObject> action) {
+			return (JsonObject jo) ->
+			{
+				boolean withCurrency = jo.has("currency");
+				ItemStack oldCurrency = this.getCurrency();
+				if (withCurrency) {
+					ItemStack[] currency = readItem(jo.get("currency"), false);
+					if (currency.length != 1 || currency[0] == null || currency[0].isEmpty()) {
+						LogUtils.getLogger().error("VanillaTradeRegistry#readData set currency failed: missing or duplicate item. Set to Emerald.");
+						currency[0] = Items.EMERALD.getDefaultInstance();
+					}
+					this.setCurrency(currency[0]);
+				}
+				action.accept(jo);
+				if (withCurrency)
+					this.setCurrency(oldCurrency);
+			};
 		}
 
 		private void readSingleJson(JsonElement json, Tuple3<Boolean, Double, ItemStack> defaultSettings, boolean debug)
@@ -528,10 +631,12 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 							// Setting modifications
 							case "settings" : {	// Set currency
 								if (jo.has("currency")) {
-									ItemStack[] item = readItem(jo.get("currency"));
-									if (item.length != 1)
-										throw new JsonParseException("set currency failed: missing or duplicate item.");
-									this.setCurrency(!item[0].isEmpty() ? item[0] : Items.EMERALD.getDefaultInstance());
+									ItemStack[] item = readItem(jo.get("currency"), false);
+									if (item.length != 1 || item[0] == null || item[0].isEmpty()) {
+										LogUtils.getLogger().error("VanillaTradeRegistry#readData set currency failed: missing or duplicate item. Set to Emerald.");
+										item[0] = Items.EMERALD.getDefaultInstance();
+									}
+									this.setCurrency(item[0]);
 								}
 								if (jo.has("poisson"))
 									this.setRandomizationDistribution(jo.get("poisson").getAsBoolean());
@@ -539,6 +644,8 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 									this.setPoissonFactor(jo.get("p").getAsDouble());
 								if (jo.has("level"))
 									this.setRequiredLevel(jo.get("level").getAsInt());
+								if (jo.has("profession"))
+									this.setProfession(ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation("profession")));
 								break;
 							}
 							case "reset" : {
@@ -547,45 +654,61 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 								this.setPoissonFactor(defaultSettings.b);
 								break;
 							}
+							case "link": {
+								String target = jo.get("target").getAsString();
+								if (jo.has("profession"))
+									this.linkListings(new ResourceLocation(target),
+											ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
+								else this.linkListings(new ResourceLocation(target));
+								break;
+							}
 							// Trade entry definitions
-							case "buy" : {
-								ItemStack[] buys = readItem(jo.get("item"));
-								int[] price = readAmountRange(jo.get("price"));
-								int[] amount = readAmountRange(jo.get("amount"));
-								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
-								this.addBuys(buys, amount[0], amount[1], price[0], price[1], maxUses);
-								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
-								break;
-							}
-							case "sell" : {
-								ItemStack[] sells = readItem(jo.get("item"));
-								int[] price = readAmountRange(jo.get("price"));
-								int[] amount = readAmountRange(jo.get("amount"));
-								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
-								this.addSells(price[0], price[1], sells, amount[0], amount[1], maxUses);
-								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
-								break;
-							}
-							case "convert" : {
-								ItemStack[] from = readItem(jo.get("item"));
-								ItemStack[] to = readItem(jo.get("result"));
-								if (from.length != 1 || to.length != 1)
-									throw new UnsupportedOperationException("VanillaTradeRegistry converting doesn't support multi-item.");
-								int[] price = readAmountRange(jo.get("price"));
-								int[] amount = readAmountRange(jo.get("amount"));
-								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
-								this.addConverts(price[0], price[1], from[0], to[0], amount[0], amount[1], maxUses);
-								if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
-								break;
-							}
-							case "enchantmentBook" : {
-								int[] price = readAmountRange(jo.get("price"));
-								var enchantment = readEnchantment(jo.get("enchantment"));
-								int maxUses = jo.has("maxUses") ? jo.get("maxUses").getAsInt() : 12;
-								if (enchantment != null) {
-									this.addEnchantsBook(price[0], price[1], enchantment.getA(), enchantment.getB(), maxUses);
-									if (jo.has("weight")) this.weight(jo.get("weight").getAsDouble());
-								}
+							default : {
+								this.withCurrencyOption(jsonObject -> {
+									switch (action) {
+										case "buy": {
+											ItemStack[] buys = readItem(jsonObject.get("item"), true);
+											int[] price = readAmountRange(jsonObject.get("price"));
+											int[] amount = readAmountRange(jsonObject.get("amount"));
+											int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
+											this.addBuys(buys, amount[0], amount[1], price[0], price[1], maxUses);
+											if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
+											break;
+										}
+										case "sell": {
+											ItemStack[] sells = readItem(jsonObject.get("item"), true);
+											int[] price = readAmountRange(jsonObject.get("price"));
+											int[] amount = readAmountRange(jsonObject.get("amount"));
+											int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
+											this.addSells(price[0], price[1], sells, amount[0], amount[1], maxUses);
+											if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
+											break;
+										}
+										case "convert": {
+											ItemStack[] from = readItem(jsonObject.get("item"), true);
+											ItemStack[] to = readItem(jsonObject.get("result"), true);
+											if (from.length != 1 || to.length != 1)
+												throw new UnsupportedOperationException("VanillaTradeRegistry converting doesn't support multi-item.");
+											int[] price = readAmountRange(jsonObject.get("price"));
+											int[] amount = readAmountRange(jsonObject.get("amount"));
+											int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
+											this.addConverts(price[0], price[1], from[0], to[0], amount[0], amount[1], maxUses);
+											if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
+											break;
+										}
+										case "enchantmentBook": {
+											int[] price = readAmountRange(jsonObject.get("price"));
+											var enchantment = readEnchantment(jsonObject.get("enchantment"));
+											int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
+											if (enchantment != null) {
+												this.addEnchantsBook(price[0], price[1], enchantment.getA(), enchantment.getB(), maxUses);
+												if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
+											}
+											break;
+										}
+										default: break;
+									}
+								}).accept(jo);
 								break;
 							}
 
@@ -599,25 +722,54 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			}
 		}
 
-		private static ItemStack[] readItem(JsonElement element) {
-			if (element.isJsonPrimitive())
-				return new ItemStack[] {ForgeRegistries.ITEMS.getValue(new ResourceLocation(element.getAsString())).getDefaultInstance()};
-			else if (element.isJsonObject())
-				return new ItemStack[] {CraftingHelper.getItemStack(element.getAsJsonObject(), true, true)};
-			else if (element.isJsonArray())
-			{
-				ItemStack[] res = new ItemStack[element.getAsJsonArray().size()];
-				int i = 0;
-				for (JsonElement e: element.getAsJsonArray())
-				{
-					if (e.isJsonArray()) throw new JsonParseException("JsonObject for item stack representation expected.");
-					else res[i] = readItem(e)[0];
-					++i;
+		/**
+		 * Read ItemStack info from a JsonElement. Supports 3 formats: Primitive - {@link Item} key;
+		 * JsonObject - {@link ItemStack}; JsonArray - multiple {@link ItemStack}s.
+		 * <p>It will never return zero-length output. If empty, it will return {@code new ItemStack[1] {ItemStack.EMPTY}}.
+		 * @param element JsonElement.
+		 * @param allowsArray Whether allows array format. If false, it will always output {@code ItemStack[1]}.
+		 * @return
+		 */
+		private static ItemStack[] readItem(JsonElement element, boolean allowsArray) {
+			try {
+				// Case of a single item type
+				if (element.isJsonPrimitive()) {
+					Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(element.getAsString()));
+					return new ItemStack[]{(item == null || item == Items.AIR) ? ItemStack.EMPTY : item.getDefaultInstance()};
 				}
-				return res;
+				// Case of an ItemStack representation of Forge format
+				else if (element.isJsonObject()) {
+					Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(element.getAsJsonObject().get("item").getAsString()));
+					return new ItemStack[]{(item == null || item == Items.AIR) ?
+						ItemStack.EMPTY :
+						CraftingHelper.getItemStack(element.getAsJsonObject(), true, true)};
+				}
+				// Case of an array, recursively read each
+				else if (element.isJsonArray()) {
+					if (allowsArray) {
+						int size = element.getAsJsonArray().size();
+						if (size == 0) return new ItemStack[]{ItemStack.EMPTY};    // Always prevent 0-length output
+						ItemStack[] res = new ItemStack[size];
+						for (int i = 0; i < size; ++i) {
+							JsonElement e = element.getAsJsonArray().get(i);
+							try {
+								if (e.isJsonArray())
+									throw new JsonParseException("VanillaTradeRegistry#readItem doesn't allow nested arrays.");
+								res[i] = readItem(e, false)[0];
+							} catch (Exception exception) {
+								exception.printStackTrace();
+								res[i] = ItemStack.EMPTY;
+							}
+						}
+						return res;
+					} else
+						throw new JsonParseException("VanillaTradeRegistry#readItem: JsonArray detected, but not allowed.");
+				} else throw new JsonParseException("Read item failed.");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ItemStack[] {ItemStack.EMPTY};
 			}
-			else throw new JsonParseException("Read item failed.");
-		}
+        }
 
 		private static int[] readAmountRange(JsonElement element) {
 			if (element == null)
@@ -655,7 +807,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 	}
 	
 	// Utilities
-	
+
 	@Nonnull
 	private static ItemStack getNonnullInstance(@Nullable Item item)
 	{
