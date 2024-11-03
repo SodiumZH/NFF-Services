@@ -154,7 +154,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		return Optional.ofNullable(this.getItemGivingTableOverride())
 				.map(table -> (table.get().getOutput(mob, item) != null))
-				.orElse(this.isItemAcceptable(item));
+				.orElseGet(() -> this.isItemAcceptable(item));
 	}
 
 	private double getProgressGainInternal(ItemStack item, Player player, Mob mob, double oldProc) {
