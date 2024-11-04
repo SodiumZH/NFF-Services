@@ -25,6 +25,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinItemInput;
 
 /**
  * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
@@ -33,6 +34,7 @@ public class NaUtilsItem extends Item
 {
 	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
+	protected boolean shouldGiveCommandUseDefaultInstance = false;
 
 	protected Optional<Supplier<ItemStack>> defaultInstanceSupplier = Optional.empty();
 
@@ -139,13 +141,31 @@ public class NaUtilsItem extends Item
 		return this.defaultInstanceOverride(() -> Optional.ofNullable(item).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
 	}
 
+	public NaUtilsItem setGiveCommandUsesDefaultInstance() {
+		this.shouldGiveCommandUseDefaultInstance = true;
+		return this;
+	}
+
+	/**
+	 * Check if this item should use {@code getDefaultInstance()} instead of {@code ItemStack#new} on /give command.
+	 * <p>This feature is intended to prevent /give command from outputting uninitialized {@code ItemStack}s which may
+	 * cause problems.
+	 * <p>This feature is implemented through {@link NaUtilsMixinItemInput}.
+	 */
+	public boolean shouldGiveCommandUseDefaultInstance() {
+		return shouldGiveCommandUseDefaultInstance;
+	}
+
+	/**
+	 * Fixed here. Override by calling {@code defaultInstanceOverride} instead.
+	 */
 	public final ItemStack getDefaultInstance()
 	{
 		return this.defaultInstanceSupplier.map(Supplier::get).orElseGet(() -> super.getDefaultInstance());
 	}
 
 	/**
-	 * Fixed here. Invoke {@code foilCondition} instead.
+	 * Fixed here. Override by calling {@code foilCondition} instead.
 	 */
 	@Override
 	public final boolean isFoil(ItemStack stack)

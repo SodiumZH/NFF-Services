@@ -1,6 +1,10 @@
 package net.sodiumzh.nautils.mixin;
 
 import com.mojang.logging.LogUtils;
+import net.sodiumzh.nautils.object.ICastable;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 /**
  * Base interface for all mixins in NaUtils containing some common utilities.
@@ -8,7 +12,7 @@ import com.mojang.logging.LogUtils;
  * If class mismatches it will throw exception. Use {@code cast()} to cast to any classes (mismatch = exception).
  * @param <T> Mixin target class.
  */
-public interface NaUtilsMixin<T> {
+public interface NaUtilsMixin<T> extends ICastable {
 	
 	/**
 	 * Get the caller object.
@@ -25,21 +29,11 @@ public interface NaUtilsMixin<T> {
 			throw e;
 		}
 	}
-	
-	/**
-	 * Cast the caller object to any class.
-	 */
-	@SuppressWarnings("unchecked")
-	public default <U> U cast()
-	{
-		try
-		{
-			return (U)(this.caller());
-		} catch (ClassCastException e)
-		{
-			LogUtils.getLogger().error("NaUtils Mixin error: class mismatch.");
-			throw e;
-		}
+
+	@Override
+	@Nonnull
+	public default Supplier<?> castTarget() {
+		return this::caller;
 	}
-	
+
 }

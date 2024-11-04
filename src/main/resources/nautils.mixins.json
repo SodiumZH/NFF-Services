@@ -1,24 +1,25 @@
 {
-	"required": true,
-	"package": "net.sodiumzh.nautils.mixin.mixins",
-	"compatibilityLevel": "JAVA_17",
-	"refmap": "nautils.refmap.json",
-	"mixins": [
-		"NaUtilsMixinItemEntity",
-		"NaUtilsMixinEntity",
-		"NaUtilsMixinMob",
-		"NaUtilsMixinPlayer",
-		"NaUtilsMixinProjectile",
-		"NaUtilsMixinThrownTrident",
-		"NaUtilsMixinLivingEntity",
-		"NaUtilsMixinServerPlayer",
-		"NaUtilsMixinLevelCapabilityData",
-		"NaUtilsMixinEntityType",
-		"NaUtilsMixinItemStack"
-	],
-		"client": [
-		"NaUtilsMerchantScreenMixin",
-		"NaUtilsMerchantMenuMixin"
-	],
-	"minVersion": "0.8"
+  "required": true,
+  "package": "net.sodiumzh.nautils.mixin.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "nautils.refmap.json",
+  "mixins": [
+    "NaUtilsMixinEntity",
+    "NaUtilsMixinEntityType",
+    "NaUtilsMixinItemEntity",
+    "NaUtilsMixinItemInput",
+    "NaUtilsMixinItemStack",
+    "NaUtilsMixinLevelCapabilityData",
+    "NaUtilsMixinLivingEntity",
+    "NaUtilsMixinMob",
+    "NaUtilsMixinPlayer",
+    "NaUtilsMixinProjectile",
+    "NaUtilsMixinServerPlayer",
+    "NaUtilsMixinThrownTrident"
+  ],
+  "client": [
+    "NaUtilsMerchantMenuMixin",
+    "NaUtilsMerchantScreenMixin"
+  ],
+  "minVersion": "0.8"
 }
