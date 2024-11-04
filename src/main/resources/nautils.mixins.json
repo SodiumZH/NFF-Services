@@ -7,6 +7,7 @@
     "NaUtilsMixinEntity",
     "NaUtilsMixinEntityType",
     "NaUtilsMixinItemEntity",
+    "NaUtilsMixinItemInput",
     "NaUtilsMixinItemStack",
     "NaUtilsMixinLivingEntity",
     "NaUtilsMixinMob",
@@ -15,7 +16,8 @@
     "NaUtilsMixinServerPlayer",
     "NaUtilsMixinTagBuilder",
     "NaUtilsMixinThrownTrident",
-    "NaUtilsMixinWorldCapabilityData"
+    "NaUtilsMixinWorldCapabilityData",
+    "NaUtilsMixinThrownTrident"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",
