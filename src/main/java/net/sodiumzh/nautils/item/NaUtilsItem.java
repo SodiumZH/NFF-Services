@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.mojang.logging.LogUtils;
@@ -20,17 +21,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinItemInput;
+import net.sodiumzh.nautils.object.ICastable;
 
 /**
  * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
  */
-public class NaUtilsItem extends Item
+public class NaUtilsItem extends Item implements ICastable
 {
 	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
@@ -93,7 +96,7 @@ public class NaUtilsItem extends Item
 	 * @param supplier Default instance getter. Leave {@code null} to use {@code new ItemStack(this)}.
 	 * @return {@code this}.
 	 */
-	public NaUtilsItem defaultInstanceOverride(@Nullable Supplier<ItemStack> supplier)
+	public NaUtilsItem setDefaultInstanceOverride(@Nullable Supplier<ItemStack> supplier)
 	{
 		this.defaultInstanceSupplier = Optional.ofNullable(supplier);
 		return this;
@@ -104,10 +107,10 @@ public class NaUtilsItem extends Item
 	 * @param getter Default instance getter (input = {@code this}). Leave {@code null} to use {@code new ItemStack(this)}.
 	 * @return {@code this}.
 	 */
-	public NaUtilsItem defaultInstanceOverride(@Nullable Function<NaUtilsItem, ItemStack> getter)
+	public NaUtilsItem setDefaultInstanceOverride(@Nullable Function<NaUtilsItem, ItemStack> getter)
 	{
-		if (getter == null) return this.defaultInstanceOverride((Supplier<ItemStack>) null);
-		return this.defaultInstanceOverride(() -> getter.apply(this));
+		if (getter == null) return this.setDefaultInstanceOverride((Supplier<ItemStack>) null);
+		return this.setDefaultInstanceOverride(() -> getter.apply(this));
 	}
 
 	/**
@@ -116,7 +119,7 @@ public class NaUtilsItem extends Item
 	 */
 	public NaUtilsItem noDefaultInstance(boolean suppressPrintInfo)
 	{
-		return this.defaultInstanceOverride(() -> {
+		return this.setDefaultInstanceOverride(() -> {
 			if (!suppressPrintInfo)
 				LogUtils.getLogger().info(String.format("Item class \"%s\" has no default instance.", this.getClass().getSimpleName()));
 			return ItemStack.EMPTY;
@@ -128,8 +131,7 @@ public class NaUtilsItem extends Item
 	 */
 	public NaUtilsItem redirectDefaultInstance(Supplier<? extends Item> other)
 	{
-		Item item = other.get();
-		return this.defaultInstanceOverride(() -> Optional.ofNullable(item).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
+		return this.setDefaultInstanceOverride(() -> Optional.ofNullable(other.get()).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
 	}
 
 	/**
@@ -137,8 +139,7 @@ public class NaUtilsItem extends Item
 	 */
 	public NaUtilsItem redirectDefaultInstance(ResourceLocation itemKey)
 	{
-		Item item = ForgeRegistries.ITEMS.getValue(itemKey);
-		return this.defaultInstanceOverride(() -> Optional.ofNullable(item).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
+		return this.setDefaultInstanceOverride(() -> Optional.ofNullable(ForgeRegistries.ITEMS.getValue(itemKey)).map(Item::getDefaultInstance).orElseGet(() -> ItemStack.EMPTY));
 	}
 
 	public NaUtilsItem setGiveCommandUsesDefaultInstance() {
@@ -156,12 +157,24 @@ public class NaUtilsItem extends Item
 		return shouldGiveCommandUseDefaultInstance;
 	}
 
+
 	/**
-	 * Fixed here. Override by calling {@code defaultInstanceOverride} instead.
+	 * Override to set the default instance. Return {@code Optional.empty()} to use {@code new ItemStack(this)}.
+	 * <p>Note: {@code setDefaultInstanceOverride} or variations will override this method.
+	 * <p>Note: To return empty {@code ItemStack}, return {@code Optional.of(ItemStack.EMPTY)}.
+	 */
+	@Nonnull
+	public Optional<ItemStack> getDefaultInstanceOverride()
+	{
+		return Optional.empty();
+	}
+
+	/**
+	 * Fixed here. Override {@code getDefaultInstanceOverride} or call {@code setDefaultInstanceOverride} instead.
 	 */
 	public final ItemStack getDefaultInstance()
 	{
-		return this.defaultInstanceSupplier.map(Supplier::get).orElseGet(() -> super.getDefaultInstance());
+		return this.defaultInstanceSupplier.map(Supplier::get).orElseGet(() -> getDefaultInstanceOverride().orElseGet(() -> super.getDefaultInstance()));
 	}
 
 	/**
@@ -210,15 +223,5 @@ public class NaUtilsItem extends Item
 	 */
 	@OnlyIn(Dist.CLIENT)
 	public void beforeAddingHoveringDescriptions(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {}
-	
-	/**
-	 * Cast to subclasses.
-	 * <p>Note: this method is for simplification, hiding an unchecked casting inside. So take care doing this to prevent {@code ClassCastException}.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T extends NaUtilsItem> T cast()
-	{
-		return (T)this;
-	}
 
 }
