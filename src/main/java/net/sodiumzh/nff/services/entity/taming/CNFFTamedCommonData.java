@@ -49,6 +49,7 @@ import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nff.services.network.NFFClientGamePacketHandlers;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
+import net.sodiumzh.nff.services.registry.NFFTagRegistry;
 
 
 /**
@@ -497,7 +498,13 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public EntityType<? extends Mob> getInitialEntityType()
 		{
-			if (this.initialType != null) return this.initialType;
+			/* If missing type, it may be saved as "minecraft:pig" and bypass fixing. Generally pig should not be a
+			 valid initial type since it's not INFFTamed. However, in the future INFFTamed may be available as a capability
+			 and somehow attached to pig, so there's a tag to prevent this (in most cases it shouldn't happen)
+			 */
+			if (this.initialType != null &&
+				!(this.initialType.equals(EntityType.PIG) && !this.getEntity().getType().is(NFFTagRegistry.COULD_BE_FROM_PIG)))
+				return this.initialType;
 			else {
 				LogUtils.getLogger().error(String.format("CNFFTamedCommonData: mob %s missing initial type. Reset to current type.", this.getEntity().getName().getString()));
 				this.recordEntityType();

@@ -207,7 +207,7 @@ public class NFFEntityEventListeners
 	        }
 	        // Handle TamableAnimal end //
 	        // Handle Golems //
-	        if (mob instanceof AbstractGolem g)
+	        if (mob instanceof AbstractGolem g && !mob.getType().is(NFFTagRegistry.IGNORES_GOLEM_ATTITUDE))
 	        {
 	        	if (target instanceof INFFTamed bm)
 	        	{
@@ -251,7 +251,9 @@ public class NFFEntityEventListeners
 	        	}
 	        }
 	        // Handle Golems End
-	        // Handle tag befriendmobs:neutral_to_bm_mobs
+	        // Handle hostility tags
+			if (mob.getType().is(NFFTagRegistry.PASSIVE_TO_NFF_MOBS))
+				event.setCanceled(true);
 	        if (mob.getType().is(NFFTagRegistry.NEUTRAL_TO_NFF_MOBS) && target instanceof INFFTamed && mob.getLastHurtByMob() != target)
 	        	event.setCanceled(true);
 		}
