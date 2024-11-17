@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.statics;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -8,11 +9,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 
@@ -167,5 +170,14 @@ public class NaUtilsMiscStatics {
 	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access)
 	{
 		return getValueFromCapability(target, holder, access, null);
+	}
+
+	/**
+	 * Get entry from Forge registry if present, otherwise return empty instead of registry default value.
+	 */
+	public static <T> Optional<T> getEntryOptional(IForgeRegistry<T> reg, ResourceLocation key)
+	{
+		if (reg.containsKey(key)) return Optional.ofNullable(reg.getValue(key));
+		else return Optional.empty();
 	}
 }

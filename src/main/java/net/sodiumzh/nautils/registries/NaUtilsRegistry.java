@@ -224,15 +224,17 @@ public class NaUtilsRegistry<T>
         }
     }
 
-    public static class Accessor<T>
+    public static class Accessor<T> implements Supplier<T>
     {
         private Entry<T> entry;
-        private boolean validated;  // Labels whether this entry has been registered into a registry. If it's false, the get() will always returns null.
+        private boolean validated;  // Labels whether this entry has been registered into a registry. If it's false, the get() will always return null.
 
         public Accessor(Entry<T> entry) {
             this.entry = entry;
             this.validated = true;
         }
+
+
 
         public static <U> Accessor<U> invalid(Entry<U> entry)
         {
