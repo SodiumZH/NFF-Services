@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.event.CellEditorListener;
 
 import com.google.gson.*;
 import com.mojang.logging.LogUtils;
@@ -23,7 +22,6 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -31,6 +29,7 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.containers.Tuple3;
 import net.sodiumzh.nautils.registries.NaUtilsConfigs;
+import net.sodiumzh.nautils.registries.NaUtilsRegistries;
 
 public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTradeListing>
 {
@@ -598,7 +597,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		/**
 		 * A wrapped data reading option that should read an extra optional {@code "currency"} field and temporarily set currency.
 		 */
-		private Consumer<JsonObject> withCurrencyOption(Consumer<JsonObject> action) {
+		private Consumer<JsonObject> withCurrencyAndLevelOption(Consumer<JsonObject> action) {
 			return (JsonObject jo) ->
 			{
 				boolean withCurrency = jo.has("currency");
@@ -611,9 +610,18 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 					}
 					this.setCurrency(currency[0]);
 				}
+
+				boolean withLevel = jo.has("level") && jo.isJsonPrimitive();
+				int oldLevel = this.level;
+				if (withLevel)
+					this.setRequiredLevel(jo.get("level").getAsInt());
+
 				action.accept(jo);
+
 				if (withCurrency)
 					this.setCurrency(oldCurrency);
+				if (withLevel)
+					this.setRequiredLevel(oldLevel);
 			};
 		}
 
@@ -645,7 +653,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 								if (jo.has("level"))
 									this.setRequiredLevel(jo.get("level").getAsInt());
 								if (jo.has("profession"))
-									this.setProfession(ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation("profession")));
+									this.setProfession(ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
 								break;
 							}
 							case "reset" : {
@@ -663,8 +671,16 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 								break;
 							}
 							// Trade entry definitions
+							case "registered": {	// Add an entry from predefined listing in registry
+								String key = jo.get("key").getAsString();
+								if (NaUtilsRegistries.VANILLA_TRADE_LISTINGS.containsKey(new ResourceLocation(key)))
+								{
+									this.addListing(NaUtilsRegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key)));
+								}
+								break;
+							}
 							default : {
-								this.withCurrencyOption(jsonObject -> {
+								this.withCurrencyAndLevelOption(jsonObject -> {
 									switch (action) {
 										case "buy": {
 											ItemStack[] buys = readItem(jsonObject.get("item"), true);
