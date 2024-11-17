@@ -3,6 +3,8 @@ package net.sodiumzh.nautils.registries;
 import net.minecraft.resources.ResourceLocation;
 import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.entity.MobApplicableItemTable;
+import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeListing;
+import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeListings;
 import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeRegistry;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
 
@@ -22,5 +24,8 @@ public class NaUtilsRegistries {
     public static final NaUtilsRegistry<VanillaTradeRegistry> VANILLA_TRADE_REGISTRIES =
             new NaUtilsRegistry<VanillaTradeRegistry>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_registries"))
                     .setShouldGenerateOnServerSetup();
+    public static final NaUtilsRegistry<VanillaTradeListing> VANILLA_TRADE_LISTINGS =
+        new NaUtilsRegistry<VanillaTradeListing>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_listings"))
+            .setShouldGenerateOnServerSetup();
 
 }
