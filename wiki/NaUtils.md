@@ -1,8 +1,62 @@
-# NaUtils Instruction
+# Sodium's Utilities Instruction
 
 ## Overview
 
-NaUtils (Sodium's Utilities) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
+Sodium's Utilities (NaUtils) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
+
+## Registry
+
+NaUtils provides a simple registry system like the forge registry, mainly for the global registration of custom-defined data types.
+
+### `NaUtilsRegistry`
+
+The registry class. Use the code below to declare a custom registry:
+
+#### Declaration
+
+```java
+public static final NaUtilsRegistry<YourDataType> YOUR_REGISTRY = new NaUtilsRegistry<YourDataType>(new ResourceLocation("your_mod_id", "your_registry_key"));
+```
+
+This defines a registry for data type `YourDataType` with key `"your_mod_id:your_registry_key"`. Please note this key is the key of *this registry*, or it's key in the registry of all registries. (The "registry registry" is internal.)
+
+Note that you must call the class where registries are defined in your mod main class' constructor, so that it will be loaded in an early stage. For example, you can define an empty method `public static void init(){}` in the declaring class and call it in the mod main class.
+
+#### Registration
+
+`RegistryEntryCollection` is a utility for registering entries into registries. Its usage is similar to Forge `DeferredRegister`.
+
+##### Declaration
+
+```java
+public static final RegistryEntryCollection<YourDataType> REGISTER = RegistryEntryCollection.create(YOUR_REGISTRY, "your_mod_id");
+```
+
+This defines a `RegistryEntryCollection` for registry `YOUR_REGISTRY` with namespace `"your_mod_id"`.
+
+##### Registering
+
+Registering should be declared in the same class of `RegistryEntryCollection` and below it.
+
+```java
+public static final NaUtilsRegistry.Accessor<YourDataType> YOUR_ENTRY = REGISTER.register("your_entry", () -> new YourDataType(...));
+```
+
+This action registers `YourDataType(...)` with key `your_mod_id:your_entry` into `REGISTER`. Like Forge registry, `NaUtilsRegistry` also uses `Supplier`s instead of instances.
+
+It returns a `NaUtilsRegistry.Accessor` which is similar to `RegistryObject` for Forge registry. You can call `get()` to access the value.
+
+##### Merging
+
+Registering above only adds entries into `RegistryEntryCollection`, and you need to merge the registered entries into registry. You can do this by calling `REGISTER.merge()` in your mod main class' constructor.
+
+#### Access
+
+As `NaUtilsRegistry` uses `Supplier`s as values, it must generate values before accessing. By default, this will be done at the first time you call `NaUtilsRegistry#Accessor#get()`. Note that once the `NaUtilsRegistry.Accessor` outputs a non-null instance, the `Supplier` will be no longer called and the output results will no longer change.
+
+##### Pre-generating
+
+Optionally, you can manually generate all instances for a registry at a given phase of game setup. This action can be done by calling `setShouldGenerateOnCommonSetup()`, `setShouldGenerateOnClientSetup()` and `setShouldGenerateOnServerSetup()` on registry declaration to make the registry to generate all entries on common setup, on client setup and on server setup respectively.
 
 ## Forge Capabilities
 
@@ -176,9 +230,21 @@ Posted before a `Monster` is preventing player sleep.
 
 Cancellable. If cancelled, this monster will not prevent sleep.
 
+## Vanilla Trade System
+
+Vanilla Trade System allows to enable Vanilla Villager-like trade on any mobs. It is Implemented by Forge Capability.
+
+### `CVanillaMerchant` and `VanillaMerchant`
+
+`CVanillaMerchant` is the capability interface for mobs carrying vanilla trade. `VanillaMerchant` is the default implementation of `CVanillaMerchant` for users to extend.
+
+#### Usage
+
+
+
+
+
 ## Utility Method Libs
-
-
 
 ### `NaContainerUtils`
 
