@@ -229,11 +229,11 @@ public class RangedRandomDouble implements Supplier<Double> {
                     return DataResult.success(RangedRandomDouble.truncatedNormal(inst.get(0),
                             inst.get(1), inst.get(2)));
                 default:
-                    return DataResult.error("RangedRandomDouble: invalid length. Size 1 = fixed, 2 = uniform, 3 = truncated normal.");
+                    return DataResult.error(() -> "RangedRandomDouble: invalid length. Size 1 = fixed, 2 = uniform, 3 = truncated normal.");
             }
         } catch (IllegalArgumentException e)
         {
-            return DataResult.error("RangedRandomDouble: invalid value.");
+            return DataResult.error(() -> "RangedRandomDouble: invalid value.");
         }
     }, inst ->
     {
