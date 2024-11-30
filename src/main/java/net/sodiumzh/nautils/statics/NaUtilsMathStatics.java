@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.statics;
 
 import java.util.Random;
+import java.util.stream.Stream;
 
 import com.mojang.logging.LogUtils;
 
@@ -251,7 +252,7 @@ public class NaUtilsMathStatics
 		return new Vec3(v.x * scale.x, v.y * scale.y, v.z * scale.z);
 	}
 	
-	/** Random vector pointing to a oval surface */
+	/** Random vector pointing to an oval surface */
 	public static Vec3 randomOvalVector(double xScale, double yScale, double zScale)
 	{
 		return randomOvalVector(new Vec3(xScale, yScale, zScale));
@@ -283,6 +284,26 @@ public class NaUtilsMathStatics
 			}
 		}
 		return res;
+	}
+
+	/**
+	 * Get a block position stream in an octahedral area of which the Manhattan distance to a given center pos is no further
+	 * than the given distance.
+	 */
+	public static Stream<BlockPos> withinManhattanDistance(BlockPos center, int distance) {
+		return BlockPos.betweenClosedStream(new BlockPos(center.getX() - distance, center.getY() - distance, center.getZ() - distance),
+			new BlockPos(center.getX() + distance, center.getY() + distance, center.getZ() + distance))
+			.filter(pos -> center.distManhattan(pos) <= distance);
+	}
+
+	/**
+	 * Get a block position stream on an octahedral surface of which the Manhattan distance to a given center pos equals
+	 * to the given distance.
+	 */
+	public static Stream<BlockPos> atManhattanDistance(BlockPos center, int distance) {
+		return BlockPos.betweenClosedStream(new BlockPos(center.getX() - distance, center.getY() - distance, center.getZ() - distance),
+				new BlockPos(center.getX() + distance, center.getY() + distance, center.getZ() + distance))
+			.filter(pos -> center.distManhattan(pos) == distance);
 	}
 
 }
