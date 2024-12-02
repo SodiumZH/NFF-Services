@@ -292,7 +292,7 @@ public class NaUtilsMathStatics
 	public static Stream<BlockPos> withinManhattanDistance(BlockPos center, int distance) {
 		return BlockPos.betweenClosedStream(new BlockPos(center.getX() - distance, center.getY() - distance, center.getZ() - distance),
 			new BlockPos(center.getX() + distance, center.getY() + distance, center.getZ() + distance))
-			.filter(pos -> center.distManhattan(pos) <= distance);
+			.filter(pos -> center.distManhattan(pos) <= distance).map(pos -> new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
 	}
 
 	/**
@@ -302,7 +302,7 @@ public class NaUtilsMathStatics
 	public static Stream<BlockPos> atManhattanDistance(BlockPos center, int distance) {
 		return BlockPos.betweenClosedStream(new BlockPos(center.getX() - distance, center.getY() - distance, center.getZ() - distance),
 				new BlockPos(center.getX() + distance, center.getY() + distance, center.getZ() + distance))
-			.filter(pos -> center.distManhattan(pos) == distance);
+			.filter(pos -> center.distManhattan(pos) == distance).map(pos -> new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
 	}
 
 }
