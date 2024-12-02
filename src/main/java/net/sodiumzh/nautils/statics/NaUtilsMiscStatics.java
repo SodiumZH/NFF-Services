@@ -16,7 +16,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.sodiumzh.nautils.compat.ModDependent;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 
@@ -193,4 +196,5 @@ public class NaUtilsMiscStatics {
 		if (reg.containsKey(key)) return Optional.ofNullable(reg.getValue(key));
 		else return Optional.empty();
 	}
+
 }

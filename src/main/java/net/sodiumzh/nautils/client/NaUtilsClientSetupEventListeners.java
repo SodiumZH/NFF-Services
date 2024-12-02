@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.client;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sodiumzh.nautils.NaUtils;
