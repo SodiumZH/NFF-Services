@@ -20,6 +20,7 @@ public class WithDyeColors<T>
 		DyeColor active = null;
 		for (Object obj: keysAndValues)
 		{
+			// Odd, for key
 			if (active == null)
 			{
 				if (obj instanceof DyeColor color)
@@ -38,8 +39,10 @@ public class WithDyeColors<T>
 			}
 			else
 			{
+				// Even, object
 				try {
 					map.put(active, (T) obj);
+					active = null;
 				}
 				catch(ClassCastException e) {
 					throw new IllegalArgumentException("Illegal format. Should be: key, value, key, value, ...");
@@ -67,7 +70,7 @@ public class WithDyeColors<T>
 			if (map.get(clr).equals(object))
 				return clr;
 		}
-		throw new IllegalArgumentException("WithStandardColor#getColor: input object isn't an element of the colored object list.");
+		throw new IllegalArgumentException("WithDyeColors#getColor: input object isn't an element of the colored object list.");
 	}
 
 	/**
