@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  */
 public class NaUtilsCompatStatics {
 
-    public static <T> Optional<RegistryObject<T>> registerModDependent(DeferredRegister<T> register,
+    public static <T> Optional<RegistryObject<T>> registerModDependent(DeferredRegister<? super T> register,
                     String path, String dependingModId, Supplier<T> entry)
     {
         if (ModList.get().isLoaded(dependingModId))
