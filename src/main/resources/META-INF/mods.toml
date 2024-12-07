@@ -56,6 +56,6 @@ description='''A toolkit for taming and friendly mobs.'''
 [[dependencies.nffservices]]
     modId="nautils"
     mandatory=true
-    versionRange="[0.0.27, 0.0.26)"
+    versionRange="[0.0.27, 0.0.28)"
     ordering="NONE"
     side="BOTH"
