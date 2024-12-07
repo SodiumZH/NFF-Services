@@ -8,6 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.sodiumzh.nautils.entity.MobApplicableItemTable;
@@ -84,7 +85,8 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 							procValue = 0;
 						if (!player.isCreative() && shouldItemConsumeInternal(player.getMainHandItem(), target)) {
 							player.getMainHandItem().shrink(1);
-							NaUtilsItemStatics.giveOrDrop(player, player.getMainHandItem().getCraftingRemainingItem());
+							NaUtilsItemStatics.giveOrDrop(player,
+								player.getMainHandItem().getItem().getContainerItem(player.getMainHandItem()));
 						}
 						NaUtilsItemStatics.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
 						if (procValue > 0)

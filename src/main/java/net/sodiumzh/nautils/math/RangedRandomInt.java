@@ -1,12 +1,11 @@
 package net.sodiumzh.nautils.math;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-
-import net.minecraft.util.RandomSource;
 
 /**
  * A {@code RangedRandomInt} is a random integer generator with a range and
@@ -19,7 +18,7 @@ import net.minecraft.util.RandomSource;
  */
 public class RangedRandomInt implements Supplier<Integer>
 {
-    private static final RandomSource RND = RandomSource.create();
+    private static final Random RND = new Random();
     private final int minValue;	// Included
     private final int maxValue;	// Included
     private final double p;
@@ -97,7 +96,7 @@ public class RangedRandomInt implements Supplier<Integer>
     /**
      * Get a random value using the given RandomSource.
      */
-    public int getValue(RandomSource rnd)
+    public int getValue(Random rnd)
     {
         switch (rndType)
         {

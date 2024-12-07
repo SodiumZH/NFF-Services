@@ -30,15 +30,21 @@ public class NaUtilsDataStatics {
         MinecraftServer server = NaUtils.getServer();
         if (server == null) return;
         ResourceManager mgr = server.getResourceManager();
-        List<Resource> resources = mgr.getResourceStack(location);
+
+        List<Resource> resources;
+        try {
+            resources = mgr.getResources(location);
+        } catch (IOException e) {
+            throw new RuntimeException("NaUtilsDataStatics#readJsonsServerSide: IOException thrown on getting resource stack.", e);
+        }
         for (Resource r: resources)
         {
             try {
-                InputStream input = r.open();
+                InputStream input = r.getInputStream();
                 Reader inputReader = new InputStreamReader(input);
                 JsonElement json = JsonParser.parseReader(inputReader);
                 reader.accept(json);
-            } catch (IOException | RuntimeException e) {
+            } catch (RuntimeException e) {
                 if (!suppressStackTrace)
                     e.printStackTrace();
             }

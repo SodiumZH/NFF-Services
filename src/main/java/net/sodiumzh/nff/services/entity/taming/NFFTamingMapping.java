@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 
 /** Defines entity types before and after taming. Mobs which are registered to be a tamable type (type before
  * taming) will be automatically attached a {@link CNFFTamable} capability.
@@ -38,12 +39,12 @@ public class NFFTamingMapping {
 
 		@SuppressWarnings("unchecked")
 		public EntityType<? extends Mob> getTypeBefore() {
-			return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(fromType);
+			return (EntityType<? extends Mob>) ForgeRegistries.ENTITIES.getValue(fromType);
 		}
 
 		@SuppressWarnings("unchecked")
 		public EntityType<? extends Mob> getTypeAfter() {
-			return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(convertToType);
+			return (EntityType<? extends Mob>) ForgeRegistries.ENTITIES.getValue(convertToType);
 		}
 	}
 		

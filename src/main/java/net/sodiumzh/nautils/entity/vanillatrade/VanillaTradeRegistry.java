@@ -1,5 +1,6 @@
 package net.sodiumzh.nautils.entity.vanillatrade;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -549,11 +550,16 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 			MinecraftServer server = NaUtils.getServer();
 			if (server == null) return this;
 			ResourceManager mgr = server.getResourceManager();
-			List<Resource> resources = mgr.getResourceStack(location);
+			List<Resource> resources;
+			try {
+				resources = mgr.getResources(location);
+			} catch (IOException e) {
+				throw new RuntimeException("VanillaTradeRegistry: IOException thrown on getting resource stack.", e);
+			}
 			for (Resource r: resources)
 			{
 				try {
-					InputStream input = r.open();
+					InputStream input = r.getInputStream();
 					Reader reader = new InputStreamReader(input);
 					JsonElement json = JsonParser.parseReader(reader);
 
@@ -653,7 +659,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 								if (jo.has("level"))
 									this.setRequiredLevel(jo.get("level").getAsInt());
 								if (jo.has("profession"))
-									this.setProfession(ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
+									this.setProfession(ForgeRegistries.PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
 								break;
 							}
 							case "reset" : {
@@ -666,7 +672,7 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 								String target = jo.get("target").getAsString();
 								if (jo.has("profession"))
 									this.linkListings(new ResourceLocation(target),
-											ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
+											ForgeRegistries.PROFESSIONS.getValue(new ResourceLocation(jo.get("profession").getAsString())));
 								else this.linkListings(new ResourceLocation(target));
 								break;
 							}
