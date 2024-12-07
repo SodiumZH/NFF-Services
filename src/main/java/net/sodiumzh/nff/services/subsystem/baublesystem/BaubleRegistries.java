@@ -21,7 +21,6 @@ import net.sodiumzh.nautils.exceptions.DuplicateRegistryEntryException;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nautils.containers.Tuple4;
-import net.sodiumzh.nautils.exceptions.DuplicatedRegistryEntryException;
 
 class BaubleRegistries
 {
@@ -42,7 +41,7 @@ class BaubleRegistries
 		RAW_REGISTRY = new HashMap<>();
 	
 	/**
-	 * Register an entry into the direct registry. Only called in {@link RegisterBaubleEvent}.
+	 * Register an entry into the direct registry. Only called in {@link RegisterBaublesEvent}.
 	 */
 	static void registerBaubleRaw(IBaubleRegistryEntry entry)
 	{

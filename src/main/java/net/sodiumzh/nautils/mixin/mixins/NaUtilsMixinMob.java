@@ -1,6 +1,5 @@
 package net.sodiumzh.nautils.mixin.mixins;
 
-import net.sodiumzh.nautils.mixin.events.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +22,8 @@ import net.sodiumzh.nautils.mixin.event.entity.MobCheckDespawnEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobFinalizePickingUpItemEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobInteractEvent;
 import net.sodiumzh.nautils.mixin.event.entity.MobPickUpItemEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobRegisterGoalsEvent;
+
 @Mixin(Mob.class)
 public class NaUtilsMixinMob implements NaUtilsMixin<Mob>
 {
@@ -31,7 +32,7 @@ public class NaUtilsMixinMob implements NaUtilsMixin<Mob>
 	private void onRegisterGoals(Mob caller, Operation<Void> original)
 	{
 		original.call(caller);
-		MinecraftForge.EVENT_BUS.post(new MobRegisterGoalsEvent(caller));
+		MinecraftForge.EVENT_BUS.post(new net.sodiumzh.nautils.mixin.events.entity.MobRegisterGoalsEvent(caller));
 	}
 
 	@Inject(method = "isSunBurnTick()Z", at = @At("RETURN"), cancellable = true)

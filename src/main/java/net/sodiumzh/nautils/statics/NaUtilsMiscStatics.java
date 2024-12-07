@@ -193,7 +193,8 @@ public class NaUtilsMiscStatics {
 	/**
 	 * Get entry from Forge registry if present, otherwise return empty instead of registry default value.
 	 */
-	public static <T> Optional<T> getEntryOptional(IForgeRegistry<T> reg, ResourceLocation key)
+	public static <T extends net.minecraftforge.registries.IForgeRegistryEntry<T>> Optional<T> getEntryOptional(
+		IForgeRegistry<T> reg, ResourceLocation key)
 	{
 		if (reg.containsKey(key)) return Optional.ofNullable(reg.getValue(key));
 		else return Optional.empty();
