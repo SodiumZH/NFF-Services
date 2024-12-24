@@ -313,16 +313,11 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (this.getItemGivingTableOverride() != null && this.getItemGivingTableOverride().get() != null)
 		{
-			var output = this.getItemGivingTableOverride().get().getOutput(mob, itemstack);
+			var output = this.getItemGivingTableOverride().get().getOutputGetter(mob, itemstack);
 			if (output != null)
-				return output.noConsume();
+				return !output.isNoConsume();
 			else return true;
 		}
 		else return shouldItemConsume(itemstack);
 	}
-
-	public boolean shouldItemConsume(ItemStack stack) {
-		return false;
-	}
-
 }

@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.datafixers.types.Func;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.Resource;
@@ -65,7 +66,13 @@ public class MobApplicableItemTable
 	{
 		return entries.isEmpty();
 	}
-	
+
+	/**
+	 *
+	 * @param mob
+	 * @param stack
+	 * @return
+	 */
 	@Nullable
 	public Output getOutput(Mob mob, ItemStack stack)
 	{
@@ -76,7 +83,18 @@ public class MobApplicableItemTable
 		}
 		return null;
 	}
-	
+
+	@Nullable
+	public OutputGetter getOutputGetter(Mob mob, ItemStack stack)
+	{
+		for (var input: entries.keySet())
+		{
+			if (input.test(stack))
+				return entries.get(input);
+		}
+		return null;
+	}
+
 	@Override
 	public String toString()
 	{
@@ -447,6 +465,24 @@ public class MobApplicableItemTable
 		public void extraAction(@Nullable Consumer<Mob> action)
 		{
 			this.extraAction = action;
+		}
+
+		public boolean isNoConsume() { return noConsume; }
+
+		/**
+		 * Get the function to generate the cool down ticks.
+		 */
+		public Function<Mob, Integer> getCooldownGetter() {
+			return cooldownStatic.<Function<Mob, Integer>>map(val -> ((Mob mob) -> val))
+					.orElse(cooldownGetter);
+		}
+
+		/**
+		 * Get the function to generate the amount.
+		 */
+		public Function<Mob, Double> getAmountGetter() {
+			return amountStatic.<Function<Mob, Double>>map(val -> ((Mob mob) -> val))
+					.orElse(amountGetter);
 		}
 	}
 	
