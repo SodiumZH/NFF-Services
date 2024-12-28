@@ -544,12 +544,12 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 
 	@DontOverride
-	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown)
+	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown, Player player)
 	{
 		MutableObject<Boolean> succeeded = new MutableObject<>(false);		
 		this.asMob().getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
 		{
-			succeeded.setValue(l.applyHealingItem(stack, value, consume, cooldown));
+			succeeded.setValue(l.applyHealingItem(stack, value, consume, cooldown, player));
 		});		
 		return succeeded.getValue();
 	}
@@ -562,7 +562,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 
 	@DontOverride
-	public default InteractionResult tryApplyHealingItems(ItemStack stack)
+	public default InteractionResult tryApplyHealingItems(ItemStack stack, Player player)
 	{
 		if (stack.isEmpty())
 			return InteractionResult.PASS;
@@ -574,7 +574,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		MobApplicableItemTable.Output output = table.getOutput(this.asMob(), stack);
 		if (output != null)
 		{
-			return applyHealingItem(stack, output.amount().floatValue(), !output.noConsume(), output.cooldown()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			return applyHealingItem(stack, output.amount().floatValue(), !output.noConsume(), output.cooldown(), player) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 		}
 		return InteractionResult.PASS;
 	}
@@ -709,7 +709,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		 */
 		PASSIVE,
 		/**
-		 * Custom, defined in {@link IBefriendMob#shouldGolemAttack}.
+		 * Custom, defined in {@link INFFTamed#shouldGolemAttack}.
 		 */
 		CUSTOM
 	}
