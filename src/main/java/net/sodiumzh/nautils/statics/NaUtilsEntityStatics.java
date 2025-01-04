@@ -517,8 +517,7 @@ public class NaUtilsEntityStatics
 	
 	// Spawn mob at a given position without any post-natural-spawn initialization, finalizeSpawn() or sth else
 	public static Mob spawnDefaultMob(EntityType<? extends Mob> type, ServerLevel level, @Nullable CompoundTag compound,
-			@Nullable Component customName, @Nullable Player player, BlockPos pos, 
-			boolean shouldOffsetY, boolean shouldOffsetYMore) 
+			@Nullable Player player, BlockPos pos, boolean shouldOffsetY, boolean shouldOffsetYMore)
 	{
 		Mob mob = type.create(level);
 		if (mob == null)
@@ -552,11 +551,6 @@ public class NaUtilsEntityStatics
 			mob.yHeadRot = mob.getYRot();
 			mob.yBodyRot = mob.getYRot();
 			/* No further initialization */
-
-			if (customName != null)
-			{
-				mob.setCustomName(customName);
-			}
 
 			EntityType.updateCustomEntityTag(level, player, mob, compound);
 			level.addFreshEntityWithPassengers(mob);

@@ -1,7 +1,5 @@
 package net.sodiumzh.nautils.entity;
 
-import java.util.function.Consumer;
-
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -14,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -32,8 +31,13 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	protected EntityType<? extends Mob> type;
 	protected CompoundTag info = new CompoundTag();
 	
-	private MobRespawnInfo()
+	protected MobRespawnInfo()
 	{
+	}
+
+	public MobRespawnInfo create()
+	{
+		return new MobRespawnInfo();
 	}
 
 	@Nullable
@@ -42,30 +46,27 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 		return this.info.contains(ENTITY_CUSTOM_NAME_KEY, Tag.TAG_STRING) ?
 				NaUtilsInfoStatics.createText(this.info.getString(ENTITY_CUSTOM_NAME_KEY)) : null;
 	}
-	
-	/**
-	 * Actions to modify the NBT before respawning mob from it, e.g. position.
-	 * This action doesn't impact the NBT itself, but creates and outputs a copy.
-	 */
-	protected CompoundTag preRespawnModify(Player player, BlockPos pos, Direction direction) {
-		CompoundTag nbt = this.info.copy();
-		Vec3 posV = new Vec3((double) pos.getX() + 0.5D, (double) (pos.getY() + 1), (double) pos.getZ() + 0.5D);
-		NaUtilsNBTStatics.putVec3(nbt, "Pos", posV);
-		return nbt;
-	}
 
 	/**
-	 * Make the info from a mob.
+	 * Save a mob's data to this instance.
 	 */
 	@SuppressWarnings("unchecked")
-	protected void makeFromMob(Mob mob) {
-		this.beforeMake(mob);
-		//this.tag.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(mob.getType()).toString());
+	public void saveFromMob(Mob mob) {
+		this.beforeSave(mob);
 		this.type = (EntityType<? extends Mob>) mob.getType();
 		this.info = new CompoundTag();
 		mob.save(info);
 		//this.tag.put("mob_nbt", nbt);
-		this.afterMake(mob).accept(info);
+		this.afterSave(mob, info);
+	}
+
+	/**
+	 * Create a new instance containing a mob's data.
+	 */
+	public static MobRespawnInfo createFromMob(Mob mob) {
+		MobRespawnInfo info = new MobRespawnInfo();
+		info.saveFromMob(mob);
+		return info;
 	}
 
 	/**
@@ -76,41 +77,35 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	 * @return The mob if respawned, or null if on client, respawning cancelled or the info isn't valid.
 	 */
 	@Nullable
-	public Mob respawn(Player player, BlockPos pos, Direction direction) {
-		if (this.info.isEmpty()) 
+	public Mob respawn(Level level, @Nullable Player player, BlockPos pos, Direction direction) {
+		if (level.isClientSide)
 			return null;
 		if (this.type == null)
 			return null;
-		if (player.level().isClientSide)
+		if (this.beforeRespawn(level, player, pos, direction))
 			return null;
-		if (this.beforeRespawn(player, pos, direction))
-			return null;
-		BlockState blockstate = player.level().getBlockState(pos);
+		BlockState blockstate = level.getBlockState(pos);
 		BlockPos pos1;
-		if (blockstate.getCollisionShape(player.level(), pos).isEmpty())
+		if (blockstate.getCollisionShape(level, pos).isEmpty())
 		{
 			pos1 = pos;
 		} else
 		{
 			pos1 = pos.relative(direction);
 		}
-		Mob mob = NaUtilsEntityStatics.spawnDefaultMob(this.type, (ServerLevel) (player.level()), null,
-				this.getCustomName() != null ? this.getCustomName() : null,
+		Mob mob = NaUtilsEntityStatics.spawnDefaultMob(this.type, (ServerLevel) level, null,
 				player, pos1, true, !pos.equals(pos1) && direction == Direction.UP);
 		if (mob != null)
 		{
-			CompoundTag nbt = preRespawnModify(player, pos1, direction);
-			mob.setYRot(direction.toYRot());
-			mob.load(nbt);
+			CompoundTag nbt = this.info.copy();
+			if (!nbt.isEmpty()) {
+				Vec3 posV = new Vec3((double) pos.getX() + 0.5D, (double) (pos.getY() + 1), (double) pos.getZ() + 0.5D);
+				NaUtilsNBTStatics.putVec3(nbt, "Pos", posV);
+				mob.setYRot(direction.toYRot());
+				mob.load(nbt);
+			}
 			mob.setHealth(mob.getMaxHealth());
-			/*if (mob instanceof IBefriendedMob b)
-			{
-				//b.setInventoryFromMob();
-				b.updateAnchor();
-				b.setInit();
-			}*/
-			// stack.shrink(1);
-			this.afterRespawn(mob, player);
+			this.afterRespawn(mob, level, player);
 		}
 		return mob;
 	}
@@ -118,14 +113,14 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	/**
 	 * Actions before merging data from mob into this respawn info.
 	 */
-	protected void beforeMake(Mob fromMob) {}
+	protected void beforeSave(Mob fromMob) {}
 	
 	/**
 	 * Actions after merging data from mob into this respawn info.
 	 * @param fromMob Mob it makes from.
-	 * @return Actions to modify the info nbt.
+	 * @param original Original NBT. Directly operate on it to modify.
 	 */
-	protected Consumer<CompoundTag> afterMake(Mob fromMob) {return c -> {};}
+	protected void afterSave(Mob fromMob, CompoundTag original) {}
 	
 	/**
 	 * Actions before respawn. Return true to cancel respawning.
@@ -134,20 +129,31 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	 * @param direction Respawning direction.
 	 * @return Whether this respawning should be cancelled. If true, respawning will be cancelled and return null.
 	 */
-	protected boolean beforeRespawn(Player player, BlockPos pos, Direction direction) {return false;}
+	protected boolean beforeRespawn(Level level, @Nullable Player player, BlockPos pos, Direction direction) {
+		return false;
+	}
 	
 	/**
 	 * Actions after respawn.
 	 * @param mob Mob just spawned.
 	 * @param player Player as respawning action source.
 	 */
-	protected void afterRespawn(Mob mob, Player player) {}
-	
+	protected void afterRespawn(Mob mob, Level level, @Nullable Player player) {}
+
+	/**
+	 * Write the info into a {@link CompoundTag}. After writing, the {@link CompoundTag} will
+	 * get two new sub-tags: "mob_type" (String) and "mob_nbt" (Compound).
+	 */
+	public void writeNBT(CompoundTag writeInto)
+	{
+		writeInto.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(type).toString());
+		writeInto.put("mob_nbt", this.info.copy());
+	}
+
 	@Override
-	public CompoundTag serializeNBT() {
+	public final CompoundTag serializeNBT() {
 		CompoundTag res = new CompoundTag();
-		res.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(type).toString());
-		res.put("mob_nbt", this.info);
+		this.writeNBT(res);
 		return res;
 	}
 
