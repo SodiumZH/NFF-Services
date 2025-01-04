@@ -1,5 +1,37 @@
 # Change Log
 
+### 0.x.27
+
+##### NFF Services
+
+Replaced `HealingItemTable` with `MobApplicableItemTable`.
+
+Enabled `MobApplicableItemTable` in `TamingProcessItemGivingProgress`.
+
+Now `NFFTamingMapping` uses `Supplier`s.
+
+Added `ItemDescriptionAppendEvent`. Listening to this event allows to inject descriptions into existing items.
+
+##### Sodium's Utilities
+
+Added `NaUtilsRegistry`, a lightweight registry system imitating Forge registry system for registering custom objects.
+
+Added `RegistryEntryCollection` as a `DeferredRegister`-like registration utility for `NaUtilsRegistry`.
+
+Now `NaUtilsDataSerializer`s use `NaUtilsRegistry`.
+
+Added `NaUtilsRegistries` for some default registries. Use `RegistryEntryCollection` to register objects into them.
+
+Added `MobApplicableItemTable` for tables of item applicable to certain mobs. It can be read from data.
+
+Added data reading support for `VanillaTradeRegistry`.
+
+Fixed `WithDyeColors` error.
+
+### 0.0.26.1 
+
+Removed invalid data which causes broken tags.
+
 ### 0.x.26
 
 ##### NFF Services 
