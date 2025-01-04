@@ -38,7 +38,7 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 		// stack.setHoverName(NaUtilsInfoStatics.createTrans(stack.getHoverName().getString() +
 		// " - " + mob.getName().getString()));
 		// Check NBT correctly added
-		if (ins.getCapTag().isEmpty())
+		if (ins.getNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
 
 		return ins.get();
@@ -51,9 +51,9 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {
 		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(stack);
 		// Check NBT correctly added
-		if (ins.getCapTag().isEmpty())
+		if (ins.getNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
-		return ins.respawn(player, pos, direction);
+		return ins.respawn(player.level(), player, pos, direction);
 	}
 
 	@SuppressWarnings("resource")
