@@ -1,12 +1,16 @@
 package net.sodiumzh.nautils.eventhandler;
 
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.entity.DeferredEntityAttributeRegisterEvent;
+import net.sodiumzh.nautils.entity.DeferredEntityAttributes;
 import net.sodiumzh.nautils.registries.NaUtilsRegistry;
 
 @Mod.EventBusSubscriber(modid = NaUtils.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -27,5 +31,11 @@ public class NaUtilsSetupEventHandlers {
                     registry.regenerateAllValues();
             }
         });
+    }
+
+    @SubscribeEvent
+    public static void registerDeferredAttributeSuppliers(EntityAttributeCreationEvent event)
+    {
+        ModLoader.get().postEvent(new DeferredEntityAttributeRegisterEvent());
     }
 }
