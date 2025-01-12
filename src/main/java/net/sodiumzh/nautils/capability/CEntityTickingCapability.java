@@ -9,7 +9,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 
 /**
- * A base interface for entity capabilities that are automatically ticked.
+ * A base interface for entity capabilities that are automatically ticked. Needs registration.
  * <p>Use {@code registerTicking()} to register capability to the ticking list after creating, otherwise
  * it won't tick correctly.
  */
@@ -18,7 +18,10 @@ public interface CEntityTickingCapability<T extends Entity>
 	static final Set<Capability<? extends CEntityTickingCapability<? extends Entity>>> ALL_CAPS = new HashSet<>();
 	public void tick();
 	public T getEntity();
-	
+
+	/**
+	 * Register a capability as ticking, so that it can be auto ticked.
+	 */
 	public static void registerTicking(Capability<? extends CEntityTickingCapability<? extends Entity>> cap)
 	{
 		ALL_CAPS.add(cap);
