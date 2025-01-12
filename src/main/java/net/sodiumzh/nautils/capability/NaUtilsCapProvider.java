@@ -16,14 +16,14 @@ import net.minecraftforge.common.util.LazyOptional;
 public class NaUtilsCapProvider<T> implements ICapabilityProvider
 {
 	private T cap;
-	private Capability<T> holder;
+	private Capability<? extends T> holder;
 
 	/**
 	 * @param entity Entity owning this capability.
 	 * @param holder The corresponding {@link Capability} holder reference. This will be called when accessing the capability interface on parent objects.
 	 * @param capSupplier A method for generating capability interface instance. Will only be invoked once on construction.
 	 */
-	public NaUtilsCapProvider(Capability<T> holder, Supplier<T> capSupplier)
+	public <U extends T> NaUtilsCapProvider(Capability<U> holder, Supplier<? extends U> capSupplier)
 	{
 		this.holder = holder;
 		this.cap = capSupplier.get();
