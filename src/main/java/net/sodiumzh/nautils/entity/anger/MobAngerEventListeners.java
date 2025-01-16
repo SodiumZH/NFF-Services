@@ -2,6 +2,7 @@ package net.sodiumzh.nautils.entity.anger;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -23,17 +24,17 @@ public class MobAngerEventListeners {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onAttack(LivingHurtEvent event)
+    public static void onHurt(LivingHurtEvent event)
     {
         if (!event.isCanceled()
                 && event.getSource().getEntity() != null
                 && event.getSource().getEntity() instanceof LivingEntity src) {
             for (var cap : CMobAngerHandler.ALL_HANDLERS) {
-                event.getEntity().getCapability(cap).ifPresent(c -> c.setAngryAt(src, MobAngerReason.ATTACKED.get()));
-                src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntity(), MobAngerReason.ATTACKING.get()));
+                event.getEntity().getCapability(cap).ifPresent(c -> c.setAngryAt(src,
+                        event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKED.get() : MobAngerReason.HIT.get()));
+                src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntity(),
+                        event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKING.get() : MobAngerReason.HITTING.get()));
             }
         }
     }
-
-
 }

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@code MobAngerRules} controls mobs' behaviors about anger in different reasons.
+ * {@code MobAngerRules} controls the mob's behaviors about anger for different reasons.
  */
 public class MobAngerRules {
 
@@ -23,23 +23,58 @@ public class MobAngerRules {
     public static final NaUtilsRegistry.Accessor<MobAngerRules> NO_ANGER = RULES.register("no_anger", MobAngerRules::new);
 
     /**
-     * This mob will be angry with whom attacked it, with forgiving time 5 min.
+     * This mob will be angry with whom attacked it even without actual damage (defined in {@link CMobAngerHandler#getDamageThreshold()}),
+     * with forgiving time 5 min.
      */
     public static final NaUtilsRegistry.Accessor<MobAngerRules> ATTACKER = RULES.register("attacker",
-            () -> new MobAngerRules().forReason(MobAngerReason.ATTACKED.get()).end());
+            () -> new MobAngerRules()
+                    .forReason(MobAngerReason.ATTACKED.get())
+                    .forReason(MobAngerReason.HIT.get())
+                    .end());
 
     /**
-     * This mob will be angry with whom attacked it and whom it attacked, with forgiving time 5 min.
+     * This mob will be angry with whom attacked it only with actual damage (defined in {@link CMobAngerHandler#getDamageThreshold()}),
+     * with forgiving time 5 min.
+     */
+    public static final NaUtilsRegistry.Accessor<MobAngerRules> ATTACKER_DAMAGED = RULES.register("attacked_damaged",
+            () -> new MobAngerRules()
+                    .forReason(MobAngerReason.ATTACKED.get())
+                    .end());
+
+    /**
+     * This mob will be angry with whom attacked it even without damage (defined in {@link CMobAngerHandler#getDamageThreshold()}),
+     * and whom it attacked (even without damage), with forgiving time 5 min.
      */
     public static final NaUtilsRegistry.Accessor<MobAngerRules> ATTACKER_AND_ATTACKING = RULES.register("attacker_and_attacking",
-            () -> new MobAngerRules().forReason(MobAngerReason.ATTACKED.get()).forReason(MobAngerReason.ATTACKING.get()).end());
+            () -> new MobAngerRules()
+                    .forReason(MobAngerReason.ATTACKED.get())
+                    .forReason(MobAngerReason.HIT.get())
+                    .forReason(MobAngerReason.ATTACKING.get())
+                    .forReason(MobAngerReason.HITTING.get())
+                    .end());
+
+    /**
+     * This mob will be angry with whom attacked it with damage (defined in {@link CMobAngerHandler#getDamageThreshold()}),
+     * and whom it attacked (even without damage), with forgiving time 5 min.
+     */
+    public static final NaUtilsRegistry.Accessor<MobAngerRules> ATTACKER_DAMAGED_AND_ATTACKING = RULES.register("attacker_and_attacking",
+            () -> new MobAngerRules()
+                    .forReason(MobAngerReason.ATTACKED.get())
+                    .forReason(MobAngerReason.ATTACKING.get())
+                    .forReason(MobAngerReason.HITTING.get())
+                    .end());
 
     /**
      * This mob will be angry with whatever it is attacking, with forgiving time 5 min.
      */
     public static final NaUtilsRegistry.Accessor<MobAngerRules> HOSTILE = RULES.register("hostile",
-            () -> new MobAngerRules().forReason(MobAngerReason.ATTACKED.get()).forReason(MobAngerReason.ATTACKING.get())
-                    .forReason(MobAngerReason.TARGETING.get()).end());
+            () -> new MobAngerRules()
+                    .forReason(MobAngerReason.ATTACKED.get())
+                    .forReason(MobAngerReason.HIT.get())
+                    .forReason(MobAngerReason.ATTACKING.get())
+                    .forReason(MobAngerReason.HITTING.get())
+                    .forReason(MobAngerReason.TARGETING.get())
+                    .end());
 
     private final Map<MobAngerReason, TriFunction<MobAngerReason, Mob, LivingEntity, Integer>> table = new HashMap<>();
     private boolean ended = false;

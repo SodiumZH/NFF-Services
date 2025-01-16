@@ -16,7 +16,7 @@ public class MobAngerReason {
             NaUtilsRegistries.MOB_ANGER_REASONS, NaUtils.MOD_ID);
 
     /**
-     * The anger target attacked the mob.
+     * The anger target attacked the mob and dealt damage.
      */
     public static final NaUtilsRegistry.Accessor<MobAngerReason> ATTACKED = REASONS.register("attacked", MobAngerReason::new);
 
@@ -29,4 +29,15 @@ public class MobAngerReason {
      * Happens EVERY TICK if the mob's attack target is the anger target.
      */
     public static final NaUtilsRegistry.Accessor<MobAngerReason> TARGETING = REASONS.register("targeting", MobAngerReason::new);
+
+    /**
+     * The anger target attacked the mob but didn't deal damage.
+     */
+    public static final NaUtilsRegistry.Accessor<MobAngerReason> HIT = REASONS.register("hit", MobAngerReason::new);
+
+    /**
+     * Mob attacked the anger target but didn't deal damage.
+     */
+    public static final NaUtilsRegistry.Accessor<MobAngerReason> HITTING = REASONS.register("hitting", MobAngerReason::new);
+
 }
