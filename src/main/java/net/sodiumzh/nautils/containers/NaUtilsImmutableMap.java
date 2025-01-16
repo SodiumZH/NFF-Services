@@ -5,13 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.logging.LogUtils;
 
 /**
  * An immutable map implementation that can be directly created from a generic map or an element collection.
  * It only supports getting, but not putting or removing.
  * <p>Generally it's used to prevent accident unexpected/invalid modification of a returned map.
+ * @deprecated Use {@link ImmutableMap} instead
  */
+@Deprecated
 public class NaUtilsImmutableMap<K, V> implements Map<K, V>
 {
 
