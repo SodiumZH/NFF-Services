@@ -16,7 +16,12 @@ public class NaUtilsCapsEventListeners
 	{
 		for (var cap: CEntityTickingCapability.ALL_CAPS)
 		{
-			event.getEntity().getCapability(cap).ifPresent(CEntityTickingCapability::tick);
+			event.getEntity().getCapability(cap).ifPresent(c -> {
+				c.tick();
+				if (c instanceof CEntityTimerCapability<?> timer) {
+					timer.tickTimer();
+				}
+			});
 		}
 	}
 }
