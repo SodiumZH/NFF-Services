@@ -7,9 +7,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityProvider;
 
 /**
- * A default template {@link CapabilityProvider} for serializable capabilities.
- * @param <E>
- * @param <T>
+ * A default template Capability Provider for non-serializable capabilities.
+ * For serializable caps, use {@link NaUtilsEntitySerializableCapProvider}.
+ * @param <E> Entity type using this capability
+ * @param <T> Capability interface.
  */
 public class NaUtilsEntityCapProvider<E extends Entity, T> extends NaUtilsCapProvider<T>
 {
