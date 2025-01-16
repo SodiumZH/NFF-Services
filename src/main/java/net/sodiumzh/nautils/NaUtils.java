@@ -11,6 +11,8 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.sodiumzh.nautils.entity.anger.MobAngerReason;
+import net.sodiumzh.nautils.entity.anger.MobAngerRules;
 import net.sodiumzh.nautils.registries.*;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
 import org.apache.logging.log4j.core.net.Priority;
@@ -35,8 +37,16 @@ public class NaUtils {
 
 		// Custom registry related
 		NaUtilsRegistries.init();
-		NaUtilsDataSerializers.SERIALIZERS.merge();
+		mergeCustomRegistries();
 	}
+
+	private void mergeCustomRegistries()
+	{
+		NaUtilsDataSerializers.SERIALIZERS.merge();
+		MobAngerReason.REASONS.merge();
+		MobAngerRules.RULES.merge();
+	}
+
 
 	/**
 	 * Get the server instance if it's on server. On other threads/side or if the server isn't open,
