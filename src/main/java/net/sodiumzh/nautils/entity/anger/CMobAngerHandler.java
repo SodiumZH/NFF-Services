@@ -45,6 +45,16 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
      */
     public void forgive(LivingEntity target);
 
+    /**
+     * Get the damage threshold above which (excluding) will be regarded as "attack", otherwise "hit".
+     */
+    public float getDamageThreshold();
+
+    /**
+     * Set the damage threshold above which (excluding) will be regarded as "attack", otherwise "hit".
+     */
+    public CMobAngerHandler setDamageThreshold(float value);
+
     public class Impl implements CMobAngerHandler {
 
         private final Mob mob;
@@ -52,6 +62,8 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
         private final Map<UUID, MutableObject<Integer>> angerList = new HashMap<>();
         // Just for preventing tick() from repeatedly creating sets
         private final Set<UUID> tempRemoval = new HashSet<>();
+        private float damageThreshold = 1e-3f;
+
 
         public Impl(Mob mob, MobAngerRules rules) {
             this.mob = mob;
@@ -110,6 +122,17 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
         @Override
         public void forgive(LivingEntity target) {
             this.angerList.remove(target.getUUID());
+        }
+
+        @Override
+        public float getDamageThreshold() {
+            return this.damageThreshold;
+        }
+
+        @Override
+        public CMobAngerHandler setDamageThreshold(float value) {
+            this.damageThreshold = value;
+            return this;
         }
 
         @Override
