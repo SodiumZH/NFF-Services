@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.events.item.BlockItemConsumeOnPlaceEvent;
+import net.sodiumzh.nautils.mixin.events.item.BlockItemConsumeOnPlacedEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -22,7 +22,7 @@ public class NaUtilsBlockItemMixin implements NaUtilsMixin<BlockItem> {
     private void postBlockItemConsumeEvent(ItemStack instance, int pDecrement, Operation<Void> original, @Local BlockPos pos,
           @Local(ordinal = 1) BlockState blockstate, @Local Player player)
     {
-        if (!MinecraftForge.EVENT_BUS.post(new BlockItemConsumeOnPlaceEvent(instance.copy(), blockstate, player, pos)))
+        if (!MinecraftForge.EVENT_BUS.post(new BlockItemConsumeOnPlacedEvent(instance.copy(), blockstate, player, pos)))
             original.call(instance, pDecrement);
     }
 

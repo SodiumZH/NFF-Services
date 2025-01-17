@@ -21,7 +21,7 @@ public class MutablePredicate<T> implements Predicate<T>
 	
 	/**
 	 * Test with the whole predicate.
-	 * <p> The object needs to satisfy all of predicates in required predicates (accessed with {@code getRequired()}) 
+	 * <p> The object needs to satisfy all predicates in required predicates (accessed with {@code getRequired()})
 	 * and at least one predicate in optional predicates (accessed with {@code getOptional()}) to return {@code true}.
 	 * <p> If optional or required predicate is empty, it will be ignored.
 	 * <p> @throws UnsupportedOperationException If both optional and required predicates are empty.
