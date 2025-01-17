@@ -58,7 +58,7 @@ public class TamingInteractionResult {
         this.result = result;
     }
 
-    @Nullable
+    @Nonnull
     public Optional<Mob> getTamedMob() {
         return Optional.ofNullable(tamed);
     }
@@ -70,4 +70,10 @@ public class TamingInteractionResult {
     public Level getLevel() {
         return level;
     }
+
+    public boolean isHandled() {
+        return this.result.equals(InteractionResult.sidedSuccess(this.level.isClientSide));
+    }
+
+    public void setHandled() {this.setResult(InteractionResult.sidedSuccess(this.level.isClientSide));}
 }
