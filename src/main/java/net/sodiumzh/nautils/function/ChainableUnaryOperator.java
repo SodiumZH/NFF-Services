@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
  * A sequence of unary operators that can be appended to be executed in sequence in the order they're added.
  * Each operator will be stored separately to prevent endless recursion.
  */
-public class ChainableUnaryOperator<T>
+public class ChainableUnaryOperator<T> implements UnaryOperator<T>
 {
 	protected ArrayList<UnaryOperator<T>> operators = new ArrayList<>();
 	
