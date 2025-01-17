@@ -11,12 +11,9 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nautils.capability.NaUtilsEntitySerializableCapProvider;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.capability.CAttributeMonitorProvider;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamableProvider;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerProvider;
-import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
-import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
+import net.sodiumzh.nff.services.entity.capability.*;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumzh.nff.services.entity.capability.wrapper.ILivingDelayedActions;
 import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
@@ -82,43 +79,33 @@ public class NFFCapabilityAttachments {
 					&& !(mob instanceof INFFTamed)) 
 			{
 				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_TAMABLE),
-						new CNFFTamableProvider(mob));
-				if (NFFTamingMapping.contains((EntityType<? extends Mob>) mob.getType()) 
-						&& NFFTamingMapping.getHandler((EntityType<? extends Mob>) mob.getType()) != null)
-				{
-					// Initialize capability (defined in handlers)
-					/*mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
-					{
-						BefriendableMobRegistry.put(mob);
-					});*/
-				}
+						new NaUtilsEntitySerializableCapProvider<>(event.getObject(), NFFCapRegistry.CAP_BEFRIENDABLE_MOB,
+								() -> new CNFFTamableImpl(mob, NFFTamingMapping.getProcess(mob).getAngerRules())));
 			}
-		}
 
-		if (event.getObject() instanceof INFFTamed bm)
-		{
-			// Temp data (CNFFTamedCommonData)
-			// Renamed key in 0.x.25 from "cap_befriended_mob_temp_data" to "cap_befriended_mob_data"
-			/*event.addCapability(new ResourceLocation(NFFServices.MOD_ID, "cap_befriended_mob_temp_data"),
-					new CNFFTamedCommonData.Prvd(bef));*/
-			event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_MOB_COMMON_DATA),
-					new CNFFTamedCommonData.Prvd(bm));
-			
-			
-			// CHealingHandler
-			if (bm.healingHandlerClass() != null)
+
+			if (NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
+					&& mob instanceof INFFTamed bm)
 			{
-				try
+				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_MOB_COMMON_DATA),
+						new CNFFTamedCommonData.Prvd(bm));
+
+
+				// CHealingHandler
+				if (bm.healingHandlerClass() != null)
 				{
-					event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_HEALING_HANDLER), 
-						new CHealingHandlerProvider(
-							// Implementation class defined in INFFTamed implementation
-							bm.healingHandlerClass().getDeclaredConstructor(LivingEntity.class).newInstance(bm.asMob()), 
-							bm.asMob()));
-				} 
-				catch (Exception e)
-				{
-					e.printStackTrace();
+					try
+					{
+						event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_HEALING_HANDLER),
+							new CHealingHandlerProvider(
+								// Implementation class defined in INFFTamed implementation
+								bm.healingHandlerClass().getDeclaredConstructor(LivingEntity.class).newInstance(bm.asMob()),
+								bm.asMob()));
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}

@@ -12,12 +12,12 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nautils.annotation.DontOverride;
+import net.sodiumzh.nautils.capability.CEntityTickingCapability;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
-public interface CItemStackMonitor {
+public interface CItemStackMonitor extends CEntityTickingCapability<LivingEntity> {
 
-	public LivingEntity getLiving();
 	
 	public HashMap<String, Supplier<ItemStack>> getListenedStacks();
 	
@@ -26,7 +26,7 @@ public interface CItemStackMonitor {
 	@DontOverride
 	public default void onChanged(String key, ItemStack from, ItemStack to)
 	{
-		MinecraftForge.EVENT_BUS.post(new ChangeEvent(getLiving(), key, from, to));
+		MinecraftForge.EVENT_BUS.post(new ChangeEvent(getEntity(), key, from, to));
 	}
 		
 	public void tick();
@@ -61,11 +61,6 @@ public interface CItemStackMonitor {
 		{
 			this.living = living;
 		}
-		
-		@Override
-		public LivingEntity getLiving() {
-			return living;
-		}
 
 		@Override
 		public HashMap<String, Supplier<ItemStack>> getListenedStacks() {
@@ -89,13 +84,18 @@ public interface CItemStackMonitor {
 				if (!newStack.equals(stacksLastTick.get(key), false))
 				{
 					onChanged(key, stacksLastTick.get(key).copy(), newStack.copy());
-					if (this.getLiving() instanceof IItemStackMonitor i)
+					if (this.getEntity() instanceof IItemStackMonitor i)
 					{
 						i.onItemStackChange(key, stacksLastTick.get(key).copy(), newStack.copy());
 					}
 					stacksLastTick.put(key, newStack.copy());
 				}
 			}
+		}
+
+		@Override
+		public LivingEntity getEntity() {
+			return living;
 		}
 	}
 	
