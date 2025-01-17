@@ -3,8 +3,9 @@ package net.sodiumzh.nautils.capability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nautils.annotation.DontOverride;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -42,7 +43,7 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
     public default void putTimer(String key, int ticks) {
         if (ticks != 0)
             getTimerMap().put(key, ticks);
-        else removeTimer(key);
+        else removeTimer(key, false);
     }
 
     /**
@@ -59,8 +60,9 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
      * Remove a timer of given key.
      */
     @DontOverride
-    public default void removeTimer(String key) {
-        getTimerMap().remove(key);
+    public default void removeTimer(String key, boolean postEvent) {
+        this.getTimerMap().remove(key);
+        if (postEvent) MinecraftForge.EVENT_BUS.post(new TimerUpEvent(this, key));
     }
 
     @DontOverride
@@ -72,8 +74,10 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
             int oldVal = map.get(key);
             if (oldVal > 0)
                 map.put(key, oldVal - 1);
-            else if (oldVal == 0)
+            else if (oldVal == 0) {
                 removal.add(key);
+                MinecraftForge.EVENT_BUS.post(new TimerUpEvent(this, key));
+            }
         }
         for (String key: removal) {
             map.remove(key);
@@ -105,6 +109,24 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
         map.clear();
         for (String key: nbt.getAllKeys()) {
             map.put(key, nbt.getInt(key));
+        }
+    }
+
+    public static class TimerUpEvent extends Event {
+        private final CEntityTimerCapability<?> cap;
+        private final String key;
+
+        public TimerUpEvent(CEntityTimerCapability<?> cap, String key) {
+            this.cap = cap;
+            this.key = key;
+        }
+
+        public CEntityTimerCapability<?> getCapability() {
+            return cap;
+        }
+
+        public String getKey() {
+            return key;
         }
     }
 }
