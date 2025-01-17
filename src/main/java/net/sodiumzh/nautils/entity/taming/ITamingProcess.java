@@ -1,22 +1,13 @@
 package net.sodiumzh.nautils.entity.taming;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nautils.math.RandomSelection;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
-import net.sodiumzh.nff.services.entity.taming.TamableInteractArguments;
 
-import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Base interface of all taming processes.
