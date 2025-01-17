@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.annotation.Nonnull;
@@ -65,6 +66,7 @@ public class NaUtilsNBTStatics {
 	
 	// Serialize a UUID array from vector into the given compound tag with given key.
 	// Return the ListTag containing the UUIDs.
+	@Deprecated
 	public static ListTag serializeUUIDSet(CompoundTag tag, HashSet<UUID> set, String key)
 	{
 		tag.remove(key);
@@ -79,6 +81,7 @@ public class NaUtilsNBTStatics {
 	
 	// Deserialize a UUID array into set from a compound tag with given key.
 	// Return a new vector containing the UUIDs.
+	@Deprecated
 	public static HashSet<UUID> deserializeUUIDSet(CompoundTag inTag, String key)
 	{
 		ListTag uuidSetTag = inTag.getList(key, Tag.TAG_INT_ARRAY);
@@ -90,67 +93,7 @@ public class NaUtilsNBTStatics {
 		return out;
 	}
 
-	// Check if a compound tag contains a compound subtag with player's string uuid as key.
-	public static boolean containsPlayer(CompoundTag inTag, Player player)
-	{
-		// Fix unknown crash on player die
-		if (player == null) return false;
-		return inTag.contains(player.getStringUUID()) 
-				&& (inTag.get(player.getStringUUID()) instanceof CompoundTag);
-	}
-	
-	// Check if a compound tag contains a player's string uuid as subtag, and a tag with given key under it
-	public static boolean containsPlayerData(CompoundTag inTag, Player player, String key)
-	{
-		return containsPlayer(inTag, player) && inTag.getCompound(player.getStringUUID()).contains(key);
-	}
-	
-	public static HashSet<Player> getAllValidPlayersContaining(CompoundTag inTag, Entity levelContext)
-	{
-		HashSet<Player> res = new HashSet<Player>();
-		for (Player player: levelContext.level.players())
-		{
-			if (containsPlayer(inTag, player))
-				res.add(player);
-		}
-		return res;
-	}
-	
-	// Get tag if a compound tag has a player-uuid-named subtag which contains subtag with given key
-	// Return null if not present
-	public static Tag getPlayerData(CompoundTag inTag, Player player, String key)
-	{
-		return containsPlayerData(inTag, player, key) ? inTag.getCompound(player.getStringUUID()).get(key) : null;
-	}
-	
-	public static void putPlayerData(Tag inTag, CompoundTag putTo, Player player, String key)
-	{
-		// If missing player data, add
-		if (!containsPlayer(putTo, player))
-			putTo.put(player.getStringUUID(), new CompoundTag());
-		/**
-		 * If missing player data string label, put it
-		 * This value is ONLY used on iteration of the parent cmpd tag to find potential player data without player in level
-		 */
-		if (!putTo.getCompound(player.getStringUUID()).contains("player_uuid_string", TAG_STRING_ID))
-			putTo.getCompound(player.getStringUUID()).putString("player_uuid_string", player.getStringUUID());
-		// Finally put
-		putTo.getCompound(player.getStringUUID()).put(key, inTag);
-	}
-	
-	public static void removePlayerData(CompoundTag removeFrom, Player player, String key)
-	{
-		if (containsPlayerData(removeFrom, player, key))
-		{
-			removeFrom.getCompound(player.getStringUUID()).remove(key);
-		}
-		// When the data is the last one, remove the whole player data tag
-		if (removeFrom.getCompound(player.getStringUUID()).isEmpty())
-		{
-			removeFrom.remove(player.getStringUUID());
-		}
-	}
-	
+	@Deprecated
 	public static CompoundTag saveItemStack(@Nullable ItemStack stack, @Nonnull CompoundTag saveTo, String key) {
 		CompoundTag newTag = new CompoundTag();
 		if (stack == null || stack.isEmpty())
@@ -160,7 +103,8 @@ public class NaUtilsNBTStatics {
 		saveTo.put(key, newTag);
 		return newTag;
 	}
-	
+
+	@Deprecated
 	public static ItemStack readItemStack(CompoundTag nbt, String key)
 	{
 		if (nbt.contains(key, 10))
@@ -172,7 +116,8 @@ public class NaUtilsNBTStatics {
 		}
 		else return ItemStack.EMPTY;
 	}
-	
+
+	@Deprecated
 	public static void saveEquipment(CompoundTag toTag, Mob inMob)
 	{
 		saveItemStack(inMob.getItemBySlot(EquipmentSlot.HEAD), toTag, "nbt_helper_equipment_item_head");
@@ -182,7 +127,8 @@ public class NaUtilsNBTStatics {
 		saveItemStack(inMob.getItemBySlot(EquipmentSlot.MAINHAND), toTag, "nbt_helper_equipment_item_main_hand");
 		saveItemStack(inMob.getItemBySlot(EquipmentSlot.OFFHAND), toTag, "nbt_helper_equipment_item_off_hand");
 	}
-	
+
+	@Deprecated
 	public static void readEquipment(Mob toMob, CompoundTag inTag)
 	{
 		toMob.setItemSlot(EquipmentSlot.HEAD, readItemStack(inTag, "nbt_helper_equipment_item_head"));
@@ -192,7 +138,7 @@ public class NaUtilsNBTStatics {
 		toMob.setItemSlot(EquipmentSlot.MAINHAND, readItemStack(inTag, "nbt_helper_equipment_item_main_hand"));
 		toMob.setItemSlot(EquipmentSlot.OFFHAND, readItemStack(inTag, "nbt_helper_equipment_item_off_hand"));
 	}
-	
+
 	@Deprecated // Use NaUtilsNBTStatics.TAG_XXX_ID constants instead
 	public static enum TagType
 	{
@@ -222,22 +168,6 @@ public class NaUtilsNBTStatics {
 			return id;
 		}
 		
-	}
-	
-	public static Player getPlayerFromKey(CompoundTag fromTag, String key, Level level)
-	{
-		if (level == null)
-			return null;
-		else if (!fromTag.contains(key, 11))
-			return null;
-		return level.getPlayerByUUID(fromTag.getUUID(key));
-	}
-	
-	public static void putPlayerToKey(Player player, CompoundTag toTag, String key)
-	{
-		if (player == null)
-			return;
-		toTag.putUUID(key, player.getUUID());
 	}
 	
 	public static void putVec3(CompoundTag toTag, String key, Vec3 val)
@@ -368,5 +298,30 @@ public class NaUtilsNBTStatics {
 	{
 		resetKey(inTag, oldKey, newKey, false);
 	}
-	
+
+	public static <T> ListTag listTagFromIterable(Iterable<T> it, Function<T, Tag> saver)
+	{
+		ListTag res = new ListTag();
+		for (T elem: it) {
+			res.add(saver.apply(elem));
+		}
+		return res;
+	}
+
+	public static <T> Set<T> setFromListTag(ListTag listTag, Function<Tag, T> loader) {
+		Set<T> res = new HashSet<>();
+        for (Tag tag : listTag) {
+            res.add(loader.apply(tag));
+        }
+		return res;
+	}
+
+	public static <T> List<T> listFromListTag(ListTag listTag, Function<Tag, T> loader) {
+		List<T> res = new ArrayList<>();
+		for (Tag tag : listTag) {
+			res.add(loader.apply(tag));
+		}
+		return res;
+	}
+
 }
