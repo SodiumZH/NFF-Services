@@ -34,7 +34,7 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 	
 	// Actions when the item condition is satisfied
 	// If the mob is befriended immediately, return it. Otherwise return null.
-	public INFFTamed finalActions(Player player, Mob mob)
+	public Mob finalActions(Player player, Mob mob)
 	{
 		sendParticlesOnBefriended(mob);
 		return doTaming(player, mob);

@@ -161,15 +161,6 @@ public class NFFTamingMapping {
 	{
 		return getProcess((EntityType<? extends Mob>) fromMob.getType());
 	}
-
-	/**
-	 * @deprecated use {@code getProcessSupplier} or {@code getProcess} instead.
-	 */
-	@Deprecated
-	public static NFFTamingProcess getHandler(Mob fromMob)
-	{
-		return getProcess(fromMob);
-	}
 	
 	/** Get if the type ("wild" type) is tamable. */
 	public static boolean contains(EntityType<? extends Mob> fromType)
@@ -190,7 +181,27 @@ public class NFFTamingMapping {
 	{
 		return contains((EntityType<? extends Mob>) fromMob.getType());
 	}
-	
+
+	/** Get if the type could be (not necessarily) a tamed mob. */
+	public static boolean containsAfter(EntityType<? extends Mob> fromType)
+	{
+		for (Entry entry: REGISTRY.map)
+		{
+			if (entry.getTypeAfter().equals(fromType))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Get if the mob could be (not necessarily) a tamed mob. */
+	@SuppressWarnings("unchecked")
+	public static boolean containsAfter(Mob fromMob)
+	{
+		return containsAfter((EntityType<? extends Mob>) fromMob.getType());
+	}
+
 	public static EntityType<? extends Mob> getTypeBefore(EntityType<? extends Mob> befriendedType)
 	{
 		for (Entry entry: REGISTRY.map)

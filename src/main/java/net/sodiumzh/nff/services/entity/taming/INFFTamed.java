@@ -387,7 +387,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** 
-	 * <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingChangeTarget}. 
+	 * <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingSetAttackTarget}.
 	 * Get the previous target before updating target.
 	 * This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	 */
@@ -399,7 +399,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** 
-	* <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingChangeTarget}. 
+	* <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingSetAttackTarget}.
 	* Get the previous target after updating target.
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/
@@ -754,4 +754,23 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	{
 		return false;
 	}
+
+	// Static
+
+	/**
+	 * Common initialization when a new tamed mob is created but not loaded from NBT, either from taming or other ways.
+	 * @param player owner.
+	 * @param from The "wild" mob from which this mob is tamed. Null if it's not created by taming.
+	 */
+	public default void commonInit(@Nonnull Player player, @Nullable Mob from)
+	{
+		this.setOwner(player);
+		this.getData().setOwnerName(player.getName().getString());
+		this.init(player.getUUID(), from);
+		this.setInventoryFromMob();
+		this.getData().generateIdentifier();
+		this.getData().recordEntityType();
+		this.getData().recordEncounteredDate();
+	}
+
 }

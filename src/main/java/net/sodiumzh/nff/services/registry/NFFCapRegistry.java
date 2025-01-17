@@ -6,6 +6,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sodiumzh.nautils.capability.CEntityTickingCapability;
+import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandler;
 import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
@@ -33,6 +34,9 @@ public class NFFCapRegistry {
 	
 	static {
 		CEntityTickingCapability.registerTicking(CAP_BEFRIENDED_MOB_DATA);
+		CEntityTickingCapability.registerTicking(CAP_ATTRIBUTE_MONITOR);
+		CEntityTickingCapability.registerTicking(CAP_ITEM_STACK_MONITOR);
+		CMobAngerHandler.register(CAP_BEFRIENDABLE_MOB);
 	}
 	
 	@SubscribeEvent

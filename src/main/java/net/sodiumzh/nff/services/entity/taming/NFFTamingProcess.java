@@ -1,25 +1,31 @@
 package net.sodiumzh.nff.services.entity.taming;
 
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.containers.ArrayIterationHelper;
+import net.sodiumzh.nautils.entity.anger.MobAngerReason;
+import net.sodiumzh.nautils.entity.taming.ITamingProcess;
+import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.math.RndUtil;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
+import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class NFFTamingProcess
+public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
 	public NFFTamingProcess()
 	{	
@@ -33,7 +39,7 @@ public abstract class NFFTamingProcess
 	 * Method to finally do taming.
 	 * If this method is overridden, it should invalidate the input target living mob.
 	 */
-	public INFFTamed doTaming(Player player, Mob target)
+	public Mob doTaming(Player player, Mob target)
 	{
 		// Don't execute on client
 		if (target.level.isClientSide())
@@ -71,15 +77,16 @@ public abstract class NFFTamingProcess
 		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, bm));
 		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
-		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.CHANNEL, packet);
-		return bm;
+		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);
+		return bm.asMob();
 	}
 	
-	public abstract TamableInteractionResult handleInteract(TamableInteractArguments args);
+	public abstract TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand);
 	
 	/**
 	 * Invoked on mob tick in server.
 	 * <p> For custom tick actions, override {@code serverTick} instead.
+	 * <p> Implemented through {@link NFFEntityEventListeners#onLivingUpdate}.
 	 */
 	public final void serverTickInternal(Mob mob)
 	{
@@ -174,9 +181,9 @@ public abstract class NFFTamingProcess
 	* Fired in CNFFTamable::addHatredWithReason and no need to manually invoke
 	* Interrupt if attacked by default
 	* */
-	public void onAddingHatred(Mob mob, Player player, TamableHatredReason reason)
+	public void onAddingHatred(Mob mob, Player player, MobAngerReason reason)
 	{
-		if (isInProcess(player, mob) && reason == TamableHatredReason.ATTACKED)
+		if (isInProcess(player, mob) && reason.equals(MobAngerReason.ATTACKED.get()))
 			interrupt(player, mob, false);
 	}
 	
@@ -190,12 +197,11 @@ public abstract class NFFTamingProcess
 	/**
 	 * Get reasons that will cause this mob to add hatred. If the reason isn't listed in, it won't cause hatred.
 	 */
-	// If reasons are not in this list, no adding hatred
-	public abstract TamableHatredReason[] getAddHatredReasons();
+	public abstract HashSet<MobAngerReason> getAddHatredReasons();
 	
 	// Duration of hatred added
 	// -1 means permanent
-	public int getHatredDurationTicks(TamableHatredReason reason)
+	public int getHatredDurationTicks(MobAngerReason reason)
 	{
 		return 300 * 20;
 	}
@@ -274,6 +280,10 @@ public abstract class NFFTamingProcess
 			rs.add(t, probabilityTable.get(t));
 		}
 		return rs.select();
+	}
+
+	public static Optional<NFFTamingProcess> getTamingProcess(Mob wild) {
+		return Optional.ofNullable(NFFTamingMapping.getProcess(wild));
 	}
 
 }
