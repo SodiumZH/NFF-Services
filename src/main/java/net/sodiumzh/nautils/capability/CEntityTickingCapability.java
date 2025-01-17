@@ -5,8 +5,6 @@ import java.util.Set;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 
 /**
  * A base interface for entity capabilities that are automatically ticked. Needs registration.
