@@ -40,4 +40,8 @@ public class MobAngerReason {
      */
     public static final NaUtilsRegistry.Accessor<MobAngerReason> HITTING = REASONS.register("hitting", MobAngerReason::new);
 
+    /**
+     * Mob is damaged by the thorns enchantment of the target. Thorns damage below the threshold is ignored.
+     */
+    public static final NaUtilsRegistry.Accessor<MobAngerReason> THORNS = REASONS.register("thorns", MobAngerReason::new);
 }
