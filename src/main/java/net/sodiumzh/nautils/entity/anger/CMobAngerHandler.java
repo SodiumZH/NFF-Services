@@ -46,6 +46,11 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
     public void forgive(LivingEntity target);
 
     /**
+     * Get how long in ticks before the mob forgives the target. Returns 0 if not angry with the target.
+     */
+    public int getRemainingForgivingTicks(LivingEntity target);
+
+    /**
      * Get the damage threshold above which (excluding) will be regarded as "attack", otherwise "hit".
      */
     public float getDamageThreshold();
@@ -54,6 +59,17 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
      * Set the damage threshold above which (excluding) will be regarded as "attack", otherwise "hit".
      */
     public CMobAngerHandler setDamageThreshold(float value);
+
+    /**
+     * Save the anger list to an nbt.
+     * @return a new nbt containing the anger list.
+     */
+    public CompoundTag saveAngerList();
+
+    /**
+     * Load the anger list from an nbt.
+     */
+    public void loadAngerList(CompoundTag nbt);
 
     public class Impl implements CMobAngerHandler {
 
@@ -120,6 +136,11 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
         }
 
         @Override
+        public int getRemainingForgivingTicks(LivingEntity target) {
+            return isAngryAt(target) ? angerList.get(target.getUUID()).getValue() : 0;
+        }
+
+        @Override
         public void forgive(LivingEntity target) {
             this.angerList.remove(target.getUUID());
         }
@@ -136,7 +157,7 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag saveAngerList() {
             CompoundTag nbt = new CompoundTag();
             for (var e: angerList.entrySet())
             {
@@ -146,12 +167,22 @@ public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSer
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
+        public void loadAngerList(CompoundTag nbt) {
             angerList.clear();
             for (var key: nbt.getAllKeys())
             {
                 angerList.put(UUID.fromString(key), new MutableObject<>(nbt.getInt(key)));
             }
+        }
+
+        @Override
+        public CompoundTag serializeNBT() {
+            return this.saveAngerList();
+        }
+
+        @Override
+        public void deserializeNBT(CompoundTag nbt) {
+            this.loadAngerList(nbt);
         }
     }
 

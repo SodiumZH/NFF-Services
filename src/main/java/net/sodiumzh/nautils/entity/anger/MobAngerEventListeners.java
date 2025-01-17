@@ -1,5 +1,6 @@
 package net.sodiumzh.nautils.entity.anger;
 
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -30,10 +31,19 @@ public class MobAngerEventListeners {
                 && event.getSource().getEntity() != null
                 && event.getSource().getEntity() instanceof LivingEntity src) {
             for (var cap : CMobAngerHandler.ALL_HANDLERS) {
-                event.getEntity().getCapability(cap).ifPresent(c -> c.setAngryAt(src,
-                        event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKED.get() : MobAngerReason.HIT.get()));
-                src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntity(),
-                        event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKING.get() : MobAngerReason.HITTING.get()));
+                if (event.getSource().is(DamageTypes.THORNS))
+                {
+                    event.getEntity().getCapability(cap).ifPresent(c -> {
+                        if (event.getAmount() > c.getDamageThreshold())
+                            c.setAngryAt(src, MobAngerReason.THORNS.get());
+                    });
+                }
+                else {
+                    event.getEntity().getCapability(cap).ifPresent(c -> c.setAngryAt(src,
+                            event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKED.get() : MobAngerReason.HIT.get()));
+                    src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntity(),
+                            event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKING.get() : MobAngerReason.HITTING.get()));
+                }
             }
         }
     }
