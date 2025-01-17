@@ -1,302 +1,147 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.UUID;
-
-import javax.annotation.Nonnull;
-
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.event.entity.TamableTimerUpEvent;
+import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
+import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class CNFFTamableImpl implements CNFFTamable
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+public class CNFFTamableImpl extends CMobAngerHandler.Impl implements CNFFTamable
 {
-	
-	protected CompoundTag nbt = new CompoundTag();
-	
-	protected Mob owner = null;
-	
-	protected HashSet<UUID> cachedHatred = new HashSet<UUID>();
-	
-	protected CNFFTamableImpl()
-	{
-		nbt.put("player_data", new CompoundTag());
-		nbt.put("timers", new CompoundTag());
-		nbt.getCompound("timers").put("player_timers", new CompoundTag());
-	}
-	
-	
-	@Override
-	public Mob getOwner()
-	{
-		if (owner != null)
-			return owner;
-		else throw new IllegalStateException("CNFFTamable owner uninitialized.");
-	}
-	
-	public void setOwner(@Nonnull Mob owner)
-	{
-		this.owner = owner;
-	}
-	
-	/* Hatred related */
-	/**
-	 * Hatred UUID list is stored in nbt/hatred
-	 * Hatred duration list is stored in nbt/timers/player_timers/{$UUID}_in_hatred
-	 */
-	
-	@Override
-	public HashSet<UUID> getHatred() 
-	{
-		cachedHatred = NaUtilsNBTStatics.deserializeUUIDSet(nbt, "hatred");	
-		return cachedHatred;
-	}
+	private static final UUID EMPTY_UUID = new UUID(0, 0);
 
-	@Override
-	public void addHatred(Player player, int ticks) 
-	{
-		cachedHatred = NaUtilsNBTStatics.deserializeUUIDSet(nbt, "hatred");	
-		if (ticks == 0 || ticks < -1)
-			throw new IllegalArgumentException("Ticks must be positive or -1 for permanent.");		
-		if (!isInHatred(player))
-		{
-			cachedHatred.add(player.getUUID());
-			NaUtilsNBTStatics.serializeUUIDSet(getNbt(), cachedHatred, "hatred");			
-			setPlayerTimer(player, "in_hatred", ticks);	
-			NaUtilsDebugStatics.debugPrintToScreen("Mob added hatred " + Integer.toString(ticks / 20) + " s.", player);
-		}
-	}
-	
-	@Override
-	public boolean isInHatred(Player player) 
-	{
-		cachedHatred = NaUtilsNBTStatics.deserializeUUIDSet(nbt, "hatred");	
-		return cachedHatred.contains(player.getUUID());
-	}
-	
-	@Override
-	public int getHatredDuration(Player player)
-	{
-		if (!isInHatred(player))
-			return 0;
-		return getPlayerTimer(player, "in_hatred");
-	}
-	
-	@Override
-	public CompoundTag getNbt() 
-	{
-		return nbt;
-	}
+	private CompoundTag generalNBT = new CompoundTag();
+	private final Map<UUID, CompoundTag> playerSpecificNBT = new HashMap<>();
+	private Mob mob;
+	private final Map<String, Integer> timer = new HashMap<>();
+	private MobAngerRules angerRules;
+	private UUID alwaysHostileTo = EMPTY_UUID;
+	private boolean forcePersistent = false;
 
-	@Override
-	public CompoundTag getPlayerDataNbt()
+	public CNFFTamableImpl(Mob mob, MobAngerRules rules)
 	{
-		return nbt.getCompound("player_data");
+		super(mob, rules);
 	}
 
 	@Override
 	public CompoundTag serializeNBT() 
 	{
-		CompoundTag tag = new CompoundTag();
-		tag.put("nbt", nbt);
-		return tag;
+		CompoundTag nbt = new CompoundTag();
+		nbt.putBoolean("0.x.28+", true);
+		nbt.put("generalNBT", generalNBT.copy());
+		nbt.put("playerSpecificNBT", this.savePlayerSpecificNBT());
+		nbt.put("timer", this.saveTimer());
+		nbt.put("anger", this.saveAngerList());
+		nbt.put("alwaysHostileTo", NbtUtils.createUUID(alwaysHostileTo));
+		nbt.putBoolean("forcePersistent", forcePersistent);
+		return nbt;
 	}
 
 	@Override
 	public void deserializeNBT(CompoundTag nbt) 
 	{		
-		this.nbt = nbt.getCompound("nbt");
-		this.cachedHatred = getHatred();
+		if (!nbt.contains("0.x.28+")) return;	// Don't load data when porting old data to prevent errors
+		this.generalNBT = nbt.getCompound("generalNBT").copy();
+		this.loadPlayerSpecificNBT(nbt.getCompound("playerSpecificNBT"));
+		this.loadTimerFromNBT(nbt.getCompound("timer"));
+		this.loadAngerList(nbt.getCompound("anger"));
+		this.alwaysHostileTo = NbtUtils.loadUUID(nbt.getCompound("alwaysHostileTo"));
+		this.forcePersistent = nbt.getBoolean("forcePersistent");
+	}
+
+	private CompoundTag savePlayerSpecificNBT() {
+		CompoundTag nbt = new CompoundTag();
+		for (var entry: this.playerSpecificNBT.entrySet()) {
+			nbt.put(entry.getKey().toString(), entry.getValue().copy());
+		}
+		return nbt;
+	}
+
+	private void loadPlayerSpecificNBT(CompoundTag nbt) {
+		this.playerSpecificNBT.clear();
+		for (String key: nbt.getAllKeys()) {
+			this.playerSpecificNBT.put(UUID.fromString(key), nbt.getCompound(key).copy());
+		}
+	}
+
+	private String playerSpecificTimerKey(@Nonnull Player player, String key)
+	{
+		return player.getStringUUID() + "|" + key;
+	}
+
+	@NotNull
+	@Override
+	public CompoundTag getPlayerSpecificNBT(Player player) {
+		return this.playerSpecificNBT.getOrDefault(player.getUUID(), new CompoundTag());
+	}
+
+	// Player timers are in nbt/timers/player_timers
+	@Override
+	public int getPlayerTimerRemainingTime(@Nonnull Player player, String key) {
+		return getTimerRemainingTime(playerSpecificTimerKey(player, key));
 	}
 
 	@Override
-	public int getTimer(String key)
-	{
-		if (key.equals("player_timers"))
-			throw new IllegalArgumentException
-				("setPlayerTimer: \"player_timers\" is reserved and cannot be a timer key.");
-		int val = 0;
-		if (nbt.getCompound("timers").contains(key, 3))
-			val = nbt.getCompound("timers").getInt(key);
-		return val;
-	}
-	
-	// Player timers are in nbt/timers/player_timers
-	@Override
-	public int getPlayerTimer(@Nonnull Player player, String key)
-	{
-		String actualKey = player.getStringUUID() + "_" + key;
-		if (nbt.getCompound("timers").getCompound("player_timers").contains(actualKey, 3))
-		{
-			return nbt.getCompound("timers").getCompound("player_timers").getInt(actualKey);
-		}
-		else return 0;
-	}
-	
-	@Override
-	public boolean hasTimer(String key)
-	{
-		if (key.equals("player_timers"))
-			throw new IllegalArgumentException
-				("setPlayerTimer: \"player_timers\" is reserved and cannot be a timer key.");
-		return nbt.getCompound("timers").contains(key, 3);
-	}
-	
-	@Override
 	public boolean hasPlayerTimer(Player player, String key)
 	{
-		return nbt.getCompound("timers").getCompound("player_timers")
-				.contains(player.getStringUUID() + "_" + key, 3);
+		return this.hasTimer(playerSpecificTimerKey(player, key));
 	}
-	
+
 	@Override
-	public IntTag setTimer(String key, int ticks)
+	public void putPlayerTimer(Player player, String key, int ticks)
 	{
-		if (key.equals("player_timers"))
-			throw new IllegalArgumentException
-				("setPlayerTimer: \"player_timers\" is reserved and cannot be a timer key.");
-		CompoundTag timers = nbt.getCompound("timers");
-		if (ticks < -1 || ticks == 0)
-			throw new IllegalArgumentException("setTimer: ticks should be positive, or -1 for permanent");
-		timers.putInt(key, ticks);
-		return (IntTag)(timers.get(key));
+		this.putTimer(playerSpecificTimerKey(player, key), ticks);
 	}
-	
+
 	@Override
-	public IntTag setPlayerTimer(Player player, String key, int ticks)
+	public void removePlayerTimer(Player player, String key, boolean postEvent)
 	{
-		if (ticks < -1 || ticks == 0)
-			throw new IllegalArgumentException("setPlayerTimer: ticks should be positive, or -1 for permanent");
-		String actualKey = player.getStringUUID() + "_" + key;
-		nbt.getCompound("timers").getCompound("player_timers").putInt(actualKey, ticks);
-		return (IntTag)(nbt.getCompound("timers").getCompound("player_timers").get(actualKey));
+		this.removeTimer(playerSpecificTimerKey(player, key), postEvent);
 	}
-	
+
 	@Override
-	public void stopTimer(String key, boolean postEvent)
-	{
-		if (hasTimer(key))
-		{
-			nbt.getCompound("timers").remove(key);
-			if (postEvent)
-			{
-				MinecraftForge.EVENT_BUS.post(new TamableTimerUpEvent(this, key, null));
-				if (NFFTamingMapping.getHandler(getOwner()) != null)
-				{
-					NFFTamingMapping.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, null);
-				}
-			}
-		}
+	public void setAlwaysHostileTo(@Nullable LivingEntity target) {
+		this.alwaysHostileTo = Optional.ofNullable(target).map(LivingEntity::getUUID).orElse(EMPTY_UUID);
 	}
-	
+
+	@Nullable
 	@Override
-	public void stopPlayerTimer(Player player, String key, boolean postEvent)
-	{
-		if (hasPlayerTimer(player, key))
-		{
-			String actualKey = player.getStringUUID() + "_" + key;
-			nbt.getCompound("timers").getCompound("player_timers").remove(actualKey);
-			if (postEvent)
-			{
-				MinecraftForge.EVENT_BUS.post(new TamableTimerUpEvent(this, actualKey, player));
-				if (NFFTamingMapping.getHandler(getOwner()) != null)
-				{
-					NFFTamingMapping.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, player);
-				}
-			}
-		}
+	public UUID getAlwaysHostileTo() {
+		return this.alwaysHostileTo;
 	}
-	
+
 	@Override
-	public void updateTimers()
-	{
-		ArrayList<String> labelRemove = new ArrayList<String>();
-		// Update non-player timers
-		for (String key : nbt.getCompound("timers").getAllKeys())
-		{
-			Tag tag = nbt.getCompound("timers").get(key);
-			if (tag instanceof IntTag intTag)	// player_timers tag is excluded
-			{
-				int val = intTag.getAsInt();
-				if (val > 0)
-				{
-					val --;
-					nbt.getCompound("timers").putInt(key, val);
-					if (val == 1)
-					{
-						MinecraftForge.EVENT_BUS.post(new TamableTimerUpEvent(this, key, null));
-						if (NFFTamingMapping.getHandler(getOwner()) != null)
-						{
-							NFFTamingMapping.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, null);
-						}
-						labelRemove.add(key);
-					}
-				}
-				else if (val == 0)
-					throw new IllegalStateException("Befriendable Mob timer update: zero timer. Key: " + key);
-			}
-		}
-		for (String key: labelRemove)
-		{
-			nbt.getCompound("timers").remove(key);
-		}
-		labelRemove.clear();
-		
-		// Update player timers		
-		for (String key : nbt.getCompound("timers").getCompound("player_timers").getAllKeys())
-		{
-			UUID uuid = UUID.fromString(key.substring(0, 36));
-			Player player = owner.level.getPlayerByUUID(uuid);
-			// position 36 is "_"
-			String actualKey = key.substring(37);
-			// Don't update times of players not in level
-			if (player != null)
-			{
-				int val = nbt.getCompound("timers").getCompound("player_timers").getInt(key);
-				if (val > 0)
-				{
-					val --;
-					nbt.getCompound("timers").getCompound("player_timers").putInt(key, val);
-					if (val == 1)
-					{
-						if (actualKey.equals("in_hatred"))
-						{
-							// If a hatred timer is up, remove the player from hatred list
-							cachedHatred = NaUtilsNBTStatics.deserializeUUIDSet(nbt, "hatred");	
-							if (cachedHatred.contains(uuid))
-								cachedHatred.remove(player.getUUID());
-							NaUtilsNBTStatics.serializeUUIDSet(nbt, cachedHatred, "hatred");
-							NaUtilsDebugStatics.debugPrintToScreen("Player removed from hatred list of mob " + owner.getName().getString(), player);
-						}
-						// Hatred time up doesn't post event
-						else 
-						{
-							MinecraftForge.EVENT_BUS.post(new TamableTimerUpEvent(this, actualKey, player));
-							if (NFFTamingMapping.getHandler(getOwner()) != null)
-							{
-								NFFTamingMapping.getHandler(getOwner()).onBefriendableMobTimerUp(getOwner(), key, player);
-							}
-						}
-						labelRemove.add(key);
-					}
-				}
-				else if (val == 0)
-				{
-					throw new IllegalStateException("Befriendable Mob timer update: zero player timer. Key: " + key);
-				}
-			}	
-		}
-		for (String key: labelRemove)
-		{
-			nbt.getCompound("timers").getCompound("player_timers").remove(key);
-		}
+	public void setForcePersistent(boolean value) {
+		this.forcePersistent = value;
+	}
+
+	@Override
+	public boolean isForcePersistent() {
+		return this.forcePersistent;
+	}
+
+	@Override
+	public Mob getEntity() {
+		return mob;
+	}
+
+	@Override
+	public MobAngerRules getRules() {
+		return angerRules;
+	}
+
+	@Override
+	public Map<String, Integer> getTimerMap() {
+		return timer;
 	}
 }

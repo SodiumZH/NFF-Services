@@ -7,23 +7,24 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 
 public class CAttributeMonitorImpl implements CAttributeMonitor {
 
-	protected LivingEntity owner;
+	protected LivingEntity living;
 	
 	protected HashMap<Attribute, Double> map = new HashMap<Attribute, Double>();
 	
-	public CAttributeMonitorImpl(LivingEntity owner)
+	public CAttributeMonitorImpl(LivingEntity living)
 	{
-		this.owner = owner;
+		this.living = living;
 	}
-	
-	@Override
-	public LivingEntity getOwner() {
-		return owner;
-	}
+
+
 
 	@Override
 	public HashMap<Attribute, Double> getListenList() {
 		return map;
 	}
 
+	@Override
+	public LivingEntity getEntity() {
+		return living;
+	}
 }

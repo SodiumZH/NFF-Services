@@ -39,10 +39,10 @@ public class NFFInstantTamerItem extends Item
 			{
 				target.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
 				{
-					INFFTamed bef = NFFTamingMapping.getHandler((EntityType<Mob>)target.getType()).doTaming(player, l.getOwner());
+					Mob bef = NFFTamingMapping.getProcess((EntityType<Mob>)target.getType()).doTaming(player, l.getEntity());
 					if (bef != null)
 					{
-						NaUtilsParticleStatics.sendHeartParticlesToEntityDefault(bef.asMob());
+						NaUtilsParticleStatics.sendHeartParticlesToEntityDefault(bef);
 						NaUtilsDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " befriended", player);
 					} else
 						throw new UnimplementedException(

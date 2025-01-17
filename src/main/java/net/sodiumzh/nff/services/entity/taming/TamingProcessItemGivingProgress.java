@@ -1,85 +1,79 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.function.Supplier;
-
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.DoubleTag;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.sodiumzh.nautils.entity.MobApplicableItemTable;
+import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsItemStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
+import net.sodiumzh.nautils.statics.NaUtilsParticleStatics;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.Random;
+import java.util.function.Supplier;
 
 
 public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving{
 
 	protected Random rnd = new Random();
+	protected String NBT_KEY_ITEM_COOLDOWN = "item_cooldown";
+	protected String NBT_KEY_PROGRESS_VALUE = "proc_value";
 	@Nullable
 	protected Supplier<MobApplicableItemTable> tamingItemTableOverride = null;
 	@Override
-	public TamableInteractionResult handleInteract(TamableInteractArguments args) {
-		Mob target = args.getTarget();
-		Player player = args.getPlayer();
-		TamableInteractionResult result = new TamableInteractionResult();
-
-		args.execServer((l) -> {
-
-			if (!player.isShiftKeyDown() 
-					&& (isItemAcceptableInternal(player.getMainHandItem(), player, l.getOwner()) || player.getMainHandItem().is(Items.DEBUG_STICK))
-					&& args.isMainHand() 
+	public TamingInteractionResult handleInteract(Player player, Mob target, InteractionHand hand) {
+		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level());
+		CNFFTamable tamable = target.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).orElse(
+				new CNFFTamableImpl(target, MobAngerRules.NO_ANGER.get()));
+		if (!player.level().isClientSide)
+		{
+			if (!player.isShiftKeyDown()
+					&& (isItemAcceptableInternal(player.getMainHandItem(), player, tamable.getEntity())
+						|| player.getMainHandItem().is(Items.DEBUG_STICK))
+					&& hand.equals(InteractionHand.MAIN_HAND)
 					&& !(target.isPassenger() && this.shouldBlockOnRiding())
 					&& additionalConditions(player, target)) {
 				// Block if in hatred
-				if (l.isInHatred(player) && !shouldIgnoreHatred()) {
+				if (tamable.isAngryAt(player) && !shouldIgnoreHatred()) {
 					sendParticlesOnHatred(target);
-					NaUtilsDebugStatics.debugPrintToScreen("Hatred cooldown: " + Integer.toString(args.asCap().getHatredDuration(player) / 20) + " s."
-							, player);
-					result.setHandled();
+					NaUtilsDebugStatics.debugPrintToScreen("Anger cooldown: "
+									+ Integer.toString(tamable.getRemainingForgivingTicks(player) / 20) + " s.", player);
+					result = TamingInteractionResult.handled(player.level());
 
 				}
 				// Block if in cooldown
-				else if (l.getPlayerTimer(player, "item_cooldown") > 0) {
+				else if (tamable.getPlayerTimerRemainingTime(player, NBT_KEY_ITEM_COOLDOWN) > 0) {
 					NaUtilsDebugStatics.debugPrintToScreen(
-							"Action cooldown " + Integer.toString(l.getPlayerTimer(player, "item_cooldown") / 20) + " s.",
+							"Action cooldown " + Integer.toString(tamable.getPlayerTimerRemainingTime(player, NBT_KEY_ITEM_COOLDOWN) / 20) + " s.",
 							player);
 					sendParticlesOnActionCooldown(target);
 					// result.setHandled();
-				} 
-				else
-				{
+				} else {
 					ItemStack mainhand = player.getMainHandItem();
 					ItemStack givenCopy = mainhand.copy();
 					boolean isDebugStick = mainhand.is(Items.DEBUG_STICK);
 					// Put a zero data first, otherwise if fulfilled after giving only one item, something unexpected
 					// may happen due to missing proc_value tag
 					// Because this tag is also used to indicate whether the player is in process
-					if (!NaUtilsNBTStatics.containsPlayerData(l.getPlayerDataNbt(), player, "proc_value"))
-						NaUtilsNBTStatics.putPlayerData(DoubleTag.valueOf(0), l.getPlayerDataNbt(), player,
-								"proc_value");
+					if (!tamable.getPlayerSpecificNBT(player).contains(NBT_KEY_PROGRESS_VALUE))
+						tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, 0d);
 					// Get amount already given
-					DoubleTag currentValueTag = (DoubleTag) NaUtilsNBTStatics.getPlayerData(l.getPlayerDataNbt(), player, "proc_value");
-					double procValue = currentValueTag == null ? 0 : currentValueTag.getAsDouble();
-					double lastProcValue = procValue;	
-					if (isDebugStick)
-					{
+					double procValue = tamable.getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE);
+					double lastProcValue = procValue;
+					if (isDebugStick) {
 						procValue += 1.01;
 						// Immediately update tag, otherwise unexpected error occurs due to out-of-date tag value
 						// (possibly 0.0)
-						NaUtilsNBTStatics.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
-					}
-					else
-					{
+						tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
+					} else {
 						procValue += getProgressGainInternal(mainhand, player, target, lastProcValue);
 						if (procValue <= 0)
 							procValue = 0;
@@ -90,29 +84,26 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 						}
 						NaUtilsItemStatics.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
 						if (procValue > 0)
-							NaUtilsNBTStatics.putPlayerData(DoubleTag.valueOf(procValue), l.getPlayerDataNbt(), player, "proc_value");
+							tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
 						else interrupt(player, target, true);
 					}
 					NaUtilsDebugStatics.debugPrintToScreen("Progress Value: " + Double.toString(procValue), player);
-					if (procValue >= 0.9999999999d)
-					{	// 1.0 actually, avoiding potential float errors
+					if (procValue >= 0.9999999999d) {    // 1.0 actually, avoiding potential float errors
 						// Satisfied
 						finalActions(player, target);
 						result.setHandled();
-					} 
-					else
-					{
+					} else {
 						// Not satisfied, put data
 						sendParticlesOnItemReceived(target);
 						sendProgressHeart(target, lastProcValue, procValue, deltaProcPerHeart());
-						l.setPlayerTimer(player, "item_cooldown", this.getItemGivingCooldownTicks()); // Set cooldown
+						tamable.putPlayerTimer(player, NBT_KEY_ITEM_COOLDOWN, this.getItemGivingCooldownTicks());
 						this.afterItemGiven(player, target, givenCopy);
 						this.onItemGiven(player, target, givenCopy, lastProcValue, procValue);
 						result.setHandled();
 					}
 				}
 			}
-		});
+		}
 
 		// ...................................
 		/*args.execClient((l) -> {
@@ -194,22 +185,6 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		return 0.2d;
 	}
-
-	@Override
-	public void serverTick(Mob mob)
-	{
-		/*mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> {
-			if (!shouldIgnoreHatred())
-			{
-				for (UUID uuid: l.getHatred())
-				{
-					if (l.hasPlayerData(mob.level.getPlayerByUUID(uuid), "proc_value")
-							&& l.getPlayerDataDouble(mob.level.getPlayerByUUID(uuid), "proc_value") > 0d)
-						this.interrupt(mob.level.getPlayerByUUID(uuid), mob, false);					
-				}
-			}
-		});*/
-	}
 	
 	@Override
 	public void interrupt(Player player, Mob mob, boolean isQuiet) {
@@ -219,7 +194,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 			{
 				sendParticlesOnInterrupted(mob);
 			}
-			l.removePlayerData(player, "proc_value");			
+			l.getPlayerSpecificNBT(player).remove(NBT_KEY_PROGRESS_VALUE);
 		});
 	}
 	
@@ -235,9 +210,8 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	@Override
 	public boolean isInProcess(Player player, Mob mob)
 	{
-		CNFFTamable l = CNFFTamable.getCap(mob);
-		return NaUtilsNBTStatics.containsPlayerData(l.getPlayerDataNbt(), player, "proc_value")
-			&& ((DoubleTag) (NaUtilsNBTStatics.getPlayerData(l.getPlayerDataNbt(), player, "proc_value"))).getAsDouble() > 0;
+		CNFFTamable tamable = CNFFTamable.get(mob);
+		return tamable.getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE) > 0;
 	}
 	
 	/**
@@ -248,7 +222,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (!isInProcess(player, mob))
 			return -1;
-		else return ((DoubleTag) (NaUtilsNBTStatics.getPlayerData(CNFFTamable.getCap(mob).getPlayerDataNbt(), player, "proc_value"))).getAsDouble();
+		return CNFFTamable.get(mob).getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE);
 	}
 
 	/**
@@ -259,35 +233,32 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	public void addProgressValue(Mob mob, Player player, double deltaValue)
 	{
 		double oldValue = getProgressValue(mob, player);
-		NaUtilsNBTStatics.putPlayerData(DoubleTag.valueOf(oldValue + deltaValue), 
-				CNFFTamable.getCap(mob).getPlayerDataNbt(), player, "proc_value");
+		CNFFTamable.get(mob).getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE,oldValue + deltaValue);
 	}
-	
-	
-	
+
 	public void sendParticlesOnHatred(Mob target)
 	{
-		NaUtilsEntityStatics.sendAngryParticlesToLivingDefault(target);
+		NaUtilsParticleStatics.sendAngryParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesOnActionCooldown(Mob target)
 	{
-		NaUtilsEntityStatics.sendSmokeParticlesToLivingDefault(target);
+		NaUtilsParticleStatics.sendSmokeParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesOnItemReceived(Mob target)
 	{
-		NaUtilsEntityStatics.sendGlintParticlesToLivingDefault(target);
+		NaUtilsParticleStatics.sendGlintParticlesToEntityDefault(target);
 	}
 
 	public void sendParticlesOnInterrupted(Mob target)
 	{
-		NaUtilsEntityStatics.sendAngryParticlesToLivingDefault(target);
+		NaUtilsParticleStatics.sendAngryParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesForProgressHeart(Mob target)
 	{
-		NaUtilsEntityStatics.sendParticlesToEntity(target, ParticleTypes.HEART, target.getBbHeight() - 0.5, 0.2d, 1, 1d);
+		NaUtilsParticleStatics.sendParticlesToEntity(target, ParticleTypes.HEART, target.getBbHeight() - 0.5, 0.2d, 1, 1d);
 	}
 
 	/**

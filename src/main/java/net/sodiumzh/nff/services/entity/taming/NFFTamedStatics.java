@@ -48,10 +48,7 @@ public class NFFTamedStatics
 			return false;
 		else if (target instanceof Ghast && !mob.canAttackGhast())
 			return false;
-		else if (isLivingAlliedToBM(mob, target))
-			return false;
-		else
-			return true;
+		else return !isLivingAlliedToBM(mob, target);
 	}
 
 	/* Save & Load */
