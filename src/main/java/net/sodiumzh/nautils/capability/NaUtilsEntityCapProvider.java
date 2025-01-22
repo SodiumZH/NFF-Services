@@ -28,7 +28,7 @@ public class NaUtilsEntityCapProvider<E extends Entity, T> extends NaUtilsCapPro
 	 * @param holder The corresponding {@link Capability} holder reference. This will be called when accessing the capability interface on parent objects.
 	 * @param capSupplier A method for generating capability interface instance. Will only be invoked once on construction.
 	 */
-	public <U extends T> NaUtilsEntityCapProvider(E entity, Capability<U> holder, Supplier<U> capSupplier)
+	public <U extends T> NaUtilsEntityCapProvider(E entity, Capability<U> holder, Supplier<? extends U> capSupplier)
 	{
 		super(holder, capSupplier);
 		this.entity = entity;

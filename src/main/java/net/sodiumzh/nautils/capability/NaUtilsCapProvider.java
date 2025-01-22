@@ -10,6 +10,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
+
 /**
  * A capability provider without side.
  */
@@ -19,7 +21,6 @@ public class NaUtilsCapProvider<T> implements ICapabilityProvider
 	private Capability<? extends T> holder;
 
 	/**
-	 * @param entity Entity owning this capability.
 	 * @param holder The corresponding {@link Capability} holder reference. This will be called when accessing the capability interface on parent objects.
 	 * @param capSupplier A method for generating capability interface instance. Will only be invoked once on construction.
 	 */
@@ -30,8 +31,8 @@ public class NaUtilsCapProvider<T> implements ICapabilityProvider
 	}
 	
 	@Override
-	@NotNull
-	public <C> LazyOptional<C> getCapability(@NotNull final Capability<C> cap, final @Nullable Direction side){
+	@Nonnull
+	public <C> LazyOptional<C> getCapability(@Nonnull final Capability<C> cap, final @Nullable Direction side){
 		if (cap == holder)
 			return LazyOptional.of(() -> {return this.cap;}).cast();
 		else return LazyOptional.empty();

@@ -20,7 +20,7 @@ public class NaUtilsEntitySerializableCapProvider<E extends Entity, T extends IN
 	extends NaUtilsEntityCapProvider<E, T> implements ICapabilitySerializable<TG>
 {
 
-	public NaUtilsEntitySerializableCapProvider(E entity, Capability<T> holder, Supplier<T> capSupplier)
+	public NaUtilsEntitySerializableCapProvider(E entity, Capability<T> holder, Supplier<? extends T> capSupplier)
 	{
 		super(entity, holder, capSupplier);
 	}

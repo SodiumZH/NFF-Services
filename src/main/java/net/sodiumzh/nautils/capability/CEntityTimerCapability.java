@@ -5,6 +5,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.annotation.DontOverride;
 
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.Set;
  */
 public interface CEntityTimerCapability<T extends Entity> extends CEntityTickingCapability<T> {
 
+    @DontCallManually
     public Map<String, Integer> getTimerMap();
 
     @DontOverride
