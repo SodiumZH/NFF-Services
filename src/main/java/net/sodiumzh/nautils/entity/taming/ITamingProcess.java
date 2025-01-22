@@ -3,9 +3,12 @@ package net.sodiumzh.nautils.entity.taming;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -38,6 +41,7 @@ public interface ITamingProcess<T extends Mob> {
     /**
      * Interrupt all players' processes.
      */
+    @DontOverride
     public default boolean interruptAll(T mob, boolean isQuiet)
     {
         boolean res = false;
@@ -55,17 +59,15 @@ public interface ITamingProcess<T extends Mob> {
     /**
      * If true, the process will not be interrupted when the player dies.
      */
-    public default boolean dontInterruptOnPlayerDie()
-    {
-        return false;
-    }
+    public boolean dontInterruptOnPlayerDie();
 
     /** Indicates if the player is this mob's taming process. */
     public boolean isInProcess(Player player, T mob);
 
     /** Indicates if any player is in this mob's taming process. */
     @SuppressWarnings("resource")
-    public default boolean isInProcess(T mob)
+    @DontOverride
+    public default boolean isInAnyProcess(T mob)
     {
         if (mob.level().isClientSide)
             return false;
@@ -80,22 +82,18 @@ public interface ITamingProcess<T extends Mob> {
     /** Execute when the mob attacks the player in taming process with it
      * Requires manual invoke in subclasses by listening to events.
      */
-    public default void onAttackProcessingPlayer(T mob, Player player, double damage)
-    {
-    }
+    public void onAttackProcessingPlayer(T mob, Player player, double damage);
 
     /**
      * Execute when the mob is attacked by the player in taming process with it.
      * Requires manual invoke in subclasses by listening to events.
      * */
-    public default void onAttackedByProcessingPlayer(T mob, Player player, double damage)
-    {
-    }
+    public void onAttackedByProcessingPlayer(T mob, Player player, double damage);
 
     /**
      * Invoked when the mob gets angry with a player.
      */
-    public void onGettingAngry(T mob, Player player, MobAngerReason reason);
+    public void onAngryAt(T mob, Player player, @Nullable MobAngerReason reason);
 
     /**
      * Get the rules about how the mob will get angry with a player.
@@ -105,29 +103,14 @@ public interface ITamingProcess<T extends Mob> {
     /**
      * If true, the mob will not despawn if any player in the level is in process with it.
      */
-    public static boolean persistentIfInProcess()
-    {
-        return true;
-    }
+    public boolean persistentIfInProcess();
 
     /* Util */
-    /**
-     * Do an action for all players in process.
-     * @deprecated use consumer version instead
-     */
-    @Deprecated
-    public default void forAllPlayersInProcess(T mob, BiConsumer<Player, T> todo)
-    {
-        for (Player player: mob.level().players())
-        {
-            if (isInProcess(player, mob))
-                todo.accept(player, mob);
-        }
-    }
 
     /**
-     * Do an action for all players in process.
+     * Do an action for all players in process that are present in the dimension.
      */
+    @DontOverride
     public default void forAllPlayersInProcess(T mob, Consumer<Player> todo)
     {
         for (Player player: mob.level().players())

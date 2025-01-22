@@ -28,8 +28,7 @@ public abstract class VanillaAnimalTamingProcess implements ITamingProcess<Tamab
     public abstract boolean isInProcess(Player player, TamableAnimal mob);
 
     @Override
-    public void onGettingAngry(TamableAnimal mob, Player player, MobAngerReason reason) {
-
+    public void onAngryAt(TamableAnimal mob, Player player, MobAngerReason reason) {
     }
 
     @Override

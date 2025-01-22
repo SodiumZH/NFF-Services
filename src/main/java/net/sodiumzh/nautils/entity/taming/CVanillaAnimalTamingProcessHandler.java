@@ -47,8 +47,7 @@ public interface CVanillaAnimalTamingProcessHandler extends INBTSerializable<Com
 
         @Override
         public void tick() {
-            if (!mob.asMob().level().isClientSide)
-                mob.getProcess().serverTick(mob.asMob());
+            mob.getProcess().serverTick(mob.asMob());
         }
 
         @Override
@@ -62,9 +61,4 @@ public interface CVanillaAnimalTamingProcessHandler extends INBTSerializable<Com
         }
     }
 
-    public static class Prvd extends NaUtilsEntitySerializableCapProvider<TamableAnimal, CVanillaAnimalTamingProcessHandler, CompoundTag> {
-        public <U extends CVanillaAnimalTamingProcessHandler> Prvd(IUsesTamingProcess entity, Capability<CVanillaAnimalTamingProcessHandler> holder) {
-            super(entity.asMob(), holder, () -> new CVanillaAnimalTamingProcessHandler.Impl(entity));
-        }
-    }
 }
