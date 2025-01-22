@@ -13,8 +13,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -26,6 +25,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
+import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
+import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
@@ -138,8 +139,7 @@ public class NFFEntityEventListeners
 				Mob mob = cap.getEntity();
 				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
 				Entity target = NaUtilsEntityStatics.getIfCanSee(alwaysHostileUUID, mob).orElse(null);
-				if (target != null 
-						&& target instanceof LivingEntity targetLiving
+				if (target instanceof LivingEntity targetLiving
 						&& event.getNewTarget() != target)
 					event.setCanceled(true);
 			});
@@ -303,7 +303,7 @@ public class NFFEntityEventListeners
 				}
 				if (!event.getEntity().level.isClientSide) {
 					// Drop all items in inventory if no vanishing curse
-					if (/*bef.dropInventoryOnDeath()*//** TODO: Fix item loss if not dropping */true) {
+					if (/*bef.dropInventoryOnDeath()*//**TODO: Fix item loss if not dropping */true) {
 						NFFTamedMobInventory container = bef.getAdditionalInventory();
 						for (int i = 0; i < container.getContainerSize(); ++i) {
 							if (container.getItem(i) != ItemStack.EMPTY) {
@@ -416,7 +416,7 @@ public class NFFEntityEventListeners
 				NFFTamingProcess handler = NFFTamingMapping.getProcess(mob);
 				if (handler.isInProcess(player, mob))
 				{
-					handler.onAttackedByProcessingPlayer(mob, player, event.getAmount() > 0.000001);
+					handler.onAttackedByProcessingPlayer(mob, player, event.getAmount());
 				}
 			}
 			// On player attacked by befriendable mob
@@ -430,7 +430,7 @@ public class NFFEntityEventListeners
 				NFFTamingProcess handler = NFFTamingMapping.getProcess(mob);
 				if (handler.isInProcess(player, mob))
 				{
-					handler.onAttackProcessingPlayer(mob, player, event.getAmount() > 0.000001);
+					handler.onAttackProcessingPlayer(mob, player, event.getAmount());
 				}
 			}
 		}
@@ -466,7 +466,8 @@ public class NFFEntityEventListeners
 								mob.setTarget(targetLiving);
 						}
 						// Befriending handler tick
-						NFFTamingMapping.getProcess((EntityType<Mob>) (mob.getType())).serverTickInternal(mob);
+						// Now ticked on CNFFTamableImpl
+						//NFFTamingMapping.getProcess((EntityType<Mob>) (mob.getType())).serverTickInternal(mob);
 					});
 				}
 				// update healing handler cooldown
@@ -547,6 +548,9 @@ public class NFFEntityEventListeners
 			{
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
 			});
+			event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> {
+				cap.getTamingProcess().tamableInit(cap);
+			});
 		}
 		if (event.getEntity() instanceof INFFTamedSunSensitiveMob um)
 		{
@@ -554,7 +558,7 @@ public class NFFEntityEventListeners
 			um.setupSunImmunityRules();
 		}
 	}
-	
+
 	/*@SubscribeEvent
 	public static void onDespawn(AllowDespawn event)
 	{
@@ -564,5 +568,12 @@ public class NFFEntityEventListeners
 				event.setResult(Result.DENY);
 		});
 	}*/
+
+	@SubscribeEvent
+	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
+	{
+		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+			event.setCanceled(true);
+	}
 	
 }
