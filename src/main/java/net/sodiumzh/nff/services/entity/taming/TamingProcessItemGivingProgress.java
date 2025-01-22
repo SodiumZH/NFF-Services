@@ -65,16 +65,16 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 					// Put a zero data first, otherwise if fulfilled after giving only one item, something unexpected
 					// may happen due to missing proc_value tag
 					// Because this tag is also used to indicate whether the player is in process
-					if (!tamable.getPlayerSpecificNBT(player).contains(NBT_KEY_PROGRESS_VALUE))
-						tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, 0d);
+					if (!tamable.getOrCreatePlayerSpecificNBT(player).contains(NBT_KEY_PROGRESS_VALUE))
+						tamable.getOrCreatePlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, 0d);
 					// Get amount already given
-					double procValue = tamable.getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE);
+					double procValue = tamable.getOrCreatePlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE);
 					double lastProcValue = procValue;
 					if (isDebugStick) {
 						procValue += 1.01;
 						// Immediately update tag, otherwise unexpected error occurs due to out-of-date tag value
 						// (possibly 0.0)
-						tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
+						tamable.getOrCreatePlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
 					} else {
 						procValue += getProgressGainInternal(mainhand, player, target, lastProcValue);
 						if (procValue <= 0)
@@ -85,7 +85,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 						}
 						NaUtilsItemStatics.giveOrDrop(player, getReturnedItem(player, target, givenCopy, lastProcValue, procValue));
 						if (procValue > 0)
-							tamable.getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
+							tamable.getOrCreatePlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE, procValue);
 						else interrupt(player, target, true);
 					}
 					NaUtilsDebugStatics.debugPrintToScreen("Progress Value: " + Double.toString(procValue), player);
@@ -211,7 +211,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 			{
 				sendParticlesOnInterrupted(mob);
 			}
-			l.getPlayerSpecificNBT(player).remove(NBT_KEY_PROGRESS_VALUE);
+			l.getPlayerSpecificNBT(player).ifPresent(nbt -> nbt.remove(NBT_KEY_PROGRESS_VALUE));
 		});
 	}
 	
@@ -228,7 +228,8 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	public boolean isInProcess(Player player, Mob mob)
 	{
 		CNFFTamable tamable = CNFFTamable.get(mob);
-		return tamable.getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE) > 0;
+		return tamable.getPlayerSpecificNBT(player).map(nbt -> nbt.getDouble(NBT_KEY_PROGRESS_VALUE) > 0)
+				.orElse(false);
 	}
 	
 	/**
@@ -239,7 +240,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (!isInProcess(player, mob))
 			return -1;
-		return CNFFTamable.get(mob).getPlayerSpecificNBT(player).getDouble(NBT_KEY_PROGRESS_VALUE);
+		return CNFFTamable.get(mob).getPlayerSpecificNBT(player).map(nbt -> nbt.getDouble(NBT_KEY_PROGRESS_VALUE)).orElse(0d);
 	}
 
 	/**
@@ -250,7 +251,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	public void addProgressValue(Mob mob, Player player, double deltaValue)
 	{
 		double oldValue = getProgressValue(mob, player);
-		CNFFTamable.get(mob).getPlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE,oldValue + deltaValue);
+		CNFFTamable.get(mob).getOrCreatePlayerSpecificNBT(player).putDouble(NBT_KEY_PROGRESS_VALUE,oldValue + deltaValue);
 	}
 
 	public void sendParticlesOnHatred(Mob target)

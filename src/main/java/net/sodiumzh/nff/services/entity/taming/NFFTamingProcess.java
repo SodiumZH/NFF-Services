@@ -3,20 +3,28 @@ package net.sodiumzh.nff.services.entity.taming;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
+import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import net.sodiumzh.nautils.entity.anger.MobSetAngerResult;
 import net.sodiumzh.nautils.entity.taming.ITamingProcess;
 import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.BMHooks;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.text.html.Option;
 import java.util.HashSet;
@@ -28,16 +36,20 @@ import java.util.function.Supplier;
 
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
+	@Nonnull
+	private MobAngerRules interruptingAngerRules = MobAngerRules.ATTACKER_DAMAGED.get();
+
 	public NFFTamingProcess()
 	{	
 	}
 
-	public void initCap(CNFFTamable cap)
-	{
-	}	
-	
-	/** If this method is overridden, it should invalidate the input target living mob.
+	/**
+	 * Invoked on entity join level to initialize the tamable capability.
+	 * <p>Handled in {@link NFFEntityEventListeners#onEntityJoinWorld}.
 	 */
+	public abstract void tamableInit(CNFFTamable cap);
+
+	@Override
 	public Mob doTaming(Player player, Mob target)
 	{
 		// Don't execute on client
@@ -79,193 +91,71 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);
 		return bm.asMob();
 	}
-	
-	public abstract TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand);
-	
+
 	/**
-	 * Invoked on mob tick in server.
+	 * Invoked on mob tick on server.
 	 * <p> For custom tick actions, override {@code serverTick} instead.
-	 * <p> Implemented through {@link NFFEntityEventListeners#onLivingUpdate}.
+	 * <p> Implemented through {@link CNFFTamableImpl#tick()}.</>}.
 	 */
-	public final void serverTickInternal(Mob mob)
+	public final void doServerTick(Mob mob)
 	{
-		if (persistantIfInProcess())
+		if (persistentIfInProcess())
 		{
 			mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(c -> 
 			{
-				c.setForcePersistent(isInProcess(mob));
+				c.setForcePersistent(isInAnyProcess(mob));
 			});
 		}
 		serverTick(mob);
 	}
 
-	/**
-	 * Invoked on mob tick in server.
-	 */
-	public void serverTick(Mob mob)
-	{}
-	
+	@Override
 	public abstract void interrupt(Player player, Mob mob, boolean isQuiet);
-	
-	// interrupt all
-	// This will not send any particles no matter isQuiet or not.
-	// If particles are needed, override this function.
-	// @return if any process is interrupted.
-	public boolean interruptAll(Mob mob, boolean isQuiet)
-	{
-		boolean res = false;
-		for (Player player: mob.level().players())
-		{
-			if (player != null && isInProcess(player, mob))
-			{
-				interrupt(player, mob, true);
-				res = true;
-			}
-		}
-		return res;
-	}
-	
-	public boolean dontInterruptOnPlayerDie()
-	{
-		return false;
-	}
-	
-	/** Indicates if the player is in befriending process of the mob. */
-	public abstract boolean isInProcess(Player player, Mob mob);
-	
-	/** Indicates if any player is in befriending process. */
-	@SuppressWarnings("resource")
-	public boolean isInProcess(Mob mob)
-	{
-		if (mob.level().isClientSide)
-			return false;
-		for (Player player: mob.level().players())
-		{
-			if (isInProcess(player, mob))
-				return true;
-		}
-		return false;
-	}
-	
-	/** Execute when the mob attacks the player in befriending process with it
-	 * Fired in NFFEntityEventListeners and no need to manually invoke
-	 * This function doesn't check if player is in hatred
-	 * No action by default
-	 *
-	 * @param damageGiven Whether the attack gave any real damage.
+
+	/** Execute when the mob attacks the player in taming process with it, no action by default.
+	 * <p>This method doesn't check if the mob got angry. For behaviors based on anger, override {@code onAngryAt} instead.
+	 * <p>Implemented through {@link NFFEntityEventListeners#onLivingHurt}.</>
 	 */
-	public void onAttackProcessingPlayer(Mob mob, Player player, boolean damageGiven)
-	{
+	@Override
+	public void onAttackProcessingPlayer(Mob mob, Player player, double damage) {
 	}
-	
-	/** Execute when the mob is attacked by the player in befriending process with it
-	* Fired in NFFEntityEventListeners and no need to manually invoke
-	* This function doesn't check if player is in hatred
-	* By default no action. Usually it will interrupt because of hatred
-	* */
-	public void onAttackedByProcessingPlayer(Mob mob, Player player, boolean damageGiven)
-	{
+
+
+	/** Execute when the mob is attacked by the player in taming process with it, no action by default.
+	 * <p>This method doesn't check if the mob got angry. For behaviors based on anger, override {@code onAngryAt} instead.
+	 * <p>Implemented through {@link NFFEntityEventListeners#onLivingHurt}.</>
+	 * */
+	@Override
+	public void onAttackedByProcessingPlayer(Mob mob, Player player, double damage) {
 	}
-	
+
 	/** Execute when the mob added player into hatred list
-	* Fired in CNFFTamable::addHatredWithReason and no need to manually invoke
 	* Interrupt if attacked by default
+	 * <p>Implemented through {@link CNFFTamableImpl#onAngryAt}</>
 	* */
-	public void onAddingHatred(Mob mob, Player player, MobAngerReason reason)
+	@Override
+	public void onAngryAt(Mob mob, Player player, MobAngerReason reason)
 	{
-		if (isInProcess(player, mob) && reason.equals(MobAngerReason.ATTACKED.get()))
+		if (isInProcess(player, mob) && this.getInterruptingAngerRules().getForgivingTicks(reason, mob, player) != 0)
 			interrupt(player, mob, false);
 	}
-	
-	// Get reasons for adding hatred in mob
-	// If reasons are not in this list, no adding hatred
-	public abstract HashSet<MobAngerReason> getAddHatredReasons();
-	
-	// Duration of hatred added
-	// -1 means permanent
-	public int getHatredDurationTicks(MobAngerReason reason)
-	{
-		return 300 * 20;
+
+	@Nonnull
+	public MobAngerRules getInterruptingAngerRules() {
+		return interruptingAngerRules;
 	}
-	
-	/**
-	 * If true, the mob will not despawn if any player in the level is in process with it.
-	 */
-	public boolean persistantIfInProcess()
-	{
+
+	public void setInterruptingAngerRules(@Nonnull MobAngerRules rules) {
+		this.interruptingAngerRules = rules;
+	}
+
+	@Override
+	public boolean dontInterruptOnPlayerDie() {
+		return false;
+	}
+
+	@Override
+	public boolean persistentIfInProcess() {
 		return true;
 	}
-	
-	/**
-	 * Action when related mob fired a timer-up event, posted after the timer-up Forge event.
-	 * @param mob	Related mob.
-	 * @param timerKey	String key of the timer.
-	 * @param player	Related player if it's a player-specified timer. Null if it isn't.
-	 */
-	public void onBefriendableMobTimerUp(Mob mob, String timerKey, @Nullable Player player) {}
-	
-	
-	/* Util */
-	/**
-	 * Do an action for all players in process.
-	 * @deprecated use consumer version instead
-	 */
-	@Deprecated
-	public void forAllPlayersInProcess(Mob mob, BiConsumer<Player, Mob> todo)
-	{
-		for (Player player: mob.level().players())
-		{
-			if (isInProcess(player, mob))
-				todo.accept(player, mob);
-		}
-	}
-
-	/**
-	 * Do an action for all players in process.
-	 */
-	public void forAllPlayersInProcess(Mob mob, Consumer<Player> todo)
-	{
-		for (Player player: mob.level().players())
-		{
-			if (isInProcess(player, mob))
-				todo.accept(player);
-		}
-	}
-
-	// Utilities
-
-	public static final double rndDouble(double min, double max)
-	{
-		return NaUtilsMathStatics.rndRangedDouble(min, max);
-	}
-	
-	public static final float rndFloat(float min, float max)
-	{
-		return NaUtilsMathStatics.rndRangedFloat(min, max);
-	}
-	
-	public static final Supplier<Double> rndDoubleSupplier(double min, double max)
-	{
-		return () -> rndDouble(min, max);
-	}
-	
-	public static final Supplier<Float> rndFloatSupplier(float min, float max)
-	{
-		return () -> rndFloat(min, max);
-	}
-	
-	public static final <T> T getFromProbabilityTable(Map<T, Double> probabilityTable, T defaultValue)
-	{
-		RandomSelection<T> rs = new RandomSelection<>(defaultValue);
-		for (T t: probabilityTable.keySet())
-		{
-			rs.add(t, probabilityTable.get(t));
-		}
-		return rs.select();
-	}
-
-	public static Optional<NFFTamingProcess> getTamingProcess(Mob wild) {
-		return Optional.ofNullable(NFFTamingMapping.getProcess(wild));
-	}
-
 }
