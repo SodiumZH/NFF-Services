@@ -37,7 +37,8 @@ public interface CAttributeMonitor extends CEntityTickingCapability<LivingEntity
 	}
 	
 	// Update and detect change on tick
-	@SuppressWarnings("deprecation")
+	@Override
+    @SuppressWarnings("deprecation")
 	@DontOverride
 	@DontCallManually
 	public default void tick()

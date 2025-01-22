@@ -21,6 +21,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.sodiumzh.nautils.compat.ModDependent;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Contract;
 
 
 public class NaUtilsMiscStatics {
@@ -197,4 +198,36 @@ public class NaUtilsMiscStatics {
 		else return Optional.empty();
 	}
 
+	/**
+	 * Convert a string to UUID if it's valid, or empty if it's not.
+	 * <p>Note: Use this method only when the string <i>is expected to be valid</i> for preventing exceptions. It's
+	 * implemented by exception catching and may cause resource waste when handling large amount of invalid inputs.
+	 */
+	public static Optional<UUID> toOptionalUUID(@Nullable String strRepresentation) {
+		try {
+			if (strRepresentation == null) return Optional.empty();
+			return Optional.of(UUID.fromString(strRepresentation));
+		} catch (RuntimeException e) {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Return the first argument if non-null, and the second if the first is null. Null if both inputs are null.
+	 */
+	@Contract("!null, _ -> !null; null, !null -> !null; null, null -> null")
+	public static <T> T orElse(@Nullable T in, @Nullable T defaultVal)
+	{
+		return in != null ? in : defaultVal;
+	}
+
+	/**
+	 * Return the first argument if non-null, and run the default getter if the first is null. Null if both inputs are null.
+	 */
+	@Contract("!null, _ -> !null; null, null -> null")
+	public static <T> T orElseGet(@Nullable T in, @Nullable Supplier<T> defaultGetter) {
+		if (in != null) return in;
+		else if (defaultGetter != null) return defaultGetter.get();
+		else return null;
+	}
 }
