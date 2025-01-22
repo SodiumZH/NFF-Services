@@ -4,6 +4,7 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nautils.entity.IMobSpecific;
 import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
+import net.sodiumzh.nautils.entity.anger.MobAngerHandler;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
 
@@ -20,7 +21,7 @@ public interface IUsesTamingProcess extends IMobSpecific<TamableAnimal> {
     @DontOverride
     public default CMobAngerHandler getAngerHandler() {
         return asMob().getCapability(NaUtilsCaps.CAP_VANILLA_TAMABLE_ANIMAL_ANGER_HANDLER)
-                .orElseGet(() -> new CMobAngerHandler.Impl(this.asMob(), MobAngerRules.NO_ANGER.get()));
+                .orElseGet(() -> new MobAngerHandler(this.asMob(), MobAngerRules.NO_ANGER.get()));
     }
 
     @DontOverride
