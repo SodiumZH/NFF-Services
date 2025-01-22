@@ -1,9 +1,7 @@
 package net.sodiumzh.nautils.entity.anger;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.NeutralMob;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nautils.entity.IMobSpecific;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
@@ -25,7 +23,7 @@ public interface IUsesDefaultAngerHandler extends IMobSpecific<Mob> {
     @DontOverride
     public default CMobAngerHandler getDefaultAngerHandler() {
         return this.asMob().getCapability(NaUtilsCaps.CAP_MOB_DEFAULT_ANGER_HANDLER)
-                .orElseGet(() -> new CMobAngerHandler.Impl(this.asMob(), this.getAngerRules()));
+                .orElseGet(() -> new MobAngerHandler(this.asMob(), this.getAngerRules()));
     }
 
     /**
