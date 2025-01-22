@@ -14,6 +14,8 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
+import javax.annotation.Nonnull;
+
 public interface CLivingEntityDelayedActionHandler
 {
 	
@@ -139,8 +141,8 @@ public interface CLivingEntityDelayedActionHandler
 		}
 		
 		@Override
-		public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-			if(cap == NFFCapRegistry.CAP_DELAYED_ACTION_HANDLER && cap != null)
+		public <T> @Nonnull LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+			if(cap == NFFCapRegistry.CAP_DELAYED_ACTION_HANDLER)
 				return LazyOptional.of(() -> {return this.cap;}).cast();
 			else
 				return LazyOptional.empty();
