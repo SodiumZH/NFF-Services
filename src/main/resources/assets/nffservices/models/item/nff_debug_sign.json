@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "nffservices:item/nff_debug_sign"
+	}
+}
