@@ -44,8 +44,8 @@ public interface CEntityTickingCapability<T extends Entity>
 		public boolean isCorrectSide(boolean isClientSide)
 		{
 			if (isClientSide)
-				return this == SERVER || this == BOTH;
-			else return this == CLIENT || this == BOTH;
+				return this == CLIENT || this == BOTH;
+			else return this == SERVER || this == BOTH;
 		}
 	}
 }
