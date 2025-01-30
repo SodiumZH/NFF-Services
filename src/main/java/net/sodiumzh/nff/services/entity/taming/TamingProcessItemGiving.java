@@ -4,13 +4,15 @@ import java.util.Random;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 
+import javax.annotation.Nullable;
+
 public abstract class TamingProcessItemGiving extends NFFTamingProcess
 {
-	
+
+	@Deprecated
 	protected Random rnd = new Random();
 	
 	/**
@@ -29,11 +31,12 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 	// Additional conditions when giving items
 	public abstract boolean additionalConditions(Player player, Mob mob);
 	
-	// If true, the action can proceed even if the player is in the hatred list
-	public boolean shouldIgnoreHatred() {return false;}
+	// If true, the action can proceed even if the mob is angry with the player
+	public boolean shouldIgnoreAnger() {return false;}
 	
 	// Actions when the item condition is satisfied
 	// If the mob is befriended immediately, return it. Otherwise return null.
+	@Nullable
 	public Mob finalActions(Player player, Mob mob)
 	{
 		sendParticlesOnBefriended(mob);

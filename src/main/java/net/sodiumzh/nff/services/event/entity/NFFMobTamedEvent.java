@@ -8,9 +8,9 @@ public class NFFMobTamedEvent extends Event
 {
 	public final Mob mobBefore;
 	
-	public final INFFTamed mobBefriended;
+	public final Mob mobBefriended;
 	
-	public NFFMobTamedEvent(Mob before, INFFTamed after)
+	public NFFMobTamedEvent(Mob before, Mob after)
 	{
 		this.mobBefore = before;
 		this.mobBefriended = after;

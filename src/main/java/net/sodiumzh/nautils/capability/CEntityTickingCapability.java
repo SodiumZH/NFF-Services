@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.capabilities.Capability;
 
 /**
@@ -12,6 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
  * it won't tick correctly.
  * <p>By default, it only ticks on server. Override {@code getTickingSide} to define on which side(s) it should tick.</>
  */
+@AutoRegisterCapability
 public interface CEntityTickingCapability<T extends Entity>
 {
 	static final Set<Capability<? extends CEntityTickingCapability<? extends Entity>>> ALL_CAPS = new HashSet<>();

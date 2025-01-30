@@ -20,6 +20,8 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
  */
 public class NaUtilsAIStatics
 {
+
+	// Private field access
 	
 	@SuppressWarnings("unchecked")
 	public static Class<? extends LivingEntity> getTargetType(NearestAttackableTargetGoal<?> goal)
@@ -49,6 +51,8 @@ public class NaUtilsAIStatics
 		 }
 		 return false;
 	}
+
+	// Private field access end
 
 	/**
 	 * Set a mob hostile to an entity type.
@@ -117,18 +121,39 @@ public class NaUtilsAIStatics
 	
 	/**
 	 * Set a mob not hostile to an entity type.
+	 * @param includeSubclass If true, all subclasses under the given class will also be excluded from hostility. Otherwise,
+	 *                       only entities of the exactly same class will be excluded from hostility.
 	 */
-	public static <T extends LivingEntity> void setNotHostileTo(Mob mob, Class<T> type)
+	public static void setNotHostileTo(Mob mob, Class<? extends LivingEntity> type, boolean includeSubclass)
+	{
+		if (includeSubclass)
+			setNotHostileIf(mob, target -> type.isAssignableFrom(target.getClass()));
+		else setNotHostileIf(mob, target -> type.equals(target.getClass()));
+	}
+
+	/**
+	 * Set a mob not hostile to an entity type.
+	 * @deprecated Use version explicitly specifying if including subclass, i.e. {@link NaUtilsAIStatics#setNotHostileTo(Mob, Class, boolean)}.
+	 */
+	@Deprecated
+	public static void setNotHostileTo(Mob mob, Class<? extends LivingEntity> type)
+	{
+		setNotHostileTo(mob, type, false);
+	}
+
+	/**
+	 * Set a mob not hostile to entities meeting the given condition.
+	 */
+	public static void setNotHostileIf(Mob mob, Predicate<LivingEntity> notHostileCondition)
 	{
 		for (WrappedGoal goal: mob.targetSelector.getAvailableGoals()) {
 			if (goal.getGoal() instanceof NearestAttackableTargetGoal<?> tg)
 			{
-				if (getTargetType(tg) == type)
-					mob.targetSelector.getAvailableGoals().remove(goal);
+				addAndTargetingCondition(tg, notHostileCondition.negate());
 			}
 		}
 	}
-	
+
 	/**
 	 * Get the goal for targeting player of a mob, or null if not having one. 
 	 * It returns {@link WrappedGoal}, which contains a {@code NearestAttackableTargetGoal<Player>} or {@code NearestAttackableTargetGoal<ServerPlayer>.} 

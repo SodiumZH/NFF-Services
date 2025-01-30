@@ -29,7 +29,8 @@ public interface CItemStackMonitor extends CEntityTickingCapability<LivingEntity
 		MinecraftForge.EVENT_BUS.post(new ChangeEvent(getEntity(), key, from, to));
 	}
 		
-	public void tick();
+	@Override
+    public void tick();
 	
 	//---------------------------------
 	

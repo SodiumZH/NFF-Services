@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nautils.exceptions.UnimplementedException;
+import net.sodiumzh.nautils.item.NaUtilsItem;
 import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import net.sodiumzh.nautils.statics.NaUtilsParticleStatics;
 import net.sodiumzh.nautils.exceptions.UnimplementedException;
@@ -16,7 +17,7 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
-public class NFFInstantTamerItem extends Item
+public class NFFInstantTamerItem extends NaUtilsItem
 {
 
 	public NFFInstantTamerItem(Properties pProperties)
@@ -26,7 +27,7 @@ public class NFFInstantTamerItem extends Item
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) 
+	public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand)
 	{
 		if (player.isCreative() && !player.level.isClientSide)
 		{

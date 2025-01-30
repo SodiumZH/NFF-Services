@@ -1,6 +1,14 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
+import com.google.common.collect.ImmutableSet;
+import com.mojang.logging.LogUtils;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.entity.anger.MobAngerHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,16 +72,6 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 		}
 	}
 
-	private String playerSpecificTimerKey(@Nonnull Player player, String key)
-	{
-		return player.getStringUUID() + "|" + key;
-	}
-
-	private String playerSpecificTimerKey(@Nonnull UUID uuid, String key)
-	{
-		return uuid.toString() + "|" + key;
-	}
-
 	@Override
 	public @Nonnull CompoundTag getGeneralNBT() {
 		return generalNBT;
@@ -96,12 +94,12 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	// Player timer's key is "{player_uuid}|{key}"
 	@Override
 	public int getPlayerTimerRemainingTime(@Nonnull Player player, String key) {
-		return getTimerRemainingTime(playerSpecificTimerKey(player, key));
+		return getTimerRemainingTime(CNFFTamable.getPlayerSpecificTimerKey(player, key));
 	}
 
 	@Override
 	public int getPlayerTimerRemainingTime(@Nonnull UUID uuid, String key) {
-		return getTimerRemainingTime(playerSpecificTimerKey(uuid, key));
+		return getTimerRemainingTime(CNFFTamable.getPlayerSpecificTimerKey(uuid, key));
 	}
 
 	@Override
@@ -138,47 +136,53 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	}
 
 	@Override
-	public void putTimer(String key, int ticks) {
+	public void setTimer(String key, int ticks) {
 		String actualKey = key;
 		if (key.contains("|")) {
 			NaUtilsDebugStatics.errorOnce(LogUtils.getLogger(), String.format("CNFFTamableImpl: illegal general timer " +
 					"\"%s\". \"|\" is reserved for player-specific timers. Removed \"|\".", key));
 			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
 		}
-		CNFFTamable.super.putTimer(actualKey, ticks);
+		CNFFTamable.super.setTimer(actualKey, ticks);
 	}
 
 	@Override
 	public boolean hasPlayerTimer(Player player, String key)
 	{
-		return this.hasTimer(playerSpecificTimerKey(player, key));
+		return this.hasTimer(CNFFTamable.getPlayerSpecificTimerKey(player, key));
 	}
 
 	@Override
 	public boolean hasPlayerTimer(UUID uuid, String key) {
-		return this.hasTimer(playerSpecificTimerKey(uuid, key));
+		return this.hasTimer(CNFFTamable.getPlayerSpecificTimerKey(uuid, key));
 	}
 
 	@Override
 	public void putPlayerTimer(Player player, String key, int ticks)
 	{
-		CNFFTamable.super.putTimer(playerSpecificTimerKey(player, key), ticks);
+		this.putPlayerTimer(player.getUUID(), key, ticks);
 	}
 
 	@Override
 	public void putPlayerTimer(UUID uuid, String key, int ticks) {
-		CNFFTamable.super.putTimer(playerSpecificTimerKey(uuid, key), ticks);
+		String actualKey = key;
+		if (key.contains("|")) {
+			NaUtilsDebugStatics.errorOnce(LogUtils.getLogger(), String.format("CNFFTamableImpl: illegal player timer " +
+					"\"%s\". \"|\" is reserved for player-specific timers only for separating the player uuid and key. Removed \"|\".", key));
+			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
+		}
+		CNFFTamable.super.setTimer(CNFFTamable.getPlayerSpecificTimerKey(uuid, actualKey), ticks);
 	}
 
 	@Override
 	public void removePlayerTimer(Player player, String key, boolean postEvent)
 	{
-		this.removeTimer(playerSpecificTimerKey(player, key), postEvent);
+		this.removeTimer(CNFFTamable.getPlayerSpecificTimerKey(player, key), postEvent);
 	}
 
 	@Override
 	public void removePlayerTimer(UUID uuid, String key, boolean postEvent) {
-		this.removeTimer(playerSpecificTimerKey(uuid, key), postEvent);
+		this.removeTimer(CNFFTamable.getPlayerSpecificTimerKey(uuid, key), postEvent);
 	}
 
 	@Override
@@ -202,6 +206,17 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 				.filter(uuid -> uuid != EMPTY_UUID).distinct().toList();
 	}
 
+	@Override
+	public List<Tuple<UUID, Integer>> getAllPlayerTimersOfKey(@Nonnull String key) {
+		return this.timer.keySet().stream()
+				.map(CNFFTamable::parsePlayerSpecificTimerKey)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.filter(tp -> key.equals(tp.getB()))
+				.map(tp -> new Tuple<>(tp.getA(), this.timer.get(CNFFTamable.getPlayerSpecificTimerKey(tp.getA(), tp.getB()))))
+				.filter(tp -> tp.getB() != 0)
+				.toList();
+	}
 
 	@Override
 	public void setAlwaysHostileTo(@Nullable LivingEntity target) {
@@ -243,8 +258,11 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	public void onAngryAt(LivingEntity target, int forgivingTicks, MobSetAngerResult setResult) {
 		super.onAngryAt(target, forgivingTicks, setResult);
 		if (target instanceof Player player) {
-			if (setResult.isHandled())
+			if (setResult.isHandled()) {
+				MinecraftForge.EVENT_BUS.post(
+						new NFFTamableAngryEvent(this.getEntity(), target, setResult.reason().orElse(null)));
 				this.getTamingProcess().onAngryAt(this.getEntity(), player, setResult.reason().orElse(null));
+			}
 		}
 	}
 

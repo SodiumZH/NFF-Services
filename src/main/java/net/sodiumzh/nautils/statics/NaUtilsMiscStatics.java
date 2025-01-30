@@ -1,16 +1,5 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -18,12 +7,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.sodiumzh.nautils.compat.ModDependent;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.Contract;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class NaUtilsMiscStatics {
 	
@@ -213,24 +206,5 @@ public class NaUtilsMiscStatics {
 		} catch (RuntimeException e) {
 			return Optional.empty();
 		}
-	}
-
-	/**
-	 * Return the first argument if non-null, and the second if the first is null. Null if both inputs are null.
-	 */
-	@Contract("!null, _ -> !null; null, !null -> !null; null, null -> null")
-	public static <T> T orElse(@Nullable T in, @Nullable T defaultVal)
-	{
-		return in != null ? in : defaultVal;
-	}
-
-	/**
-	 * Return the first argument if non-null, and run the default getter if the first is null. Null if both inputs are null.
-	 */
-	@Contract("!null, _ -> !null; null, null -> null")
-	public static <T> T orElseGet(@Nullable T in, @Nullable Supplier<T> defaultGetter) {
-		if (in != null) return in;
-		else if (defaultGetter != null) return defaultGetter.get();
-		else return null;
 	}
 }
