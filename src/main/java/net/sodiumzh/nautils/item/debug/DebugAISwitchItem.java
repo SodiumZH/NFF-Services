@@ -9,9 +9,10 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumzh.nautils.item.NaUtilsItem;
 import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 
-public class DebugAISwitchItem extends Item
+public class DebugAISwitchItem extends NaUtilsItem
 {
 
 	public DebugAISwitchItem(Properties pProperties)
@@ -21,13 +22,12 @@ public class DebugAISwitchItem extends Item
 	}
 	
 	@Override
-	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) 
+	public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand)
 	{
 		if (target instanceof Mob mob)
 		{
 			mob.setNoAi(!mob.isNoAi());
-			// TODO: change the key to nautils after separating NaUtils out
-			String key = mob.isNoAi() ? "info.nautils.debug_ai_switch_off" : "info.nautils.debug_ai_switch_on";		
+			String key = mob.isNoAi() ? "info.nautils.item.debug_ai_switch_off" : "info.nautils.item.debug_ai_switch_on";
 			MutableComponent info = Component.translatable(key, target.getName().getString());
 			NaUtilsMiscStatics.printToScreen(info, player);
 			return InteractionResult.sidedSuccess(player.level.isClientSide);
