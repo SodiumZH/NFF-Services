@@ -1,9 +1,25 @@
 {   
 
- "item.nautils.debug_ai_switch": "Debug AI Switch",
- "item.nautils.debug_target_setter": "Debug Target Setter",   
- "info.nautils.debug_ai_switch_on": "Mob %1$s AI enabled.",
- "info.nautils.debug_ai_switch_off": "Mob %1$s AI disabled.",
+ "item.nautils.debug_ai_switch": "AI Switch (Debug)",
+ "item.nautils.debug_target_setter": "Target Setter (Debug)",
+ "item.nautils.debug_mob_remover": "Mob Remover (Debug)",
+
+ "info.nautils.item.debug_ai_switch_desc": "Right click a mob to switch on/off its AI.",
+ "info.nautils.item.debug_ai_switch_on": "Mob %1$s AI enabled.",
+ "info.nautils.item.debug_ai_switch_off": "Mob %1$s AI disabled.",
+ "info.nautils.item.debug_target_setter_desc": "Right click to select a mob, and then right click another mob to make the former attack this mob.",
+ "info.nautils.item.debug_mob_remover_desc": "Right click to select a mob as pending removal, and right click again to remove it.",
+ "info.nautils.item.debug_mob_remover_switch_mode": "Shift + Right Click switch the mode",
+ "info.nautils.item.debug_mob_remover_selected": "Selected mob %1$s, right click again to confirm removal. (%2$s)",
+ "info.nautils.item.debug_mob_remover_removed": "Removed mob %1$s.",
+ "info.nautils.item.debug_mob_remover_mode_switched": "Switched to %1$s.",
+ "info.nautils.item.debug_mob_remover_discard_mode": "Delete Mode",
+ "info.nautils.item.debug_mob_remover_discard_mode_desc": "Directly delete the mob. Actions on mob death will be skipped.",
+ "info.nautils.item.debug_mob_remover_kill_mode": "Kill Mode",
+ "info.nautils.item.debug_mob_remover_kill_mode_desc": "Kill the mob. Actions on mob death will be invoked.",
+ "info.nautils.item.debug_mob_remover_reset": "Target reset.",
+
+
  "info.nautils.item_missing_dependency": "This item depends on mod %1$s. Install %1$s to enable this item.",
 
  "color.nautils.html.alice_blue": "Alice Blue",
