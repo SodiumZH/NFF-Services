@@ -188,7 +188,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		return 0.2d;
 	}
-	
+
 	@Override
 	public void serverTick(Mob mob)
 	{
