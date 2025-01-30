@@ -2,6 +2,7 @@ package net.sodiumzh.nff.services.item;
 
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -34,8 +35,10 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	protected boolean invulnerable = true;
 	protected boolean recoverInVoid = true;
 
-	protected NFFMobRespawnerInstance(ItemStack stack)
+	protected NFFMobRespawnerInstance(@Nonnull ItemStack stack)
 	{
+		if (stack.isEmpty())
+			throw new IllegalArgumentException("NFFMobRespawnerInstance: Input ItemStack is empty.");
 		this.stack = stack;
 		// Initialize fields first
 		this.deserializeNBT(getNBT());
@@ -43,8 +46,12 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 		this.writeNBT(getNBT());
 	}
 	
-	public void set(ItemStack stack)
+	public void set(ItemStack stack, boolean clearOldNBT)
 	{
+		if (stack.isEmpty())
+			throw new IllegalArgumentException("NFFMobRespawnerInstance: Input ItemStack is empty.");
+		if (clearOldNBT && this.stack.hasTag())
+			this.stack.getTag().remove(ITEM_STACK_NBT_PATH);
 		this.stack = stack;
 		// Initialize fields first
 		this.deserializeNBT(getNBT());
@@ -59,14 +66,18 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 
 	/**
 	 * Transform ItemStack to NFFMobRespawnerInstance.
-	 * If empty or type mismatching, return null.
+	 * @deprecated Use constructor instead.
 	 */
-	@Nullable
+	@Nonnull
+	@Deprecated
 	public static NFFMobRespawnerInstance create(ItemStack stack)
 	{
 		return new NFFMobRespawnerInstance(stack);
 	}
 
+	/**
+	 * Get the full NBT stored in the item stack. The NBT will be stored into item stack when calling {@code writeNBT()}.
+	 */
 	public CompoundTag getNBT() {
 		return this.get().getOrCreateTag().getCompound(ITEM_STACK_NBT_PATH);
 	}
@@ -100,30 +111,22 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	}
 
 	public CompoundTag getMobNbt() {
-		return getNBT().getCompound("mob_nbt");
+		return getNBT().getCompound(MOB_NBT_KEY);
 	}
 
 	@SuppressWarnings("unchecked")
 	public EntityType<? extends Mob> getType() {
 		return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES
-				.getValue(new ResourceLocation(getNBT().getString("mob_type")));
+				.getValue(new ResourceLocation(getNBT().getString(MOB_TYPE_KEY)));
 	}
 
 	public CompoundTag makeMobData(Player player, BlockPos pos, Direction direction) {
-		CompoundTag nbt = getNBT().getCompound("mob_nbt");
+		CompoundTag nbt = getNBT().getCompound(MOB_NBT_KEY);
 		// Update position first, otherwise the generated mob will perform teleporting
 		// away and back
 		Vec3 posV = new Vec3((double) pos.getX() + 0.5D, (double) (pos.getY() + 1), (double) pos.getZ() + 0.5D);
 		NaUtilsNBTStatics.putVec3(nbt, "Pos", posV);
 		return nbt;
-	}
-
-	/**
-	 * @deprecated Use {@code saveFromMob} instead
-	 */
-	@Deprecated
-	public void initFromMob(Mob mob) {
-		this.saveFromMob(mob);
 	}
 
 	@Override
@@ -162,6 +165,7 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 		writeInto.putBoolean("no_expire", noExpire);
 		writeInto.putBoolean("invulnerable", invulnerable);
 		writeInto.putBoolean("recover_in_void", recoverInVoid);
+		stack.getOrCreateTag().put(ITEM_STACK_NBT_PATH, writeInto);
 	}
 
 	@Override

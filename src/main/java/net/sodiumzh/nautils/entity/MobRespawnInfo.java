@@ -28,6 +28,8 @@ import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 {
 	protected static final String ENTITY_CUSTOM_NAME_KEY = "CustomName";
+	protected static final String MOB_TYPE_KEY = "mob_type";
+	protected static final String MOB_NBT_KEY = "mob_nbt";
 	protected EntityType<? extends Mob> type;
 	protected CompoundTag info = new CompoundTag();
 	
@@ -146,8 +148,8 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	 */
 	public void writeNBT(CompoundTag writeInto)
 	{
-		writeInto.putString("mob_type", ForgeRegistries.ENTITY_TYPES.getKey(type).toString());
-		writeInto.put("mob_nbt", this.info.copy());
+		writeInto.putString(MOB_TYPE_KEY, ForgeRegistries.ENTITY_TYPES.getKey(type).toString());
+		writeInto.put(MOB_NBT_KEY, this.info.copy());
 	}
 
 	@Override
@@ -160,7 +162,7 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	@SuppressWarnings("unchecked")
 	@Override
 	public void deserializeNBT(CompoundTag nbt) {
-		this.type = nbt.contains("mob_type", Tag.TAG_STRING) ? (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("mob_type"))) : null;
-		this.info = nbt.contains("mob_nbt", Tag.TAG_COMPOUND) ? nbt.getCompound("mob_nbt") : new CompoundTag();
+		this.type = nbt.contains(MOB_TYPE_KEY, Tag.TAG_STRING) ? (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("mob_type"))) : null;
+		this.info = nbt.contains(MOB_NBT_KEY, Tag.TAG_COMPOUND) ? nbt.getCompound(MOB_NBT_KEY) : new CompoundTag();
 	}
 }

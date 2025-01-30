@@ -16,6 +16,8 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 public class NFFMobRespawnerItem extends NaUtilsItem
 {
 
+	protected static final String RESPAWNER_NBT_KEY = "respawner_info";
+
 	protected boolean retainBefriendedMobInventory = true;
 	
 	public NFFMobRespawnerItem(Properties pProperties)
@@ -32,24 +34,16 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 	public static ItemStack fromMob(NFFMobRespawnerItem itemType, Mob mob) {
 		if (mob.level().isClientSide)
 			return ItemStack.EMPTY;
-		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(new ItemStack(itemType, 1));
-		ins.initFromMob(mob);
+		NFFMobRespawnerInstance ins = new NFFMobRespawnerInstance(new ItemStack(itemType, 1));
+		ins.saveFromMob(mob);
 
-		// stack.setHoverName(NaUtilsInfoStatics.createTrans(stack.getHoverName().getString() +
-		// " - " + mob.getName().getString()));
-		// Check NBT correctly added
 		if (ins.getNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
-
 		return ins.get();
 	}
-/*
-	public static ItemStack fromMob(Mob mob) {
-		return fromMob((NFFMobRespawnerItem) NFFItemRegistry.MOB_RESPAWNER.get(), mob);
-	}
-*/
+
 	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {
-		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(stack);
+		NFFMobRespawnerInstance ins = new NFFMobRespawnerInstance(stack);
 		// Check NBT correctly added
 		if (ins.getNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
