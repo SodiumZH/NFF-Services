@@ -29,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nautils.NaUtils;
 import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinItemInput;
 import net.sodiumzh.nautils.object.ICastable;
+import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
 
 /**
  * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
@@ -63,7 +64,22 @@ public class NaUtilsItem extends Item implements ICastable
 		descriptions.add(i -> desc.get());
 		return this;
 	}
-	
+
+	/**
+	 * Add a simple description (translation key).
+	 */
+	public NaUtilsItem descTranslatable(String key, Object... params)
+	{
+		return description(() -> NaUtilsInfoStatics.createTranslatable(key, params));
+	}
+
+	/**
+	 * Add a description (plain text).
+	 */
+	public NaUtilsItem descPlain(String desc) {
+		return description(() -> NaUtilsInfoStatics.createText(desc));
+	}
+
 	/**
 	 * Add a description {@code Component} to hovering text. 
 	 */

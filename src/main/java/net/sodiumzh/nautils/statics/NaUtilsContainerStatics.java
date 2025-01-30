@@ -572,5 +572,4 @@ public class NaUtilsContainerStatics
 		}
 		return res;
 	}
-
 }

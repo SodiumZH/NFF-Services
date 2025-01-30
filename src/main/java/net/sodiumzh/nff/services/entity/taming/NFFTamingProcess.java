@@ -1,5 +1,6 @@
 package net.sodiumzh.nff.services.entity.taming;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -9,6 +10,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nautils.capability.CEntityTimerCapability;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
 import net.sodiumzh.nautils.entity.anger.MobSetAngerResult;
@@ -17,11 +21,14 @@ import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
+import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
+import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.BMHooks;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -30,14 +37,17 @@ import javax.swing.text.html.Option;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
-	@Nonnull
-	private MobAngerRules interruptingAngerRules = MobAngerRules.ATTACKER_DAMAGED.get();
+
+	protected static final UUID EMPTY_UUID = new UUID(0L, 0L);
+	protected static final RandomSource RND = RandomSource.create();
 
 	public NFFTamingProcess()
 	{	
@@ -61,7 +71,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 		// Check if befriendable capability is attached
 		if(!target.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent())
-			throw new RuntimeException("Befriending: Target living mob not having CNFFTamable capability attached.");
+			throw new RuntimeException("Befriending: Target mob not having CNFFTamable capability attached.");
 		
 		// Get new type, and do check
 		@SuppressWarnings("unchecked")
@@ -95,7 +105,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	/**
 	 * Invoked on mob tick on server.
 	 * <p> For custom tick actions, override {@code serverTick} instead.
-	 * <p> Implemented through {@link CNFFTamableImpl#tick()}.</>}.
+	 * <p> Implemented through {@link CNFFTamableImpl#tick()}.
 	 */
 	public final void doServerTick(Mob mob)
 	{
@@ -103,7 +113,8 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		{
 			mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(c -> 
 			{
-				c.setForcePersistent(isInAnyProcess(mob));
+				if (this.isInAnyProcess(mob))
+					c.setForcePersistent(true);
 			});
 		}
 		serverTick(mob);
@@ -142,11 +153,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 	@Nonnull
 	public MobAngerRules getInterruptingAngerRules() {
-		return interruptingAngerRules;
-	}
-
-	public void setInterruptingAngerRules(@Nonnull MobAngerRules rules) {
-		this.interruptingAngerRules = rules;
+		return MobAngerRules.ATTACKER_DAMAGED.get();
 	}
 
 	@Override
@@ -157,5 +164,41 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	@Override
 	public boolean persistentIfInProcess() {
 		return true;
+	}
+
+	/**
+	 * Invoked when a general timer of a mob expires.
+	 */
+	public void onGeneralTimerExpire(Mob mob, String key) {}
+
+	/**
+	 * Invoked when a player timer of a mob expires.
+	 */
+	public void onPlayerTimerExpire(Mob mob, UUID playerUUID, String key) {}
+
+	@SubscribeEvent
+	public static void notifyTimerExpire(CEntityTimerCapability.ExpireEvent event) {
+		if (event.getCapability() instanceof CNFFTamable tamable) {
+			var playerInfo = CNFFTamable.parsePlayerSpecificTimerKey(event.getKey());
+			playerInfo.ifPresent(info -> tamable.getTamingProcess().onPlayerTimerExpire(tamable.getEntity(), info.getA(), info.getB()));
+			if (playerInfo.isEmpty()) {
+				tamable.getTamingProcess().onGeneralTimerExpire(tamable.getEntity(), event.getKey());
+			}
+ 		}
+	}
+
+	/**
+	 * Get the tamable capability of a mob. It's a shortcut of {@link CNFFTamable#get}.
+	 */
+	public final CNFFTamable getTamable(Mob mob) {
+		return CNFFTamable.get(mob);
+	}
+
+	/**
+	 * Print info if holding the debug sign.
+	 */
+	protected void debugPrint(Player printTo, String info) {
+		if (printTo.getOffhandItem().is(NFFItemRegistry.NFF_DEBUG_SIGN.get()))
+			NaUtilsMiscStatics.printToScreen(info, printTo);
 	}
 }

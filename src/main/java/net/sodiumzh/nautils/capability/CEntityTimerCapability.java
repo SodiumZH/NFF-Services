@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.annotation.DontOverride;
@@ -19,6 +20,7 @@ import java.util.Set;
  * <p>Capabilities using this interface need a field of timer map (i.e. a {@code Map<String, Integer>}) and make {@code getTimerMap}
  * return it.
  */
+@AutoRegisterCapability
 public interface CEntityTimerCapability<T extends Entity> extends CEntityTickingCapability<T> {
 
     @DontCallManually
@@ -38,11 +40,13 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
     }
 
     /**
-     * Put an entry to timer. If the timer exists, the remaining ticks will be overwritten. Negative = add a permanent entry
+     * Set the given timer. If the timer exists, the remaining ticks will be overwritten. Negative = add a permanent entry
      * that will never expire until manually removed.
+     * <p>Note: if 0 is input, it will end the timer WITHOUT posting event. This operation is not recommended, and
+     * use {@code removeTimer} instead.
      */
     @DontOverride
-    public default void putTimer(String key, int ticks) {
+    public default void setTimer(String key, int ticks) {
         if (ticks != 0)
             getTimerMap().put(key, ticks);
         else removeTimer(key, false);
@@ -53,9 +57,9 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
      * Negative = add a permanent entry that will never expire until manually removed.
      */
     @DontOverride
-    public default void putTimerNoReducing(String key, int ticks) {
+    public default void safeSetTimer(String key, int ticks) {
         if (!(getTimerRemainingTime(key) > 0 && ticks > 0 && ticks < getTimerRemainingTime(key)))
-            putTimer(key, ticks);
+            setTimer(key, ticks);
     }
 
     /**
@@ -64,7 +68,7 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
     @DontOverride
     public default void removeTimer(String key, boolean postEvent) {
         this.getTimerMap().remove(key);
-        if (postEvent) MinecraftForge.EVENT_BUS.post(new TimerUpEvent(this, key));
+        if (postEvent) MinecraftForge.EVENT_BUS.post(new ExpireEvent(this, key));
     }
 
     @DontOverride
@@ -78,7 +82,7 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
                 map.put(key, oldVal - 1);
             else if (oldVal == 0) {
                 removal.add(key);
-                MinecraftForge.EVENT_BUS.post(new TimerUpEvent(this, key));
+                MinecraftForge.EVENT_BUS.post(new ExpireEvent(this, key));
             }
         }
         for (String key: removal) {
@@ -114,11 +118,11 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
         }
     }
 
-    public static class TimerUpEvent extends Event {
+    public static class ExpireEvent extends Event {
         private final CEntityTimerCapability<?> cap;
         private final String key;
 
-        public TimerUpEvent(CEntityTimerCapability<?> cap, String key) {
+        public ExpireEvent(CEntityTimerCapability<?> cap, String key) {
             this.cap = cap;
             this.key = key;
         }

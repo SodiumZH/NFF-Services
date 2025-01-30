@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -14,6 +15,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -757,10 +759,16 @@ public class NaUtilsEntityStatics
 	{
 		NaUtilsReflectionStatics.forceSet(mob, Mob.class, "f_21362_", newTarget);	// Mob.target
 	}
-	
+
+	/**
+	 * @deprecated Use {@link ServerLevel#getEntity(UUID)} instead.
+	 */
+	@Deprecated
 	@Nullable
 	public static Entity getEntityByUUID(Level level, UUID uuid)
 	{
+		if (level instanceof ServerLevel sl)
+			return sl.getEntity(uuid);
 		if (level.getPlayerByUUID(uuid) != null)
 			return level.getPlayerByUUID(uuid);
 		@SuppressWarnings("unchecked")
@@ -849,5 +857,29 @@ public class NaUtilsEntityStatics
         }
 		else return type.getDescription();
 	}
-	
+
+	/**
+	 * Find a player in all dimensions. Empty if not found.
+	 * Only on server. On client, it will only return if the player is in the current dimension.
+	 */
+	public static Optional<Player> findPlayerInAllDimensions(@Nonnull UUID uuid, Level levelContext) {
+		if (levelContext.isClientSide)
+		{
+			return Optional.ofNullable(levelContext.getPlayerByUUID(uuid));
+		}
+		else
+		{
+			MinecraftServer sv = levelContext.getServer();
+			if (sv == null) return Optional.empty();
+			for (Level level: sv.getAllLevels())
+			{
+				Player player = level.getPlayerByUUID(uuid);
+				if (player != null)
+					return Optional.of(player);
+			}
+			return Optional.empty();
+		}
+	}
+
+
 }

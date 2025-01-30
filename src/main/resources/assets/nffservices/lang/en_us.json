@@ -1,7 +1,8 @@
 {
    "item.nffservices.instant_taming_tool": "Instant Taming Tool",
    "item.nffservices.mob_respawner": "Respawner",
-   "item.nffservices.dummy_item": "Dummy Item (IF YOU SEE THIS WITHOUT USING /give, PLEASE REPORT BUGS.)",
+   "item.nffservices.nff_debug_sign": "NFF Debug Sign",
+
    "info.nffservices.gui_health": "HP",
    "info.nffservices.gui_atk": "ATK",
    "info.nffservices.gui_armor": "Armor" ,
@@ -9,5 +10,8 @@
    "info.nffservices.mob_follow": "is following",
    "info.nffservices.mob_wander": "is wandering" ,
    "info.nffservices.debug_ai_switch_on": "Mob %1$s AI enabled.",
-   "info.nffservices.debug_ai_switch_off": "Mob %1$s AI disabled."
+   "info.nffservices.debug_ai_switch_off": "Mob %1$s AI disabled.",
+   "info.nffservices.item.instant_taming_tool": "Right click to tame any NFF-tamable mob. Only for creative mode.",
+   "info.nffservices.item.nff_debug_sign": "Hold on the off-hand during the taming process to display debug output.",
+   "info.nffservices.other_player_ongoing": "You cannot give item to this mob because %1$s has given item to it."
 }

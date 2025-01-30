@@ -20,7 +20,7 @@ public class BMHooks
 	{
 		public static void onMobBefriended(Mob mobBefore, INFFTamed befriended)
 		{
-			MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(mobBefore, befriended));
+			MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(mobBefore, befriended.asMob()));
 		}
 	}
 	

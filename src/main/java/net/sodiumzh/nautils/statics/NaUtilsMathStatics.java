@@ -1,5 +1,7 @@
 package net.sodiumzh.nautils.statics;
 
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -304,6 +306,25 @@ public class NaUtilsMathStatics
 		return BlockPos.betweenClosedStream(new BlockPos(center.getX() - distance, center.getY() - distance, center.getZ() - distance),
 				new BlockPos(center.getX() + distance, center.getY() + distance, center.getZ() + distance))
 			.filter(pos -> center.distManhattan(pos) == distance).map(pos -> new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
+	}
+
+
+	private static final ArrayList<Integer> FIBONACCI_SEQUENCE = new ArrayList<>(60);
+
+	static {
+		FIBONACCI_SEQUENCE.add(0);
+		FIBONACCI_SEQUENCE.add(1);
+		for (int i = 2; true; ++i) {
+			if (FIBONACCI_SEQUENCE.get(i - 1) > Integer.MAX_VALUE - FIBONACCI_SEQUENCE.get(i - 2)) break;
+			FIBONACCI_SEQUENCE.add(FIBONACCI_SEQUENCE.get(i - 2) + FIBONACCI_SEQUENCE.get(i - 1));
+		}
+	}
+
+	/**
+	 * Get the Fibonacci number if it's within INT_MAX. Or empty if it's not.
+	 */
+	public static Optional<Integer> getFibonacci(int index) {
+		return (index >= 0 && index < FIBONACCI_SEQUENCE.size()) ? Optional.of(FIBONACCI_SEQUENCE.get(index)) : Optional.empty();
 	}
 
 }

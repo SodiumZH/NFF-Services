@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.entity.taming;
 
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 
@@ -33,6 +34,14 @@ public class TamingInteractionResult {
     }
 
     /**
+     * Indicates that interaction is not handled in {@link ITamingProcess#handleInteract}, and should be passed to the
+     * next step i.e. {@link Mob#mobInteract}.
+     */
+    public static TamingInteractionResult unhandled(Entity context) {
+        return of(context.level(), InteractionResult.PASS, null);
+    }
+
+    /**
      * Indicates that interaction is already handled and should not be passed to the next step, but the mob isn't tamed.
      */
     public static TamingInteractionResult handled(Level level) {
@@ -40,10 +49,17 @@ public class TamingInteractionResult {
     }
 
     /**
+     * Indicates that interaction is already handled and should not be passed to the next step, but the mob isn't tamed.
+     */
+    public static TamingInteractionResult handled(Entity context) {
+        return of(context.level(), InteractionResult.sidedSuccess(context.level().isClientSide()), null);
+    }
+
+    /**
      * Indicates that interaction is already handled and finally tamed the mob.
      */
-    public static TamingInteractionResult mobTamed(Level level, @Nonnull Mob tamedMob) {
-        return of(level, InteractionResult.sidedSuccess(level.isClientSide()), tamedMob);
+    public static TamingInteractionResult mobTamed(@Nonnull Mob tamedMob) {
+        return of(tamedMob.level(), InteractionResult.sidedSuccess(tamedMob.level().isClientSide()), tamedMob);
     }
 
     /**
