@@ -3,6 +3,7 @@ package net.sodiumzh.nautils.statics;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 public class NaUtilsInfoStatics
 {
@@ -17,4 +18,30 @@ public class NaUtilsInfoStatics
 	{
 		return new TranslatableComponent(key, params);
 	}
+
+	/**
+	 * Print system message to a player's chat box.
+	 */
+	public static void printMessage(Player receiver, Component msg)
+	{
+		if (receiver == null)
+			return;
+		receiver.sendSystemMessage(msg);
+	}
+
+	/**
+	 * Print system message (plain text) to a player's chat box.
+	 */
+	public static void printMessage(Player receiver, String msg)
+	{
+		printMessage(receiver, createText(msg));
+	}
+
+	/**
+	 * Print system message (translatable) to a player's chat box.
+	 */
+	public static void printMessageTranslatable(Player receiver, String key, Object... params) {
+		printMessage(receiver, createTranslatable(key, params));
+	}
+
 }

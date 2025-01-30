@@ -19,34 +19,39 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class NaUtilsMiscStatics {
-	
-	public static UUID getUUIDIfExists(Entity entity)
-	{
-		return entity == null ? null : entity.getUUID();
-	}
-	
-	public static String getNameString(Entity target)
-	{
-		return target != null ? target.getName().getString() : "null";
-	}
 
+	/**
+	 * @deprecated use {@link NaUtilsInfoStatics#printMessage} instead
+	 */
+	@Deprecated
 	public static void printToScreen(Component text, Player receiver, Entity sender)
 	{
 		receiver.sendMessage(text, sender.getUUID());
 	}
-	
+
+	/**
+	 * @deprecated use {@link NaUtilsInfoStatics#printMessage} instead
+	 */
+	@Deprecated
 	public static void printToScreen(String text, Player receiver, Entity sender)
 	{
 		receiver.sendMessage(NaUtilsInfoStatics.createText(text), sender.getUUID());
 	}
-	
+
+	/**
+	 * @deprecated use {@link NaUtilsInfoStatics#printMessage} instead
+	 */
+	@Deprecated
 	public static void printToScreen(Component text, Player receiver)
 	{
 		if (receiver == null)
 			return;
 		receiver.sendMessage(text, receiver.getUUID());
 	}
-	
+
+	/**
+	 * @deprecated use {@link NaUtilsInfoStatics#printMessage} instead
+	 */
 	public static void printToScreen(String text, Player receiver)
 	{
 		NaUtilsMiscStatics.printToScreen(NaUtilsInfoStatics.createText(text), receiver);

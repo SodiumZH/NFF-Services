@@ -1,7 +1,23 @@
 {
-	"item.nautils.debug_ai_switch": "AI开关工具(调试用)",
-	"item.nautils.debug_target_setter": "攻击目标设置工具(调试用)",
-	
+	"item.nautils.debug_ai_switch": "AI开关工具(调试)",
+	"item.nautils.debug_target_setter": "攻击目标设置工具(调试)",
+	"item.nautils.debug_mob_remover": "生物移除工具(调试)",
+
+	"info.nautils.item.debug_ai_switch_desc": "右键生物切换是否启用AI",
+	"info.nautils.item.debug_ai_switch_on": "生物 %1$s AI已启用",
+	"info.nautils.item.debug_ai_switch_off": "生物 %1$s AI已禁用",
+	"info.nautils.item.debug_target_setter_desc": "右键选择生物，随后右键另外一个生物使前者攻击该生物",
+	"info.nautils.item.debug_mob_remover_desc": "右键选择生物为待移除，再次右键移除该生物",
+	"info.nautils.item.debug_mob_remover_switch_mode": "Shift+右键切换模式",
+	"info.nautils.item.debug_mob_remover_selected": "已选择生物“%1$s”，右键确定移除 (%2$s)",
+	"info.nautils.item.debug_mob_remover_removed": "已移除生物“%1$s”",
+	"info.nautils.item.debug_mob_remover_mode_switched": "已切换为%1$s模式",
+	"info.nautils.item.debug_mob_remover_discard_mode": "删除模式",
+	"info.nautils.item.debug_mob_remover_discard_mode_desc": "直接删除生物，生物死亡时的机制会被跳过",
+	"info.nautils.item.debug_mob_remover_kill_mode": "击杀模式",
+	"info.nautils.item.debug_mob_remover_kill_mode_desc": "击杀生物，生物死亡时的机制会正常进行",
+	"info.nautils.item.debug_mob_remover_reset": "目标已重置",
+
 	"color.nautils.html.alice_blue": "爱丽丝蓝",
 	"color.nautils.html.antique_white": "古董白",
 	"color.nautils.html.aqua": "水色",
