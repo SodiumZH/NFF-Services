@@ -3,8 +3,10 @@ package net.sodiumzh.nautils.entity.anger;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.sodiumzh.nautils.annotation.CapabilityInterface;
 import net.sodiumzh.nautils.capability.CEntityTickingCapability;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +18,8 @@ import java.util.*;
  * {@code CMobAngerHandler} is a capability handling mechanics that mob can be angry with other living entities when some
  * event happens (e.g. attack). This capability doesn't to anything other than keeping an anger list.
  */
+@CapabilityInterface
+@AutoRegisterCapability
 public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSerializable<CompoundTag> {
 
     /**

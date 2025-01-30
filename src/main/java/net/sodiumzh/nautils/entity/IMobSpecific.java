@@ -8,7 +8,7 @@ import net.sodiumzh.nautils.annotation.DontOverride;
  * mob-specific interfaces.
  */
 public interface IMobSpecific<T extends Mob> {
-    @DontOverride
+
     public default T asMob() {
         return (T) this;
     }

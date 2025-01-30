@@ -13,7 +13,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Base interface of all taming processes.
+ * Base interface of all taming processes. This interface doesn't provide any implementation through events.
+ * <p>Usually taming process should be singleton for each type of process. On usage, the process instance only operates
+ * external objects (player, mob etc.) and do not store any data in itself.
  * @param <T>The tamable mob's base class.
  */
 public interface ITamingProcess<T extends Mob> {
@@ -42,19 +44,7 @@ public interface ITamingProcess<T extends Mob> {
      * Interrupt all players' processes.
      */
     @DontOverride
-    public default boolean interruptAll(T mob, boolean isQuiet)
-    {
-        boolean res = false;
-        for (Player player: mob.level().players())
-        {
-            if (player != null && isInProcess(player, mob))
-            {
-                interrupt(player, mob, true);
-                res = true;
-            }
-        }
-        return res;
-    }
+    public boolean interruptAll(T mob, boolean isQuiet);
 
     /**
      * If true, the process will not be interrupted when the player dies.

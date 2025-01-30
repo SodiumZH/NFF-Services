@@ -2,13 +2,16 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nautils.capability.CEntityTimerCapability;
+import net.sodiumzh.nautils.capability.EntityTimerAccessor;
 import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
@@ -79,6 +82,11 @@ public interface CNFFTamable extends CEntityTimerCapability<Mob>, CMobAngerHandl
 	public List<UUID> getAllTimingPlayers();
 
 	/**
+	 * Get all player UUIDs and remaining timers of the same key. (The players are not necessarily present in the level)
+	 */
+	public List<Tuple<UUID, Integer>> getAllPlayerTimersOfKey(String key);
+
+	/**
 	 * Set the mob is always hostile to a specified target once it's in the follow range, ignoring target goals.
 	 * If input is null, the previous always-hostile-to target will be removed and the mob will perform normally.
 	 * <p>Always Hostile feature is handled in {@link NFFEntityEventListeners#onLivingChangeTarget_Low}
@@ -129,6 +137,26 @@ public interface CNFFTamable extends CEntityTimerCapability<Mob>, CMobAngerHandl
 	@Nonnull
 	public static LazyOptional<CNFFTamable> getOptional(Mob mob) {
 		return mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB);
+	}
+
+
+	public static String getPlayerSpecificTimerKey(UUID playerUUID, String key) {
+		return playerUUID + "|" + key;
+	}
+
+	public static String getPlayerSpecificTimerKey(Player player, String key) {
+		return player.getStringUUID() + "|" + key;
+	}
+
+	public static Optional<Tuple<UUID, String>> parsePlayerSpecificTimerKey(String rawKey) {
+		if (!rawKey.contains("|")) return Optional.empty();
+		String[] split = rawKey.split("\\|");
+		if (split.length != 2) return Optional.empty();
+		return NaUtilsMiscStatics.toOptionalUUID(split[0]).map(uuid -> new Tuple<>(uuid, split[1]));
+	}
+
+	public static EntityTimerAccessor getTimerAccessor(String key) {
+		return EntityTimerAccessor.get(key, NFFCapRegistry.CAP_BEFRIENDABLE_MOB);
 	}
 
 }
