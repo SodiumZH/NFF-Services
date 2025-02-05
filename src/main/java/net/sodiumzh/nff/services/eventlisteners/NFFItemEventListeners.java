@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nautils.mixin.events.entity.EntityTickEvent;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.event.entity.ServerEntityTickEvent;
@@ -24,7 +25,7 @@ public class NFFItemEventListeners
 		// Initialize mob respawner invulnerable
 		if (event.getEntity() instanceof ItemEntity ie)
 		{
-			NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(ie.getItem());
+			NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createIfValid(ie.getItem());
 			if (ins != null && ins.isInvulnerable())
 			{
 				ie.setInvulnerable(true);
@@ -34,14 +35,14 @@ public class NFFItemEventListeners
 	
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
-	public static void onServerItemEntityPreWorldTick(ServerEntityTickEvent.PreWorldTick event)
+	public static void onServerItemEntityPreWorldTick(EntityTickEvent event)
 	{
 		if (event.getEntity() instanceof ItemEntity itementity)
 		{
 			// Handle respawner item entity falling into void
 			if (itementity.getY() < (double)(itementity.level.getMinBuildHeight() - 1))
 			{
-				NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(itementity.getItem());
+				NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createIfValid(itementity.getItem());
 				if (ins != null && ins.recoverInVoid())
 				{
 					// Lift onto y=64

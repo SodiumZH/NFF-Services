@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.world.entity.Entity;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.core.BlockPos;
@@ -314,7 +315,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	{
 		return this.getOwnerInWorld() != null;
 	}
-	
+
+	public default boolean isOwner(Entity test) {
+		return this.getOwnerUUID() != null && test != null && test.getUUID().equals(this.getOwnerUUID());
+	}
+
 	/* -------------------------------------------------------- */
 	/* AI configs */
 

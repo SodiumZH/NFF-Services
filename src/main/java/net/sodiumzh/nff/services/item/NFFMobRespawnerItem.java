@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -31,13 +32,13 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 		return this;
 	}
 	
-	public static ItemStack fromMob(NFFMobRespawnerItem itemType, Mob mob) {
-		if (mob.level.isClientSide)
+	public static ItemStack fromMob(Item itemType, Mob mob) {
+		if (mob.level().isClientSide)
 			return ItemStack.EMPTY;
 		NFFMobRespawnerInstance ins = new NFFMobRespawnerInstance(new ItemStack(itemType, 1));
 		ins.saveFromMob(mob);
 
-		if (ins.getNBT().isEmpty())
+		if (ins.getOrCreateNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
 		return ins.get();
 	}
@@ -45,7 +46,7 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 	public static Mob doRespawn(ItemStack stack, Player player, BlockPos pos, Direction direction) {
 		NFFMobRespawnerInstance ins = new NFFMobRespawnerInstance(stack);
 		// Check NBT correctly added
-		if (ins.getNBT().isEmpty())
+		if (ins.getOrCreateNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
 		return ins.respawn(player.level(), player, pos, direction);
 	}

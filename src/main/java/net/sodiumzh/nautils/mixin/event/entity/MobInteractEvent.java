@@ -10,6 +10,7 @@ import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
  * Posted on both sides before {@link Mob#mobInteract} is called. This event will not be posted if {@link Mob#mobInteract} is not invoked somehow.
  * <p>Not cancellable or having an event result ({@link Event.Result}), but holds an {@link InteractionResult} as result. If the result is set to "consumes action" i.e. {@code SUCCESS},
  * {@code CONSUME} or {@code CONSUME_PARTIAL}, the following {@link Mob#mobInteract} will be skipped.
+ * <p>This event is handled in {@link Mob#interact}, and will be skipped by cancelling {@link EntitySpecificInteractionEvent}.
  */
 public class MobInteractEvent extends NaUtilsLivingEvent<Mob>
 {
