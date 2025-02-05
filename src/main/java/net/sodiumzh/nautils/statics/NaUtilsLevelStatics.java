@@ -1,21 +1,26 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.ArrayList;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.apache.commons.lang3.mutable.MutableObject;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class NaUtilsLevelStatics
 {
@@ -273,5 +278,63 @@ public class NaUtilsLevelStatics
 	public static <T> T selectByDifficulty(Entity levelContext, T peaceful, T easy, T normal, T hard)
 	{
 		return selectByDifficulty(levelContext.level, peaceful, easy, normal, hard);
+	}
+
+	/**
+	 * Find the closest object from a starting point in a given direction, either block or entity.
+	 * @param entityContext Entity to determine the level. Also, itself will be excluded.
+	 * @param direction Direction vector, not necessarily normal, but must be non-zero. (Not end point!)
+	 * @param maxDistance Max tracing distance. Objects further than this distance will be ignored. Note: don't set this value too large, or it may face performance issues.
+	 * @param includeFluid If true, it will trace fluid, otherwise fluid will be ignored.
+	 * @return The result if something is found, either block or entity. Empty if not. It will not return miss HitResult.
+	 */
+	public static Optional<HitResult> lineTrace(@Nonnull Entity entityContext, Vec3 startPoint, Vec3 direction,
+			double maxDistance, boolean includeFluid) {
+		Vec3 endPoint = startPoint.add(direction.normalize().scale(maxDistance));
+		// Search block
+		HitResult blockResult = entityContext.level().clip(new ClipContext(startPoint, endPoint, ClipContext.Block.OUTLINE,
+				includeFluid ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, entityContext));
+		// Search entity
+		AABB entitySearchBound = entityContext.getBoundingBox()
+				.expandTowards(direction.normalize().scale(maxDistance)).inflate(1.0D, 1.0D, 1.0D);
+		EntityHitResult entityResult = ProjectileUtil.getEntityHitResult(entityContext, startPoint, endPoint, entitySearchBound,
+				e -> !e.isSpectator() && e.isPickable(), maxDistance * maxDistance);
+		// Compare results and return
+		Function<HitResult, Double> distanceSqr = r -> (r != null && !r.getType().equals(HitResult.Type.MISS)) ?
+				r.getLocation().distanceToSqr(startPoint) : Double.MAX_VALUE;
+		if (distanceSqr.apply(blockResult) > maxDistance * maxDistance) blockResult = null;
+		if (distanceSqr.apply(entityResult) > maxDistance * maxDistance) entityResult = null;
+		return Optional.ofNullable(distanceSqr.apply(blockResult) > distanceSqr.apply(entityResult) ? entityResult : blockResult);
+	}
+
+	/**
+	 * Find the closest object from a starting point in a given direction, either block or entity (excluding fluid).
+	 * @param entityContext Entity to determine the level. Also, itself will be excluded.
+	 * @param direction Direction vector, not necessarily normal, but must be non-zero. (Not end point!)
+	 * @param maxDistance Max tracing distance. Objects further than this distance will be ignored. Note: don't set this value too large, or it may face performance issues.
+	 * @return The result if something is found, either block or entity. Empty if not.
+	 */
+	public static Optional<HitResult> lineTrace(@Nonnull Entity entityContext, Vec3 startPoint, Vec3 direction, double maxDistance) {
+		return lineTrace(entityContext, startPoint, direction, maxDistance, false);
+	}
+
+	/**
+	 * Find the closest object in an entity's direction of view, either block or entity.
+	 * @param entity Source entity.
+	 * @param maxDistance Max tracing distance. Objects further than this distance will be ignored. Note: don't set this value too large, or it may face performance issues.
+	 * @return The result if something is found, either block or entity. Empty if not.
+	 */
+	public static Optional<HitResult> eyeTrace(@Nonnull Entity entity, double maxDistance, boolean includeFluid) {
+		return lineTrace(entity, entity.getEyePosition(), entity.getViewVector(1f), maxDistance, includeFluid);
+	}
+
+	/**
+	 * Find the closest object in an entity's direction of view, either block or entity.
+	 * @param entity Source entity.
+	 * @param maxDistance Max tracing distance. Objects further than this distance will be ignored. Note: don't set this value too large, or it may face performance issues.
+	 * @return The result if something is found, either block or entity. Empty if not.
+	 */
+	public static Optional<HitResult> eyeTrace(@Nonnull Entity entity, double maxDistance) {
+		return lineTrace(entity, entity.getEyePosition(), entity.getViewVector(1f), maxDistance, false);
 	}
 }

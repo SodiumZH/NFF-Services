@@ -60,7 +60,8 @@ public class MobCatcherItem extends NaUtilsItem
 		 {
 			 if (!player.level.isClientSide)
 			 {
-				 NFFMobRespawnerInstance resp = NFFMobRespawnerInstance.create(NFFMobRespawnerItem.fromMob(respawnerType, mob));
+				 NFFMobRespawnerInstance resp =
+						 NFFMobRespawnerInstance.createAndInitItem(NFFMobRespawnerItem.fromMob(respawnerType, mob));
 				 MobCatcherCatchMobEvent event = new MobCatcherCatchMobEvent(mob, player, resp);
 				 if (MinecraftForge.EVENT_BUS.post(event))
 					 return InteractionResult.PASS;

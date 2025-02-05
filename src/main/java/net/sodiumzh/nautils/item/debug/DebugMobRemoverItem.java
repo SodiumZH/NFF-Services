@@ -16,7 +16,6 @@ import net.sodiumzh.nautils.item.NaUtilsItem;
 import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
 import java.util.UUID;
 
 public class DebugMobRemoverItem extends NaUtilsItem {
@@ -31,22 +30,19 @@ public class DebugMobRemoverItem extends NaUtilsItem {
     @Override
     public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand) {
         if (!player.level().isClientSide()
-                && player.level() instanceof ServerLevel sl
                 && target instanceof Mob
                 && !player.isShiftKeyDown()) {
             ItemStack stack = player.getItemInHand(hand);
 
             // Check if set ongoing mob
             UUID removingUUID = getOngoingMobUUID(stack);
-            Mob ongoingMob = removingUUID.equals(EMPTY_UUID) ? null :
-                    Optional.ofNullable(sl.getEntity(removingUUID))
-                            .map(e -> (e instanceof Mob m) ? m : null).orElse(null);
 
             // If not set or targeting non-ongoing mob, reset to the target
-            if (ongoingMob == null || !ongoingMob.getUUID().equals(target.getUUID())) {
+            if (removingUUID.equals(EMPTY_UUID) || !removingUUID.equals(target.getUUID())) {
                 stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, target.getUUID());
                 NaUtilsInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_selected",
                         target.getName().getString(), getModeInfo(stack).getString());
+                return InteractionResult.sidedSuccess(player.level().isClientSide);
             }
             // Confirmed, remove
             else {

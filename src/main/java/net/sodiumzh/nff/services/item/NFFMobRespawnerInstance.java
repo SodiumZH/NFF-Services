@@ -8,10 +8,12 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -30,7 +32,7 @@ import net.sodiumzh.nff.services.item.event.NFFMobRespawnerBeforeConstructEvent;
 public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 {
 	protected ItemStack stack;
-	protected final String ITEM_STACK_NBT_PATH = "mob_respawner";
+	protected static final String ITEM_STACK_NBT_PATH = "mob_respawner";
 	protected boolean noExpire = true;
 	protected boolean invulnerable = true;
 	protected boolean recoverInVoid = true;
@@ -41,9 +43,10 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 			throw new IllegalArgumentException("NFFMobRespawnerInstance: Input ItemStack is empty.");
 		this.stack = stack;
 		// Initialize fields first
-		this.deserializeNBT(getNBT());
+		if (this.getNBTIfPresent() != null)
+			this.deserializeNBT(this.getNBTIfPresent());
 		// Then fix ItemStack NBT
-		this.writeNBT(getNBT());
+		this.writeNBT(this.getOrCreateNBT());
 	}
 	
 	public void set(ItemStack stack, boolean clearOldNBT)
@@ -54,9 +57,9 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 			this.stack.getTag().remove(ITEM_STACK_NBT_PATH);
 		this.stack = stack;
 		// Initialize fields first
-		this.deserializeNBT(getNBT());
+		this.deserializeNBT(getOrCreateNBT());
 		// Then fix ItemStack NBT
-		this.writeNBT(getNBT());
+		this.writeNBT(getOrCreateNBT());
 	}
 
 	public ItemStack get()
@@ -65,21 +68,38 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	}
 
 	/**
-	 * Transform ItemStack to NFFMobRespawnerInstance.
-	 * @deprecated Use constructor instead.
+	 * Create {@code NFFMobRespawnerInstance} if the input ItemStack is already in a valid respawner format
+	 * (not necessarily being able to respawn a mob). Returns {@code null} if not.
+	 */
+	@Nullable
+	public static NFFMobRespawnerInstance createIfValid(ItemStack stack)
+	{
+		return isValidRespawner(stack) ? new NFFMobRespawnerInstance(stack) : null;
+	}
+
+	/**
+	 * Create {@code NFFMobRespawnerInstance} and initialize the NBT of ItemStack to be a valid spawner format
+	 * (not necessarily being able to respawn a mob).
 	 */
 	@Nonnull
-	@Deprecated
-	public static NFFMobRespawnerInstance create(ItemStack stack)
-	{
+	public static NFFMobRespawnerInstance createAndInitItem(ItemStack stack) {
 		return new NFFMobRespawnerInstance(stack);
 	}
 
 	/**
-	 * Get the full NBT stored in the item stack. The NBT will be stored into item stack when calling {@code writeNBT()}.
+	 * Get the full NBT stored in the item stack. Create NBT if the path is absent.
+	 * The NBT will be stored into item stack when calling {@code writeNBT()}.
 	 */
-	public CompoundTag getNBT() {
+	@Nonnull
+	public CompoundTag getOrCreateNBT() {
 		return this.get().getOrCreateTag().getCompound(ITEM_STACK_NBT_PATH);
+	}
+
+	@Nullable
+	public CompoundTag getNBTIfPresent() {
+		if (!this.get().hasTag()) return null;
+		if (!this.get().getTag().contains(ITEM_STACK_NBT_PATH, Tag.TAG_COMPOUND)) return null;
+		return this.get().getTag().getCompound(ITEM_STACK_NBT_PATH);
 	}
 
 	public boolean isNoExpire() {
@@ -89,7 +109,7 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	public void setNoExpire(boolean val) {
 
 		this.noExpire = val;
-		this.writeNBT(getNBT());
+		this.writeNBT(getOrCreateNBT());
 	}
 
 	public boolean recoverInVoid() {
@@ -98,7 +118,7 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 
 	public void setRecoverInVoid(boolean val) {
 		this.recoverInVoid = val;
-		this.writeNBT(getNBT());
+		this.writeNBT(getOrCreateNBT());
 	}
 
 	public boolean isInvulnerable() {
@@ -107,21 +127,21 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 
 	public void setInvulnerable(boolean val) {
 		this.invulnerable = val;
-		this.writeNBT(getNBT());
+		this.writeNBT(getOrCreateNBT());
 	}
 
 	public CompoundTag getMobNbt() {
-		return getNBT().getCompound(MOB_NBT_KEY);
+		return getOrCreateNBT().getCompound(MOB_NBT_KEY);
 	}
 
 	@SuppressWarnings("unchecked")
 	public EntityType<? extends Mob> getType() {
 		return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES
-				.getValue(new ResourceLocation(getNBT().getString(MOB_TYPE_KEY)));
+				.getValue(new ResourceLocation(getOrCreateNBT().getString(MOB_TYPE_KEY)));
 	}
 
 	public CompoundTag makeMobData(Player player, BlockPos pos, Direction direction) {
-		CompoundTag nbt = getNBT().getCompound(MOB_NBT_KEY);
+		CompoundTag nbt = getOrCreateNBT().getCompound(MOB_NBT_KEY);
 		// Update position first, otherwise the generated mob will perform teleporting
 		// away and back
 		Vec3 posV = new Vec3((double) pos.getX() + 0.5D, (double) (pos.getY() + 1), (double) pos.getZ() + 0.5D);
@@ -179,6 +199,24 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	@Override
 	public void saveFromMob(Mob mob) {
 		super.saveFromMob(mob);
-		this.writeNBT(getNBT());
+		this.writeNBT(getOrCreateNBT());
 	}
+
+
+	/**
+	 * Check if an ItemStack is valid to respawn the mob.
+	 */
+	public static boolean isValidRespawner(ItemStack itemStack) {
+		if (itemStack.isEmpty()) return false;
+		if (!itemStack.hasTag()) return false;
+		CompoundTag nbt = itemStack.getTag().getCompound(ITEM_STACK_NBT_PATH);
+		return !nbt.isEmpty()
+				&& nbt.contains(MOB_TYPE_KEY, Tag.TAG_STRING)
+				&& nbt.contains(MOB_NBT_KEY, Tag.TAG_COMPOUND)
+				&& nbt.contains("no_expire", Tag.TAG_BYTE)
+				&& nbt.contains("invulnerable", Tag.TAG_BYTE)
+				&& nbt.contains("recover_in_void", Tag.TAG_BYTE);
+	}
+
+	public boolean isNFFRespawnerItem() {return this.get().getItem() instanceof NFFMobRespawnerItem;}
 }

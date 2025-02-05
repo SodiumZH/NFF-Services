@@ -25,7 +25,7 @@ public class NaUtilsItemRegistry
 					.descTranslatable("info.nautils.item.debug_target_setter_desc")
 					.cast());
 
-	public static final RegistryObject<DebugTargetSetterItem> DEBUG_MOB_REMOVER = NAUTILS_ITEMS.register("debug_mob_remover",
+	public static final RegistryObject<DebugMobRemoverItem> DEBUG_MOB_REMOVER = NAUTILS_ITEMS.register("debug_mob_remover",
 			() -> new DebugMobRemoverItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
 					.descTranslatable("info.nautils.item.debug_mob_remover_desc")
 					.description(DebugMobRemoverItem::getModeInfo)
