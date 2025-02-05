@@ -1,5 +1,31 @@
 # Change Log
 
+### 0.x.28
+
+##### NFF Services
+
+Refactored `CNFFTamable` and `NFFTamingProcess`.
+
+​	-Rearranged `CNFFTamable` features (NBT, player-specific NBT, timer, player-specific timer etc.).
+
+​	-Now `CNFFTamable` uses NaUtils `EntityTimerCapability` and mob anger API.
+
+​	-Now `NFFTamingProcess` uses NaUtils `ITamingProcess`.
+
+##### Sodium's Utilities
+
+Added mob anger API. This is a capability which maintains an anger list but not doesn't affect mob behaviors by default. Users can query the list to perform custom actions.
+
+Added `EntityTimerCapability`, an extension of `EntityTickingCapability` which maintains a auto-ticking timer list.
+
+Added `EntityDataCapability`. This capability is auto-attached to all entities and only contains an NBT, allowing to save & load entity NBT externally.
+
+Added mob taming API for non-NFF-specific generic taming process. Vanilla `TamableAnimal` taming process is planned but not implemented yet. 
+
+Added Mixin Event:
+
+ -`EntitySpecificInteractionEvent`: Posted on calling `Entity#interact`. This allows to bypass only `Entity#interact` but not interaction steps below like `ItemStack#interactLivingEntity`.
+
 ### 0.x.27
 
 ##### NFF Services

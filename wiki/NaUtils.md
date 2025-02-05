@@ -58,6 +58,20 @@ As `NaUtilsRegistry` uses `Supplier`s as values, it must generate values before 
 
 Optionally, you can manually generate all instances for a registry at a given phase of game setup. This action can be done by calling `setShouldGenerateOnCommonSetup()`, `setShouldGenerateOnClientSetup()` and `setShouldGenerateOnServerSetup()` on registry declaration to make the registry to generate all entries on common setup, on client setup and on server setup respectively.
 
+#### Built-in registries
+
+NaUtils built-in registries are declared in `NaUtilsRegistries `class.
+
+### Misc
+
+There are also some registries or utilities for registration that are not in `NaUtilsRegistry`.
+
+#### `DeferredEntityAttributeRegisterEvent`
+
+Event for registering `AttributeSupplier`s that should be added on server start, not on mod setup. This is for attributes depending on data which is not available on mod setup (e.g. config attributes).
+
+
+
 ## Forge Capabilities
 
 ##### `CEntityTickingCapability`
@@ -84,6 +98,16 @@ Then the capability will be auto ticked by calling `CEntityTickingCapability#tic
 ## Mixin Events
 
 NaUtils provides some event hooks implemented by Mixin.
+
+### Client
+
+#### Entity
+
+##### `MerchantOfferUnavailableInfoEvent`
+
+Posted on client when a vanilla merchant (villager GUI) is about to display information to show the trade is out of stock. 
+
+By default it's "Villagers restock up to two times per day." (translation key = `"merchant.deprecated"`).
 
 ### Entity
 
@@ -220,15 +244,29 @@ This event is not cancellable or having an event result (`Event.Result`), but ho
 
 ##### `MobCheckDespawnEvent`
 
-Posted when a mob starts to check if it should despawn. This event will be always posted despite of the results of `Entity#shouldDespawnInPeaceful`, `Mob#requiresCustomPersistence` and `AllowDespawn` event.
+Posted when a mob starts to check if it should despawn. This event will be always posted despite the results of `Entity#shouldDespawnInPeaceful`, `Mob#requiresCustomPersistence` and `AllowDespawn` event.
 
-Cancellable. If cancelled, the whole despawn check will be skipped and this mob will not despawn, despite of the results above, and `AllowDespawn` event will not be posted.
+Cancellable. If cancelled, the whole despawn check will be skipped and this mob will not despawn, despite the results above, and `AllowDespawn` event will not be posted.
 
 ##### `MonsterPreventSleepEvent`
 
 Posted before a `Monster` is preventing player sleep.
 
 Cancellable. If cancelled, this monster will not prevent sleep.
+
+### Level
+
+##### `LevelCapabilityDataLoadEvent`
+
+Posted before loading Level capabilities from data, allowing to modify the NBT before loading.
+
+### Item
+
+##### `BlockItemConsumeOnPlaceEvent`
+
+Posted before an `ItemStack` of `BlockItem` is about to be consumed after being placed onto the level.
+
+Cancellable. If cancelled, the item will not be consumed, but the placed block will still be there.
 
 ## Vanilla Trade System
 
@@ -242,11 +280,41 @@ Vanilla Trade System allows to enable Vanilla Villager-like trade on any mobs. I
 
 
 
+## In-Game Debug Items
 
+NaUtils provides some in-game debug utilities. The items are available only by `/give` command.
+
+### AI Switch
+
+Item key: `nautils:debug_ai_switch`
+
+Right click to enable/disable a mob's AI. The effect is the same as changing the mob's `isNoAi` tag and calling `setNoAi()` method.
+
+### Target Setter 
+
+Item key: `nautils:debug_target_setter`
+
+Used to specify a mob's attack target.
+
+Right click a mob to select, and then right click another mob to make the former attack this mob.
+
+### Mob Remover
+
+Item key: `nautils:debug_mob_remover`
+
+Used to remove a mob.
+
+Right click a mob to select as pending removal, then right click this mob again to confirm removing it.
+
+It has two modes: delete mode and killing mode. The mode can be switched by shift+right click without target. Kill mode by default.
+
+In delete mode, the mob will be directly deleted from the level but not killed, and the actions on mob death will be skipped.
+
+In killing mode, the mob will be killed (same as using `/kill` command). The actions on mob death will be performed. 
 
 ## Utility Method Libs
 
-### `NaContainerUtils`
+### `NaUtilsContainerStatics`
 
 This lib includes methods for simplifying operations on containers.
 
