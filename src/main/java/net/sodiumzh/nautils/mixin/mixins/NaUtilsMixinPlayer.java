@@ -1,5 +1,8 @@
 package net.sodiumzh.nautils.mixin.mixins;
 
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.sodiumzh.nautils.mixin.events.entity.EntitySpecificInteractionEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -33,4 +36,15 @@ public class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 			return Double.MAX_VALUE;
 		else return original.call(caller, entity);
 	}
+
+	@WrapOperation(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/Entity;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+	private InteractionResult onEntityDefinedInteraction(Entity instance, Player player, InteractionHand hand, Operation<InteractionResult> original){
+		if (MinecraftForge.EVENT_BUS.post(new EntitySpecificInteractionEvent(instance, player, hand))){
+			return InteractionResult.PASS;
+		}
+		return original.call(instance, player, hand);
+	}
+
 }

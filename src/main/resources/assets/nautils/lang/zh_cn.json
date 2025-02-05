@@ -11,7 +11,7 @@
 	"info.nautils.item.debug_mob_remover_switch_mode": "Shift+右键切换模式",
 	"info.nautils.item.debug_mob_remover_selected": "已选择生物“%1$s”，右键确定移除 (%2$s)",
 	"info.nautils.item.debug_mob_remover_removed": "已移除生物“%1$s”",
-	"info.nautils.item.debug_mob_remover_mode_switched": "已切换为%1$s模式",
+	"info.nautils.item.debug_mob_remover_mode_switched": "已切换为%1$s",
 	"info.nautils.item.debug_mob_remover_discard_mode": "删除模式",
 	"info.nautils.item.debug_mob_remover_discard_mode_desc": "直接删除生物，生物死亡时的机制会被跳过",
 	"info.nautils.item.debug_mob_remover_kill_mode": "击杀模式",

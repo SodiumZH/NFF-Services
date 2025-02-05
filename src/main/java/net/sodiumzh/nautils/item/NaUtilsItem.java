@@ -3,6 +3,7 @@ package net.sodiumzh.nautils.item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -10,6 +11,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -74,10 +76,34 @@ public class NaUtilsItem extends Item implements ICastable
 	}
 
 	/**
+	 * Add a simple description (translation key).
+	 */
+	public NaUtilsItem descTranslatable(String key, Consumer<Component> componentModification , Object... params)
+	{
+		return description(() -> {
+			Component res = NaUtilsInfoStatics.createTranslatable(key, params);
+			if (componentModification != null) componentModification.accept(res);
+			return res;
+		});
+	}
+
+	/**
 	 * Add a description (plain text).
 	 */
 	public NaUtilsItem descPlain(String desc) {
 		return description(() -> NaUtilsInfoStatics.createText(desc));
+	}
+
+	/**
+	 * Add a description (plain text).
+	 * @param componentModification Operation after component creation. Null = uses default.
+	 */
+	public NaUtilsItem descPlain(String desc, @Nullable Consumer<Component> componentModification) {
+		return description(() -> {
+			Component res = NaUtilsInfoStatics.createText(desc);
+			if (componentModification != null) componentModification.accept(res);
+			return res;
+		});
 	}
 
 	/**

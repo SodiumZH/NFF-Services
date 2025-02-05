@@ -129,7 +129,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 			ItemStack stack = ItemStack.of(container.getCompound(key));
 			if (stack == null)
 				return false;	// Not a valid item stack
-			NFFMobRespawnerInstance resp = NFFMobRespawnerInstance.create(stack);
+			NFFMobRespawnerInstance resp = NFFMobRespawnerInstance.createIfValid(stack);
 			if (resp == null)
 				return false;	// Not a valid respawner
 			if (this.getLevel().getPlayerByUUID(resp.getOwnerUUID()) == null)

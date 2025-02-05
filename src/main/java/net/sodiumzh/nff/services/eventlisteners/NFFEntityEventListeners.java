@@ -323,19 +323,18 @@ public class NFFEntityEventListeners
 					}
 					// If drop respawner, drop and initialize
 					if (bef.getRespawnerType() != null) {
-						NFFMobRespawnerInstance ins = NFFMobRespawnerInstance
-								.create(NFFMobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
-						if (ins != null) {
+						NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createAndInitItem(NFFMobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
+						if (ins.isNFFRespawnerItem()) {
 							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE) {
-								if (bef.isOwnerPresent() && bef.getOwner().getInventory().getFreeSlot() != -1 && bef.getOwner().addItem(ins.get())) 
-								{} 
-								else 
+								if (bef.isOwnerInDimension() && bef.getOwner().getInventory().getFreeSlot() != -1 && bef.getOwner().addItem(ins.get()))
+								{}
+								else
 								{
 									if (!bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap -> 
+									bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -524,15 +523,15 @@ public class NFFEntityEventListeners
 		if (event.getStateBefore().equals(NFFTamedMobAIState.WAIT))
 		{
 			event.getMob().asMob().setTarget(null);
-			if (event.getMob().isOwnerPresent())
-				event.getMob().getOwner().setLastHurtMob(null);
+			if (event.getMob().isOwnerInDimension())
+				event.getMob().getOwnerInDimension().setLastHurtMob(null);
 		}
 	}
 	
 	@SubscribeEvent
 	public static void onItemExpire(ItemExpireEvent event)
 	{
-		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.create(event.getEntity().getItem());
+		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createIfValid(event.getEntity().getItem());
 		if (ins != null && ins.isNoExpire())
 		{
 			event.setCanceled(true);	
