@@ -19,10 +19,7 @@ import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHan
 import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumzh.nff.services.entity.capability.wrapper.ILivingDelayedActions;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamableProvider;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
-import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
+import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;

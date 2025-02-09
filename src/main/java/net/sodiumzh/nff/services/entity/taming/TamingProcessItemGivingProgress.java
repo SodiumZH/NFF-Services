@@ -32,11 +32,11 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	@Override
 	public TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand) {
 
-		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level());
+		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level);
 		CNFFTamable tamable = CNFFTamable.getOptional(mob).resolve().orElse(null);
-		if (tamable == null) return TamingInteractionResult.unhandled(player.level());
+		if (tamable == null) return TamingInteractionResult.unhandled(player.level);
 
-		if (!player.level().isClientSide)
+		if (!player.level.isClientSide)
 		{
 			if (!player.isShiftKeyDown()
 					&& (isItemAcceptableInternal(player.getMainHandItem(), player, tamable.getEntity())

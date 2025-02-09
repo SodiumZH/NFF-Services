@@ -6,10 +6,8 @@ import net.minecraft.world.entity.player.Player;
 import net.sodiumzh.nautils.annotation.DontOverride;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 
 import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -59,9 +57,9 @@ public interface ITamingProcess<T extends Mob> {
     @DontOverride
     public default boolean isInAnyProcess(T mob)
     {
-        if (mob.level().isClientSide)
+        if (mob.level.isClientSide)
             return false;
-        for (Player player: mob.level().players())
+        for (Player player: mob.level.players())
         {
             if (isInProcess(player, mob))
                 return true;
@@ -103,7 +101,7 @@ public interface ITamingProcess<T extends Mob> {
     @DontOverride
     public default void forAllPlayersInProcess(T mob, Consumer<Player> todo)
     {
-        for (Player player: mob.level().players())
+        for (Player player: mob.level.players())
         {
             if (isInProcess(player, mob))
                 todo.accept(player);

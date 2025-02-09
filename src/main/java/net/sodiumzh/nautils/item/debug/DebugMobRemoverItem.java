@@ -29,7 +29,7 @@ public class DebugMobRemoverItem extends NaUtilsItem {
 
     @Override
     public InteractionResult interactLivingEntity(Player player, LivingEntity target, InteractionHand hand) {
-        if (!player.level().isClientSide()
+        if (!player.level.isClientSide()
                 && target instanceof Mob
                 && !player.isShiftKeyDown()) {
             ItemStack stack = player.getItemInHand(hand);
@@ -42,7 +42,7 @@ public class DebugMobRemoverItem extends NaUtilsItem {
                 stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, target.getUUID());
                 NaUtilsInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_selected",
                         target.getName().getString(), getModeInfo(stack).getString());
-                return InteractionResult.sidedSuccess(player.level().isClientSide);
+                return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
             // Confirmed, remove
             else {
@@ -53,7 +53,7 @@ public class DebugMobRemoverItem extends NaUtilsItem {
                     target.kill();
                 }
                 stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, EMPTY_UUID);
-                return InteractionResult.sidedSuccess(player.level().isClientSide);
+                return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
 
         }

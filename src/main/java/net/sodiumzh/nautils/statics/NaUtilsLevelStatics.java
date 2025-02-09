@@ -292,7 +292,7 @@ public class NaUtilsLevelStatics
 			double maxDistance, boolean includeFluid) {
 		Vec3 endPoint = startPoint.add(direction.normalize().scale(maxDistance));
 		// Search block
-		HitResult blockResult = entityContext.level().clip(new ClipContext(startPoint, endPoint, ClipContext.Block.OUTLINE,
+		HitResult blockResult = entityContext.level.clip(new ClipContext(startPoint, endPoint, ClipContext.Block.OUTLINE,
 				includeFluid ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, entityContext));
 		// Search entity
 		AABB entitySearchBound = entityContext.getBoundingBox()
