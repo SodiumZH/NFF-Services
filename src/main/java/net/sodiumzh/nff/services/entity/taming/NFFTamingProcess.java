@@ -79,8 +79,8 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		bm.getData().generateIdentifier();
 		bm.getData().recordEntityType();
 		bm.getData().recordEncounteredDate();
-		//NaUtilsDebugStatics.debugPrintToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
-		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, bm));
+		//Debug.printToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
+		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, bm.asMob()));
 		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
 		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);

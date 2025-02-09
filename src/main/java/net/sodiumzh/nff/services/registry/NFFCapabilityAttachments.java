@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.capability.NaUtilsEntitySerializableCapProvider;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CAttributeMonitorProvider;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamableProvider;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerProvider;
 import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;

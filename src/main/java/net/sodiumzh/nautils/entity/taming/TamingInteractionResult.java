@@ -38,7 +38,7 @@ public class TamingInteractionResult {
      * next step i.e. {@link Mob#mobInteract}.
      */
     public static TamingInteractionResult unhandled(Entity context) {
-        return of(context.level(), InteractionResult.PASS, null);
+        return of(context.level, InteractionResult.PASS, null);
     }
 
     /**
@@ -52,14 +52,14 @@ public class TamingInteractionResult {
      * Indicates that interaction is already handled and should not be passed to the next step, but the mob isn't tamed.
      */
     public static TamingInteractionResult handled(Entity context) {
-        return of(context.level(), InteractionResult.sidedSuccess(context.level().isClientSide()), null);
+        return of(context.level, InteractionResult.sidedSuccess(context.level.isClientSide()), null);
     }
 
     /**
      * Indicates that interaction is already handled and finally tamed the mob.
      */
     public static TamingInteractionResult mobTamed(@Nonnull Mob tamedMob) {
-        return of(tamedMob.level(), InteractionResult.sidedSuccess(tamedMob.level().isClientSide()), tamedMob);
+        return of(tamedMob.level, InteractionResult.sidedSuccess(tamedMob.level.isClientSide()), tamedMob);
     }
 
     /**

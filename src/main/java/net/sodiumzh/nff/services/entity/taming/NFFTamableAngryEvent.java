@@ -4,7 +4,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

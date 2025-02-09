@@ -31,9 +31,9 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 		this.retainBefriendedMobInventory = value;
 		return this;
 	}
-	
+
 	public static ItemStack fromMob(Item itemType, Mob mob) {
-		if (mob.level().isClientSide)
+		if (mob.level.isClientSide)
 			return ItemStack.EMPTY;
 		NFFMobRespawnerInstance ins = new NFFMobRespawnerInstance(new ItemStack(itemType, 1));
 		ins.saveFromMob(mob);
@@ -48,7 +48,7 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 		// Check NBT correctly added
 		if (ins.getOrCreateNBT().isEmpty())
 			throw new IllegalStateException("Respawner missing NBT");
-		return ins.respawn(player.level(), player, pos, direction);
+		return ins.respawn(player.level, player, pos, direction);
 	}
 
 	@SuppressWarnings("resource")

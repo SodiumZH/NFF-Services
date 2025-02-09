@@ -17,7 +17,7 @@ public class NaUtilsCapsEventListeners
 		for (var cap: CEntityTickingCapability.ALL_CAPS)
 		{
 			event.getEntity().getCapability(cap).ifPresent(c -> {
-				if (c.getTickingSide().isCorrectSide(event.getEntity().level().isClientSide)) {
+				if (c.getTickingSide().isCorrectSide(event.getEntity().level.isClientSide)) {
 					c.tick();
 					if (c instanceof CEntityTimerCapability<?> timer) {
 						timer.tickTimer();

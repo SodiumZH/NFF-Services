@@ -25,6 +25,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
@@ -310,7 +311,7 @@ public class NFFEntityEventListeners
 				
         		// Add hatred only when settring to player
         		if (mob.getTarget() instanceof Player player)
-        			cap.addHatredWithReason(player, TamableHatredReason.SET_TARGET);
+        			cap.setAngryAt(player, MobAngerReason.TARGETING.get());
 			});
 		}
 		
@@ -371,7 +372,7 @@ public class NFFEntityEventListeners
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap ->
+									bef.asMob().level.getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
