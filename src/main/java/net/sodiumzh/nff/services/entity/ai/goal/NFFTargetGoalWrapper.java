@@ -33,7 +33,7 @@ public class NFFTargetGoalWrapper<T extends TargetGoal> extends NFFTargetGoal {
 
     public static <T extends TargetGoal> NFFTargetGoalWrapper<T> create(INFFTamed mob, T goal) {
         Mob goalMob = NaUtilsReflectionStatics.forceGet(goal, TargetGoal.class, "f_26135_"/*"mob"*/).cast();
-        if (!INFFTamed.isTamedAnd(goalMob, m -> Objects.equals(m, mob)))
+        if (!INFFTamed.isBMAnd(goalMob, m -> Objects.equals(m, mob)))
             throw new IllegalArgumentException("NFFTargetGoalWrapper#create: input goal's mob isn't equal to " +
                     "the input tamed mob.");
         return new NFFTargetGoalWrapper<>(mob, goal);

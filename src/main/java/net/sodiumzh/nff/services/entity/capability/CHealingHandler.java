@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.extensions.IForgeItem;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
@@ -45,7 +46,7 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 			{
 				if (consume)
 				{
-					ItemStack remaining = stack.getCraftingRemainingItem();
+					ItemStack remaining = stack.getItem().getContainerItem(stack);
 					stack.shrink(1);
 					if (player != null)
 						NaUtilsItemStatics.giveOrDrop(player, remaining);

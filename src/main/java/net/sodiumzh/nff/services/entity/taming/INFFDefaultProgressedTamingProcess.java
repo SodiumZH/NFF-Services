@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.sodiumzh.nautils.capability.EntityTimerAccessor;
 import net.sodiumzh.nautils.entity.taming.ITamingProcessWithProgress;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 
 import javax.annotation.Nullable;
 import java.util.Objects;

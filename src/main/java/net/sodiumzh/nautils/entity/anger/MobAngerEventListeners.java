@@ -14,7 +14,7 @@ import net.sodiumzh.nautils.NaUtils;
 public class MobAngerEventListeners {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onTick(LivingEvent.LivingTickEvent event)
+    public static void onTick(LivingEvent.LivingUpdateEvent event)
     {
         if (!event.isCanceled() && event.getEntity() instanceof Mob mob && mob.getTarget() != null) {
             for (var cap : CMobAngerHandler.ALL_HANDLERS) {
@@ -40,7 +40,7 @@ public class MobAngerEventListeners {
                 else {
                     event.getEntity().getCapability(cap).ifPresent(c -> c.setAngryAt(src,
                             event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKED.get() : MobAngerReason.HIT.get()));
-                    src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntity(),
+                    src.getCapability(cap).ifPresent(c -> c.setAngryAt(event.getEntityLiving(),
                             event.getAmount() > c.getDamageThreshold() ? MobAngerReason.ATTACKING.get() : MobAngerReason.HITTING.get()));
                 }
             }

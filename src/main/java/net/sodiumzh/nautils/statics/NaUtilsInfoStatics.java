@@ -27,7 +27,7 @@ public class NaUtilsInfoStatics
 	{
 		if (receiver == null)
 			return;
-		receiver.sendSystemMessage(msg);
+		receiver.sendMessage(msg, receiver.getUUID());
 	}
 
 	/**

@@ -2,17 +2,12 @@ package net.sodiumzh.nautils.capability;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
 
 /**
  * A simple capability serving as an additional data container.
  */
-@AutoRegisterCapability
 public interface CEntityDataCapability extends INBTSerializable<CompoundTag> {
 
     public CompoundTag getNBT();

@@ -1,3 +1,5 @@
+package net.sodiumzh.nff.services.entity.capability;
+
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Tuple;
@@ -10,6 +12,7 @@ import net.sodiumzh.nautils.capability.EntityTimerAccessor;
 import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
 import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 

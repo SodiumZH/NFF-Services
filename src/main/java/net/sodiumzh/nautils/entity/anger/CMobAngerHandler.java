@@ -3,7 +3,6 @@ package net.sodiumzh.nautils.entity.anger;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.sodiumzh.nautils.annotation.CapabilityInterface;
@@ -19,7 +18,6 @@ import java.util.*;
  * event happens (e.g. attack). This capability doesn't to anything other than keeping an anger list.
  */
 @CapabilityInterface
-@AutoRegisterCapability
 public interface CMobAngerHandler extends CEntityTickingCapability<Mob>, INBTSerializable<CompoundTag> {
 
     /**

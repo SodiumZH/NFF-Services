@@ -1,5 +1,6 @@
 package net.sodiumzh.nautils.item.debug;
 
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,7 +26,7 @@ public class DebugAISwitchItem extends NaUtilsItem
 		{
 			mob.setNoAi(!mob.isNoAi());
 			String key = mob.isNoAi() ? "info.nautils.item.debug_ai_switch_off" : "info.nautils.item.debug_ai_switch_on";
-			MutableComponent info = Component.translatable(key, target.getName().getString());
+			MutableComponent info = NaUtilsInfoStatics.createTranslatable(key, target.getName().getString());
 			NaUtilsInfoStatics.printMessage(player, info);
 			return InteractionResult.sidedSuccess(player.level.isClientSide);
 		}

@@ -4,7 +4,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nautils.annotation.DontCallManually;
 import net.sodiumzh.nautils.annotation.DontOverride;
@@ -20,7 +19,6 @@ import java.util.Set;
  * <p>Capabilities using this interface need a field of timer map (i.e. a {@code Map<String, Integer>}) and make {@code getTimerMap}
  * return it.
  */
-@AutoRegisterCapability
 public interface CEntityTimerCapability<T extends Entity> extends CEntityTickingCapability<T> {
 
     @DontCallManually

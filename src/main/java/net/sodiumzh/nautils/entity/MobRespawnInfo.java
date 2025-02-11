@@ -148,7 +148,7 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	 */
 	public void writeNBT(CompoundTag writeInto)
 	{
-		writeInto.putString(MOB_TYPE_KEY, ForgeRegistries.ENTITY_TYPES.getKey(type).toString());
+		writeInto.putString(MOB_TYPE_KEY, ForgeRegistries.ENTITIES.getKey(type).toString());
 		writeInto.put(MOB_NBT_KEY, this.info.copy());
 	}
 
@@ -162,7 +162,7 @@ public class MobRespawnInfo implements INBTSerializable<CompoundTag>
 	@SuppressWarnings("unchecked")
 	@Override
 	public void deserializeNBT(CompoundTag nbt) {
-		this.type = nbt.contains(MOB_TYPE_KEY, Tag.TAG_STRING) ? (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("mob_type"))) : null;
+		this.type = nbt.contains(MOB_TYPE_KEY, Tag.TAG_STRING) ? (EntityType<? extends Mob>) ForgeRegistries.ENTITIES.getValue(new ResourceLocation(nbt.getString("mob_type"))) : null;
 		this.info = nbt.contains(MOB_NBT_KEY, Tag.TAG_COMPOUND) ? nbt.getCompound(MOB_NBT_KEY) : new CompoundTag();
 	}
 }

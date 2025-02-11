@@ -10,10 +10,20 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.entity.anger.MobAngerHandler;
+import net.sodiumzh.nautils.entity.anger.MobAngerRules;
+import net.sodiumzh.nautils.entity.anger.MobForgiveResult;
+import net.sodiumzh.nautils.entity.anger.MobSetAngerResult;
+import net.sodiumzh.nautils.exceptions.MissingRegistryException;
+import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
+import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
+import net.sodiumzh.nff.services.entity.taming.NFFTamableAngryEvent;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.*;
 
 public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 {

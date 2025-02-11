@@ -1,6 +1,5 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -15,12 +14,14 @@ import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 
 import javax.annotation.Nonnull;
+import java.util.Random;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
@@ -28,7 +29,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
 
 	protected static final UUID EMPTY_UUID = new UUID(0L, 0L);
-	protected static final RandomSource RND = RandomSource.create();
+	protected static final Random RND = new Random();
 
 	public NFFTamingProcess()
 	{	

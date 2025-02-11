@@ -27,7 +27,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nautils.mixin.event.entity.MobSunBurnTickEvent;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
@@ -119,8 +119,7 @@ public class NFFEntityEventListeners
 
 	@SuppressWarnings("resource")
 	@SubscribeEvent(priority = EventPriority.LOW)
-	public static void onLivingChangeTarget_Low(LivingChangeTargetEvent event)
-	{
+	public static void onLivingChangeTarget_Low(LivingChangeTargetEvent event) {
 		/** Handle {@link CNFFTamable} AlwaysHostile feature */
 		/*if (!event.getEntity().level.isClientSide)
 		{
@@ -135,7 +134,8 @@ public class NFFEntityEventListeners
 			});
 		}
 	}*/
-	
+	}
+
 	@SubscribeEvent
 	public static void onLivingChangeTarget(LivingChangeTargetEvent event)
 	{
@@ -568,7 +568,7 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onItemExpire(ItemExpireEvent event)
 	{
-		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createIfValid(event.getEntity().getItem());
+		NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createIfValid(event.getEntityItem().getItem());
 		if (ins != null && ins.isNoExpire())
 		{
 			event.setCanceled(true);	
