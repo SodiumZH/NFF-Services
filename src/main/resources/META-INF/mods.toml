@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/SodiumZH/NFF-Services"
 
 [[mods]]
 modId="nautils" #mandatory
-version="0.0.28"
+version="0.0.28.1"
 displayName="Sodium's Utilities" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
