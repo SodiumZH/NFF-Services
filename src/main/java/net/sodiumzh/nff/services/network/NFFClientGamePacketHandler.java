@@ -55,6 +55,7 @@ public class NFFClientGamePacketHandler
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
 		Entity e = mc.level.getEntity(packet.entityId);
+		if (e == null) return; // Otherwise it prints repeated nullptr exceptions, dk why
 		e.getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
 			for (var entry: packet.objects.entrySet())
 				c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
