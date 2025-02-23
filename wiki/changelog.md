@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.28.1
+
+Fixed `CNFFTamable` serialization error.
+
 ### 0.x.28
 
 ##### NFF Services
