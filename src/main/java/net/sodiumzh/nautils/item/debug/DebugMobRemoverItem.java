@@ -57,7 +57,7 @@ public class DebugMobRemoverItem extends NaUtilsItem {
             }
 
         }
-        return InteractionResult.PASS;
+        return InteractionResult.sidedSuccess(player.level.isClientSide);
     }
 
     @Nonnull
