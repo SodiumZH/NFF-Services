@@ -30,7 +30,7 @@ description='''Miscellaneous utility library by SodiumZH.'''
 
 [[mods]] #mandatory
 modId="nffservices" #mandatory
-version="0.1.28"
+version="0.1.28.1"
 displayName="NFF Services" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
