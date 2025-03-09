@@ -1,20 +1,15 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.sodiumzh.nautils.containers.MapPair;
 
 /**
@@ -23,10 +18,10 @@ import net.sodiumzh.nautils.containers.MapPair;
 public class NaUtilsContainerStatics
 {
 	
-	protected static Random rnd = new Random();
+	private static final RandomSource RND = RandomSource.create();
 	
 	/**
-	 * Remove all elements fulfilling a condition from a set
+	 * Remove all elements meeting a condition from a set
 	 * @deprecated Use {@code Set#removeIf(Predicate)} instead.
 	 */
 	@Deprecated
@@ -45,7 +40,7 @@ public class NaUtilsContainerStatics
 	}
 	
 	/** 
-	 * Remove all elements with the key fulfilling a condition from a map.
+	 * Remove all elements with the key meeting a condition from a map.
 	 */
 	public static <T, U> void removeFromMapKey(Map<T, U> map, Predicate<T> keyCondition)
 	{
@@ -61,7 +56,7 @@ public class NaUtilsContainerStatics
 		}
 	}
 	
-	// Remove all elements with the value fulfilling a condition from a map
+	/** Remove all elements with the value meeting a condition from a map */
 	public static <T, U> void removeFromMapValue(Map<T, U> map, Predicate<U> valueCondition)
 	{
 		HashSet<T> toRemove = new HashSet<T>();
@@ -77,7 +72,7 @@ public class NaUtilsContainerStatics
 	}
 	
 	/** 
-	 * Pick an element fulfilling the condition from a set.  If there are multiple, it will randomly pick one.
+	 * Pick an element meeting the condition from a set.  If there are multiple, it will randomly pick one.
 	 */
 	public static <T> T pickSetElement(Set<T> set, Predicate<T> condition)
 	{
@@ -89,7 +84,7 @@ public class NaUtilsContainerStatics
 		return null;
 	}
 	
-	/** Pick all elements fulfilling the condition from a set. */
+	/** Pick all elements meeting the condition from a set. */
 	public static <T> HashSet<T> pickSetElements(Set<T> set, Predicate<T> condition)
 	{
 		HashSet<T> out = new HashSet<T>();
@@ -101,7 +96,7 @@ public class NaUtilsContainerStatics
 		return out;
 	}
 	
-	/** Pick all keys of which values satisfying the condition from a map. */
+	/** Pick all keys of which values meeting the condition from a map. */
 	public static <K, V> HashSet<K> pickMapKeys(Map<K, V> map, Predicate<V> valueCondition)
 	{
 		HashSet<K> out = new HashSet<>();
@@ -260,15 +255,8 @@ public class NaUtilsContainerStatics
 	 */
 	public static <T> T randomPickCollection(Collection<T> collection)
 	{
-		int r = rnd.nextInt(collection.size());
-		int i = 0;
-		for (T t: collection)
-		{
-			if (i == r)
-				return t;
-			else ++i;
-		}
-		throw new RuntimeException();
+		int r = RND.nextInt(collection.size());
+		return collection.stream().toList().get(r);
 	}
 	
 	/**
@@ -285,11 +273,11 @@ public class NaUtilsContainerStatics
 	 */
 	public static <T> T randomPick(List<T> list)
 	{
-		return list.get(rnd.nextInt(0, list.size()));
+		return list.get(RND.nextInt(0, list.size()));
 	}
 	
 	/**
-	 * Gather elements fulfilling certain condition, transform with a function and collect into a list
+	 * Gather elements meeting certain condition, transform with a function and collect into a list
 	 */
 	public static <T, U> ArrayList<U> collectAndTransform(Collection<T> from, Predicate<T> condition, Function<T, U> transformation)
 	{
@@ -319,19 +307,13 @@ public class NaUtilsContainerStatics
 	 * Cast a list element-wise to a subclass. If cast failed, the element will be ignored.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, U> ArrayList<U> castListType(List<T> list, Class<U> castToClass)
+	public static <T, U> List<U> castListType(List<T> list, Class<U> castToClass)
 	{
-		ArrayList<U> out = new ArrayList<>();
-		list.forEach(t -> {
-			if (castToClass.isAssignableFrom(t.getClass()))
-			{
-				out.add((U)t);
-			}
-		});
-		return out;
+		return list.stream().filter(t -> castToClass.isAssignableFrom(t.getClass()))
+				.map(t -> (U)t).collect(Collectors.toList());
 	}
 	
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T, U> ArrayList<U> castListTypeUnchecked(List<T> list, boolean suppressException)
 	{
 		ArrayList<U> out = new ArrayList<>();
@@ -346,7 +328,8 @@ public class NaUtilsContainerStatics
 		});
 		return out;
 	}
-	
+
+	@Deprecated
 	public static <T, U> ArrayList<U> castListTypeUnchecked(List<T> list)
 	{
 		return castListTypeUnchecked(list, false);
@@ -449,16 +432,15 @@ public class NaUtilsContainerStatics
 		return out;
 	}
 	
-	/** Convert a generic list (modifiable or not) to an ArrayList. */
-	public static <T> ArrayList<T> toArrayList(List<T> list)
+	/**
+	 * Convert a generic list (modifiable or not) to a modifiable list (ArrayList).
+	 * It ensures the output is a new instance, so modification of the output never impacts the input.
+	 * @deprecated Use constructor instead.
+	 */
+	@Deprecated
+	public static <T> ArrayList<T> modifiablize(List<T> list)
 	{
-		ArrayList<T> arrayList = new ArrayList<T>();
-		for (int i = 0; i < list.size(); ++i)
-		{
-			arrayList.add(list.get(i));
-		}
-		return arrayList;
-			
+		return new ArrayList<>(list);
 	}
 
 	/**
@@ -466,29 +448,25 @@ public class NaUtilsContainerStatics
 	 * @return The satisfying element. If it contains multiple, randomly return one. If there's none, return null.
 	 */
 	@Nullable
-	public static <T, U> U getSatisfies(T in, Collection<U> col, BiPredicate<T, U> condition)
+	public static <T, U> U getIf(T in, Collection<U> col, BiPredicate<T, U> condition)
 	{
-		for (U u: col)
-		{
-			if (condition.test(in, u))
-				return u;
-		}
-		return null;
+		var list = col.stream().filter(u -> condition.test(in, u)).toList();
+		return list.get(RND.nextInt(list.size()));
 	}
-	
-	/**
-	 * Add elements of a collection into a Hash set. It will only collect unique items. Equality is checked with custom predicate,
+
+	/** Add elements of a collection into a
+	 * set. It will only collect unique items. Equality is checked with custom predicate,
 	 * not necessarily {@code Object#equals}. (To use {@code equals} you can use {@code Set#addAll.) 
 	 * defined by the predicate within the same input set, it will randomly collect one.
 	 * <p>Note: if two items are different with the predicate but {@code equals} returns true, it will still be consider 
 	 * as duplication.
 	 * <p>Note: complexity of this method is O(n^2), meaning it could be costly if called multiple times or in a loop.
 	 */
-	public static <T> void addAll(HashSet<T> set, Collection<T> col, BiPredicate<T, T> equalsPredicate)
+	public static <T> void addAll(Set<T> set, Collection<T> col, BiPredicate<T, T> equalsPredicate)
 	{
 		for (T t: col)
 		{
-			if (getSatisfies(t, set, equalsPredicate) == null)
+			if (getIf(t, set, equalsPredicate) == null)
 				set.add(t);
 		}
 	}
@@ -518,57 +496,44 @@ public class NaUtilsContainerStatics
 	 */
 	public static <T1, T2> HashSet<T2> castUniqueToSet(Collection<T1> col, Function<T1, T2> cast, BiPredicate<T2, T2> equalsPredicate)
 	{
-		HashSet<T2> raw = new HashSet<>();
-		for (T1 t1: col)
-		{
-			raw.add(cast.apply(t1));
-		}
-		return collectUnique(raw, equalsPredicate);
+		return collectUnique(col.stream().map(cast).collect(Collectors.toSet()), equalsPredicate);
 	}
 	
 	/**
 	 * Cast elements of a collection into another type, and collect unique items into a set. 
 	 * It uses {@code Object#equals} to check equality. 
 	 * <p>Note: the result's size is not necessarily equal to the input, as duplicated cast result will be excluded.
+	 * @deprecated Use stream operation instead
 	 */
-	public static <T1, T2> HashSet<T2> castSet(Collection<T1> col, Function<T1, T2> cast)
+	@Deprecated
+	public static <T1, T2> Set<T2> castSet(Collection<T1> col, Function<T1, T2> cast)
 	{
-		HashSet<T2> res = new HashSet<>();
-		for (T1 t1: col)
-			res.add(cast.apply(t1));
-		return res;
+		return col.stream().map(cast).collect(Collectors.toSet());
 	}
-	
-	public static <T1, T2> ArrayList<T2> castList(List<T1> list, Function<T1, T2> cast)
-	{
-		ArrayList<T2> res = new ArrayList<>();
-		for (T1 elem: list)
-		{
-			res.add(cast.apply(elem));
-		}
-		return res;
-	}
-	
+
+	/**
+	 * @deprecated use stream operation instead
+	 */
+	@Deprecated
 	public static <T1, T2> void castListAndFill(List<T1> list, Function<T1, T2> cast, List<T2> fillInto)
 	{
 		fillInto.clear();
-		for (T1 elem: list)
-		{
-			fillInto.add(cast.apply(elem));
-		}
+		fillInto.addAll(list.stream().map(cast).toList());
 	}
 	
-	public static <T> HashSet<T> getRandomSubset(Set<T> parent, int subsetSize)
+	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
 	{
 		if (subsetSize > parent.size())
 			throw new IllegalArgumentException("subsetSize is larger than parent size.");
-		ArrayList<T> copy = iterableToList(parent);
-		HashSet<T> res = new HashSet<>();
-		for (int i = 0; i < subsetSize; ++i)
-		{
-			int pos = rnd.nextInt(copy.size());
-			res.add(copy.get(pos));
-			copy.remove(pos);
+		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true);
+		List<T> list = parent.stream().toList();
+		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
+	}
+
+	public static <T, K, V> Map<K, V> iterableToMap(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
+		Map<K, V> res = new HashMap<>();
+		for (T t: iterable) {
+			res.put(keyMapper.apply(t), valueMapper.apply(t));
 		}
 		return res;
 	}

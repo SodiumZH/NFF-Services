@@ -486,16 +486,16 @@ public class NFFEntityEventListeners
 					holder.updateBaubleEffects();
 				}*/
 				
-				// update befriended mob anchor position
-				if (mob instanceof INFFTamed bm)
-				{
+
+				INFFTamed.ifBM(mob, bm -> {
+					// update befriended mob anchor position
 					if (bm.getAnchorPos() != null)
 					{
 						// Stop update when wandering
 						if (bm.getAIState() != NFFTamedMobAIState.WANDER)
 							bm.updateAnchor();
 					}
-					// Sometimes it may happens that the mobs still attack allies, reset here
+					// Sometimes it may happen that the mobs still attack allies, reset here
 		        	// Generally the code below shouldn't be invoked, so print an error to log
 		        	if (NFFTamedStatics.isLivingAlliedToBM(bm, bm.asMob().getTarget()))
 		        	{
@@ -508,7 +508,9 @@ public class NFFEntityEventListeners
 		        			NaUtilsEntityStatics.forceSetTarget(bm.asMob(), null);
 		        		bm.setPreviousTarget(null);
 		        	}
-				}
+
+					bm.recordLocationToOwner();
+				});
 			}
 		}
 	}

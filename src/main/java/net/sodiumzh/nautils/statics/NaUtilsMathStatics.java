@@ -1,8 +1,6 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 import com.mojang.logging.LogUtils;
@@ -10,8 +8,10 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Range;
 
 public class NaUtilsMathStatics
 {
@@ -326,5 +326,27 @@ public class NaUtilsMathStatics
 	public static Optional<Integer> getFibonacci(int index) {
 		return (index >= 0 && index < FIBONACCI_SEQUENCE.size()) ? Optional.of(FIBONACCI_SEQUENCE.get(index)) : Optional.empty();
 	}
+
+	/**
+	 * Randomly pick a given amount of integers from the range [0, maxEx) successively and fill into a list.
+	 * @param maxEx Upper bound of the integers (excluding, i.e. range = [0, maxEx))
+	 * @param amount Amount of picked integers.
+	 * @param unique If true, each element of the output sequence will be unique.
+	 */
+	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique) {
+		if (amount > maxEx && unique)
+			throw new IllegalArgumentException("getRandomIntegerSequence unique requires amount <= maxEx");
+		List<Integer> all = NaUtilsContainerStatics.intRangeList(0, amount, 1);
+		List<Integer> out = new ArrayList<>(amount * 2);
+		for (int i = 0; i < amount; ++i) {
+			int pickedIndex = RND.nextInt(out.size());
+			out.add(all.get(pickedIndex));
+			if (unique)
+				all.remove(pickedIndex);
+		}
+		return out;
+	}
+
+
 
 }

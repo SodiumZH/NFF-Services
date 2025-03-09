@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.checkerframework.checker.units.qual.C;
 
 public class NaUtilsNBTStatics {
 
@@ -318,6 +319,44 @@ public class NaUtilsNBTStatics {
 			res.add(loader.apply(tag));
 		}
 		return res;
+	}
+
+	public static <T> ListTag listTagFromList(List<T> list, Function<T, Tag> saver) {
+		ListTag tag = new ListTag();
+		for (T t: list) tag.add(saver.apply(t));
+		return tag;
+	}
+
+	public static <K, V> Map<K, V> mapFromCompoundTag(CompoundTag nbt, Function<String, K> keyLoader, Function<Tag, V> valLoader) {
+		Map<K, V> res = new HashMap<>();
+		for (String key: nbt.getAllKeys()) {
+			res.put(keyLoader.apply(key), valLoader.apply(nbt.get(key)));
+		}
+		return res;
+	}
+
+	public static <V> Map<String, V> stringMapFromCompoundTag(CompoundTag nbt, Function<Tag, V> valLoader) {
+		return mapFromCompoundTag(nbt, s -> s, valLoader);
+	}
+
+	public static <K, V> CompoundTag compoundTagFromMap(Map<K, V> map, Function<K, String> keySaver, Function<V, Tag> valSaver) {
+		CompoundTag nbt = new CompoundTag();
+		for (var entry: map.entrySet()) {
+			nbt.put(keySaver.apply(entry.getKey()), valSaver.apply(entry.getValue()));
+		}
+		return nbt;
+	}
+
+	public static <V> CompoundTag compoundTagFromStringMap(Map<String, V> map, Function<V, Tag> valSaver) {
+		return compoundTagFromMap(map, s -> s, valSaver);
+	}
+
+	public static <T> CompoundTag compoundTagFromIterable(Iterable<T> iterable, Function<T, String> toKey, Function<T, Tag> toValue) {
+		CompoundTag nbt = new CompoundTag();
+		for (T t: iterable) {
+			nbt.put(toKey.apply(t), toValue.apply(t));
+		}
+		return nbt;
 	}
 
 }

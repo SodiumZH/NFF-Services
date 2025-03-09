@@ -1,19 +1,12 @@
  package net.sodiumzh.nautils.entity.vanillatrade;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+ import net.sodiumzh.nautils.containers.CompoundSet;
+ import net.sodiumzh.nautils.math.RandomSelection;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.sodiumzh.nautils.containers.CompoundSet;
-import net.sodiumzh.nautils.math.RandomSelection;
-import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
+ import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
+ import java.util.*;
+ import java.util.stream.Collectors;
 
 public class VanillaTradeListings<T extends IVanillaTradeListing>
 {
@@ -40,8 +33,7 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 	
 	public VanillaTradeListings<T> addAll(Collection<T> c)
 	{
-		Set<T> copy = new HashSet<>();
-		copy.addAll(c);
+        Set<T> copy = new HashSet<>(c);
 		copy.removeIf(t -> t == null || !t.isValid());
 		this.set.addAll(copy);
 		return this;
@@ -90,7 +82,7 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 			if (!res.contains(t.getMerchantLevel()))
 				res.add(t.getMerchantLevel());
 		});
-		return NaUtilsContainerStatics.toArrayList(res.stream().sorted().toList());
+		return res.stream().sorted().collect(Collectors.toList());
 	}
 	
 	/**
@@ -120,12 +112,12 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 				if (fallback == null || fallback.getSelectionWeight() < t.getSelectionWeight())
 					fallback = t;
 			}
-			RandomSelection<T> sel = RandomSelection.create(fallback);
+			RandomSelection<T> sel = new RandomSelection<>(fallback);
 			for (var t: candidates)
 			{
 				sel.add(t, t.getSelectionWeight() / totalWeight);
 			}
-			T selected = sel.getValue();
+			T selected = sel.select();
 			if (selected != null)
 			{
 				candidates.remove(selected);

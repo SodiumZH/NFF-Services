@@ -1,13 +1,27 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.sodiumzh.nautils.containers.Tuple3;
+import net.sodiumzh.nautils.registries.NaUtilsCaps;
+import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
+import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.core.BlockPos;
@@ -43,6 +57,8 @@ import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.logging.log4j.core.jmx.Server;
+import org.checkerframework.checker.units.qual.C;
 
 public interface INFFTamed extends ContainerListener, OwnableEntity  {
 
@@ -432,7 +448,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	public default double getAnchoredStrollRadius()  
 	{
-		return 64.0d;
+		return 16.0d;
 	}
 	
 	/**
@@ -776,6 +792,97 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		this.getData().generateIdentifier();
 		this.getData().recordEntityType();
 		this.getData().recordEncounteredDate();
+	}
+
+	// ===== Mob Search ===
+
+	/**
+	 *  Only on server, record the current location to the owner's data.
+	 *  Called in {@link NFFEntityEventListeners#onLivingUpdate}.
+	 */
+	public default void recordLocationToOwner() {
+		Player player = this.getOwnerInWorld();
+		if (player == null) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
+				c.getNBT().put("tamedMobLocations", new ListTag());
+			MobLocationInfo info = MobLocationInfo.fromMob(this);
+			c.getNBT().getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
+		});
+	}
+
+	/** Only on server, get all nffgirls mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
+	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
+		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
+		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
+				new AtomicReference<>(new HashMap<>());
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
+			res.set(NaUtilsNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
+					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
+		});
+		return NaUtilsContainerStatics.iterableToMap(res.get().values().stream()
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.filter(MobLocationInfo::isValid)
+				.toList(),
+				MobLocationInfo::identifier, info -> info);
+	}
+
+	/**
+	 * Find tamed mob by its tamed mob identifier (not entity uuid). Will search in all loaded dimensions.
+	 * @param identifier Tamed mob identifier. (Not the entity UUID!)
+	 * @param context Any server level that can provide a context to the server.
+	 * @return Find result.
+	 */
+	public static Optional<Mob> byIdentifier(UUID identifier, ServerLevel context) {
+		for (ServerLevel sl: context.getServer().getAllLevels()) {
+			var list = sl.getEntities(EntityTypeTest.forClass(Mob.class), mob ->
+					INFFTamed.isBM(mob) && INFFTamed.getBM(mob).getIdentifier().equals(identifier));
+			if (!list.isEmpty()) return Optional.of(list.get(0));
+		}
+		return Optional.empty();
+	}
+
+	public static record MobLocationInfo(UUID identifier, Component mobName, ResourceKey<Level> dimension, BlockPos pos) {
+
+		public static MobLocationInfo fromMob(INFFTamed mob) {
+			return new MobLocationInfo(mob.getIdentifier(), mob.asMob().getName(),
+					mob.asMob().level().dimension(), mob.asMob().getOnPos());
+		}
+
+		public CompoundTag save() {
+			CompoundTag nbt = new CompoundTag();
+			nbt.putUUID("identifier", this.identifier());
+			nbt.putString("name", Component.Serializer.toJson(mobName()));
+			nbt.putString("dimension", dimension().location().toString());
+			nbt.putIntArray("pos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
+			return nbt;
+		}
+
+		@Nullable
+		public static MobLocationInfo load(CompoundTag nbt, ServerLevel context) {
+
+			if (!nbt.hasUUID("identifier")) return null;
+			UUID id = nbt.getUUID("identifier");
+			if (id.equals(new UUID(0L, 0L))) return null;
+
+			Component name = Component.Serializer.fromJson(nbt.getString("name"));
+
+			ResourceLocation dimKey = new ResourceLocation(nbt.getString("dimension"));
+			List<ResourceKey<Level>> dim = context.getServer().levelKeys().stream()
+					.filter(key -> key.location().equals(dimKey)).toList();
+			if (dim.isEmpty()) return null;
+
+			int[] posArray = nbt.getIntArray("pos");
+
+			return new MobLocationInfo(id, name, dim.get(0), new BlockPos(posArray[0], posArray[1], posArray[2]));
+		}
+
+		public boolean isValid() {
+			return !Objects.equals(identifier(), new UUID(0L, 0L))
+					&& mobName() != null && dimension() != null && pos() != null;
+		}
 	}
 
 }
