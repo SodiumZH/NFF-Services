@@ -15,7 +15,6 @@ public class NaUtilsConfigs
 	public static final ForgeConfigSpec.BooleanValue SPEC_ENABLES_SAVE_DATA_PORTER;
 	public static final ForgeConfigSpec.BooleanValue SPEC_ENABLES_TAG_FIX;
 	public static final ForgeConfigSpec.BooleanValue SPEC_DEBUG_MODE;
-	public static final ForgeConfigSpec.BooleanValue SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED;
 
 	static
 	{
@@ -32,8 +31,6 @@ public class NaUtilsConfigs
 		BUILDER.push("debug");
 		SPEC_DEBUG_MODE = BUILDER.comment("If true, it will enable debug actions defined in NaUtilsDebugStatics, like debug output in the chatting box.")
 				.define("debugMode", false);
-		SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED = BUILDER.comment("If true, the game will crash if entity load failed.")
-				.define("crashesWhenEntityLoadFailed", false);
 		BUILDER.pop();
 		CONFIG = BUILDER.build();
 	}
@@ -48,7 +45,6 @@ public class NaUtilsConfigs
 		CACHED_ENABLES_SAVE_DATA_PORTER = SPEC_ENABLES_SAVE_DATA_PORTER.get();
 		CACHED_ENABLES_TAG_FIX = SPEC_ENABLES_TAG_FIX.get();
 		CACHED_DEBUG_MODE = SPEC_DEBUG_MODE.get();
-		CACHED_CRASHES_WHEN_ENTITY_LOAD_FAILED = SPEC_CRASHES_WHEN_ENTITY_LOAD_FAILED.get(); 
 	}
 	
 	@SubscribeEvent

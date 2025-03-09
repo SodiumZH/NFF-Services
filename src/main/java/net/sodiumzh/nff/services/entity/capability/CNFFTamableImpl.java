@@ -150,7 +150,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	public void setTimer(String key, int ticks) {
 		String actualKey = key;
 		if (key.contains("|")) {
-			NaUtilsDebugStatics.errorOnce(LogUtils.getLogger(), String.format("CNFFTamableImpl: illegal general timer " +
+			NaUtilsDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal general timer " +
 					"\"%s\". \"|\" is reserved for player-specific timers. Removed \"|\".", key));
 			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
 		}
@@ -178,7 +178,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	public void putPlayerTimer(UUID uuid, String key, int ticks) {
 		String actualKey = key;
 		if (key.contains("|")) {
-			NaUtilsDebugStatics.errorOnce(LogUtils.getLogger(), String.format("CNFFTamableImpl: illegal player timer " +
+			NaUtilsDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal player timer " +
 					"\"%s\". \"|\" is reserved for player-specific timers only for separating the player uuid and key. Removed \"|\".", key));
 			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
 		}

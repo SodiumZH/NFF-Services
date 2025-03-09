@@ -488,7 +488,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 		
 		if (this.baseCostA.size() == 1)
 			res = res + this.baseCostA.get(0).getItem().toString();
-		else res = res + NaUtilsContainerStatics.castList(this.baseCostA, stack -> stack.getItem()).toString();
+		else res = res + this.baseCostA.stream().map(ItemStack::getItem).toList().toString();
 		res = res + ", countA = " + this.aCount.toString() + ", ";
 		if (this.hasB)
 			res = res + "hasB, ";
@@ -498,14 +498,14 @@ public class VanillaTradeListing implements IVanillaTradeListing
 			res = res + "costB = ";
 			if (this.costB.size() == 1)
 				res = res + this.costB.get(0).getItem().toString();
-			else res = res +  NaUtilsContainerStatics.castList(this.costB, stack -> stack.getItem()).toString();
+			else res = res +  this.costB.stream().map(ItemStack::getItem).toList().toString();
 			res = res + ", countB = " + this.bCount.toString() + ", ";
 		}
 		
 		res = res + " result = ";
 		if (this.result.size() == 1)
 			res = res + this.result.get(0).getItem().toString();
-		else res = res +  NaUtilsContainerStatics.castList(this.result, stack -> stack.getItem()).toString();
+		else res = res +  this.result.stream().map(ItemStack::getItem).toList().toString();
 		res = res + ", countResult = " + this.resCount.toString();
 		
 		res = res + String.format(", requiredLevel = %d, maxUses = %d", this.requiredLevel, this.maxUses);

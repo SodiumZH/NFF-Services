@@ -9,8 +9,10 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Range;
 
 public class NaUtilsMathStatics
 {
@@ -355,4 +357,5 @@ public class NaUtilsMathStatics
 	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique) {
 		return getRandomIntegerSequence(maxEx, amount, unique, RND);
 	}
+
 }

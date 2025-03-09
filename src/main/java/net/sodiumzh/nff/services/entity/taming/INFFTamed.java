@@ -3,6 +3,8 @@ package net.sodiumzh.nff.services.entity.taming;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -10,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -20,7 +23,6 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import net.sodiumzh.nautils.object.NaUtilsMapper;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -57,6 +59,8 @@ import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.logging.log4j.core.jmx.Server;
+import org.checkerframework.checker.units.qual.C;
 
 public interface INFFTamed extends ContainerListener, OwnableEntity  {
 
@@ -437,7 +441,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	public default double getAnchoredStrollRadius()  
 	{
-		return 64.0d;
+		return 16.0d;
 	}
 	
 	/**

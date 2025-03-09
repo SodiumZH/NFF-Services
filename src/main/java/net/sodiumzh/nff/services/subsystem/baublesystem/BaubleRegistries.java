@@ -101,7 +101,7 @@ class BaubleRegistries
 		{
 			ToDoubleFunction<Tuple4<Double, ResourceLocation, IBaubleRegistryEntry, BaubleEquippingCondition>> func = t -> t.a;
 			var sorted = SINGLE_REGISTRY.get(item).stream().sorted(Comparator.comparingDouble(func).reversed()).toList();
-			SINGLE_REGISTRY.put(item, NaUtilsContainerStatics.toArrayList(sorted));
+			SINGLE_REGISTRY.put(item, NaUtilsContainerStatics.modifiablize(sorted));
 		}
 	}
 	
