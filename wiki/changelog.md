@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.1.28.1
+
+Fixed `CNFFTamable` serialization error.
+
 ### 0.0.28.1
 
 Fixed the client printing repeated `NullPointerException` to the log.
