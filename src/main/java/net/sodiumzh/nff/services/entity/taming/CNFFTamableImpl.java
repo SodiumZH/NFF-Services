@@ -47,7 +47,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 		nbt.put("playerSpecificNBT", this.savePlayerSpecificNBT());
 		nbt.put("timer", this.saveTimer());
 		nbt.put("anger", this.saveAngerList());
-		nbt.put("alwaysHostileTo", NbtUtils.createUUID(alwaysHostileTo));
+		nbt.putUUID("alwaysHostileTo", alwaysHostileTo);
 		nbt.putBoolean("forcePersistent", forcePersistent);
 		return nbt;
 	}
@@ -60,7 +60,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 		this.loadPlayerSpecificNBT(nbt.getCompound("playerSpecificNBT"));
 		this.loadTimerFromNBT(nbt.getCompound("timer"));
 		this.loadAngerList(nbt.getCompound("anger"));
-		this.alwaysHostileTo = NbtUtils.loadUUID(nbt.getCompound("alwaysHostileTo"));
+		this.alwaysHostileTo = nbt.getUUID("alwaysHostileTo");
 		this.forcePersistent = nbt.getBoolean("forcePersistent");
 	}
 
