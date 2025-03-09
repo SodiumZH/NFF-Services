@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.nbt.CompoundTag;
@@ -253,13 +254,13 @@ public class NFFTamedStatics
 		else return Optional.empty();
 	}
 
-	public static ArrayList<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
+	public static List<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
-		Stream<Entity> stream = player.level.getEntities(player, NaUtilsEntityStatics.getNeighboringArea(player, radius),
+		Stream<Entity> stream = player.level.getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
 				e -> (e.getType() == type && e instanceof INFFTamed bm && bm.getOwner() == player)).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
-		return NaUtilsContainerStatics.castListTypeUnchecked(stream.toList());
+		return stream.map(e -> (Mob)e).collect(Collectors.toList());
 	}
 	
 	/**

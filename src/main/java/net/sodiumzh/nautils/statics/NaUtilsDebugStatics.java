@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumzh.nautils.registries.NaUtilsConfigs;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,28 +29,30 @@ public class NaUtilsDebugStatics {
 
 	/**
 	 * Report an error to logger if it has not been reported by this method.
-	 * @param logger Use {@link LogUtils#getLogger} to provide a context-sensitive logger reference
+	 * @param callerClass The class in which the error is reported. Usually
+	 * {@code this.getClass()} or {@code CallingClass.class}.
 	 * @param msg Error message.
 	 */
-	public static void errorOnce(Logger logger, String msg)
+	public static void errorOnce(Class<?> callerClass, String msg)
 	{
 		if (!REPORTED_ERROR_MSG.contains(msg))
 		{
-			logger.error(msg);
+			LoggerFactory.getLogger(callerClass).error(msg);
 			REPORTED_ERROR_MSG.add(msg);
 		}
 	}
 
 	/**
 	 * Report a warning to logger if it has not been reported by this method.
-	 * @param logger Use {@link LogUtils#getLogger} to provide a context-sensitive logger reference
+	 * @param callerClass The class in which the warning is reported. Usually
+	 * {@code this.getClass()} or {@code CallingClass.class}.
 	 * @param msg Warning message.
 	 */
-	public static void warnOnce(Logger logger, String msg)
+	public static void warnOnce(Class<?> callerClass, String msg)
 	{
 		if (!REPORTED_WARNING_MSG.contains(msg))
 		{
-			logger.warn(msg);
+			LoggerFactory.getLogger(callerClass).warn(msg);
 			REPORTED_WARNING_MSG.add(msg);
 		}
 	}

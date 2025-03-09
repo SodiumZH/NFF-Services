@@ -19,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nautils.containers.Tuple4;
 import net.sodiumzh.nautils.exceptions.DuplicateRegistryEntryException;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
 
 class BaubleRegistries
 {
@@ -99,7 +98,7 @@ class BaubleRegistries
 		{
 			ToDoubleFunction<Tuple4<Double, ResourceLocation, IBaubleRegistryEntry, BaubleEquippingCondition>> func = t -> t.a;
 			var sorted = SINGLE_REGISTRY.get(item).stream().sorted(Comparator.comparingDouble(func).reversed()).toList();
-			SINGLE_REGISTRY.put(item, NaUtilsContainerStatics.toArrayList(sorted));
+			SINGLE_REGISTRY.put(item, NaUtilsContainerStatics.modifiablize(sorted));
 		}
 	}
 	
