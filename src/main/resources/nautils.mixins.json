@@ -8,8 +8,6 @@
     "NFUMixinEnderMan",
     "NFUMixinEntity",
     "NFUMixinEntityType",
-    "NFUMixinGrindstoneMenuLowerSlot",
-    "NFUMixinGrindstoneMenuUpperSlot",
     "NFUMixinItemEntity",
     "NFUMixinItemInput",
     "NFUMixinItemStack",
@@ -21,6 +19,8 @@
     "NFUMixinServerPlayerGameMode",
     "NFUMixinTagBuilder",
     "NFUMixinThrownTrident",
+    "NFUMixinGrindstoneMenuLowerSlot",
+    "NFUMixinGrindstoneMenuUpperSlot",
     "NFUMixinWorldCapabilityData"
   ],
   "client": [
