@@ -5,6 +5,7 @@
   "refmap": "nautils.refmap.json",
   "mixins": [
     "NaUtilsBlockItemMixin",
+    "NaUtilsMixinEnderMan",
     "NaUtilsMixinEntity",
     "NaUtilsMixinEntityType",
     "NaUtilsMixinItemEntity",
@@ -18,7 +19,8 @@
     "NaUtilsMixinServerPlayer",
     "NaUtilsMixinThrownTrident",
     "NaUtilsMixinGrindstoneMenuUpperSlot",
-    "NaUtilsMixinGrindstoneMenuLowerSlot"
+    "NaUtilsMixinGrindstoneMenuLowerSlot",
+    "NaUtilsMixinLevelCapabilityData"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",
