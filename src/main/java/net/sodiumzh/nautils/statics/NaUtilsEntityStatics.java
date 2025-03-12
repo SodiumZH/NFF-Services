@@ -1,10 +1,7 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,6 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -51,6 +49,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+import org.apache.maven.artifact.Artifact;
 
 // Static function library for befriending-related actions.
 public class NaUtilsEntityStatics
@@ -880,5 +879,12 @@ public class NaUtilsEntityStatics
 		}
 	}
 
-
+	public static <T extends Entity> List<T> getEntitiesOnServer(
+			ServerLevel context, EntityTypeTest<Entity, T> typeTest, Predicate<? super T> entityTest) {
+		List<T> res = new ArrayList<>();
+		for (ServerLevel sl: context.getServer().getAllLevels()) {
+			res.addAll(sl.getEntities(typeTest, entityTest));
+		}
+		return res;
+	}
 }
