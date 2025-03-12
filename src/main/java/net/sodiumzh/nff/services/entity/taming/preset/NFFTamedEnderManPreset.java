@@ -135,8 +135,9 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 	 */
 	@Override
 	public void setTarget(@Nullable LivingEntity pLivingEntity) {
+		super.setTarget(pLivingEntity);
 		AttributeInstance attributeinstance = this.getAttribute(Attributes.MOVEMENT_SPEED);
-		if (pLivingEntity == null)
+		if (this.getTarget() == null)
 		{
 			this.targetChangeTime = 0;
 			this.entityData.set(DATA_CREEPY, false);
@@ -151,8 +152,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 				attributeinstance.addTransientModifier(SPEED_MODIFIER_ATTACKING);
 			}
 		}
-
-		super.setTarget(pLivingEntity); // Forge: Moved down to allow event handlers to write data manager values.
 	}
 
 	@Override
