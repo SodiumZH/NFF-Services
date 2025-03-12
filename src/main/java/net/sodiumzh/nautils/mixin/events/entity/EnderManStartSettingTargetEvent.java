@@ -1,5 +1,4 @@
 package net.sodiumzh.nautils.mixin.events.entity;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;

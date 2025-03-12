@@ -20,7 +20,10 @@
     "NaUtilsMixinProjectile",
     "NaUtilsMixinServerPlayer",
     "NaUtilsMixinServerPlayerGameMode",
-    "NaUtilsMixinThrownTrident"
+    "NaUtilsMixinThrownTrident",
+    "NaUtilsMixinGrindstoneMenuUpperSlot",
+    "NaUtilsMixinGrindstoneMenuLowerSlot",
+    "NaUtilsMixinLevelCapabilityData"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",
