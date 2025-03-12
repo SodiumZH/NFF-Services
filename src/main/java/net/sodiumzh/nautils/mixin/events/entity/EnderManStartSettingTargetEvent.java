@@ -1,11 +1,11 @@
-package net.sodiumzh.nautils.mixin.event.entity;
+package net.sodiumzh.nautils.mixin.events.entity;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
-import net.sodiumzh.nff.services.entity.taming.preset.NFFTamedEnderManPreset;
+import net.sodiumzh.nff.services.entity.taming.presets.NFFTamedEnderManPreset;
 
 /**
  * Posted at the start of {@link EnderMan#setTarget}. Its usage is similar to
