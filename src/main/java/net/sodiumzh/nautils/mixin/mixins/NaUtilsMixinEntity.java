@@ -1,7 +1,7 @@
 package net.sodiumzh.nautils.mixin.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import net.sodiumzh.nautils.mixin.events.entity.EntityLoadFailedEvent;
+import net.sodiumzh.nautils.mixin.events.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,9 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
 import net.sodiumzh.nautils.mixin.NaUtilsMixinHooks;
-import net.sodiumzh.nautils.mixin.events.entity.EntityFinalizeLoadingEvent;
-import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
-import net.sodiumzh.nautils.mixin.events.entity.EntityTickEvent;
 import net.sodiumzh.nautils.registries.NaUtilsConfigs;
 
 @Mixin(Entity.class)
@@ -56,7 +53,8 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 			@At(value = "INVOKE", target = "net/minecraft/CrashReport.forThrowable(Ljava/lang/Throwable;Ljava/lang/String;)Lnet/minecraft/CrashReport;"),
 	cancellable = true)
 	private void loadFailed(CompoundTag pCompound, CallbackInfo ci,
-							@Local(ordinal = 0) Throwable throwable, @Local(ordinal = 0) CompoundTag nbt)
+							@Local(ordinal = 0) Throwable throwable,
+							@Local(ordinal = 0, argsOnly = true) CompoundTag nbt)
 	{
 		EntityLoadFailedEvent event = new EntityLoadFailedEvent(caller(), throwable, nbt);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -64,5 +62,10 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 			MinecraftForge.EVENT_BUS.post(new EntityFinalizeLoadingEvent(caller(), nbt));
 			ci.cancel();
 		}
+	}
+
+	@Inject(method = "discard()V", at = @At("HEAD"))
+	private void onDiscard(CallbackInfo ci) {
+		MinecraftForge.EVENT_BUS.post(new EntityDiscardEvent(caller()));
 	}
 }

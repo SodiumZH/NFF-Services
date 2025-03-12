@@ -18,9 +18,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.sodiumzh.nautils.containers.Tuple3;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
+import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -705,9 +708,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	public default void onDataInit(CNFFTamedCommonData dataCap) {}
 	
 	/**
-	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID)
+	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID).
+	 * Returns empty uuid (0, 0) if the data cap is lost (may occasionally happen).
 	 */
 	@DontOverride
+	@Nonnull
 	public default UUID getIdentifier()
 	{
 		return this.getData().getIdentifier();
@@ -805,9 +810,20 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		if (player == null) return;
 		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
 			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
-				c.getNBT().put("tamedMobLocations", new ListTag());
+				c.getNBT().put("tamedMobLocations", new CompoundTag());
 			MobLocationInfo info = MobLocationInfo.fromMob(this);
 			c.getNBT().getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
+		});
+	}
+
+	/**
+	 * Remove the location when the entity is removed.
+	 */
+	public default void removeLocationOnOwner() {
+		Player player = this.getOwnerInWorld();
+		if (player == null) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
 		});
 	}
 
@@ -842,6 +858,32 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 			if (!list.isEmpty()) return Optional.of(list.get(0));
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * Remove suspicious tamed location stored in player that the mob may no longer exist。
+	 * A suspicious location entry is defined as the entry in which the pos is loaded
+	 * but the mob isn't found in level。
+	 * */
+	public static void removeSuspiciousMobLocations(Player player) {
+		if (!(player.level() instanceof ServerLevel sl)) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			List<UUID> levelLoadedIdentifiers = NaUtilsEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
+							e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
+					.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
+					.map(INFFTamed::getIdentifier).toList();
+			List<INFFTamed.MobLocationInfo> savedLocations =
+					c.getNBT().getCompound("tamedMobLocations").getAllKeys()
+							.stream().map(k -> INFFTamed.MobLocationInfo.load(c.getNBT().getCompound("tamedMobLocations").getCompound(k), sl))
+							.filter(Objects::nonNull).toList();
+			List<UUID> suspiciousIdentifiers = new ArrayList<>();
+			for (INFFTamed.MobLocationInfo loc: savedLocations) {
+				ServerLevel dim = sl.getServer().getLevel(loc.dimension());
+				if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
+					suspiciousIdentifiers.add(loc.identifier());
+			}
+			suspiciousIdentifiers.forEach(id -> c.getNBT().getCompound("tamedMobLocations").remove(id.toString()));
+		});
 	}
 
 	public static record MobLocationInfo(UUID identifier, Component mobName, ResourceKey<Level> dimension, BlockPos pos) {
