@@ -317,6 +317,10 @@ public class NaUtilsNBTStatics {
 		return res;
 	}
 
+	/**
+	 * Use {@code list.stream().map(loader).collect(Collector.toList())} instead
+	 */
+	@Deprecated
 	public static <T> List<T> listFromListTag(ListTag listTag, Function<Tag, T> loader) {
 		List<T> res = new ArrayList<>();
 		for (Tag tag : listTag) {

@@ -21,8 +21,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.sodiumzh.nautils.object.NaUtilsMapper;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.sodiumzh.nautils.containers.Tuple3;
 import net.sodiumzh.nautils.registries.NaUtilsCaps;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
+import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -701,9 +706,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	public default void onDataInit(CNFFTamedCommonData dataCap) {}
 	
 	/**
-	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID)
+	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID).
+	 * Returns empty uuid (0, 0) if the data cap is lost (may occasionally happen).
 	 */
 	@DontOverride
+	@Nonnull
 	public default UUID getIdentifier()
 	{
 		return this.getData().getIdentifier();
