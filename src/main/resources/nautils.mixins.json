@@ -16,7 +16,9 @@
     "NaUtilsMixinPlayer",
     "NaUtilsMixinProjectile",
     "NaUtilsMixinServerPlayer",
-    "NaUtilsMixinThrownTrident"
+    "NaUtilsMixinThrownTrident",
+    "NaUtilsMixinGrindstoneMenuUpperSlot",
+    "NaUtilsMixinGrindstoneMenuLowerSlot"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",

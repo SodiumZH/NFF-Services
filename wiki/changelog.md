@@ -1,5 +1,17 @@
 # Change Log
 
+### 0.x.29
+
+##### NFF Services
+
+Now mobs will auto save their locations to the owner.
+
+Now anchored patrol radius is 16 instead of 64 by default.
+
+##### Sodium's Utilities
+
+Added Mixin Events: `EntityLoadFailedEvent`, `GrindstoneAcceptItemEvent`
+
 ### 0.1.28.1
 
 Fixed `CNFFTamable` serialization error.
@@ -33,6 +45,8 @@ Added `EntityTimerCapability`, an extension of `EntityTickingCapability` which m
 Added `EntityDataCapability`. This capability is auto-attached to all entities and only contains an NBT, allowing to save & load entity NBT externally.
 
 Added mob taming API for non-NFF-specific generic taming process. Vanilla `TamableAnimal` taming process is planned but not implemented yet. 
+
+Added debug item: Debug Mob Remover (`nautils:debug_mob_remover`).
 
 Added Mixin Event:
 
