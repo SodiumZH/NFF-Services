@@ -2,6 +2,7 @@ package net.sodiumzh.nautils.registries;
 
 import net.minecraft.resources.ResourceLocation;
 import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.entity.EntityAttributeProvider;
 import net.sodiumzh.nautils.entity.MobApplicableItemTable;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
@@ -57,7 +58,11 @@ public class NaUtilsRegistries {
     public static final NaUtilsRegistry<MobAngerReason> MOB_ANGER_REASONS =
         new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "mob_anger_reasons"));
 
+
     public static final NaUtilsRegistry<MobAngerRules> MOB_ANGER_RULES =
         new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "mob_anger_rules"));
+
+    public static final NaUtilsRegistry<EntityAttributeProvider> ENTITY_ATTRIBUTE_PROVIDERS =
+            new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "entity_anger_rules"));
 
 }
