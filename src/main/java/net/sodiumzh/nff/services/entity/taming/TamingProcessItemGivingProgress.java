@@ -32,6 +32,8 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 
 	@Nullable
 	protected Supplier<MobApplicableItemTable> tamingItemTableOverride = null;
+
+
 	@Override
 	public TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand) {
 

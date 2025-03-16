@@ -73,7 +73,7 @@ import net.sodiumzh.nff.services.entity.ai.goal.presets.target.NFFNearestAttacka
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
 
-public abstract class NFFTamedEnderManPreset extends Monster implements INFFTamed, NeutralMob
+public abstract class NFFTamedEnderManPreset extends Monster implements INFFTamed
 {
 
 	protected static final UUID SPEED_MODIFIER_ATTACKING_UUID = UUID.fromString("020E0DFB-87AE-4653-9556-831010E291A0");
@@ -128,7 +128,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		// BefriendedEnderManGoals.LookForPlayerGoal(this, this::isAngryAt));
 		this.targetSelector.addGoal(2, new NFFHurtByTargetGoal(this));
 		this.targetSelector.addGoal(3, new NFFNearestAttackableTargetGoal<>(this, Endermite.class, true, false));
-		this.targetSelector.addGoal(4, new ResetUniversalAngerTargetGoal<>(this, false));
 	}
 
 	/**
@@ -163,32 +162,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		this.entityData.define(DATA_STARED_AT, false);
 	}
 
-	@Override
-	public void startPersistentAngerTimer() {
-		/*this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));*/
-	}
-
-	@Override
-	public void setRemainingPersistentAngerTime(int pTime) {
-		/*this.remainingPersistentAngerTime = pTime;*/
-	}
-
-	@Override
-	public int getRemainingPersistentAngerTime() {
-		return 0;/*return this.remainingPersistentAngerTime;*/
-	}
-
-	@Override
-	public void setPersistentAngerTarget(@Nullable UUID pTarget) {
-		/*this.persistentAngerTarget = pTarget;*/
-	}
-
-	@Override
-	@Nullable
-	public UUID getPersistentAngerTarget() {
-		return this.persistentAngerTarget;
-	}
-
 	public void playStareSound() {
 		if (this.tickCount >= this.lastStareSound + 400)
 		{
@@ -220,8 +193,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		{
 			tag.put("carriedBlockState", NbtUtils.writeBlockState(blockstate));
 		}
-
-		this.addPersistentAngerSaveData(tag);
 		NFFTamedStatics.addBefriendedCommonSaveData(this, tag);
 	}
 
@@ -242,7 +213,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		}
 
 		this.setCarriedBlock(blockstate);
-		this.readPersistentAngerSaveData(this.level(), tag);
 		NFFTamedStatics.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
@@ -308,11 +278,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		}
 
 		this.jumping = false;
-		if (!this.level().isClientSide)
-		{
-			this.updatePersistentAnger((ServerLevel) this.level(), true);
-		}
-
 		super.aiStep();
 	}
 
