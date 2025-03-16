@@ -2,16 +2,15 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,6 +38,7 @@ import net.sodiumzh.nautils.capability.CEntityTickingCapability;
 import net.sodiumzh.nautils.function.MutablePredicate;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
+import net.sodiumzh.nautils.object.CastableObject;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
@@ -186,8 +186,15 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 	public NFFTamedMobAIState getAIState();
 	
-	public void setAIState(NFFTamedMobAIState state); 
-	
+	public void setAIState(NFFTamedMobAIState state);
+
+	/**
+	 * Get the attack target. Same to {@link Mob#getTarget()} on server. On client,
+	 * it will be read from the synched field cache.
+	 */
+	@Nullable
+	public LivingEntity getAttackTarget();
+
 	/**
 	 * <b> Don't call manually! </b> This method is only called in {@link INFFTamed#getPreviousTarget}.
 	 */
@@ -219,9 +226,9 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 	public <T> boolean hasSynchedData(String key, Class<T> dataType);
 
-	public <T> T getSynchedData(String key, Class<T> dataClass);
+	public <T> Optional<T> getSynchedData(String key, Class<T> dataClass);
 	
-	public <T> T getSynchedDataUnchecked(String key);
+	public <T> Optional<T> getSynchedDataUnchecked(String key);
 	
 	/**
 	 * Set synched data value. Only on server.
@@ -232,8 +239,56 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public <T> void setSynchedData(String key, Class<T> dataClass, T value);
 	
 	public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value);
-	
-	public void setDataSyncInterval(int ticks);
+
+	/**
+	 * Define a synched field. Synched fields get from a {@link Supplier} every tick from server and store it on client.
+	 * They are not saved into data.
+	 * <p>When a field is accessed on the client, it will read the cache value synched from server (if no synching happened,
+	 * it's the default value).
+	 */
+	public <T> void createSynchedField(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
+
+	/**
+	 * Get synched field from key and type.
+	 * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
+	 * and on client it will be read from the cached field which is updated on synching.
+	 * <p>Note: this includes an unsafe casting. Double-check the type before using.
+	 * Return {@code null} if not present.
+	 */
+	public <T> Optional<T> getSynchedField(String key, Class<T> type);
+
+	/**
+	 * Get a synched field as a raw {@link CastableObject}.
+	 * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
+	 * and on client it will be read from the cached field which is updated on synching.
+	 * <p> This method will never return {@code null}, but if the field is not present, return an empty {@link CastableObject}
+	 * of which {@code cast()} and {@code castTo} always return {@code null}.
+	 */
+	@Nonnull
+	public CastableObject getSynchedField(String key);
+
+	/**
+	 * Set the key-value pair in the synched field cache on client.
+	 * <p>This is only used in synching process and should not be called elsewhere.
+	 * Safe to call on server as the cache on server will not be read.
+	 */
+	@DontCallManually
+	public void setSynchedFieldClient(String key, @Nonnull Object o);
+
+	/**
+	 * Set how many ticks to do a sync (data and fields)/
+	 * @deprecated use {@code setSyncInterval} instead. This method name is confusing.
+	 */
+	@Deprecated
+	public default void setDataSyncInterval(int ticks) {
+		setSyncInterval(ticks);
+	}
+
+	/**
+	 * Set how many ticks to do a sync (data and fields)
+	 */
+	public void setSyncInterval(int ticks);
+
 
 	// Misc //
 	
@@ -269,6 +324,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private static final String OWNER_UUID_SYNCHED_KEY = "ownerUUID";
 		private static final String OWNER_NAME_SYNCHED_KEY = "ownerName";
 		private static final String ENCOUNTERED_DATE_SYNCHED_KEY = "encounteredDate";
+		private static final String ATTACK_TARGET_SYNCHED_KEY = "attackTarget";
 		// Behavior
 		private LivingEntity previousTarget = null;
 		private Vec3 anchor;
@@ -279,6 +335,11 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private boolean hasInit = false;
 		// Syncher
 		private Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
+			// Suppliers are only called on server. On client, this table is present for keeping a serializer instance
+			// to decode, but the suppliers will never be called.
+		private Map<String, Tuple<NaUtilsDataSerializer<?>, Supplier<?>>> synchedFieldAccessors = new HashMap<>();
+			// only called on client
+		private Map<String, Object> synchedFieldCache = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
 		private MutablePredicate<INFFTamedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -294,8 +355,11 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
 			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
 			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializers.STRING, "");
-			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializers.INT_ARRAY, new int[] {0, 0, 0});
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializers.INT_ARRAY, new int[] {2023, 1, 1});
 			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString());
+			this.createSynchedField(ATTACK_TARGET_SYNCHED_KEY, NaUtilsDataSerializers.INT, -1,
+					() -> Optional.ofNullable(this.getEntity().getTarget())
+							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
 			this.getBM().onDataInit(this);
 			MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
@@ -464,20 +528,20 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public UUID getIdentifier()
 		{
-			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
+			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class).orElse(null);
 			if (id != null && !id.equals(EMPTY_UUID))
 				return id;
 			else {
 				LogUtils.getLogger().error(String.format("CNFFTamedCommonData: mob %s missing identifier. Regenerated.", this.getEntity().getName().getString()));
 				this.generateIdentifier();
-				return this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
+				return this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class).orElseThrow();
 			}
 		}
 
 		@Override
 		public void generateIdentifier()
 		{
-			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class);
+			UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class).orElse(null);
 			if (id == null || id.equals(EMPTY_UUID))
 			{
 				if (!this.getEntity().level.isClientSide)
@@ -527,8 +591,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		@Override
 		public String getOwnerName() {
-			String str = this.getSynchedData(OWNER_NAME_SYNCHED_KEY, String.class);
-			if (str != null && str != "") return str;
+			String str = this.getSynchedData(OWNER_NAME_SYNCHED_KEY, String.class).orElse(null);
+			if (str != null && !str.isEmpty()) return str;
 			else {
 				LogUtils.getLogger().error(String.format("CNFFTamedCommonData: mob %s missing owner name. Return \"(Unknown)\". It will be updated once the owner entered the level", this.getEntity().getName().getString()));
 				return "(Unknown)";
@@ -543,7 +607,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		@Override
 		public int[] getEncounteredDate() {
-			return this.getSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class);
+			return this.getSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, int[].class).orElse(new int[]{2023, 1, 1});
 		}
 
 		@Override
@@ -556,7 +620,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public UUID getOwnerUUID()
 		{
-			UUID uuid = this.getSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class);
+			UUID uuid = this.getSynchedData(OWNER_UUID_SYNCHED_KEY, UUID.class).orElse(EMPTY_UUID);
 			if (uuid == null || uuid.equals(EMPTY_UUID)) 
 				if (this.getLevel().isClientSide)
 				{
@@ -583,7 +647,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public NFFTamedMobAIState getAIState()
 		{
-			return NFFTamedMobAIState.fromID(new ResourceLocation(this.getSynchedData(AI_STATE_SYNCHED_KEY, String.class)));
+			return NFFTamedMobAIState.fromID(new ResourceLocation(
+					this.getSynchedData(AI_STATE_SYNCHED_KEY, String.class).orElseThrow()));
 		}
 		
 		@Override
@@ -610,6 +675,17 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public void setInitState(boolean value) {
 			this.hasInit = value;
+		}
+
+		@Override
+		public LivingEntity getAttackTarget() {
+			if (this.getEntity().level().isClientSide) {
+				int id = this.getSynchedField(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
+				if (id < 0) return null;
+				Entity e = this.getEntity().level().getEntity(id);
+				return e instanceof LivingEntity living ? living : null;
+			}
+			else return this.getEntity().getTarget();
 		}
 
 		@Override
@@ -656,7 +732,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public <T> T getSynchedData(String key, Class<T> dataClass)
+		public <T> Optional<T> getSynchedData(String key, Class<T> dataClass)
 		{
 			if (!this.synchedData.containsKey(key))
 			{
@@ -665,7 +741,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			}
 			if (!dataClass.isAssignableFrom(this.synchedData.get(key).getB().getClass()))
 				throw new IllegalArgumentException("CNFFTamedCommonData synched data: data type and serializer don't match.");
-			return (T) this.synchedData.get(key).getB();
+			return Optional.of((T) this.synchedData.get(key).getB());
 		}
 		
 		@SuppressWarnings("resource")
@@ -681,14 +757,42 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getSynchedDataUnchecked(String key) {
+		public <T> Optional<T> getSynchedDataUnchecked(String key) {
 			if (!this.synchedData.containsKey(key))
 				throw new IllegalArgumentException(String.format("CNFFTamedCommonData#getSynchedDataUnchecked: Field \"%s\" not defined.", key));
-			return (T) this.synchedData.get(key).getB();
+			return Optional.of((T) this.synchedData.get(key).getB());
 		}
 
 		@Override
-		public void setDataSyncInterval(int ticks)
+		public <T> void createSynchedField(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
+			this.synchedFieldAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
+			this.synchedFieldCache.put(key, defaultValue);
+		}
+
+		@Override
+		@Nullable
+		@SuppressWarnings("unchecked")
+		public <T> Optional<T> getSynchedField(String key, Class<T> type) {
+			if (this.getEntity().level().isClientSide())
+				return Optional.ofNullable((T) this.synchedFieldCache.get("key"));
+			else return Optional.ofNullable((T) this.synchedFieldAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
+					.getB().get());
+		}
+
+		@Override
+		@Nonnull
+		public CastableObject getSynchedField(String key) {
+			// Raw casting to Object is safe
+			return new CastableObject(this.getSynchedField(key, Object.class));
+		}
+
+		@Override
+		public void setSynchedFieldClient(String key, @Nonnull Object o) {
+			this.synchedFieldCache.put(key, o);
+		}
+
+		@Override
+		public void setSyncInterval(int ticks)
 		{
 			if (ticks <= 0)
 				throw new IllegalArgumentException();
@@ -765,27 +869,41 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	{
 		public final CNFFTamedCommonData.Values dataCap;	// Only on server
 		public final int entityId;
-		public final Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> objects; // Only on client
-		
+		public final Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> objects; // Synched data, only on client
+		public final Map<String, Object> fields; // Synched fields, only on client
+
+
 		public ClientboundDataSyncPacket(CNFFTamedCommonData.Values v)
 		{
 			this.dataCap = v;
 			this.entityId = v.getBM().asMob().getId();
 			this.objects = null;
+			this.fields = null;
 		}
 		
 		public ClientboundDataSyncPacket(FriendlyByteBuf buf)
 		{
 			this.dataCap = null;
 			this.objects = new HashMap<>();
+			this.fields = new HashMap<>();
+			// Start reading
 			this.entityId = buf.readInt();
-			int size = buf.readInt();
-			for (int i = 0; i < size; ++i)
+			// Read data
+			int dataSize = buf.readInt();
+			for (int i = 0; i < dataSize; ++i)
 			{
 				String key = buf.readUtf();
 				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
 				objects.put(key, new Tuple<>(type, obj));
+			}
+			// Read fields
+			int fieldSize = buf.readInt();
+			for (int i = 0; i < fieldSize; ++i) {
+				String key = buf.readUtf();
+				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
+				Object obj = type.read(buf);
+				fields.put(key, new Tuple<>(type, obj));
 			}
 		}
 		
@@ -793,12 +911,20 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		public void write(FriendlyByteBuf buf) 
 		{
 			buf.writeInt(entityId);
+			// Read synched data
 			buf.writeInt(dataCap.synchedData.size());
-			for (var entry: dataCap.synchedData.entrySet())
-			{
+			for (var entry: dataCap.synchedData.entrySet()) {
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().getA().getKey().toString());
 				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
+			}
+			// Read synched fields
+			buf.writeInt(dataCap.synchedFieldAccessors.size());
+			for (var entry: dataCap.synchedFieldAccessors.entrySet()) {
+				buf.writeUtf(entry.getKey());
+				buf.writeUtf(entry.getValue().getA().getKey().toString());
+				// Access the value and write
+				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB().get());
 			}
 		}
 
