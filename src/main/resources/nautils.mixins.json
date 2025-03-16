@@ -8,6 +8,8 @@
     "NaUtilsMixinEnderMan",
     "NaUtilsMixinEntity",
     "NaUtilsMixinEntityType",
+    "NaUtilsMixinGrindstoneMenuLowerSlot",
+    "NaUtilsMixinGrindstoneMenuUpperSlot",
     "NaUtilsMixinItemEntity",
     "NaUtilsMixinItemInput",
     "NaUtilsMixinItemStack",
@@ -17,14 +19,12 @@
     "NaUtilsMixinPlayer",
     "NaUtilsMixinProjectile",
     "NaUtilsMixinServerPlayer",
-    "NaUtilsMixinThrownTrident",
-    "NaUtilsMixinGrindstoneMenuUpperSlot",
-    "NaUtilsMixinGrindstoneMenuLowerSlot",
-    "NaUtilsMixinLevelCapabilityData"
+    "NaUtilsMixinThrownTrident"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",
-    "NaUtilsMerchantScreenMixin"
+    "NaUtilsMerchantScreenMixin",
+    "NaUtilsMixinLivingEntityRenderer"
   ],
   "minVersion": "0.8"
 }
