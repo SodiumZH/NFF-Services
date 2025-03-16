@@ -52,6 +52,7 @@ public class NaUtilsMiscStatics {
 	/**
 	 * @deprecated use {@link NaUtilsInfoStatics#printMessage} instead
 	 */
+	@Deprecated
 	public static void printToScreen(String text, Player receiver)
 	{
 		NaUtilsMiscStatics.printToScreen(NaUtilsInfoStatics.createText(text), receiver);
