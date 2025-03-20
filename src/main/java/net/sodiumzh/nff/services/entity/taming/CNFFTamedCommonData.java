@@ -505,7 +505,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		public MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity() {
 			if (mob instanceof INFFTamedSunSensitiveMob)
 				return sunImmunity;
-			else throw new UnsupportedOperationException("CNFFTamedCommonData only supports INFFTamedSunSensitiveMob. "
+			else throw new UnsupportedOperationException("CNFFTamedCommonData sun immunity field only supports INFFTamedSunSensitiveMob. "
 					+ "Attempted class: " + mob.getClass().toString());
 		}
 
@@ -700,10 +700,6 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerializer, T defaultValue)
 		{
-			if (this.isClientSide())
-				return;
-			if (this.synchedData.containsKey(key))
-				throw new IllegalArgumentException("CNFFTamedCommonData synched data: duplicated data key.");
 			this.synchedData.put(key, new Tuple<>(dataSerializer, defaultValue));
 		}
 
