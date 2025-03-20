@@ -8,10 +8,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.capability.NaUtilsEntitySerializableCapProvider;
+import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.*;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
@@ -23,6 +25,7 @@ import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
 
+import java.util.Map;
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class NFFCapabilityAttachments {
 
@@ -125,15 +128,22 @@ public class NFFCapabilityAttachments {
 		}
 		
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@SubscribeEvent
 	public static void attachLevelCapabilities(AttachCapabilitiesEvent<Level> event)
 	{
-		if (event.getObject() instanceof ServerLevel sl)
+		if (event.getObject() instanceof ServerLevel sl
+				&& !getExistingCaps(event).containsKey(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_LEVEL)))
+			// A duplicate key error is often reported here, so make a check
+			// TODO: Will it have side effects?
 		{
 			event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_LEVEL), 
 					new CNFFLevelModule.Prvd(sl));
 		}
+	}
+
+	public static Map<ResourceLocation, ICapabilityProvider> getExistingCaps(AttachCapabilitiesEvent<?> event) {
+		return NaUtilsReflectionStatics.forceGet(event, AttachCapabilitiesEvent.class, "caps")
+				.cast();
 	}
 }

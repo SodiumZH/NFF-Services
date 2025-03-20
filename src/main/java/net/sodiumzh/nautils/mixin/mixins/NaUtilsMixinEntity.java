@@ -30,12 +30,11 @@ public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
 		if (NaUtilsMixinHooks.onNonLivingEntityHurt(caller(), src, amount))
 			callback.setReturnValue(false);
 	}
-	
-	@Inject(at = @At("HEAD"), method = "tick()V", cancellable = true)
+
+	@Inject(at = @At("HEAD"), method = "tick()V")
 	private void tick(CallbackInfo callback)
 	{
-		if (MinecraftForge.EVENT_BUS.post(new EntityTickEvent(caller())))
-			callback.cancel();
+		MinecraftForge.EVENT_BUS.post(new EntityTickEvent(caller()));
 	}
 	
 	@Inject(at = @At("HEAD"), method = "load(Lnet/minecraft/nbt/CompoundTag;)V")
