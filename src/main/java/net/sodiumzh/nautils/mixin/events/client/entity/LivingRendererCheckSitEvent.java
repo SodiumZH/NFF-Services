@@ -1,5 +1,6 @@
 package net.sodiumzh.nautils.mixin.events.client.entity;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,11 +19,24 @@ public class LivingRendererCheckSitEvent extends NaUtilsLivingEvent<LivingEntity
 
     private final LivingEntityRenderer<?, ?> renderer;
     private final boolean originalSit;
+    private final PoseStack poseStack;
 
-    public LivingRendererCheckSitEvent(LivingEntity entity, LivingEntityRenderer<?, ?> renderer, boolean originalSit) {
+    public LivingRendererCheckSitEvent(LivingEntity entity, LivingEntityRenderer<?, ?> renderer, boolean originalSit, PoseStack poseStack) {
         super(entity);
         this.renderer = renderer;
         this.originalSit = originalSit;
+        this.poseStack = poseStack;
     }
 
+    public LivingEntityRenderer<?, ?> getRenderer() {
+        return renderer;
+    }
+
+    public boolean isOriginalSit() {
+        return originalSit;
+    }
+
+    public PoseStack getPoseStack() {
+        return poseStack;
+    }
 }
