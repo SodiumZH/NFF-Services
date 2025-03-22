@@ -7,7 +7,19 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.sodiumzh.nautils.object.NaUtilsMapper;
+import net.sodiumzh.nautils.registries.NaUtilsCaps;
+import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
+import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
+import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.core.BlockPos;
@@ -48,7 +60,18 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 
 	public static final CyclicSwitch<NFFTamedMobAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>
 		(NFFTamedMobAIState.WAIT, NFFTamedMobAIState.FOLLOW, NFFTamedMobAIState.WANDER);
+
+	/**
+	 * Mapper to test if a mob is {@code INFFTamed}, and cast it to {@code INFFTamed}.
+	 */
+	public static final NaUtilsMapper<Object, INFFTamed> IS_TAMED_MAPPER =
+			NaUtilsMapper.unconditionalNoVararg(Object.class, INFFTamed.class, obj -> {
+				if (obj instanceof INFFTamed tamed) return tamed;
+				else return null;
+	});
+
 	
+
 	/* Common */
 	/**
 	 * Check if an object has a BM interface.
@@ -56,11 +79,10 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
 	 * always use this instead of {@code instanceof} check.
 	 */
-	public static boolean isBM(Object o)
+	@Deprecated
+	public static boolean isTamed(Object o)
 	{
-		if (o instanceof INFFTamed bm)
-			return true;
-		else return false;
+		return IS_TAMED_MAPPER.apply(o).isPresent();
 	}
 	
 	/**
@@ -69,12 +91,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
 	 * always use this to cast a mob to BM.
 	 */
+	@Deprecated
 	@Nullable
 	public static INFFTamed getBM(Object o)
 	{
-		if (o instanceof INFFTamed bm)
-			return bm;
-		else return null;
+		return IS_TAMED_MAPPER.apply(o).orElse(null);
 	}
 	
 	/**
@@ -84,14 +105,10 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * you can use this to safely cast and do things to BM.
 	 * @return Whether the action is invoked.
 	 */
-	public static boolean ifBM(Object o, Consumer<INFFTamed> action)
+	@Deprecated
+	public static boolean ifTamed(Object o, Consumer<INFFTamed> action)
 	{
-		if (INFFTamed.isBM(o))
-		{
-			action.accept(INFFTamed.getBM(o));
-			return true;
-		}
-		else return false;
+		return IS_TAMED_MAPPER.apply(o).filter(tamed -> {action.accept(tamed); return true;}).isPresent();
 	}
 	
 	/**
@@ -99,11 +116,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * <p>
 	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
 	 * always use this instead of {@code instanceof} check and followed checks of the cast BM.
-	 */
-	public static boolean isBMAnd(Object o, Predicate<INFFTamed> cond)
+	*/
+	@Deprecated
+	public static boolean isTamedAnd(Object o, Predicate<INFFTamed> cond)
 	{
-		if (!isBM(o)) return false;
-		return cond.test(getBM(o));
+		return IS_TAMED_MAPPER.apply(o).filter(cond).isPresent();
 	}	
 	
 	/* Initialization */
