@@ -13,50 +13,50 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class AbstractVanillaTradeRegistry<T extends IVanillaTradeListing>
 {
-	private Map<ResourceLocation, Map<VillagerProfession, VanillaTradeListings<T>>> table = new HashMap<>();
+	private Map<ResourceLocation, Map<VillagerProfession, VanillaTradeListingCollection<T>>> table = new HashMap<>();
 
 	public AbstractVanillaTradeRegistry() {}
 	
 	// Getters
 	
-	protected Map<ResourceLocation, Map<VillagerProfession, VanillaTradeListings<T>>> getRaw()
+	protected Map<ResourceLocation, Map<VillagerProfession, VanillaTradeListingCollection<T>>> getRaw()
 	{
 		return this.table;
 	}
 	
 	@Nullable
-	public Map<VillagerProfession, VanillaTradeListings<T>> getAllListings(ResourceLocation key)
+	public Map<VillagerProfession, VanillaTradeListingCollection<T>> getAllListings(ResourceLocation key)
 	{
 		if (key == null) return null;
 		return table.get(key);
 	}
 
-	public Map<VillagerProfession, VanillaTradeListings<T>> getAllListings(EntityType<?> ofType)
+	public Map<VillagerProfession, VanillaTradeListingCollection<T>> getAllListings(EntityType<?> ofType)
 	{
 		if (ofType == null) return new HashMap<>();
 		return Optional.ofNullable(getAllListings(ForgeRegistries.ENTITIES.getKey(ofType))).orElseGet(HashMap::new);
 	}
 
-	public VanillaTradeListings<T> getListings(ResourceLocation key, @Nullable VillagerProfession profession)
+	public VanillaTradeListingCollection<T> getListings(ResourceLocation key, @Nullable VillagerProfession profession)
 	{
 		VillagerProfession profNonnull = profession == null ? VillagerProfession.NONE : profession;
 		var allListings = this.getAllListings(key);
-		if (allListings == null) return VanillaTradeListings.empty();
-		return Optional.ofNullable(allListings.get(profNonnull)).orElseGet(VanillaTradeListings::empty);
+		if (allListings == null) return VanillaTradeListingCollection.empty();
+		return Optional.ofNullable(allListings.get(profNonnull)).orElseGet(VanillaTradeListingCollection::empty);
 	}
 
-	public VanillaTradeListings<T> getListings(EntityType<?> ofType, @Nullable VillagerProfession profession)
+	public VanillaTradeListingCollection<T> getListings(EntityType<?> ofType, @Nullable VillagerProfession profession)
 	{
-		if (ofType == null) return VanillaTradeListings.empty();
+		if (ofType == null) return VanillaTradeListingCollection.empty();
 		return this.getListings(ForgeRegistries.ENTITIES.getKey(ofType), profession);
 	}
 
-	public VanillaTradeListings<T> getListings(ResourceLocation key)
+	public VanillaTradeListingCollection<T> getListings(ResourceLocation key)
 	{
 		return this.getListings(key, null);
 	}
 
-	public VanillaTradeListings<T> getListings(EntityType<?> ofType)
+	public VanillaTradeListingCollection<T> getListings(EntityType<?> ofType)
 	{
 		return this.getListings(ofType, null);
 	}
@@ -86,7 +86,7 @@ public abstract class AbstractVanillaTradeRegistry<T extends IVanillaTradeListin
 		if (!this.table.containsKey(key))
 			this.table.put(key, new HashMap<>());
 		if (!this.table.get(key).containsKey(profNonnull))
-			this.table.get(key).put(profNonnull, new VanillaTradeListings<>());
+			this.table.get(key).put(profNonnull, new VanillaTradeListingCollection<>());
 	}
 	
 	public void putIfAbsent(ResourceLocation key)

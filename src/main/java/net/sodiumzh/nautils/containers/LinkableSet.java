@@ -8,25 +8,25 @@ import java.util.Set;
 import com.mojang.logging.LogUtils;
 
 /**
- * A {@code CompoundSet} is a combination of multiple sets including several "external" parts and a "mutable" part.
+ * A {@code LinkableSet} is a combination of multiple sets including several "external" parts and a "mutable" part.
  * <p>An "external" part is a reference of another set. It will be counted into the set elements but not changeable in this set.
  * <p>The "mutable" part is an internal part that can be modified with {@code add}, {@code remove} etc. of this set. Please note
  * that "remove" operation doesn't guarantee the element to be removed as it may exist in an external part.
- * <p><b>Note: It's intended to work as static references e.g. registries but not created/modified on runtime.</b>
+ * <p><b>Note: It's intended to work as static references (e.g. registries) but not created/modified on runtime.</b>
  * This set is not performance-friendly as it needs to keep a real HashSet and refresh on many operations, 
  * including {@code size}, {@code addAll}, iteration, etc.
  * Also, as it allows to be recursively defined, the HashSet refresh could cause multiple {@code CompoundSet}s to refresh.
  */
-public class CompoundSet<E> implements Set<E>
+public class LinkableSet<E> implements Set<E>
 {
 
 	private Set<Set<E>> externalParts = new HashSet<>();
 	private HashSet<E> mutablePart = new HashSet<>();
 	private HashSet<E> cachedHash = new HashSet<>();
 	
-	public CompoundSet() {}
+	public LinkableSet() {}
 	
-	public CompoundSet(Set<E> external)
+	public LinkableSet(Set<E> external)
 	{
 		this.externalParts.add(external);
 	}
@@ -176,9 +176,9 @@ public class CompoundSet<E> implements Set<E>
 	/**
 	 * Create a new {@code CompoundSet} using {@code this} as an external.
 	 */
-	public CompoundSet<E> createCompoundSet()
+	public LinkableSet<E> createCompoundSet()
 	{
-		return new CompoundSet<>(this);
+		return new LinkableSet<>(this);
 	}
 
 	@Override
