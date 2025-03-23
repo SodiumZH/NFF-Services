@@ -152,10 +152,10 @@ public class VanillaTradeRegistry extends AbstractVanillaTradeRegistry<VanillaTr
 		}
 		
 		@Nonnull
-		private VanillaTradeListings<VanillaTradeListing> getActiveListings()
+		private VanillaTradeListingCollection<VanillaTradeListing> getActiveListings()
 		{
 			if (!this.registry.getRaw().get(this.key).containsKey(this.profession))
-				this.registry.getRaw().get(this.key).put(this.profession, new VanillaTradeListings<>());
+				this.registry.getRaw().get(this.key).put(this.profession, new VanillaTradeListingCollection<>());
 			return this.registry.getRaw().get(this.key).get(this.profession);
 		}
 		

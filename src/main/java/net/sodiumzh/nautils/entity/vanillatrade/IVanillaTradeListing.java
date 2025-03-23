@@ -1,6 +1,7 @@
 package net.sodiumzh.nautils.entity.vanillatrade;
 
 import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.trading.MerchantOffers;
 
 /**
  * NaUtils' extension of vanilla {@link VillagerTrades.ItemListing}.

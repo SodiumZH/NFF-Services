@@ -1,6 +1,6 @@
  package net.sodiumzh.nautils.entity.vanillatrade;
 
- import net.sodiumzh.nautils.containers.CompoundSet;
+ import net.sodiumzh.nautils.containers.LinkableSet;
  import net.sodiumzh.nautils.math.RandomSelection;
 
  import javax.annotation.Nonnull;
@@ -8,15 +8,15 @@
  import java.util.*;
  import java.util.stream.Collectors;
 
-public class VanillaTradeListings<T extends IVanillaTradeListing>
+public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 {
-	private CompoundSet<T> set = new CompoundSet<>();
+	private LinkableSet<T> set = new LinkableSet<>();
 	
-	public VanillaTradeListings() {}
+	public VanillaTradeListingCollection() {}
 
-	public static <T extends IVanillaTradeListing> VanillaTradeListings<T> empty()
+	public static <T extends IVanillaTradeListing> VanillaTradeListingCollection<T> empty()
 	{
-		return new VanillaTradeListings<>();
+		return new VanillaTradeListingCollection<>();
 	}
 
 	public boolean isEmpty()
@@ -24,14 +24,14 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 		return this.set.isEmpty();
 	}
 
-	public VanillaTradeListings<T> add(T t)
+	public VanillaTradeListingCollection<T> add(T t)
 	{
 		if (t != null && t.isValid())
 			set.add(t);
 		return this;
 	}
 	
-	public VanillaTradeListings<T> addAll(Collection<T> c)
+	public VanillaTradeListingCollection<T> addAll(Collection<T> c)
 	{
         Set<T> copy = new HashSet<>(c);
 		copy.removeIf(t -> t == null || !t.isValid());
@@ -39,13 +39,13 @@ public class VanillaTradeListings<T extends IVanillaTradeListing>
 		return this;
 	}
 	
-	public VanillaTradeListings<T> linkExternal(Set<T> other)
+	public VanillaTradeListingCollection<T> linkExternal(Set<T> other)
 	{
 		set.addExternalSet(other);
 		return this;
 	}
 	
-	public VanillaTradeListings<T> linkExternal(VanillaTradeListings<T> other)
+	public VanillaTradeListingCollection<T> linkExternal(VanillaTradeListingCollection<T> other)
 	{
 		set.addExternalSet(other.set);
 		return this;

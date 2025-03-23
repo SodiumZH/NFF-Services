@@ -7,7 +7,7 @@ import net.sodiumzh.nautils.entity.MobApplicableItemTable;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.anger.MobAngerRules;
 import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeListing;
-import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeListings;
+import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeListingCollection;
 import net.sodiumzh.nautils.entity.vanillatrade.VanillaTradeRegistry;
 import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
 
@@ -48,12 +48,16 @@ public class NaUtilsRegistries {
                     .setShouldGenerateOnServerSetup();
 
     /**
-     * Registry for trade listings (from vanilla trade system). A trade listing is a generator for providing random trade offers
+     * Registry for trade listing  (from vanilla trade system). A trade listing is a generator for providing random trade offers
      * for mobs.
      */
     public static final NaUtilsRegistry<VanillaTradeListing> VANILLA_TRADE_LISTINGS =
         new NaUtilsRegistry<VanillaTradeListing>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_listings"))
             .setShouldGenerateOnServerSetup();
+
+    public static final NaUtilsRegistry<VanillaTradeListingCollection<?>> VANILLA_TRADE_LISTING_COLLECTIONS =
+            new NaUtilsRegistry<VanillaTradeListingCollection<?>>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_listing_collections"))
+                    .setShouldGenerateOnServerSetup();
 
     public static final NaUtilsRegistry<MobAngerReason> MOB_ANGER_REASONS =
         new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "mob_anger_reasons"));
