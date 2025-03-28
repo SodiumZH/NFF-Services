@@ -1,8 +1,5 @@
 package net.sodiumzh.nautils.statics;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import com.mojang.logging.LogUtils;
@@ -326,5 +323,34 @@ public class NaUtilsMathStatics
 	public static Optional<Integer> getFibonacci(int index) {
 		return (index >= 0 && index < FIBONACCI_SEQUENCE.size()) ? Optional.of(FIBONACCI_SEQUENCE.get(index)) : Optional.empty();
 	}
+	/**
+	 * Randomly pick a given amount of integers from the range [0, maxEx) successively and fill into a list.
+	 * @param maxEx Upper bound of the integers (excluding, i.e. range = [0, maxEx))
+	 * @param amount Amount of picked integers.
+	 * @param unique If true, each element of the output sequence will be unique.
+	 * @param rnd Random source.
+	 */
+	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique, RandomSource rnd) {
+		if (amount > maxEx && unique)
+			throw new IllegalArgumentException("getRandomIntegerSequence unique requires amount <= maxEx");
+		List<Integer> all = NaUtilsContainerStatics.intRangeList(0, amount, 1);
+		List<Integer> out = new ArrayList<>(amount * 2);
+		for (int i = 0; i < amount; ++i) {
+			int pickedIndex = rnd.nextInt(out.size());
+			out.add(all.get(pickedIndex));
+			if (unique)
+				all.remove(pickedIndex);
+		}
+		return out;
+	}
 
+	/**
+	 * Randomly pick a given amount of integers from the range [0, maxEx) successively and fill into a list.
+	 * @param maxEx Upper bound of the integers (excluding, i.e. range = [0, maxEx))
+	 * @param amount Amount of picked integers.
+	 * @param unique If true, each element of the output sequence will be unique.
+	 */
+	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique) {
+		return getRandomIntegerSequence(maxEx, amount, unique, RND);
+	}
 }

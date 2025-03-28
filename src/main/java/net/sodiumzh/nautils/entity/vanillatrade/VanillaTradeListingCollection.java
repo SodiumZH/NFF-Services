@@ -1,19 +1,45 @@
- package net.sodiumzh.nautils.entity.vanillatrade;
+package net.sodiumzh.nautils.entity.vanillatrade;
 
- import net.sodiumzh.nautils.containers.LinkableSet;
- import net.sodiumzh.nautils.math.RandomSelection;
- 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.sodiumzh.nautils.containers.CompoundSet;
-import net.sodiumzh.nautils.math.RandomSelection;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
+import com.google.gson.JsonElement;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.sodiumzh.nautils.containers.LinkableMultimap;
+import net.sodiumzh.nautils.registries.NaUtilsRegistries;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 
+import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
+ import java.util.*;
+ import java.util.stream.Collectors;
+
+/**
+ * A {@code VanillaTradeListingCollection} is a collection of {@link IVanillaTradeListing}s. It's the minimal unit of the
+ * trade entry generator.
+ * <p>It maps each merchant level to a collection of {@link IVanillaTradeListing}s
+ * for the merchant level. It doesn't specify mob types or {@link VillagerProfession}s.
+ * <p>{@code VanillaTradeListingCollection}s are required to be registered and accessed through registry
+ * ({@link NaUtilsRegistries#VANILLA_TRADE_LISTING_COLLECTIONS}).
+ * @see IVanillaTradeListing
+ * @see VanillaTradeRegistry
+ */
 public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 {
-	private LinkableSet<T> set = new LinkableSet<>();
-	
+	/**
+	 * Do not modify the table externally by reflection of mixin. It's unsafe, unless you fully understand
+	 * what you're doing.
+	 */
+	final LinkableMultimap<Integer, T> table = new LinkableMultimap<>();
+
+	// This reference is recorded for
+	private final Set<VanillaTradeListingCollection<?>> attachedCollections = new HashSet<>();
+
+
+	int helperCount = 0;
+
 	public VanillaTradeListingCollection() {}
 
 	public static <T extends IVanillaTradeListing> VanillaTradeListingCollection<T> empty()
@@ -21,47 +47,52 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 		return new VanillaTradeListingCollection<>();
 	}
 
-	public boolean isEmpty()
-	{
-		return this.set.isEmpty();
+	public int getHelperCreationCount() {
+		return helperCount;
 	}
 
-	public VanillaTradeListingCollection<T> add(T t)
+	public ImmutableSetMultimap<Integer, T> getTableSnapshot() {
+		return table.copyAsImmutable();
+	}
+
+	public boolean isEmpty()
+	{
+		return this.table.isEmpty();
+	}
+
+	public VanillaTradeListingCollection<T> add(int merchantLevel, T t)
 	{
 		if (t != null && t.isValid())
-			set.add(t);
+			table.put(merchantLevel, t);
 		return this;
 	}
 	
-	public VanillaTradeListingCollection<T> addAll(Collection<T> c)
+	public VanillaTradeListingCollection<T> addAll(Multimap<Integer, T> c)
 	{
-		Set<T> copy = new HashSet<>();
-		copy.addAll(c);
-		copy.removeIf(t -> t == null || !t.isValid());
-		this.set.addAll(copy);
+        c.entries().stream().filter(entry -> entry.getValue().isValid())
+				.forEach(entry -> table.put(entry.getKey(), entry.getValue()));
 		return this;
 	}
 	
-	public VanillaTradeListingCollection<T> linkExternal(Set<T> other)
+	public VanillaTradeListingCollection<T> attach(Multimap<Integer, T> other)
 	{
-		set.addExternalSet(other);
+		table.attach(other);
 		return this;
 	}
 	
-	public VanillaTradeListingCollection<T> linkExternal(VanillaTradeListingCollection<T> other)
+	public VanillaTradeListingCollection<T> attach(VanillaTradeListingCollection<? extends T> other)
 	{
-		set.addExternalSet(other.set);
+		table.attach(other.table);
 		return this;
 	}
 	
 	/**
 	 * Get a set of all valid listings.
 	 */
-	public Set<T> getValidSet()
+	public Set<T> getValidListings()
 	{
-		Set<T> res = this.set.toHashSet();
-		res.removeIf(t -> !t.isValid());
-		return res;
+		return this.table.values().stream().filter(IVanillaTradeListing::isValid)
+				.collect(Collectors.toSet());
 	}
 	
 	/**
@@ -69,10 +100,8 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 	 */
 	public Set<T> forLevel(int level)
 	{
-		Set<T> res = this.set.toHashSet();
-		res.removeIf(t -> !t.isValid());
-		res.removeIf(t -> t.getMerchantLevel() != level);
-		return res;
+		return this.table.get(level).stream().filter(IVanillaTradeListing::isValid)
+				.collect(Collectors.toSet());
 	}
 	
 	/**
@@ -80,108 +109,81 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 	 */
 	public List<Integer> allLevels()
 	{
-		List<Integer> res = new ArrayList<>();
-		this.set.toHashSet().forEach(t -> {
-			if (!res.contains(t.getMerchantLevel()))
-				res.add(t.getMerchantLevel());
-		});
-		return NaUtilsContainerStatics.toArrayList(res.stream().sorted().toList());
+		return table.keySet().stream()
+				.filter(i -> !table.get(i).stream().filter(IVanillaTradeListing::isValid).collect(Collectors.toSet()).isEmpty())
+				.toList();
 	}
-	
+
+	public SetMultimap<Integer, T> allLevelsAndListings() {
+		SetMultimap<Integer, T> res = HashMultimap.create();
+		table.keySet().forEach(k -> res.putAll(k, table.get(k)));
+		return res;
+	}
+
 	/**
 	 * Randomly pick several listings from the set with given amount and merchant level.
 	 * <p>Note: the output set size could possibly be smaller than the input.
 	 */ 
 	public Set<T> pickListings(int amount, int merchantLevel)
 	{
-		if (amount < 0)
-			throw new IllegalArgumentException();
-		if (amount == 0)
-			return new HashSet<>();
-		HashSet<T> candidates = set.toHashSet();
-		candidates.removeIf(t -> t == null || !t.isValid());
-		candidates.removeIf(t -> t.getMerchantLevel() != merchantLevel);
-		if (amount >= candidates.size())
-			return candidates;
-		
-		HashSet<T> out = new HashSet<>();
-		for (int i = 0; i < amount; ++i)
-		{
-			double totalWeight = 0;
-			T fallback = null;	// This shouldn't be called, but due to the double calculation error there could be a very minor probability to hit the fallback
-			for (var t: candidates)
-			{
-				totalWeight += t.getSelectionWeight();
-				if (fallback == null || fallback.getSelectionWeight() < t.getSelectionWeight())
-					fallback = t;
-			}
-			RandomSelection<T> sel = RandomSelection.create(fallback);
-			for (var t: candidates)
-			{
-				sel.add(t, t.getSelectionWeight() / totalWeight);
-			}
-			T selected = sel.getValue();
-			if (selected != null)
-			{
-				candidates.remove(selected);
-				out.add(selected);
-			}
-		}
-		return out;
+		return NaUtilsContainerStatics.getWeightedRandomSubset(table.get(merchantLevel).stream()
+				.filter(IVanillaTradeListing::isValid)
+				.collect(Collectors.toMap(t -> t, IVanillaTradeListing::getSelectionWeight)), amount);
 	}
 	
 	/**
 	 * Pick listing instances for all present levels.
 	 * @param amountForEachLevel How many Listing instances it should pick for each level.
-	 * Null input or absent level value will be picked 1 instance.
-	 * @return A list of Listing instances with ascending order in level. 
+	 * Null input or absent level value will be picked 1 instance. To skip a certain level,
+	 * explicitly specify it to 0.
+	 * @return A Multimap of picked listing instances.
 	 */
-	public List<T> pickListingForAllLevels(@Nullable Map<Integer, Integer> amountForEachLevel)
+	public Multimap<Integer, T> pickListingsForAllLevels(@Nullable Map<Integer, Integer> amountForEachLevel)
 	{
-		List<T> res = new ArrayList<>();
-		for (int lv: this.allLevels())
-		{
-			int amount = (amountForEachLevel != null && amountForEachLevel.containsKey(lv)) ? amountForEachLevel.get(lv) : 1;
-			res.addAll(this.pickListings(amount, lv));
+		Map<Integer, Integer> actualAmounts = this.allLevels().stream()
+				.collect(Collectors.toMap(i -> i, i -> 1));
+		if (amountForEachLevel == null) {
+			this.allLevels().forEach(i -> {
+				if (amountForEachLevel.containsKey(i))
+					actualAmounts.put(i, amountForEachLevel.get(i));
+			});
 		}
-		res.removeIf(t -> t == null || !t.isValid());
+		Multimap<Integer, T> res = HashMultimap.create();
+		actualAmounts.entrySet().stream().map(entry -> new Tuple<>(entry.getKey(), this.pickListings(actualAmounts.get(entry.getValue()), entry.getKey())))
+				.forEach(e -> res.putAll(e.getA(), e.getB()));
 		return res;
 	}
 	
 	/**
 	 * Pick listing instances for all present levels.
 	 * @param amountForEachLevel How many Listing instances it should pick for each level.
-	 * input[i] for level i+1.
-	 * @return A list of Listing instances with ascending order in level. 
+	 * input[i] for level i+1. Missing levels will be 1.
+	 * @return A Multimap of picked listing instances.
 	 */
-	public List<T> pickListingsForAllLevels(int... amountForEachLevel)
+	public Multimap<Integer, T> pickListingsForAllLevels(int... amountForEachLevel)
 	{
-		if (amountForEachLevel == null || amountForEachLevel.length == 0) return this.pickListingForAllLevels((Map<Integer, Integer>)null); 
-		Map<Integer, Integer> map = new HashMap<>();
+		Map<Integer, Integer> in = new HashMap<>();
 		for (int i = 0; i < amountForEachLevel.length; ++i)
-		{
-			map.put(i + 1, amountForEachLevel[i]);
-		}
-		return this.pickListingForAllLevels(map);
+			in.put(i + 1, amountForEachLevel[i]);
+		return pickListingsForAllLevels(in);
 	}
 	
 	/**
 	 * Pick listing instances for all specified levels in the input map keys.
 	 * @param amountForEachLevel How many Listing instances it should pick for each level.
-	 * Null input or absent level value will be picked 1 instance.
-	 * @return A list of Listing instances with ascending order in level. 
+	 * Missing levels will be skipped.
+	 * @return A Multimap of picked listing instances.
 	 */
-	public List<T> pickListingForSpecifiedLevels(@Nonnull Map<Integer, Integer> amountForEachLevel)
+	public Multimap<Integer, T> pickListingForSpecifiedLevels(@Nonnull Map<Integer, Integer> amountForEachLevel)
 	{
-		List<Integer> validLevels = this.allLevels();
-		validLevels.removeIf(i -> !amountForEachLevel.containsKey(i));
-		List<T> res = new ArrayList<>();
-		for (int lv: validLevels)
-		{
-			res.addAll(this.pickListings(amountForEachLevel.get(lv), lv));
-		}
-		res.removeIf(t -> t == null || !t.isValid());
-		return res;
+		Map<Integer, Integer> actualAmounts = new HashMap<>(amountForEachLevel);
+		this.allLevels().forEach(i -> {
+			if (!amountForEachLevel.containsKey(i))
+				actualAmounts.put(i, 0);
+		});
+		actualAmounts.keySet().removeIf(i -> !this.allLevels().contains(i));
+		return this.pickListingsForAllLevels(actualAmounts);
+
 	}
 	
 	/**
@@ -190,22 +192,23 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing>
 	 * input[i] for level i+1.
 	 * @return A list of Listing instances with ascending order in level. 
 	 */
-	public List<T> pickListingForSpecifiedLevels(int... amountForEachLevel)
+	public Multimap<Integer, T> pickListingForSpecifiedLevels(int... amountForEachLevel)
 	{
-		if (amountForEachLevel.length == 0) return new ArrayList<>(); 
-		Map<Integer, Integer> map = new HashMap<>();
-		for (int i = 0; i < amountForEachLevel.length; ++i)
-		{
-			map.put(i + 1, amountForEachLevel[i]);
+		Map<Integer, Integer> actualAmounts = new HashMap<>();
+		for (int i = 0; i < amountForEachLevel.length; ++i) {
+			actualAmounts.put(i + 1, amountForEachLevel[i]);
 		}
-		var res = this.pickListingForSpecifiedLevels(map);
-		res.removeIf(t -> t == null || !t.isValid());
-		return res;
+		return this.pickListingForSpecifiedLevels(actualAmounts);
 	}
 	
 	@Override
-	public String toString()
-	{
-		return "VanillaTradeListings{" + this.set.toHashSet().toString() + "}";
+	public String toString() {
+		return "VanillaTradeListingCollection{\n" + this.table.copyAsImmutable().toString() + "\n}";
 	}
+
+	public static void getFromJsons(VanillaTradeListingCollection<VanillaTradeListing> in, Collection<JsonElement> jsons) {
+
+	}
+
+
 }

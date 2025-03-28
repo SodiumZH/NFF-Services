@@ -4,56 +4,55 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.mojang.logging.LogUtils;
+import net.sodiumzh.nautils.object.DirectedGraphNode;
 
 /**
- * A {@code LinkableSet} is a combination of multiple sets including several "external" parts and a "mutable" part.
- * <p>An "external" part is a reference of another set. It will be counted into the set elements but not changeable in this set.
- * <p>The "mutable" part is an internal part that can be modified with {@code add}, {@code remove} etc. of this set. Please note
- * that "remove" operation doesn't guarantee the element to be removed as it may exist in an external part.
- * <p><b>Note: It's intended to work as static references (e.g. registries) but not created/modified on runtime.</b>
- * This set is not performance-friendly as it needs to keep a real HashSet and refresh on many operations, 
- * including {@code size}, {@code addAll}, iteration, etc.
- * Also, as it allows to be recursively defined, the HashSet refresh could cause multiple {@code CompoundSet}s to refresh.
+ * A {@code LinkableSet} is a {@link Set} with attachments to other {@link Set}s. Query of the {@code LinkableSet} will
+ * return the union of this set and all attached sets. Modification will always operate this set but never attached sets.
  */
-public class LinkableSet<E> implements Set<E>
+public class LinkableSet<E> implements Set<E>, DirectedGraphNode<LinkableSet<E>>
 {
 
-	private Set<Set<E>> externalParts = new HashSet<>();
-	private HashSet<E> mutablePart = new HashSet<>();
+	private Set<Set<E>> attachments = new HashSet<>();
+	private HashSet<E> original = new HashSet<>();
 	private HashSet<E> cachedHash = new HashSet<>();
 	
 	public LinkableSet() {}
 	
 	public LinkableSet(Set<E> external)
 	{
-		this.externalParts.add(external);
+		this.attachments.add(external);
 	}
 	
 	protected HashSet<E> updateHashSet()
 	{
 		cachedHash.clear();
-		for (var ex: externalParts)
+		for (var ex: attachments)
 		{
 			cachedHash.addAll(ex);
 		}
-		cachedHash.addAll(mutablePart);
+		cachedHash.addAll(original);
 		return cachedHash;
 	}
 	
-	protected boolean containsInExternalParts(Object o)
+	protected boolean containsInAttachments(Object o)
 	{
-		for (var ex: externalParts)
+		for (var ex: attachments)
 		{
 			if (ex.contains(o)) return true;
 		}
 		return false;
 	}
-	
-	protected void cleanMutable()
+
+	/**
+	 *
+	 */
+	protected void deduplicateOriginal()
 	{
-		this.mutablePart.removeIf(e -> this.containsInExternalParts(e));
+		this.original.removeIf(e -> this.containsInAttachments(e));
 	}
 	
 	@Override
@@ -63,22 +62,22 @@ public class LinkableSet<E> implements Set<E>
 
 	@Override
 	public boolean isEmpty() {
-		for (var ex: externalParts)
+		for (var ex: attachments)
 		{
 			if (!ex.isEmpty())
 				return false;
 		}
-		return this.mutablePart.isEmpty();
+		return this.original.isEmpty();
 	}
 
 	@Override
 	public boolean contains(Object o) {
-		for (var ex: externalParts)
+		for (var ex: attachments)
 		{
 			if (ex.contains(o))
 				return true;
 		}
-		return this.mutablePart.contains(o);
+		return this.original.contains(o);
 	}
 
 	@Override
@@ -99,19 +98,19 @@ public class LinkableSet<E> implements Set<E>
 	@Override
 	public boolean add(E e) {
 		if (this.contains(e)) return false;
-		return this.mutablePart.add(e);
+		return this.original.add(e);
 	}
 
 	@Override
 	public boolean remove(Object o) {
-		if (this.containsInExternalParts(o))
+		if (this.containsInAttachments(o))
 		{
 			LogUtils.getLogger().warn("NaUtils#CompoundSet: attempting to remove an element from the external parts. Skipped and returned false.");
-			this.cleanMutable();
+			this.deduplicateOriginal();
 			return false;
 		}
-		else if (this.mutablePart.contains(o))
-			return this.mutablePart.remove(o);
+		else if (this.original.contains(o))
+			return this.original.remove(o);
 		else return false;
 	}
 
@@ -123,8 +122,8 @@ public class LinkableSet<E> implements Set<E>
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		int old = this.size();
-		this.mutablePart.addAll(c);
-		this.cleanMutable();
+		this.original.addAll(c);
+		this.deduplicateOriginal();
 		return this.updateHashSet().size() != old;
 	}
 
@@ -140,8 +139,8 @@ public class LinkableSet<E> implements Set<E>
 
 	@Override
 	public void clear() {
-		this.externalParts.clear();
-		this.mutablePart.clear();
+		this.attachments.clear();
+		this.original.clear();
 	}
 	
 	/**
@@ -149,17 +148,23 @@ public class LinkableSet<E> implements Set<E>
 	 */
 	public void clearMutable()
 	{
-		this.mutablePart.clear();
+		this.original.clear();
 	}
 	
-	public void addExternalSet(Set<E> s)
+	public void attach(Set<E> s)
 	{
-		this.externalParts.add(s);
+		if (this.getCycle() != null)
+			throw new IllegalStateException("LinkableSet: cyclic reference path detected.");
+		this.attachments.add(s);
+		if (s instanceof LinkableSet<?> && this.getCycle() != null) {
+			this.attachments.remove(s);
+			throw new IllegalArgumentException("LinkableSet#attach: attachment caused a cyclic reference path.");
+		}
 	}
 
 	public void removeExternalSet(Set<E> s)
 	{
-		this.externalParts.remove(s);
+		this.attachments.remove(s);
 	}
 	
 	/**
@@ -185,10 +190,15 @@ public class LinkableSet<E> implements Set<E>
 	public String toString()
 	{
 		String res = "CompoundSet { EXTERNAL: \n";
-		for (var s: this.externalParts)
+		for (var s: this.attachments)
 			res = res + s.toString() + ",\n" + "*****\n";
-		res = res + "MUTABLE:\n" + this.mutablePart.toString() + "\n*****}\n";
+		res = res + "MUTABLE:\n" + this.original.toString() + "\n*****}\n";
 		return res;
 	}
-	
+
+	@Override
+	public Set<LinkableSet<E>> children() {
+		return this.attachments.stream().filter(set -> set instanceof LinkableSet<E>)
+				.map(set -> (LinkableSet<E>)set).collect(Collectors.toSet());
+	}
 }
