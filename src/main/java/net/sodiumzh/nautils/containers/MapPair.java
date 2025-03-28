@@ -8,8 +8,9 @@ import javax.annotation.Nullable;
 
 /**
  * A key-value pair for maps.
- * It's similar to {#link java.util.Map#Entry} but supporting null values.
+ * @deprecated Use {@link Tuple2} instead.
  */
+@Deprecated
 public class MapPair<K, V> implements Map.Entry<K, V> 
 {
 	@Nonnull
@@ -57,5 +58,16 @@ public class MapPair<K, V> implements Map.Entry<K, V>
 		V old = v;
 		v = value;
 		return old;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return other instanceof MapPair<?,?> mapPair && Objects.equals(this.getKey(), mapPair.getKey())
+				&& Objects.equals(this.getValue(), mapPair.getValue());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getKey(), this.getValue());
 	}
 }
