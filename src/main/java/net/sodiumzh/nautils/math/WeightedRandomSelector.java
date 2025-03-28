@@ -21,24 +21,35 @@ public class WeightedRandomSelector<T>
 {
 	private static final RandomSource RND = RandomSource.create();
 	private final Map<T, Double> objs = new HashMap<>();
-	private final double nullWeight = 0d;
+	private double nullWeight = 0d;
 	
 	public WeightedRandomSelector() {}
-	
+
+	public WeightedRandomSelector(Map<? extends T, Double> source) {
+		source.forEach(this::add);
+	}
+
 	public WeightedRandomSelector<T> add(@Nullable T value, double weight)
 	{
 		if (weight < 0)
 			throw new IllegalArgumentException("WeightedRandomSelector: negative weight.");
-		
-		objs.put(value, weight);
+		if (value != null)
+			objs.put(value, weight);
+		else nullWeight = weight;
 		return this;
 	}
-	
 	public boolean isNullable()
 	{
 		return nullWeight > 0;
 	}
-	
+
+	public WeightedRandomSelector<T> remove(@Nullable T value) {
+		if (value != null) objs.remove(value);
+		else nullWeight = 0d;
+		return this;
+	}
+
+
 	public T select(RandomSource rnd)
 	{
 		double weightSum = 0d;
@@ -49,7 +60,7 @@ public class WeightedRandomSelector<T>
 		weightSum += this.nullWeight;
 		if (weightSum == 0)
 			throw new IllegalStateException("WeightedRandomSelector#pick: No valid entries.");
-		RandomSelection<T> s = RandomSelection.create(null);
+		RandomSelection<T> s = new RandomSelection<>(null);
 		for (var entry: objs.entrySet())
 		{
 			s.add(entry.getKey(), entry.getValue() / weightSum);

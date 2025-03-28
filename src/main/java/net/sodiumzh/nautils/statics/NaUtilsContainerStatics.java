@@ -10,7 +10,10 @@ import javax.annotation.Nullable;
 
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Tuple;
 import net.sodiumzh.nautils.containers.MapPair;
+import net.sodiumzh.nautils.math.RandomSelection;
+import net.sodiumzh.nautils.math.WeightedRandomSelector;
 
 /**
  * Utility static methods for containers (List, Set, Map, etc).
@@ -521,13 +524,38 @@ public class NaUtilsContainerStatics
 		fillInto.addAll(list.stream().map(cast).toList());
 	}
 	
-	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
+	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize, RandomSource rnd)
 	{
-		if (subsetSize > parent.size())
-			throw new IllegalArgumentException("subsetSize is larger than parent size.");
-		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true);
+		if (subsetSize > parent.size()) return new HashSet<>(parent);
+		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true, rnd);
 		List<T> list = parent.stream().toList();
 		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
+	}
+
+	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
+	{
+		if (subsetSize > parent.size()) return new HashSet<>(parent);
+		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true, RND);
+		List<T> list = parent.stream().toList();
+		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
+	}
+
+	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize, RandomSource rnd)
+	{
+		if (subsetSize > valuesAndWeights.size())
+			return new HashSet<>(valuesAndWeights.keySet());
+		Set<T> res = new HashSet<>();
+		WeightedRandomSelector<T> selector = new WeightedRandomSelector<>(valuesAndWeights);
+		for (int i = 0; i < subsetSize; ++i) {
+			T selected = selector.select(rnd);
+			res.add(selected);
+			selector.remove(selected);
+		}
+		return res;
+	}
+
+	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize) {
+		return getWeightedRandomSubset(valuesAndWeights, subsetSize, RND);
 	}
 
 	public static <T, K, V> Map<K, V> iterableToMap(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {

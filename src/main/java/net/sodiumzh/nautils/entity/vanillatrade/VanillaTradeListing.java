@@ -21,6 +21,11 @@ import net.sodiumzh.nautils.math.RangedRandomInt;
 import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 
+/**
+ * A default implementation of {@link IVanillaTradeListing} (extending vanilla {@link VillagerTrades.ItemListing}).
+
+ *
+ */
 public class VanillaTradeListing implements IVanillaTradeListing
 {
 	protected ArrayList<ItemStack> baseCostA = new ArrayList<>();	// If there're more than one, it will randomly pick one with the same probability.
@@ -383,11 +388,6 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	{
 		this.selectionWeight = value;
 		return this;
-	}
-	
-	@Override
-	public int getMerchantLevel() {
-		return Math.max(requiredLevel, 1);
 	}
 	
 	@Override
