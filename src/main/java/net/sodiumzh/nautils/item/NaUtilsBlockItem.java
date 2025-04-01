@@ -159,8 +159,14 @@ public class NaUtilsBlockItem extends ItemNameBlockItem implements INaUtilsItem 
      * cause problems.
      * <p>This feature is implemented through {@link NaUtilsMixinItemInput}.
      */
+    @Override
     public boolean shouldGiveCommandUseDefaultInstance() {
         return shouldGiveCommandUseDefaultInstance;
+    }
+
+    @Override
+    public boolean shouldConsumeInCreative() {
+        return false;
     }
 
 

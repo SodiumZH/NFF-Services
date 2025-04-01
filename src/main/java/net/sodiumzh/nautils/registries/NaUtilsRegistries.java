@@ -67,6 +67,7 @@ public class NaUtilsRegistries {
         new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "mob_anger_rules"));
 
     public static final NaUtilsRegistry<EntityAttributeProvider> ENTITY_ATTRIBUTE_PROVIDERS =
-            new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "entity_anger_rules"));
+            new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "entity_attribute_providers"));
+
 
 }

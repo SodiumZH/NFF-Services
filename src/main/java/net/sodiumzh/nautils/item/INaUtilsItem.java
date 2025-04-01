@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinItemInput;
+import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinServerPlayerGameMode;
 import net.sodiumzh.nautils.object.ICastable;
 
 import javax.annotation.Nonnull;
@@ -80,6 +81,11 @@ public interface INaUtilsItem extends ICastable, ItemLike {
      */
     public boolean shouldGiveCommandUseDefaultInstance();
 
+    /**
+     * Check if this item should be consumed if the player is in creative mode.
+     * <p>This feature is implemented through {@link NaUtilsMixinServerPlayerGameMode}.
+     */
+    public boolean shouldConsumeInCreative();
 
     /**
      * Override to set the default instance. Return {@code Optional.empty()} to use {@code new ItemStack(this)}.

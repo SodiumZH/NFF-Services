@@ -407,23 +407,15 @@ public class VanillaTradeListingCollectionHelper {
         return this;
     }
 
-    @Nullable
-    public ResourceLocation getDataPath()
-    {
-        return dataPath;
-    }
-
-    public VanillaTradeListingCollectionHelper setDataPath(@Nonnull ResourceLocation location) {
-        this.dataPath = location;
-        return this;
-    }
-
     public VanillaTradeListingCollectionHelper readData(ResourceLocation location)
     {
         MinecraftServer server = NaUtils.getServer();
         if (server == null) return this;
         ResourceManager mgr = server.getResourceManager();
-        List<Resource> resources = mgr.getResourceStack(location);
+        // Auto-fix if the coder forgets to add ".json"
+        ResourceLocation actualLocation = location.toString().endsWith(".json")?
+                location : new ResourceLocation(location.toString() + ".json");
+        List<Resource> resources = mgr.getResourceStack(actualLocation);
         for (Resource r: resources)
         {
             try {
@@ -454,19 +446,6 @@ public class VanillaTradeListingCollectionHelper {
                 e.printStackTrace();
             }
         }
-        return this;
-    }
-
-    /**
-     * Read data under default directory. If the current registering
-     * entity type is {@code "some_mod:some_entity"}, then the data path will be
-     * {@code "some_mod:{default_path}/some_entity.json"}.
-     * <p> The default path can be set by calling {@code dataPath()}. Default is {"vanilla_trade_listings"}.
-     */
-    public VanillaTradeListingCollectionHelper readData()
-    {
-        if (this.dataPath != null)
-            this.readData(this.dataPath);
         return this;
     }
 

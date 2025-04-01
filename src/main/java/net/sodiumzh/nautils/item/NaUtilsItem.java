@@ -36,7 +36,7 @@ import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
 /**
  * {@code NaUtilsItem} is an {@link Item} template with some simplifications, e.g. foiling, hovering descriptions, etc.
  */
-public class NaUtilsItem extends Item implements ICastable
+public class NaUtilsItem extends Item implements ICastable, INaUtilsItem
 {
 	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
@@ -54,7 +54,8 @@ public class NaUtilsItem extends Item implements ICastable
 	 */
 	public NaUtilsItem description(Function<ItemStack, ? extends Component> desc)
 	{
-		descriptions.add(desc);
+		if (desc != null)
+			descriptions.add(desc);
 		return this;
 	}
 	
@@ -63,7 +64,8 @@ public class NaUtilsItem extends Item implements ICastable
 	 */
 	public NaUtilsItem description(Supplier<? extends Component> desc)
 	{
-		descriptions.add(i -> desc.get());
+		if (desc != null)
+			descriptions.add(i -> desc.get());
 		return this;
 	}
 
@@ -72,7 +74,9 @@ public class NaUtilsItem extends Item implements ICastable
 	 */
 	public NaUtilsItem descTranslatable(String key, Object... params)
 	{
-		return description(() -> NaUtilsInfoStatics.createTranslatable(key, params));
+		if (key != null)
+			return description(() -> NaUtilsInfoStatics.createTranslatable(key, params));
+		return this;
 	}
 
 	/**
@@ -80,18 +84,22 @@ public class NaUtilsItem extends Item implements ICastable
 	 */
 	public NaUtilsItem descTranslatable(String key, Consumer<Component> componentModification , Object... params)
 	{
-		return description(() -> {
+		if (key != null)
+			return description(() -> {
 			Component res = NaUtilsInfoStatics.createTranslatable(key, params);
 			if (componentModification != null) componentModification.accept(res);
 			return res;
 		});
+		return this;
 	}
 
 	/**
 	 * Add a description (plain text).
 	 */
 	public NaUtilsItem descPlain(String desc) {
-		return description(() -> NaUtilsInfoStatics.createText(desc));
+		if (desc != null)
+			return description(() -> NaUtilsInfoStatics.createText(desc));
+		return this;
 	}
 
 	/**
@@ -99,11 +107,13 @@ public class NaUtilsItem extends Item implements ICastable
 	 * @param componentModification Operation after component creation. Null = uses default.
 	 */
 	public NaUtilsItem descPlain(String desc, @Nullable Consumer<Component> componentModification) {
-		return description(() -> {
+		if (desc != null)
+			return description(() -> {
 			Component res = NaUtilsInfoStatics.createText(desc);
 			if (componentModification != null) componentModification.accept(res);
 			return res;
 		});
+		return this;
 	}
 
 	/**
@@ -111,7 +121,8 @@ public class NaUtilsItem extends Item implements ICastable
 	 */
 	public NaUtilsItem description(Component desc)
 	{
-		descriptions.add(i -> desc);
+		if (desc != null)
+			descriptions.add(i -> desc);
 		return this;
 	}
 	
@@ -195,8 +206,14 @@ public class NaUtilsItem extends Item implements ICastable
 	 * cause problems.
 	 * <p>This feature is implemented through {@link NaUtilsMixinItemInput}.
 	 */
+	@Override
 	public boolean shouldGiveCommandUseDefaultInstance() {
 		return shouldGiveCommandUseDefaultInstance;
+	}
+
+	@Override
+	public boolean shouldConsumeInCreative() {
+		return false;
 	}
 
 

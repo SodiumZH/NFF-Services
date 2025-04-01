@@ -19,6 +19,7 @@
     "NaUtilsMixinPlayer",
     "NaUtilsMixinProjectile",
     "NaUtilsMixinServerPlayer",
+    "NaUtilsMixinServerPlayerGameMode",
     "NaUtilsMixinThrownTrident"
   ],
   "client": [
