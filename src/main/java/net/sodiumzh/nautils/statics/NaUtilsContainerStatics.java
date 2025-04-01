@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.util.Mth;
 import net.sodiumzh.nautils.containers.MapPair;
 import net.sodiumzh.nautils.math.RandomSelection;
@@ -597,6 +598,61 @@ public class NaUtilsContainerStatics
 		Map<K, V> res = new HashMap<>();
 		for (T t: iterable) {
 			res.put(keyMapper.apply(t), valueMapper.apply(t));
+		}
+		return res;
+	}
+
+	/**
+	 * Get map from arrays of keys and values. A key and a value with the same index will be mapped.
+	 * If the array lengths are different, the longer part will be ignored.
+	 */
+	public static <K, V> Map<K, V> arraysToMap(K[] keys, V[] values) {
+		Map<K, V> res = new HashMap<>();
+		for (int i = 0; i < Math.min(keys.length, values.length); ++i) {
+			res.put(keys[i], values[i]);
+		}
+		return res;
+	}
+
+	/**
+	 * Get map from an array of key-value pairs with format like [k1, v1, k2, v2, ...].
+	 * If the array length is odd, the last element will be ignored.
+	 */
+	public static <T> Map<T, T> entryPairsToMap(T[] entryPairs) {
+		Map<T, T> res = new HashMap<>();
+		for (int i = 0; i < entryPairs.length - 1; i += 2) {
+			res.put(entryPairs[i], entryPairs[i + 1]);
+		}
+		return res;
+	}
+
+	public static <T> Map<Integer, T> toIndexMap(List<T> values) {
+		Map<Integer, T> res = new HashMap<>();
+		for (int i = 0; i < values.size(); ++i) {
+			res.put(i, values.get(i));
+		}
+		return res;
+	}
+	public static <T> Map<Integer, T> toIndexMap(T[] values) {
+		Map<Integer, T> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
+		}
+		return res;
+	}
+
+	public static Map<Integer, Integer> toIndexMapInt(int[] values) {
+		Map<Integer, Integer> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
+		}
+		return res;
+	}
+
+	public static Map<Integer, Double> toIndexMapDouble(double[] values) {
+		Map<Integer, Double> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
 		}
 		return res;
 	}
