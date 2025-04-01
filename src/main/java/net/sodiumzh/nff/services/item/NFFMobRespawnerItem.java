@@ -58,14 +58,14 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 		if (!(level instanceof ServerLevel))
 		{
 			return InteractionResult.SUCCESS;
-		} else
+		} else if (context.getPlayer() != null)
 		{
 			Mob mob = doRespawn(context.getItemInHand(), context.getPlayer(), context.getClickedPos(),
 					context.getClickedFace());
 			if (mob != null)
 			{
 
-				context.getItemInHand().shrink(1);
+				context.getPlayer().getItemInHand(context.getHand()).shrink(1);
 				if (mob instanceof INFFTamed bef)
 				{
 					bef.init(bef.getOwnerUUID(), null);
@@ -79,9 +79,9 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 					bef.setInit();
 				}
 				return InteractionResult.CONSUME;
-			} else
-				return InteractionResult.PASS;
+			}
 		}
+		return InteractionResult.PASS;
 	}
 
 }

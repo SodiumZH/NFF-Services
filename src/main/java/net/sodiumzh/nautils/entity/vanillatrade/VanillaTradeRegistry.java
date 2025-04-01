@@ -33,6 +33,7 @@ import javax.swing.plaf.PanelUI;
  * <p>Mob instances will access the trade entry generators by this registry. Note that this trade registry is not {@link NaUtilsRegistry},
  * but is recommended to be registered into "the registry of trade registries"({@link NaUtilsRegistries#VANILLA_TRADE_REGISTRIES}.
  * <p>Note: The {@link ResourceLocation}s are arbitrary as an identifier without pre-defined meanings.
+ * <p>Tip: Use {@link VanillaTradeRegistry#collect()} to get the mapping to the merged listing sets from all related collections.
  */
 public class VanillaTradeRegistry
 {
@@ -43,6 +44,7 @@ public class VanillaTradeRegistry
 	private ResourceLocation lastKey = null;
 	@Nonnull
 	private VillagerProfession lastProfession = VillagerProfession.NONE;
+	private VanillaTradeRegistry.Collected collectedCache = null;
 
 	public VanillaTradeRegistry() {
 		this.table = HashMultimap.create();
@@ -58,6 +60,7 @@ public class VanillaTradeRegistry
 		}
 		lastKey = key;
 		lastProfession = profession;
+		this.collectedCache = null;
 		return this;
 	}
 
@@ -69,6 +72,7 @@ public class VanillaTradeRegistry
 		values.forEach(v -> table.put(new Tuple2<>(key, profession), v));
 		lastKey = key;
 		lastProfession = profession;
+		this.collectedCache = null;
 		return this;
 	}
 
@@ -92,15 +96,20 @@ public class VanillaTradeRegistry
 		return put(lastKey, lastProfession, values);
 	}
 
-	public Set<VanillaTradeListingCollection<?>> get(ResourceLocation key, VillagerProfession profession) {
+	public Set<VanillaTradeListingCollection<?>> getCollections(ResourceLocation key, VillagerProfession profession) {
 		return table.get(new Tuple2<>(key, profession));
 	}
 
-	public Set<VanillaTradeListingCollection<?>> get(ResourceLocation key) {
-		return get(key, VillagerProfession.NONE);
+	public Set<VanillaTradeListingCollection<?>> getCollectionsForDefaultProfession(ResourceLocation key) {
+		return getCollections(key, VillagerProfession.NONE);
 	}
 
+	/**
+	 * Collect all elements and provide a 3-dimensional mapping from (key, profession, merchant level) to
+	 * united listings from all listing collections.
+	 */
 	public Collected collect() {
+		if (collectedCache != null) return collectedCache;
 		Collected res = new Collected();
 		table.keySet().stream()
 				.map(k -> Tuple3.of(k, table.get(k)))
@@ -110,6 +119,7 @@ public class VanillaTradeRegistry
 						.forEach(multimap -> multimap.keySet().forEach(level -> res.table.
 								putAll(Tuple3.of(entry.a, entry.b, level), multimap.get(level))));
 		});
+		collectedCache = res;
 		return res;
 	}
 
@@ -120,68 +130,49 @@ public class VanillaTradeRegistry
 	public static class Collected {
 		private final SetMultimap<Tuple3<ResourceLocation, VillagerProfession, Integer>, IVanillaTradeListing> table
 				= HashMultimap.create();
+
 		private Collected() {}
 
+		/**
+		 * Get a set of listings for given key, profession and merchant level.
+		 */
 		public Set<IVanillaTradeListing> get(ResourceLocation key, VillagerProfession profession, Integer level) {
 			return table.get(Tuple3.of(key, profession, level));
 		}
 
-		public SetMultimap<Integer, IVanillaTradeListing> get(ResourceLocation key, VillagerProfession profession) {
+		/**
+		 * Get a level-listings mapping for specified key and profession.
+		 * @return A listing-collection-like mapping, unmodifiable but supporting most queries
+		 * of {@link VanillaTradeListingCollection}.
+		 */
+		public IVanillaTradeListingCollection<IVanillaTradeListing> get(ResourceLocation key, VillagerProfession profession) {
 			SetMultimap<Integer, IVanillaTradeListing> res = HashMultimap.create();
 			table.keySet().stream().filter(ks -> ks.a.equals(key) && ks.b.equals(profession))
 					.forEach(ks -> res.putAll(ks.c, table.get(ks)));
-			return res;
+			return new UnmodifiableVanillaTradeListingCollection<>(res);
 		}
 
-		public Set<IVanillaTradeListing> getDefaultProfession(ResourceLocation key, Integer level) {
+		/**
+		 * Get a set of listings for given key and merchant level for {@link VillagerProfession#NONE}.
+		 */
+		public Set<IVanillaTradeListing> getForDefaultProfession(ResourceLocation key, Integer level) {
 			return this.get(key, VillagerProfession.NONE, level);
 		}
 
-		public SetMultimap<Integer, IVanillaTradeListing> getDefaultProfession(ResourceLocation key) {
+		/**
+		 * Get a level-listings mapping for specified key for {@link VillagerProfession#NONE}.
+		 * @return A listing-collection-like mapping, unmodifiable but supporting most queries
+		 * of {@link VanillaTradeListingCollection}.
+		 */
+		public IVanillaTradeListingCollection<IVanillaTradeListing> getForDefaultProfession(ResourceLocation key) {
 			return this.get(key, VillagerProfession.NONE);
 		}
 	}
 
-	public Set<IVanillaTradeListing> pickListings(ResourceLocation key, VillagerProfession prof, int merchantLevel, int amount, RandomSource rnd) {
-		Set<IVanillaTradeListing> set = collect().get(key, prof, merchantLevel);
-		return NaUtilsContainerStatics.getWeightedRandomSubset(set.stream()
-				.collect(Collectors.toMap(l -> l, IVanillaTradeListing::getSelectionWeight)), amount);
-	}
-
-	public Set<IVanillaTradeListing> pickListings(ResourceLocation key, VillagerProfession prof, int merchantLevel, int amount) {
-		return pickListings(key, prof, merchantLevel, amount, RND);
-	}
-
-	public SetMultimap<Integer, IVanillaTradeListing> pickListings(
-			ResourceLocation key, VillagerProfession prof, RandomSource rnd, Map<Integer, Integer> levelsAndAmounts) {
-		SetMultimap<Integer, IVanillaTradeListing> res = HashMultimap.create();
-		levelsAndAmounts.entrySet().stream()
-				.map(entry -> Tuple2.of(entry.getKey(), pickListings(key, prof, entry.getKey(), entry.getValue(), rnd)))
-				.forEach(entry -> res.putAll(entry.getA(), entry.getB()));
-		return res;
-	}
-
-	public SetMultimap<Integer, IVanillaTradeListing> pickListings(
-			ResourceLocation key, VillagerProfession prof, Map<Integer, Integer> levelsAndAmounts) {
-		return pickListings(key, prof, RND, levelsAndAmounts);
-	}
-
-	public SetMultimap<Integer, IVanillaTradeListing> pickListings(
-			ResourceLocation key, VillagerProfession prof, RandomSource rnd, int... levelsAndAmounts) {
-		Map<Integer, Integer> levelsAndAmountsMap = new HashMap<>();
-		for (int i = 0; i < levelsAndAmounts.length - 1; i += 2) {
-			levelsAndAmountsMap.put(levelsAndAmounts[i], levelsAndAmounts[i+1]);
-		}
-		return pickListings(key, prof, rnd, levelsAndAmountsMap);
-	}
-
-	public SetMultimap<Integer, IVanillaTradeListing> pickListings(
-			ResourceLocation key, VillagerProfession prof, int... levelsAndAmounts) {
-		return pickListings(key, prof, RND, levelsAndAmounts);
-	}
-
 	public VanillaTradeRegistry readData(ResourceLocation data) {
-		NaUtilsDataStatics.readJsonsServerSide(data, json -> {
+		ResourceLocation actualDataKey = data.toString().endsWith(".json")?
+				data : new ResourceLocation(data.getNamespace(), data.getPath() + ".json");
+		NaUtilsDataStatics.readJsonsServerSide(actualDataKey, json -> {
 			try {
 				json.getAsJsonArray().forEach(elem -> {
 					ResourceLocation lastKey = null;
@@ -219,6 +210,12 @@ public class VanillaTradeRegistry
 			}
 		});
 		return this;
+	}
+
+	// Utilities
+
+	public boolean hasAnyListing(ResourceLocation key, VillagerProfession profession) {
+		return !this.collect().get(key, profession).isEmpty();
 	}
 
 }

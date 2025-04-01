@@ -138,7 +138,7 @@ public abstract class VanillaMerchant implements CVanillaMerchant
 	/**
 	 * Get the offers without any initialization or checks.
 	 * <p><b>Warning:</b> Call this only when you're modifying the offers. It won't check if offers initialized.
-	 * Under other contexts (e.g. vanilla calls, external access) you'll probably want to use {@code getOffers} instead.
+	 * Under other contexts (e.g. vanilla calls, external access), use {@code getOffers} instead.
 	 */
 	@Nullable
 	protected final MerchantOffers getOffersRaw()

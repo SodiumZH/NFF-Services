@@ -21,6 +21,8 @@
     "NaUtilsMixinTagBuilder",
     "NaUtilsMixinThrownTrident",
     "NaUtilsMixinWorldCapabilityData"
+    "NaUtilsMixinServerPlayerGameMode",
+    "NaUtilsMixinThrownTrident"
   ],
   "client": [
     "NaUtilsMerchantMenuMixin",

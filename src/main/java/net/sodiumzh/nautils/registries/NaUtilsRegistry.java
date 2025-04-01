@@ -11,6 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -77,12 +78,14 @@ public class NaUtilsRegistry<T>
      * Get the value from key. Note that if the supplier throws an exception,
      * it will not crash but print stacktrace and return null.
      */
+    @Nullable
     public T getValue(ResourceLocation key) {
         Entry<? extends T> entry = table.get(key);
         if (entry == null) return null;
         return entry.get();
     }
 
+    @Nullable
     public ResourceLocation getKey(T value) {
         for (var entry: this.table.entrySet())
         {

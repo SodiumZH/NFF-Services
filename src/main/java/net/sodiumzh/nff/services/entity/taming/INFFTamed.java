@@ -129,11 +129,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
 	 * @param playerUUID Player UUID who owns this mob.
 	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
-	 * <p>========
-	 * <p>初始化生物。
-	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此实现必须处理null的情况。
-	 * @param playerUUID 拥有此生物的玩家UUID。
-	 * @param from 友好化或转化为该生物的来源生物。可以为null！
 	 */
 	@DontOverride
 	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
@@ -160,11 +155,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
 	 * @param playerUUID Player UUID who owns this mob.
 	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
-	 * <p>========
-	 * <p>在初始化{@link INFFTamed#init(UUID, Mob)}后执行的自定义操作。
-	 * <p>在读取NBT时{@code befriendedFrom}生物为null，因此实现必须处理null的情况。
-	 * @param playerUUID 拥有此生物的玩家UUID。
-	 * @param from 友好化或转化为该生物的来源生物。可以为null！
 	 */
 	@DontCallManually
 	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
@@ -172,8 +162,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Get whether this mob has finished initialization.
 	 * <p>After finishing initialization the mob will start updating from its inventory.
-	 * <p>获取是否该生物已经完成初始化。
-	 * <p>在完成初始化后，生物将开始基于附加道具栏更新。
 	 */
 	@DontOverride
 	public default boolean hasInit()
@@ -274,7 +262,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	/** 
 	 * Get owner as UUID.
-	* <p>获取拥有者的UUID。
 	*/
 	@Override
 	@DontOverride
@@ -285,7 +272,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** Set owner from player entity.
-	 * <p>从玩家实体设置拥有者。
 	 */
 	@DontOverride
 	public default void setOwner(@Nonnull Player owner)
@@ -295,7 +281,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	
 	/**
 	* Set owner from player UUID.
-	* <p>从玩家UUID设置拥有者。
 	*/
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
@@ -307,9 +292,9 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Check if owner is in the level.
 	 * @deprecated Use {@code isOwnerInDimension} or {@code isOwnerInWorld} instead.
-	 * <p>检查拥有者是否在同一世界中。
 	 */
 	@DontOverride
+	@Deprecated
 	public default boolean isOwnerPresent()
 	{
 		return getOwner() != null;
