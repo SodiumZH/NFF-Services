@@ -4,45 +4,67 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Tuple;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.level.PistonEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import net.sodiumzh.nautils.NaUtils;
+import net.sodiumzh.nautils.containers.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class NaUtilsDataStatics {
 
+    public static Optional<ResourceManager> getResourceManager(LogicalSide side) {
+        try {
+            switch (side) {
+                case SERVER -> {return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getResourceManager());}
+                case CLIENT -> {return Optional.ofNullable(Minecraft.getInstance().getResourceManager());}
+                default -> throw new RuntimeException();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<ResourceManager> getResourceManager() {
+        return getResourceManager(EffectiveSide.get());
+    }
+
+
     /**
-     * Read all jsons at a given location on server side. On client or if server hasn't started, do nothing.
+     * Read all jsons at a given location.
      * @param location Location of the json.
      * @param reader Actions to do for each json. Note that this reader may be invoked multiple times if there are
      *               multiple data packs present. If IO or runtime exception occurs during invoking, it will not throw the
      *               exception out but print stack trace and continue reading next json.
      * @param suppressStackTrace If true, when an exception is caught, it will not print stack trace and just continue on next json.
      */
-    public static void readJsonsServerSide(ResourceLocation location, Consumer<JsonElement> reader, boolean suppressStackTrace)
+    public static void readJsons(LogicalSide side, ResourceLocation location, Consumer<JsonElement> reader, boolean suppressStackTrace)
     {
-        MinecraftServer server = NaUtils.getServer();
-        if (server == null) return;
-        ResourceManager mgr = server.getResourceManager();
+        ResourceManager mgr = getResourceManager(side).orElse(null);
+        if (mgr == null) return;
         List<Resource> resources = mgr.getResourceStack(location);
         for (Resource r: resources)
         {
-            try {
-                InputStream input = r.open();
+            try (InputStream input = r.open()){
                 Reader inputReader = new InputStreamReader(input);
                 JsonElement json = JsonParser.parseReader(inputReader);
                 reader.accept(json);
@@ -54,15 +76,15 @@ public class NaUtilsDataStatics {
     }
 
     /**
-     * Read all jsons at a given location on server side. On client or if server hasn't started, do nothing.
+     * Read all jsons at a given location.
      * @param location Location of the json.
      * @param reader Actions to do for each json. Note that this reader may be invoked multiple times if there are
      *               multiple data packs present. If IO or runtime exception occurs during invoking, it will not throw the
      *               exception out but print stack trace and continue reading next json.
      */
-    public static void readJsonsServerSide(ResourceLocation location, Consumer<JsonElement> reader)
+    public static void readJsons(LogicalSide side, ResourceLocation location, Consumer<JsonElement> reader)
     {
-        readJsonsServerSide(location, reader, false);
+        readJsons(side, location, reader, false);
     }
 
     /**
@@ -202,4 +224,43 @@ public class NaUtilsDataStatics {
     public static <T> List<T> getOptionalList(JsonObject source, String key, Function<JsonElement, T> getter) {
         return getOptionalList(source, key, getter, e -> true, e -> {});
     }
+
+    public static List<Tuple2<ResourceLocation, JsonElement>> getJsonsUnderPath(LogicalSide side, String path, boolean suppressStackTrace) {
+        List<Tuple2<ResourceLocation, JsonElement>> res = new ArrayList<>();
+        ResourceManager mgr = getResourceManager(side).orElse(null);
+        if (mgr == null) return res;
+        mgr.listResourceStacks(path, l -> l.getPath().endsWith(".json")).entrySet().forEach(entry -> {
+            entry.getValue().stream().map(r -> {
+                try (InputStream input = r.open()) {
+                    Reader inputReader = new InputStreamReader(input);
+                    return JsonParser.parseReader(inputReader);
+                } catch (IOException | RuntimeException e) {
+                    if (!suppressStackTrace)
+                        e.printStackTrace();
+                    return null;
+                }
+            }).filter(Objects::nonNull).map(j -> Tuple2.of(entry.getKey(), j)).forEach(res::add);
+        });
+        return res;
+    }
+
+    public static List<Tuple2<ResourceLocation, JsonElement>> getJsonsUnderPath(LogicalSide side, String path) {
+        return getJsonsUnderPath(side, path, false);
+    }
+
+    public static void readJsonsUnderPath(LogicalSide side, String path, BiConsumer<ResourceLocation,JsonElement> reader, boolean suppressStackTrace) {
+        getJsonsUnderPath(side, path, suppressStackTrace).forEach(entry -> {
+            try {
+                reader.accept(entry.getA(), entry.getB());
+            } catch (Exception e) {
+                if (!suppressStackTrace)
+                    e.printStackTrace();
+            }
+        });
+    }
+
+    public static void readJsonsUnderPath(LogicalSide side, String path, BiConsumer<ResourceLocation,JsonElement> reader) {
+        readJsonsUnderPath(side, path, reader, false);
+    }
+
 }

@@ -31,7 +31,9 @@ public class NaUtilsRegistries {
      */
     public static final NaUtilsRegistry<MobApplicableItemTable> MOB_APPLICABLE_ITEM_TABLES =
             new NaUtilsRegistry<MobApplicableItemTable>(new ResourceLocation(NaUtils.MOD_ID, "mob_applicable_item_tables"))
-                    .setShouldGenerateOnServerSetup();
+                    .setShouldGenerateOnServerSetup()
+                    .setUnavailableBefore(NaUtilsRegistry.SetupPhase.SERVER_SETUP)
+                    .setSide(NaUtilsRegistry.AvailableSide.SERVER);
 
     /**
      * Registry for generic {@link Function}s. Note that the functions' input/output types are generic, and will not do
@@ -41,23 +43,32 @@ public class NaUtilsRegistries {
             new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "functions"));
 
     /**
-     * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade listings.
-     */
-    public static final NaUtilsRegistry<VanillaTradeRegistry> VANILLA_TRADE_REGISTRIES =
-            new NaUtilsRegistry<VanillaTradeRegistry>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_registries"))
-                    .setShouldGenerateOnServerSetup();
-
-    /**
      * Registry for trade listing  (from vanilla trade system). A trade listing is a generator for providing random trade offers
      * for mobs.
      */
     public static final NaUtilsRegistry<VanillaTradeListing> VANILLA_TRADE_LISTINGS =
         new NaUtilsRegistry<VanillaTradeListing>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_listings"))
-            .setShouldGenerateOnServerSetup();
+                .setShouldGenerateOnServerSetup()
+                .setUnavailableBefore(NaUtilsRegistry.SetupPhase.SERVER_SETUP)
+                .setSide(NaUtilsRegistry.AvailableSide.SERVER);
 
     public static final NaUtilsRegistry<VanillaTradeListingCollection<?>> VANILLA_TRADE_LISTING_COLLECTIONS =
             new NaUtilsRegistry<VanillaTradeListingCollection<?>>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_listing_collections"))
-                    .setShouldGenerateOnServerSetup();
+                    .setShouldGenerateOnServerSetup()
+                    .setUnavailableBefore(NaUtilsRegistry.SetupPhase.SERVER_SETUP)
+                    .setSide(NaUtilsRegistry.AvailableSide.SERVER)
+                    .setLoadAfter(VANILLA_TRADE_LISTINGS);
+
+    /**
+     * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade listings.
+     */
+    public static final NaUtilsRegistry<VanillaTradeRegistry> VANILLA_TRADE_REGISTRIES =
+            new NaUtilsRegistry<VanillaTradeRegistry>(new ResourceLocation(NaUtils.MOD_ID, "vanilla_trade_registries"))
+                    .setShouldGenerateOnServerSetup()
+                    .setUnavailableBefore(NaUtilsRegistry.SetupPhase.SERVER_SETUP)
+                    .setSide(NaUtilsRegistry.AvailableSide.SERVER)
+                    .setLoadAfter(VANILLA_TRADE_LISTINGS)
+                    .setLoadAfter(VANILLA_TRADE_LISTING_COLLECTIONS);
 
     public static final NaUtilsRegistry<MobAngerReason> MOB_ANGER_REASONS =
         new NaUtilsRegistry<>(new ResourceLocation(NaUtils.MOD_ID, "mob_anger_reasons"));

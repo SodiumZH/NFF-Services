@@ -58,4 +58,31 @@ public interface DirectedGraphNode<T extends DirectedGraphNode<T>> {
         return null;
     }
 
+    /**
+     * Check if the input node is in the downstream of this node, i.e. there's a path from this node to the test node.
+     * <p>Note: this node is NOT regarded as in the downstream.
+     */
+    public default boolean isDownstreamNode(T test) {
+        Set<T> scannedNodes = new HashSet<>();
+        scannedNodes.add(self());
+        Set<T> next = this.children();
+        while (!next.isEmpty()) {
+            if (next.contains(test)) return true;
+            next.removeIf(scannedNodes::contains);  // Break cycle
+            scannedNodes.addAll(next);
+            Set<T> newNext = new HashSet<>();
+            next.forEach(t -> newNext.addAll(t.children()));
+            next = newNext;
+        }
+        return false;
+    }
+
+    /**
+     * Check if the input node is in the upstream of this node, i.e. there's a path from the test node to this node.
+     * <p>Note: this node is NOT regarded as in the upstream.
+     */
+    public default boolean isUpstreamNode(T test) {
+        return test.isDownstreamNode(self());
+    }
+
 }

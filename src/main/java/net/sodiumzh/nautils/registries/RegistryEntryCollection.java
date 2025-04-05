@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
+import net.sodiumzh.nautils.containers.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class RegistryEntryCollection<T>
 {
     private final NaUtilsRegistry<T> registry;
     private final String namespace;
-    private final HashMap<ResourceLocation, Tuple<NaUtilsRegistry.Entry<? extends T>, NaUtilsRegistry.Accessor<? extends T>>> table = new HashMap<>();
+    private final HashMap<ResourceLocation, Tuple2<NaUtilsRegistry.Entry<? extends T>, NaUtilsRegistry.Accessor<? extends T>>> table = new HashMap<>();
     private RegistryEntryCollection(NaUtilsRegistry<T> registry, String namespace)
     {
         this.registry = registry;
@@ -43,9 +43,9 @@ public class RegistryEntryCollection<T>
      */
     public <U extends T> NaUtilsRegistry.Accessor<U> register(@Nonnull String key, @Nonnull Supplier<U> value)
     {
-        NaUtilsRegistry.Entry<U> entry = new NaUtilsRegistry.Entry<>(value);
-        NaUtilsRegistry.Accessor<U> accessor = NaUtilsRegistry.Accessor.invalid(entry);
-        this.table.put(new ResourceLocation(namespace, key), new Tuple<>(entry, accessor));
+        NaUtilsRegistry.Entry<U> entry = new NaUtilsRegistry.Entry<>(registry, value, new ResourceLocation(namespace, key));
+        NaUtilsRegistry.Accessor<U> accessor = NaUtilsRegistry.Accessor.createInvalid(entry);
+        this.table.put(new ResourceLocation(namespace, key), new Tuple2<>(entry, accessor));
         return new NaUtilsRegistry.Accessor<>(entry);
     }
 
