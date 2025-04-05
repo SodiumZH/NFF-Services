@@ -1,10 +1,12 @@
-# Sodium's Utilities Instruction
+# NFE Library Instruction
 
 ## Overview
 
-Sodium's Utilities (NaUtils) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
+NFE (Natrium Forge Extension) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
 
-## Registry
+Now in code it's called "NaUtils" (Natrium Utilities), but will be changed to NFE some time.
+
+## NaUtils Registry API
 
 NaUtils provides a simple registry system like the forge registry, mainly for the global registration of custom-defined data types.
 
@@ -70,11 +72,47 @@ There are also some registries or utilities for registration that are not in `Na
 
 Event for registering `AttributeSupplier`s that should be added on server start, not on mod setup. This is for attributes depending on data which is not available on mod setup (e.g. config attributes).
 
+## NaUtils Item Template
 
+NaUtils provides a template for items, including utility methods, some of which are implemented by mixin.
+
+#### `INaUtilsItem`
+
+Base interface of NaUtils Item Templates. External implementations of features recognize the templated items by trying casting to this interface.
+
+### Features
+
+##### Dynamic tooltips
+
+On item initialization, you can call description- and foiling- related methods to dynamically add tooltips (allowing chaining). Each addition operation adds a new row of tooltip.
+
+##### Default instance operation
+
+NaUtils item template allows to manipulate the behavior of default instances, including:
+
+a) On-initialization setting of default instances: overriding, redirecting to another item, removing (setting to air).
+
+b) Redirecting /give command result to the default instance instead of uninitialized `ItemStack`. (Implemented by mixin)
+
+##### Force consumption in creative
+
+By overriding `shouldConsumeInCreative` you can force the item to be consumed on usage in the creative mode. (Implemented by mixin)
+
+##### Fool-proofing
+
+Removed the `ItemStack` argument of `interactLivingEntity`. The `ItemStack` is a **copy** of the interacting item, which may confuse users. 
+
+
+
+
+
+## Mob Anger API
+
+## Vanilla Trade API
 
 ## Forge Capabilities
 
-##### `CEntityTickingCapability`
+## `CEntityTickingCapability`
 
 A capability template that will be ticked together with entities.
 
