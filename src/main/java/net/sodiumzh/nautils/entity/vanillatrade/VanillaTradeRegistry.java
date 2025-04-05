@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -172,7 +173,7 @@ public class VanillaTradeRegistry
 	public VanillaTradeRegistry readData(ResourceLocation data) {
 		ResourceLocation actualDataKey = data.toString().endsWith(".json")?
 				data : new ResourceLocation(data.getNamespace(), data.getPath() + ".json");
-		NaUtilsDataStatics.readJsonsServerSide(actualDataKey, json -> {
+		NaUtilsDataStatics.readJsons(LogicalSide.SERVER, actualDataKey, json -> {
 			try {
 				json.getAsJsonArray().forEach(elem -> {
 					ResourceLocation lastKey = null;
@@ -216,6 +217,10 @@ public class VanillaTradeRegistry
 
 	public boolean hasAnyListing(ResourceLocation key, VillagerProfession profession) {
 		return !this.collect().get(key, profession).isEmpty();
+	}
+
+	public List<ResourceLocation> getAllCollectionKeys(ResourceLocation key, VillagerProfession profession) {
+		return this.getCollections(key, profession).stream().map(VanillaTradeListingCollection::getRegistryKey).map(o -> o.orElse(new ResourceLocation("not:registered"))).collect(Collectors.toList());
 	}
 
 }

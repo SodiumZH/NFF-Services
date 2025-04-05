@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -166,6 +167,11 @@ public class NaUtilsBlockItem extends ItemNameBlockItem implements INaUtilsItem 
 
     @Override
     public boolean shouldConsumeInCreative() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldSkipEntityInteract(Player user, Entity target, InteractionHand hand) {
         return false;
     }
 

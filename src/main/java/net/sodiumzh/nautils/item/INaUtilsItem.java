@@ -1,13 +1,18 @@
 package net.sodiumzh.nautils.item;
 
-import com.mojang.logging.LogUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.level.block.state.BlockState;
 import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinItemInput;
+import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinPlayer;
 import net.sodiumzh.nautils.mixin.mixins.NaUtilsMixinServerPlayerGameMode;
 import net.sodiumzh.nautils.object.ICastable;
 
@@ -23,6 +28,8 @@ import java.util.function.Supplier;
  * Do not implement this interface unless you fully understand how it works.
  */
 public interface INaUtilsItem extends ICastable, ItemLike {
+
+    // Dynamic Description //
 
     /**
      * Add an {@code ItemStack}-depending {@code Component} supplier to hovering text.
@@ -48,6 +55,9 @@ public interface INaUtilsItem extends ICastable, ItemLike {
      * If input condition is true, the item will be foiled as if it's enchanted.
      */
     public INaUtilsItem foilCondition(Predicate<ItemStack> cond);
+
+
+    // Default Instance Operation //
 
     /**
      * Set the default instance getter.
@@ -82,12 +92,6 @@ public interface INaUtilsItem extends ICastable, ItemLike {
     public boolean shouldGiveCommandUseDefaultInstance();
 
     /**
-     * Check if this item should be consumed if the player is in creative mode.
-     * <p>This feature is implemented through {@link NaUtilsMixinServerPlayerGameMode}.
-     */
-    public boolean shouldConsumeInCreative();
-
-    /**
      * Override to set the default instance. Return {@code Optional.empty()} to use {@code new ItemStack(this)}.
      * <p>Note: {@code setDefaultInstanceOverride} or variations will override this method.
      * <p>Note: To return empty {@code ItemStack}, return {@code Optional.of(ItemStack.EMPTY)}.
@@ -95,5 +99,103 @@ public interface INaUtilsItem extends ICastable, ItemLike {
     @Nonnull
     public Optional<ItemStack> getDefaultInstanceOverride();
 
+    // Force Creative Consumption //
+
+    /**
+     * Check if this item should be consumed if the player is in creative mode.
+     * <p>This feature is implemented through {@link NaUtilsMixinServerPlayerGameMode}.
+     */
+    public boolean shouldConsumeInCreative();
+
+    // Usage Skipping //
+
+    /**
+     * Whether this item's interaction should skip {@link Entity#interact} to ensure {@link Item#interactLivingEntity} being invoked.
+     * <p>Implemented through {@link NaUtilsMixinPlayer}.
+     */
+    public boolean shouldSkipEntityInteract(Player user, Entity target, InteractionHand hand);
+
+
+/*
+    public boolean shouldSkipUsagePhase(UsagePhase phase, UsageContext ctx);
+
+    public static enum UsagePhase {
+
+        ENTITY_X_INTERACT,
+
+        ITEM_X_INTERACTION_LIVING,
+
+        ITEM_X_USE,
+
+        ITEM_X_USE_ON
+
+    }
+
+    public static class UsageContext {
+        // 0 = simple use; 1 = use on block; 2 = use on entity
+        private final int type;
+        private final Player player;
+        private final InteractionHand hand;
+        private final BlockPos onBlockPos;
+        private final BlockState onBlockState;
+        private final Entity onEntity;
+
+        private UsageContext(int type, Player player, InteractionHand hand, BlockPos onBlockPos, BlockState onBlockState, Entity onEntity) {
+            this.type = type;
+            this.player = player;
+            this.hand = hand;
+            this.onBlockPos = onBlockPos;
+            this.onBlockState = onBlockState;
+            this.onEntity = onEntity;
+        }
+
+        public static UsageContext forUse(Player player, InteractionHand hand) {
+            return new UsageContext(0, player, hand, null, null, null);
+        }
+
+        public static UsageContext forUseOn(Player player, InteractionHand hand, BlockPos pos) {
+            return new UsageContext(1, player, hand, pos, player.level().getBlockState(pos), null);
+        }
+
+        public static UsageContext forInteractEntity(Player player, InteractionHand hand, Entity entity) {
+            return new UsageContext(2, player, hand, null, null, entity);
+        }
+
+        public boolean isUse() {
+            return type == 0;
+        }
+
+        public boolean isUseOn() {
+            return type == 1;
+        }
+
+        public boolean isInteractEntity() {
+            return type == 2;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public InteractionHand getHand() {
+            return hand;
+        }
+
+        @Nullable
+        public BlockPos getBlockPos() {
+            return onBlockPos;
+        }
+
+        @Nullable
+        public BlockState getOnBlockState() {
+            return onBlockState;
+        }
+
+        @Nullable
+        public Entity getOnEntity() {
+            return onEntity;
+        }
+    }
+*/
 
 }

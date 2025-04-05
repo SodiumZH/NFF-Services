@@ -18,6 +18,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -213,6 +214,11 @@ public class NaUtilsItem extends Item implements ICastable, INaUtilsItem
 
 	@Override
 	public boolean shouldConsumeInCreative() {
+		return false;
+	}
+
+	@Override
+	public boolean shouldSkipEntityInteract(Player user, Entity target, InteractionHand hand) {
 		return false;
 	}
 

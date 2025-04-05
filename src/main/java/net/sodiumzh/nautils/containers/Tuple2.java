@@ -2,6 +2,8 @@ package net.sodiumzh.nautils.containers;
 
 import net.minecraft.util.Tuple;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -34,6 +36,10 @@ public class Tuple2<A, B> extends Tuple<A, B>
 
 	public static <A, B> Tuple2<A, B> of(A a, B b) {
 		return new Tuple2<>(a, b);
+	}
+
+	public static <A, B> Tuple2<A, B> of(Map.Entry<A, B> entry) {
+		return new Tuple2<>(entry.getKey(), entry.getValue());
 	}
 
 }
