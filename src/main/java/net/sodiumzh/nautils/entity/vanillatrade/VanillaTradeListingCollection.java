@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.JsonElement;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.sodiumzh.nautils.containers.LinkableMultimap;
@@ -121,4 +123,11 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing> imple
 		return "VanillaTradeListingCollection{\n" + this.table.copyAsImmutable().toString() + "\n}";
 	}
 
+	public Optional<ResourceLocation> getRegistryKey() {
+		return Optional.ofNullable(NaUtilsRegistries.VANILLA_TRADE_LISTING_COLLECTIONS.getKey(this));
+	}
+
+	public List<IVanillaTradeListing> allListings() {
+		return table.copyAsImmutable().entries().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+	}
 }

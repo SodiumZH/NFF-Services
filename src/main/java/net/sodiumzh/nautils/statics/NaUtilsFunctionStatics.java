@@ -1,8 +1,9 @@
-package net.sodiumzh.nautils.function;
+package net.sodiumzh.nautils.statics;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 
-public class NaFunctionUtils
+public class NaUtilsFunctionStatics
 {
 
 	/**

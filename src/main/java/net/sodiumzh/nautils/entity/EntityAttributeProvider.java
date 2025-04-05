@@ -25,28 +25,28 @@ public class EntityAttributeProvider implements Supplier<AttributeSupplier.Build
     /**
      * Create based on {@link LivingEntity#createLivingAttributes()}.
      */
-    public EntityAttributeProvider living() {
+    public static EntityAttributeProvider living() {
         return new EntityAttributeProvider(LivingEntity::createLivingAttributes);
     }
 
     /**
      * Create based on {@link Mob#createLivingAttributes()}.
      */
-    public EntityAttributeProvider mob() {
+    public static EntityAttributeProvider mob() {
         return new EntityAttributeProvider(Mob::createMobAttributes);
     }
 
     /**
      * Create based on {@link Monster#createLivingAttributes()}.
      */
-    public EntityAttributeProvider monster() {
+    public static EntityAttributeProvider monster() {
         return new EntityAttributeProvider(Monster::createMobAttributes);
     }
 
     /**
      * Create based on {@link Zombie#createLivingAttributes()}.
      */
-    public EntityAttributeProvider zombie() {
+    public static EntityAttributeProvider zombie() {
         return new EntityAttributeProvider(Zombie::createMobAttributes);
     }
 
@@ -55,7 +55,7 @@ public class EntityAttributeProvider implements Supplier<AttributeSupplier.Build
      * another {@link EntityAttributeProvider}.
      * This operation will not impact the input supplier but only calls its {@link Supplier#get} method.
      */
-    public EntityAttributeProvider from(Supplier<AttributeSupplier.Builder> other) {
+    public static EntityAttributeProvider from(Supplier<AttributeSupplier.Builder> other) {
         return new EntityAttributeProvider(other);
     }
 

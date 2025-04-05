@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nautils.function.NaFunctionUtils;
+import net.sodiumzh.nautils.statics.NaUtilsFunctionStatics;
 
 /**
  * A checker for if a bauble item can be equipped in a given bauble slot of a given living entity.
@@ -109,7 +109,7 @@ public class BaubleEquippingCondition
 	 */
 	public BaubleEquippingCondition excludeLivingTypes(EntityType<? extends Mob>... toExclude)
 	{
-		return this.and(args -> NaFunctionUtils.and((EntityType<? extends Mob> type) -> args.user().getType() != type, toExclude));
+		return this.and(args -> NaUtilsFunctionStatics.and((EntityType<? extends Mob> type) -> args.user().getType() != type, toExclude));
 	}
 	
 	/**
@@ -157,7 +157,7 @@ public class BaubleEquippingCondition
 	 */
 	public BaubleEquippingCondition onlyForTypes(EntityType<? extends Mob>... types)
 	{
-		return this.and((args) -> NaFunctionUtils.or((EntityType<? extends LivingEntity> entitytype) -> args.user().getType() == entitytype, types));
+		return this.and((args) -> NaUtilsFunctionStatics.or((EntityType<? extends LivingEntity> entitytype) -> args.user().getType() == entitytype, types));
 	}
 	
 	/**

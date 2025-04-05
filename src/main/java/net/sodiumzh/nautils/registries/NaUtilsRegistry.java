@@ -3,29 +3,41 @@ package net.sodiumzh.nautils.registries;
 import com.google.common.collect.HashBiMap;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.registries.DeferredRegister;
 import net.sodiumzh.nautils.eventhandler.NaUtilsSetupEventHandlers;
 import net.sodiumzh.nautils.exceptions.DuplicateRegistryEntryException;
+import net.sodiumzh.nautils.object.DirectedGraphNode;
+import net.sodiumzh.nautils.object.LimitedMutable;
+import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
 import org.jetbrains.annotations.Nullable;
 import net.minecraftforge.registries.RegistryObject;
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 /**
  * A simple registry. It's internally a {@link HashBiMap} with keys of {@link ResourceLocation}s.
  * Note that this is NOT a part of Minecraft registry system.
  */
-public class NaUtilsRegistry<T>
+public class NaUtilsRegistry<T> implements DirectedGraphNode<NaUtilsRegistry<?>>
 {
+    public static final LimitedMutable<Boolean> COMMON_SETUP_DONE = new LimitedMutable<>(false, 1);
+    public static final LimitedMutable<Boolean> CLIENT_SETUP_DONE = new LimitedMutable<>(false, 1);
+    public static final LimitedMutable<Boolean> SERVER_SETUP_DONE = new LimitedMutable<>(false, 1);
+
     /** All declared registries. */
     private static final HashBiMap<ResourceLocation, NaUtilsRegistry<?>> REGISTRIES = HashBiMap.create();
     private final HashMap<ResourceLocation, Entry<? extends T>> table = new HashMap<>();
     private boolean shouldGenerateOnSetup = false;
     private int generateOnSetupPhase = 0;   // 0 = common setup: 1 = server setup; 2 = client setup
+    private SetupPhase[] unavailableBefore = new SetupPhase[]{};
+    private AvailableSide availableSide = AvailableSide.BOTH;
+    private final List<NaUtilsRegistry<?>> shouldLoadAfter = new ArrayList<>();
 
     /**
      * @param registryKey Key of this registry in the table of all registries.
@@ -108,7 +120,7 @@ public class NaUtilsRegistry<T>
     public <U extends T> Accessor<U> register(ResourceLocation key, Supplier<U> supplier)
     {
         if (this.containsKey(key)) throw DuplicateRegistryEntryException.registeredTwice(key.toString());
-        Entry<U> entry = new Entry<>(supplier);
+        Entry<U> entry = new Entry<>(this, supplier, key);
         this.table.put(key, entry);
         return new Accessor<>(entry);
     }
@@ -132,6 +144,15 @@ public class NaUtilsRegistry<T>
     }
 
     /**
+     * Generate all values that haven't generated. It doesn't impact values already generated.
+     */
+    public void generateAllValues()
+    {
+        this.table.keySet().forEach(this::getValue);
+    }
+
+
+    /**
      * Regenerate all values, i.e. rerun all suppliers and generate new values.
      * <p><b>Take extreme care calling this.</b> This operation will probably generate new value instances and may invalidate
      * the old references.
@@ -150,7 +171,7 @@ public class NaUtilsRegistry<T>
     }
 
     /**
-     * Labels that this registry's values should be generated on setup phase (e.g. requiring data reading).
+     * Labels that this registry's all values should be generated on the common setup phase.
      * Registries with this label will generate values on {@link FMLCommonSetupEvent}.
      * @return {@code this}.
      */
@@ -160,6 +181,12 @@ public class NaUtilsRegistry<T>
         return this;
     }
 
+    /**
+     * Labels that this registry's all values should be generated on server setup phase (e.g. requiring data reading).
+     * Registries with this label will generate values on {@link ServerAboutToStartEvent}.
+     * <p>Note: Use this only for server-side registries. Values will not generate on client.
+     * @return {@code this}.
+     */
     public NaUtilsRegistry<T> setShouldGenerateOnServerSetup()
     {
         this.shouldGenerateOnSetup = true;
@@ -167,6 +194,11 @@ public class NaUtilsRegistry<T>
         return this;
     }
 
+    /**
+     * Labels that this registry's all values should be generated on server setup phase (e.g. requiring data reading).
+     * Registries with this label will generate values on {@link ServerStartingEvent}.
+     * @return {@code this}.
+     */
     public NaUtilsRegistry<T> setShouldGenerateOnClientSetup()
     {
         this.shouldGenerateOnSetup = true;
@@ -188,15 +220,80 @@ public class NaUtilsRegistry<T>
         return this.generateOnSetupPhase;
     }
 
+    /**
+     * Check if this registry is unavailable before a given phase. If {@link Accessor#get()} is called before this phase,
+     * it will always return {@code null}.
+     */
+    public boolean isUnavailableBefore(SetupPhase phase) {
+        return Arrays.stream(unavailableBefore).toList().contains(phase);
+    }
+
+    /**
+     * Set this registry is unavailable before given phase(s). If {@link Accessor#get()} is called before the set phase(s),
+     * it will always return {@code null}.
+     */
+    public NaUtilsRegistry<T> setUnavailableBefore(SetupPhase... phases) {
+        this.unavailableBefore = phases;
+        return this;
+    }
+
+    /**
+     * Check if the registry is called on the correct logical side.
+     */
+    public boolean isCorrectSide() {
+        return this.availableSide.equals(AvailableSide.BOTH) ||
+                (EffectiveSide.get().isClient() && this.availableSide.equals(AvailableSide.CLIENT)) ||
+                (EffectiveSide.get().isServer() && this.availableSide.equals(AvailableSide.SERVER));
+    }
+
+    /**
+     * Set this registry should be only available on a given logical side. If {@link Accessor#get()} is called on the
+     * wrong side, it will always return {@code null}.
+     */
+    public NaUtilsRegistry<T> setSide(AvailableSide side) {
+        this.availableSide = side;
+        return this;
+    }
+
+    public NaUtilsRegistry<T> setLoadAfter(NaUtilsRegistry<?>... registries) {
+        for (NaUtilsRegistry<?> reg: registries) {
+            this.shouldLoadAfter.add(reg);
+            // Detect cycle
+            List<NaUtilsRegistry<?>> cycle = this.getCycle();
+            if (cycle != null) {
+                this.shouldLoadAfter.remove(reg);
+                StringBuilder cycleInfo = new StringBuilder(cycle.get(0).getKeyOfRegistry().toString());
+                for (int i = 1; i < cycle.size(); ++i)
+                    cycleInfo.append(" -> ").append(cycle.get(i).getKeyOfRegistry().toString());
+                throw new IllegalArgumentException("NaUtilsRegistry loading order error: cyclic dependency detected.\n" +
+                        "Cycle: " + cycleInfo);
+            }
+        }
+        return this;
+    }
+
+    public boolean shouldLoadAfter(NaUtilsRegistry<?> other) {
+        return this.shouldLoadAfter.contains(other) && !other.shouldLoadAfter.contains(this);
+    }
+
+    @Override
+    public Set<NaUtilsRegistry<?>> children() {
+        return REGISTRIES.values().stream().filter(reg -> reg.shouldLoadAfter(this)).collect(Collectors.toSet());
+    }
+
     static class Entry<T>
     {
         private final Supplier<T> supplier;
         private T cachedValue;
+        private final NaUtilsRegistry<? super T> registry;
+        private final ResourceLocation key;
 
-        public Entry(@Nonnull Supplier<T> supplier)
+        public Entry(@Nonnull NaUtilsRegistry<? super T> registry, @Nonnull Supplier<T> supplier, ResourceLocation key)
         {
             this.supplier = supplier;
+            this.key = key;
             this.cachedValue = null;
+            this.registry = registry;
         }
 
         /**
@@ -206,6 +303,14 @@ public class NaUtilsRegistry<T>
         @Nullable
         public T get()
         {
+            if (!registry.isCorrectSide())
+                return null;
+            if (registry.isUnavailableBefore(SetupPhase.COMMON_SETUP) && !NaUtilsRegistry.COMMON_SETUP_DONE.get())
+                return null;
+            if (registry.isUnavailableBefore(SetupPhase.CLIENT_SETUP) && !NaUtilsRegistry.CLIENT_SETUP_DONE.get() && EffectiveSide.get().isClient())
+                return null;
+            if (registry.isUnavailableBefore(SetupPhase.SERVER_SETUP) && !NaUtilsRegistry.SERVER_SETUP_DONE.get() && !EffectiveSide.get().isClient())
+                return null;
             if (cachedValue == null) {
                 try {
                     cachedValue = supplier.get();
@@ -213,7 +318,9 @@ public class NaUtilsRegistry<T>
                 {
                     // If running supplier encountered error, don't crash but
                     // set the cache to null so that the supplier will rerun next time.
-                    e.printStackTrace();
+                    NaUtilsDebugStatics.errorOnce(NaUtilsRegistry.Accessor.class,
+                            "Registry entry getting value failed. Registry=\"" + this.registry.getKeyOfRegistry()
+                    + "\", key=\"" + this.key + "\".");
                     cachedValue = null;
                     return null;
                 }
@@ -232,20 +339,21 @@ public class NaUtilsRegistry<T>
         private Entry<T> entry;
         private boolean validated;  // Labels whether this entry has been registered into a registry. If it's false, the get() will always return null.
 
-        public Accessor(Entry<T> entry) {
+        Accessor(Entry<T> entry) {
             this.entry = entry;
             this.validated = true;
         }
 
 
 
-        public static <U> Accessor<U> invalid(Entry<U> entry)
+        static <U> Accessor<U> createInvalid(Entry<U> entry)
         {
             Accessor<U> res = new Accessor<>(entry);
             res.validated = false;
             return res;
         }
 
+        @Override
         public T get()
         {
             if (!validated) return null;
@@ -253,6 +361,34 @@ public class NaUtilsRegistry<T>
         }
 
         Accessor<T> validate() {this.validated = true; return this;}
+    }
+
+    public enum SetupPhase {
+        COMMON_SETUP, CLIENT_SETUP, SERVER_SETUP;
+    }
+
+    public enum AvailableSide {
+        SERVER, CLIENT, BOTH
+    }
+
+    // This sorting is slow, but it's ok as it will be only called once on generating values
+    public static List<NaUtilsRegistry<?>> sortByLoadingOrder(Collection<NaUtilsRegistry<?>> raw) {
+        List<NaUtilsRegistry<?>> sort = new ArrayList<>(raw);
+        start:
+        while (true) {
+            for (int i = 0; i < sort.size(); ++i) {
+                for (int j = i + 1; j < sort.size(); ++j) {
+                    if (sort.get(i).shouldLoadAfter(sort.get(j)))
+                    {
+                        NaUtilsRegistry<?> temp = sort.get(i);
+                        sort.set(i, sort.get(j));
+                        sort.set(j, temp);
+                        continue start;
+                    }
+                }
+            }
+            return sort;
+        }
     }
 
 }
