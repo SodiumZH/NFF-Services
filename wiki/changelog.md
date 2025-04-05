@@ -8,9 +8,29 @@ Now mobs will auto save their locations to the owner.
 
 Now anchored patrol radius is 16 instead of 64 by default.
 
-##### Sodium's Utilities
+##### NFE Library
 
-Added Mixin Events: `EntityLoadFailedEvent`, `GrindstoneAcceptItemEvent`
+NaUtils is now named "NFE Library". NFE stands for "Natrium Forge Extension". Now code is not renamed yet.
+
+Added Mixin Events: `EntityLoadFailedEvent`, `GrindstoneAcceptItemEvent`, `LivingRendererCheckSitEvent`, `EnderManStartSettingTargetEvent`
+
+Removed Mixin Event: `EntitySpecificInteractionEvent`
+
+Added NaUtils Item template feature: skipping `Entity#interact`.
+
+Restructured the listing data of Vanilla Trade API.
+
+ -Renamed: `VanillaTradeListings` -> `VanillaTradeListingCollection`.
+
+ -Now `VanillaTradeListingCollection` is the minimum unit of listing data, mapping merchant levels to sets of `VanillaTradeListing`s. 
+
+ -Now `VanillaTradeRegistry` doesn't save listings, but maps keys and professions to sets of `VanillaTradeListingCollection` references.
+
+ -Now `VanillaTradeListingCollection`  and ``VanillaTradeRegistry``  are both readable from jsons.
+
+Added features about registry loading phase: Unavailable Before, Loading order, Event before generating values.
+
+Added `EntityAttributeProvider`,  (registry-able entity attribute data). Added the corresponding registry. 
 
 ### 0.1.28.1
 
