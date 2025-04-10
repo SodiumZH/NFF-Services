@@ -12,7 +12,7 @@ import java.util.function.*;
  */
 public class NaUtilsMapper<T, R> implements BiFunction<T, Object[], Optional<R>> {
 
-    public static <T, R extends T> NaUtilsMapper<T, R> instanceOfMapper(Class<T> inType, Class<R> outType) {
+    public static <T, R> NaUtilsMapper<T, R> instanceOfMapper(Class<T> inType, Class<R> outType) {
         return NaUtilsMapper.noVararg(inType, outType, t -> outType.isAssignableFrom(t.getClass()), t -> (R)t);
     }
 
