@@ -70,7 +70,9 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 				else return null;
 	});
 
-	
+	public static Optional<INFFTamed> get(Object o) {
+		return IS_TAMED_MAPPER.apply(o);
+	}
 
 	/* Common */
 	/**
@@ -120,7 +122,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	@Deprecated
 	public static boolean isTamedAnd(Object o, Predicate<INFFTamed> cond)
 	{
-		return IS_TAMED_MAPPER.apply(o).filter(cond).isPresent();
+		return get(o).filter(cond).isPresent();
 	}	
 	
 	/* Initialization */
@@ -259,13 +261,12 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		return null;
 	}
 	
-	
 	/** 
 	 * Get owner as UUID.
 	*/
 	@Override
 	@DontOverride
-	@Nonnull
+	@Nullable
 	public default UUID getOwnerUUID()
 	{
 		return this.getData().getOwnerUUID();
@@ -318,8 +319,17 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		return this.getOwnerInWorld() != null;
 	}
 
-	public default boolean isOwner(Entity test) {
+	public default boolean isOwnedBy(Entity test) {
 		return this.getOwnerUUID() != null && test != null && test.getUUID().equals(this.getOwnerUUID());
+	}
+
+	public default boolean isOwnedBy(UUID test) {
+		return this.getOwnerUUID() != null && test != null && Objects.equals(this.getOwnerUUID(), test);
+	}
+
+	@Deprecated
+	public default boolean isOwner(Entity test) {
+		return isOwnedBy(test);
 	}
 
 	/* -------------------------------------------------------- */
@@ -339,10 +349,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * By default it cycles among Wait, Follow and Wander.
 	 * <p>DO NOT override this. Override {@code getNextAIState()} instead.
 	 * @return The new AI state.
-	 * <p>========
-	 * <p>切换AI的操作预设，例如按下右键时。默认会在等待、跟随和游荡之间循环切换。
-	 * <p>不要重载这个函数。如有需要请重载{@code getNextAIState()}。
-	 * @return 新的AI状态。
 	 */
 	@DontOverride
 	public default NFFTamedMobAIState switchAIState()
@@ -357,8 +363,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Get the next AI State after a switching action e.g. right click.
 	 * <p>Called in {@code switchAIState()} above.
-	 * <p>获取切换后的AI状态。
-	 * <p>在上面的{@code switchAIState()}中调用。
 	 */
 	@DontCallManually
 	public default NFFTamedMobAIState getNextAIState()
@@ -370,9 +374,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Set the AI state.
 	 * @param postEvent Whether it should post a {@link NFFTamedChangeAiStateEvent}.
-	 * <p>========
-	 * <p>设置AI状态。
-	 * @param postEvent 是否需要发射{@link NFFTamedChangeAiStateEvent}事件。
 	 */
 	@DontOverride
 	public default void setAIState(NFFTamedMobAIState state, boolean postEvent)
