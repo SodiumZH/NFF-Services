@@ -1,10 +1,10 @@
-# NFE Library Instruction
+# NFU Library Instruction
 
 ## Overview
 
-NFE (Natrium Forge Extension) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
+NFU (Natrium Forge Utilities) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
 
-Now in code it's called "NaUtils" (Natrium Utilities), but will be changed to NFE some time.
+Now in code it's called "NaUtils" (Natrium Utilities), but will be changed to NFU some time.
 
 ## NaUtils Registry API
 
