@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
@@ -196,7 +197,7 @@ class BaubleRegistries
 	static boolean canEquipOn(ItemStack itemstack, Mob mob, String slot)
 	{
 		if (itemstack.getItem() == null) return false;
-		MutableObject<Boolean> res = new MutableObject<>(false);
+		AtomicReference<Boolean> res = new AtomicReference<>(false);
 		mob.getCapability(BaubleSystemCapabilities.CAP_BAUBLE_EQUIPPABLE_MOB).ifPresent(cap -> {
 			if (cap.isValid())
 			{
@@ -208,7 +209,7 @@ class BaubleRegistries
 					{
 						if (isRelatedEntry(itemstack, entry) && entry.getEquippingCondition().test(new BaubleProcessingArgs(itemstack, cap, slot)))
 						{
-							res.setValue(true);
+							res.set(true);
 							return;
 						}
 					}
@@ -220,14 +221,14 @@ class BaubleRegistries
 					{
 						if (entry.getEquippingCondition().test(new BaubleProcessingArgs(itemstack, cap, slot)))
 						{
-							res.setValue(true);
+							res.set(true);
 							return;
 						}
 					}
 				}
 			}
 		});
-		return res.getValue();
+		return res.get();
 	}
 	
 	/**

@@ -522,10 +522,10 @@ public class NFFEntityEventListeners
 				{
 					holder.updateBaubleEffects();
 				}*/
-				
+
 				// update befriended mob anchor position
-				if (mob instanceof INFFTamed bm)
-				{
+				INFFTamed.get(mob).ifPresent(bm -> {
+					// update befriended mob anchor position
 					if (bm.getAnchorPos() != null)
 					{
 						// Stop update when wandering
@@ -617,5 +617,14 @@ public class NFFEntityEventListeners
 		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
 			event.setCanceled(true);
 	}
-	
+
+	@SubscribeEvent
+	public static void onDiscard(EntityDiscardEvent event) {
+		INFFTamed.get(event.getEntity()).ifPresent(INFFTamed::removeLocationOnOwner);
+	}
+
+	@SubscribeEvent
+	public static void onStartDeath(LivingStartDeathEvent event) {
+		INFFTamed.get(event.getEntity()).ifPresent(INFFTamed::removeLocationOnOwner);
+	}
 }

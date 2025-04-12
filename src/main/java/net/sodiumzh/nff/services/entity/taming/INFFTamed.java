@@ -651,6 +651,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Get this as INFFTamed.
 	 */
+	@Deprecated
 	@DontOverride
 	public default INFFTamed getBM()
 	{
@@ -776,6 +777,134 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		this.getData().generateIdentifier();
 		this.getData().recordEntityType();
 		this.getData().recordEncounteredDate();
+	}
+
+	// ===== Mob Search ===
+
+	/**
+	 *  Only on server, record the current location to the owner's data.
+	 *  Called in {@link NFFEntityEventListeners#onLivingUpdate}.
+	 */
+	public default void recordLocationToOwner() {
+		Player player = this.getOwnerInWorld();
+		if (player == null) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
+				c.getNBT().put("tamedMobLocations", new CompoundTag());
+			MobLocationInfo info = MobLocationInfo.fromMob(this);
+			c.getNBT().getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
+		});
+	}
+
+	/**
+	 * Remove the location when the entity is removed.
+	 */
+	public default void removeLocationOnOwner() {
+		Player player = this.getOwnerInWorld();
+		if (player == null) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
+		});
+	}
+
+	/** Only on server, get all nffgirls mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
+	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
+		if (!(player.level instanceof ServerLevel sl)) return new HashMap<>();
+		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
+				new AtomicReference<>(new HashMap<>());
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
+			res.set(NaUtilsNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
+					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
+		});
+		return NaUtilsContainerStatics.iterableToMap(res.get().values().stream()
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.filter(MobLocationInfo::isValid)
+				.toList(),
+				MobLocationInfo::identifier, info -> info);
+	}
+
+	/**
+	 * Find tamed mob by its tamed mob identifier (not entity uuid). Will search in all loaded dimensions.
+	 * @param identifier Tamed mob identifier. (Not the entity UUID!)
+	 * @param context Any server level that can provide a context to the server.
+	 * @return Find result.
+	 */
+	public static Optional<Mob> byIdentifier(UUID identifier, ServerLevel context) {
+		for (ServerLevel sl: context.getServer().getAllLevels()) {
+			var list = sl.getEntities(EntityTypeTest.forClass(Mob.class), mob ->
+					INFFTamed.get(mob).filter(m -> m.getIdentifier().equals(identifier)).isPresent());
+			if (!list.isEmpty()) return Optional.of(list.get(0));
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Remove suspicious tamed location stored in player that the mob may no longer exist。
+	 * A suspicious location entry is defined as the entry in which the pos is loaded
+	 * but the mob isn't found in level。
+	 * */
+	public static void removeSuspiciousMobLocations(Player player) {
+		if (!(player.level instanceof ServerLevel sl)) return;
+		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+			List<UUID> levelLoadedIdentifiers = NaUtilsEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
+							e -> INFFTamed.get(e).filter(tamed -> Objects.equals(tamed.getOwner(), player)).isPresent())
+					.stream().map(e -> INFFTamed.get(e).orElse(null)).filter(Objects::nonNull)
+					.map(INFFTamed::getIdentifier).toList();
+			List<INFFTamed.MobLocationInfo> savedLocations =
+					c.getNBT().getCompound("tamedMobLocations").getAllKeys()
+							.stream().map(k -> INFFTamed.MobLocationInfo.load(c.getNBT().getCompound("tamedMobLocations").getCompound(k), sl))
+							.filter(Objects::nonNull).toList();
+			List<UUID> suspiciousIdentifiers = new ArrayList<>();
+			for (INFFTamed.MobLocationInfo loc: savedLocations) {
+				ServerLevel dim = sl.getServer().getLevel(loc.dimension());
+				if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
+					suspiciousIdentifiers.add(loc.identifier());
+			}
+			suspiciousIdentifiers.forEach(id -> c.getNBT().getCompound("tamedMobLocations").remove(id.toString()));
+		});
+	}
+
+	public static record MobLocationInfo(UUID identifier, Component mobName, ResourceKey<Level> dimension, BlockPos pos) {
+
+		public static MobLocationInfo fromMob(INFFTamed mob) {
+			return new MobLocationInfo(mob.getIdentifier(), mob.asMob().getName(),
+					mob.asMob().level.dimension(), mob.asMob().getOnPos());
+		}
+
+		public CompoundTag save() {
+			CompoundTag nbt = new CompoundTag();
+			nbt.putUUID("identifier", this.identifier());
+			nbt.putString("name", Component.Serializer.toJson(mobName()));
+			nbt.putString("dimension", dimension().location().toString());
+			nbt.putIntArray("pos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
+			return nbt;
+		}
+
+		@Nullable
+		public static MobLocationInfo load(CompoundTag nbt, ServerLevel context) {
+
+			if (!nbt.hasUUID("identifier")) return null;
+			UUID id = nbt.getUUID("identifier");
+			if (id.equals(new UUID(0L, 0L))) return null;
+
+			Component name = Component.Serializer.fromJson(nbt.getString("name"));
+
+			ResourceLocation dimKey = new ResourceLocation(nbt.getString("dimension"));
+			List<ResourceKey<Level>> dim = context.getServer().levelKeys().stream()
+					.filter(key -> key.location().equals(dimKey)).toList();
+			if (dim.isEmpty()) return null;
+
+			int[] posArray = nbt.getIntArray("pos");
+
+			return new MobLocationInfo(id, name, dim.get(0), new BlockPos(posArray[0], posArray[1], posArray[2]));
+		}
+
+		public boolean isValid() {
+			return !Objects.equals(identifier(), new UUID(0L, 0L))
+					&& mobName() != null && dimension() != null && pos() != null;
+		}
 	}
 
 }

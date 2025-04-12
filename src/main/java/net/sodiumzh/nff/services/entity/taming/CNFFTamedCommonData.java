@@ -615,6 +615,17 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
+		public LivingEntity getAttackTarget() {
+			if (this.getEntity().level.isClientSide) {
+				int id = this.getSynchedField(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
+				if (id < 0) return null;
+				Entity e = this.getEntity().level.getEntity(id);
+				return e instanceof LivingEntity living ? living : null;
+			}
+			else return this.getEntity().getTarget();
+		}
+
+		@Override
 		public LivingEntity getPreviousTarget() {
 			return this.previousTarget;
 		}
@@ -690,7 +701,35 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
-		public void setDataSyncInterval(int ticks)
+		public <T> void createSynchedField(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
+			this.synchedFieldAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
+			this.synchedFieldCache.put(key, defaultValue);
+		}
+
+		@Override
+		@Nullable
+		@SuppressWarnings("unchecked")
+		public <T> Optional<T> getSynchedField(String key, Class<T> type) {
+			if (this.getEntity().level.isClientSide())
+				return Optional.ofNullable((T) this.synchedFieldCache.get("key"));
+			else return Optional.ofNullable((T) this.synchedFieldAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
+					.getB().get());
+		}
+
+		@Override
+		@Nonnull
+		public CastableObject getSynchedField(String key) {
+			// Raw casting to Object is safe
+			return new CastableObject(this.getSynchedField(key, Object.class));
+		}
+
+		@Override
+		public void setSynchedFieldClient(String key, @Nonnull Object o) {
+			this.synchedFieldCache.put(key, o);
+		}
+
+		@Override
+		public void setSyncInterval(int ticks)
 		{
 			if (ticks <= 0)
 				throw new IllegalArgumentException();

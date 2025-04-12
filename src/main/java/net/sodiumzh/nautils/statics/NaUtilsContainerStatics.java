@@ -562,13 +562,88 @@ public class NaUtilsContainerStatics
 	{
 		if (subsetSize > parent.size())
 			throw new IllegalArgumentException("subsetSize is larger than parent size.");
-		ArrayList<T> copy = iterableToList(parent);
-		HashSet<T> res = new HashSet<>();
-		for (int i = 0; i < subsetSize; ++i)
-		{
-			int pos = rnd.nextInt(copy.size());
-			res.add(copy.get(pos));
-			copy.remove(pos);
+		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true);
+		List<T> list = parent.stream().toList();
+		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
+	}
+
+	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize, RandomSource rnd)
+	{
+		if (subsetSize > valuesAndWeights.size())
+			return new HashSet<>(valuesAndWeights.keySet());
+		Set<T> res = new HashSet<>();
+		WeightedRandomSelector<T> selector = new WeightedRandomSelector<>(valuesAndWeights);
+		for (int i = 0; i < subsetSize; ++i) {
+			T selected = selector.select(rnd);
+			res.add(selected);
+			selector.remove(selected);
+		}
+		return res;
+	}
+
+	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize) {
+		return getWeightedRandomSubset(valuesAndWeights, subsetSize, RND);
+	}
+
+	public static <T, K, V> Map<K, V> iterableToMap(Iterable<T> iterable, Function<T, K> keyMapper, Function<T, V> valueMapper) {
+		Map<K, V> res = new HashMap<>();
+		for (T t: iterable) {
+			res.put(keyMapper.apply(t), valueMapper.apply(t));
+		}
+		return res;
+	}
+
+	/**
+	 * Get map from arrays of keys and values. A key and a value with the same index will be mapped.
+	 * If the array lengths are different, the longer part will be ignored.
+	 */
+	public static <K, V> Map<K, V> arraysToMap(K[] keys, V[] values) {
+		Map<K, V> res = new HashMap<>();
+		for (int i = 0; i < Math.min(keys.length, values.length); ++i) {
+			res.put(keys[i], values[i]);
+		}
+		return res;
+	}
+
+	/**
+	 * Get map from an array of key-value pairs with format like [k1, v1, k2, v2, ...].
+	 * If the array length is odd, the last element will be ignored.
+	 */
+	public static <T> Map<T, T> entryPairsToMap(T[] entryPairs) {
+		Map<T, T> res = new HashMap<>();
+		for (int i = 0; i < entryPairs.length - 1; i += 2) {
+			res.put(entryPairs[i], entryPairs[i + 1]);
+		}
+		return res;
+	}
+
+	public static <T> Map<Integer, T> toIndexMap(List<T> values) {
+		Map<Integer, T> res = new HashMap<>();
+		for (int i = 0; i < values.size(); ++i) {
+			res.put(i, values.get(i));
+		}
+		return res;
+	}
+	public static <T> Map<Integer, T> toIndexMap(T[] values) {
+		Map<Integer, T> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
+		}
+		return res;
+	}
+
+	public static Map<Integer, Integer> toIndexMapInt(int[] values) {
+		Map<Integer, Integer> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
+		}
+		return res;
+	}
+
+	public static Map<Integer, Double> toIndexMapDouble(double[] values) {
+		Map<Integer, Double> res = new HashMap<>();
+		for (int i = 0; i < values.length; ++i) {
+			res.put(i, values[i]);
 		}
 		return res;
 	}
