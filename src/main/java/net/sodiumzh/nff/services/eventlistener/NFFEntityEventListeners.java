@@ -526,9 +526,7 @@ public class NFFEntityEventListeners
 					holder.updateBaubleEffects();
 				}*/
 
-				// update befriended mob anchor position
 				INFFTamed.get(mob).ifPresent(bm -> {
-
 					// update befriended mob anchor position
 					if (bm.getAnchorPos() != null)
 					{
@@ -647,6 +645,5 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onStartDeath(LivingStartDeathEvent event) {
 		INFFTamed.get(event.getEntity()).ifPresent(INFFTamed::removeLocationOnOwner);
-		
 	}
 }
