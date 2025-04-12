@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.entity.ai.goal.preset;
+package net.sodiumzh.nff.services.entity.ai.goal.presets;
 
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;

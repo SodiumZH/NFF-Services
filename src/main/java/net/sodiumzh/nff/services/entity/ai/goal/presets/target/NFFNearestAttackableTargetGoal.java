@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
+package net.sodiumzh.nff.services.entity.ai.goal.presets.target;
 
 import java.util.EnumSet;
 import java.util.function.Predicate;
