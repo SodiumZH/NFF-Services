@@ -679,10 +679,10 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public LivingEntity getAttackTarget() {
-			if (this.getEntity().level().isClientSide) {
+			if (this.getEntity().level.isClientSide) {
 				int id = this.getSynchedField(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
 				if (id < 0) return null;
-				Entity e = this.getEntity().level().getEntity(id);
+				Entity e = this.getEntity().level.getEntity(id);
 				return e instanceof LivingEntity living ? living : null;
 			}
 			else return this.getEntity().getTarget();
@@ -769,7 +769,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Nullable
 		@SuppressWarnings("unchecked")
 		public <T> Optional<T> getSynchedField(String key, Class<T> type) {
-			if (this.getEntity().level().isClientSide())
+			if (this.getEntity().level.isClientSide())
 				return Optional.ofNullable((T) this.synchedFieldCache.get("key"));
 			else return Optional.ofNullable((T) this.synchedFieldAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
 					.getB().get());

@@ -532,14 +532,6 @@ public class NaUtilsContainerStatics
 		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
 	}
 
-	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
-	{
-		if (subsetSize > parent.size()) return new HashSet<>(parent);
-		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true, RND);
-		List<T> list = parent.stream().toList();
-		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
-	}
-
 	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize, RandomSource rnd)
 	{
 		if (subsetSize > valuesAndWeights.size())

@@ -665,6 +665,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Get this as INFFTamed.
 	 */
+	@Deprecated
 	@DontOverride
 	public default INFFTamed getBM()
 	{
@@ -824,7 +825,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 
 	/** Only on server, get all nffgirls mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
 	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
-		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
+		if (!(player.level instanceof ServerLevel sl)) return new HashMap<>();
 		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
 				new AtomicReference<>(new HashMap<>());
 		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
@@ -849,7 +850,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	public static Optional<Mob> byIdentifier(UUID identifier, ServerLevel context) {
 		for (ServerLevel sl: context.getServer().getAllLevels()) {
 			var list = sl.getEntities(EntityTypeTest.forClass(Mob.class), mob ->
-					INFFTamed.isBM(mob) && INFFTamed.getBM(mob).getIdentifier().equals(identifier));
+					INFFTamed.get(mob).filter(m -> m.getIdentifier().equals(identifier)).isPresent());
 			if (!list.isEmpty()) return Optional.of(list.get(0));
 		}
 		return Optional.empty();
@@ -861,11 +862,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * but the mob isn't found in level。
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
-		if (!(player.level() instanceof ServerLevel sl)) return;
+		if (!(player.level instanceof ServerLevel sl)) return;
 		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
 			List<UUID> levelLoadedIdentifiers = NaUtilsEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
-							e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
-					.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
+							e -> INFFTamed.get(e).filter(tamed -> Objects.equals(tamed.getOwner(), player)).isPresent())
+					.stream().map(e -> INFFTamed.get(e).orElse(null)).filter(Objects::nonNull)
 					.map(INFFTamed::getIdentifier).toList();
 			List<INFFTamed.MobLocationInfo> savedLocations =
 					c.getNBT().getCompound("tamedMobLocations").getAllKeys()
@@ -885,7 +886,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 
 		public static MobLocationInfo fromMob(INFFTamed mob) {
 			return new MobLocationInfo(mob.getIdentifier(), mob.asMob().getName(),
-					mob.asMob().level().dimension(), mob.asMob().getOnPos());
+					mob.asMob().level.dimension(), mob.asMob().getOnPos());
 		}
 
 		public CompoundTag save() {
