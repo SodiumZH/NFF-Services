@@ -1,5 +1,7 @@
 package net.sodiumzh.nff.services.entity.taming;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -395,7 +397,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** 
-	 * <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingSetAttackTarget}.
+	 * <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingChangeTarget}.
 	 * Get the previous target before updating target.
 	 * This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	 */
@@ -407,7 +409,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	}
 	
 	/** 
-	* <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingSetAttackTarget}.
+	* <b> Don't call manually! </b> This method is only called in {@link NFFEntityEventListeners#onLivingChangeTarget}.
 	* Get the previous target after updating target.
 	* This function is only called on setting target. DO NOT CALL ANYWHERE ELSE!
 	*/

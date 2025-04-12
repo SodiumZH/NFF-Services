@@ -11,11 +11,13 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.sodiumzh.nautils.containers.MapPair;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.math.WeightedRandomSelector;
@@ -26,7 +28,7 @@ import net.sodiumzh.nautils.math.WeightedRandomSelector;
 public class NaUtilsContainerStatics
 {
 	
-	protected static Random rnd = new Random();
+	protected static RandomSource RND = RandomSource.create();
 	
 	/**
 	 * Remove all elements fulfilling a condition from a set
@@ -263,7 +265,7 @@ public class NaUtilsContainerStatics
 	 */
 	public static <T> T randomPickCollection(Collection<T> collection)
 	{
-		int r = rnd.nextInt(collection.size());
+		int r = RND.nextInt(collection.size());
 		int i = 0;
 		for (T t: collection)
 		{
@@ -288,7 +290,7 @@ public class NaUtilsContainerStatics
 	 */
 	public static <T> T randomPick(List<T> list)
 	{
-		return list.get(rnd.nextInt(0, list.size()));
+		return list.get(RND.nextInt(0, list.size()));
 	}
 	
 	/**
@@ -552,13 +554,12 @@ public class NaUtilsContainerStatics
 		return res;
 	}
 	
-	public static <T1, T2> void castListAndFill(List<T1> list, Function<T1, T2> cast, List<T2> fillInto)
-	{
+	public static <T1, T2> void castListAndFill(List<T1> list, Function<T1, T2> cast, List<T2> fillInto) {
 		fillInto.clear();
-		for (T1 elem: list)
-		{
+		for (T1 elem : list) {
 			fillInto.add(cast.apply(elem));
 		}
+	}
 
 	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize, RandomSource rnd)
 	{
