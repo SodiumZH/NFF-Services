@@ -19,8 +19,8 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = mod_version
-group = mod_group_id
+version = filename_version
+group = "net.sodiumzh"
 
 base {
     archivesName = archive_base_name
@@ -110,7 +110,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                "${mod_id}" {
+                "${common_mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -118,11 +118,11 @@ minecraft {
 
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', common_mod_id
         }
 
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', common_mod_id
             args '--nogui'
         }
 
@@ -130,7 +130,7 @@ minecraft {
         // By default, the server will crash when no gametests are provided.
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', common_mod_id
         }
 
         data {
@@ -138,7 +138,7 @@ minecraft {
             workingDirectory project.file('run-data')
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', common_mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
     }
 }
@@ -188,15 +188,15 @@ dependencies {
     }
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 	
 	//implementation fg.deobf("curse.maven:bettercombat-639842:5625757")
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
-    // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
+    // This maps to ./libs/coolmod-${minecraft_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+    // implementation fg.deobf("blank:coolmod-${minecraft_version}:${coolmod_version}")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
@@ -211,9 +211,13 @@ tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
             minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
             forge_version: forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+            loader_version_range: loader_version_range, license: license,
+            nfu_mod_id: nfu_mod_id, nfu_name: nfu_name, nfu_license: nfu_license,
+            nfu_version: nfu_version, nfu_authors: nfu_authors,
+            nfu_description: nfu_description, nfu_version_range: nfu_version_range,
+            nff_mod_id: nff_mod_id, nff_name: nff_name, nff_license: nff_license,
+            nff_version: nff_version, nff_authors: nff_authors,
+            nff_description: nff_description
     ]
     inputs.properties replaceProperties
 
@@ -227,12 +231,12 @@ tasks.named('jar', Jar).configure {
 	archiveClassifier = 'slim'
     manifest {
         attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
+                'Specification-Title'     : common_mod_id,
+                'Specification-Vendor'    : common_authors,
                 'Specification-Version'   : '1', // We are version 1 of ourselves
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Vendor'   : common_authors,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
