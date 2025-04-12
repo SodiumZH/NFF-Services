@@ -29,7 +29,8 @@ public abstract class NaUtilsMixinPlayer implements NaUtilsMixin<Player>
 	// Last condition is "this.distanceToSqr(livingentity) < entityReachSq", so make it false if cancelled
 	@WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V",
 			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/entity/player/Player;canHit(Lnet/minecraft/world/entity/Entity;D)Z"))
+					target = "Lnet/minecraft/world/entity/player/Player;canHit(Lnet/minecraft/world/entity/Entity;D)Z",
+			remap = false))
 	private boolean acceptSweepDamage(Player caller, Entity entity, double amount, Operation<Boolean> original)
 	{
 		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
