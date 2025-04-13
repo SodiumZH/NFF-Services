@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,6 +23,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -190,7 +190,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 	/**
 	 * Get the attack target. Same to {@link Mob#getTarget()} on server. On client,
-	 * it will be read from the synched field cache.
+	 * it will be read from the synched getter cache.
 	 */
 	@Nullable
 	public LivingEntity getAttackTarget();
@@ -241,39 +241,39 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value);
 
 	/**
-	 * Define a synched field. Synched fields get from a {@link Supplier} every tick from server and store it on client.
+	 * Define a synched getter. Synched getters get from a {@link Supplier} every tick from server and store it on client.
 	 * They are not saved into data.
 	 * <p>When a field is accessed on the client, it will read the cache value synched from server (if no synching happened,
 	 * it's the default value).
 	 */
-	public <T> void createSynchedField(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
+	public <T> void createSynchedGetter(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
 
 	/**
-	 * Get synched field from key and type.
+	 * Get synched getter from key and type.
 	 * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
 	 * and on client it will be read from the cached field which is updated on synching.
 	 * <p>Note: this includes an unsafe casting. Double-check the type before using.
 	 * Return {@code null} if not present.
 	 */
-	public <T> Optional<T> getSynchedField(String key, Class<T> type);
+	public <T> Optional<T> getSynchedGetter(String key, Class<T> type);
 
 	/**
-	 * Get a synched field as a raw {@link CastableObject}.
+	 * Get a synched getter as a raw {@link CastableObject}.
 	 * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
 	 * and on client it will be read from the cached field which is updated on synching.
 	 * <p> This method will never return {@code null}, but if the field is not present, return an empty {@link CastableObject}
 	 * of which {@code cast()} and {@code castTo} always return {@code null}.
 	 */
 	@Nonnull
-	public CastableObject getSynchedField(String key);
+	public CastableObject getSynchedGetter(String key);
 
 	/**
-	 * Set the key-value pair in the synched field cache on client.
+	 * Set the key-value pair in the synched getter cache on client.
 	 * <p>This is only used in synching process and should not be called elsewhere.
 	 * Safe to call on server as the cache on server will not be read.
 	 */
 	@DontCallManually
-	public void setSynchedFieldClient(String key, @Nonnull Object o);
+	public void setSynchedGetterClient(String key, @Nonnull Object o);
 
 	/**
 	 * Set how many ticks to do a sync (data and fields)/
@@ -337,9 +337,9 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
 			// Suppliers are only called on server. On client, this table is present for keeping a serializer instance
 			// to decode, but the suppliers will never be called.
-		private Map<String, Tuple<NaUtilsDataSerializer<?>, Supplier<?>>> synchedFieldAccessors = new HashMap<>();
+		private Map<String, Tuple<NaUtilsDataSerializer<?>, Supplier<?>>> synchedGetterAccessors = new HashMap<>();
 			// only called on client
-		private Map<String, Object> synchedFieldCache = new HashMap<>();
+		private Map<String, Object> synchedGetterCache = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
 		private MutablePredicate<INFFTamedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -357,7 +357,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializers.STRING, "");
 			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializers.INT_ARRAY, new int[] {2023, 1, 1});
 			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString());
-			this.createSynchedField(ATTACK_TARGET_SYNCHED_KEY, NaUtilsDataSerializers.INT, -1,
+			this.createSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, NaUtilsDataSerializers.INT, -1,
 					() -> Optional.ofNullable(this.getEntity().getTarget())
 							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
@@ -680,7 +680,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public LivingEntity getAttackTarget() {
 			if (this.getEntity().level.isClientSide) {
-				int id = this.getSynchedField(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
+				int id = this.getSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
 				if (id < 0) return null;
 				Entity e = this.getEntity().level.getEntity(id);
 				return e instanceof LivingEntity living ? living : null;
@@ -760,31 +760,31 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
-		public <T> void createSynchedField(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
-			this.synchedFieldAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
-			this.synchedFieldCache.put(key, defaultValue);
+		public <T> void createSynchedGetter(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
+			this.synchedGetterAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
+			this.synchedGetterCache.put(key, defaultValue);
 		}
 
 		@Override
 		@Nullable
 		@SuppressWarnings("unchecked")
-		public <T> Optional<T> getSynchedField(String key, Class<T> type) {
+		public <T> Optional<T> getSynchedGetter(String key, Class<T> type) {
 			if (this.getEntity().level.isClientSide())
-				return Optional.ofNullable((T) this.synchedFieldCache.get("key"));
-			else return Optional.ofNullable((T) this.synchedFieldAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
+				return Optional.ofNullable((T) this.synchedGetterCache.get("key"));
+			else return Optional.ofNullable((T) this.synchedGetterAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
 					.getB().get());
 		}
 
 		@Override
 		@Nonnull
-		public CastableObject getSynchedField(String key) {
+		public CastableObject getSynchedGetter(String key) {
 			// Raw casting to Object is safe
-			return new CastableObject(this.getSynchedField(key, Object.class));
+			return new CastableObject(this.getSynchedGetter(key, Object.class));
 		}
 
 		@Override
-		public void setSynchedFieldClient(String key, @Nonnull Object o) {
-			this.synchedFieldCache.put(key, o);
+		public void setSynchedGetterClient(String key, @Nonnull Object o) {
+			this.synchedGetterCache.put(key, o);
 		}
 
 		@Override
@@ -866,22 +866,23 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		public final CNFFTamedCommonData.Values dataCap;	// Only on server
 		public final int entityId;
 		public final Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> objects; // Synched data, only on client
-		public final Map<String, Object> fields; // Synched fields, only on client
-
+		public final Map<String, Object> getters; // Synched getters, only on client
+		public final List<ItemStack> inventory;
 
 		public ClientboundDataSyncPacket(CNFFTamedCommonData.Values v)
 		{
 			this.dataCap = v;
 			this.entityId = v.getBM().asMob().getId();
 			this.objects = null;
-			this.fields = null;
+			this.getters = null;
+			this.inventory = v.getAdditionalInventory().toList();
 		}
 		
 		public ClientboundDataSyncPacket(FriendlyByteBuf buf)
 		{
 			this.dataCap = null;
 			this.objects = new HashMap<>();
-			this.fields = new HashMap<>();
+			this.getters = new HashMap<>();
 			// Start reading
 			this.entityId = buf.readInt();
 			// Read data
@@ -899,7 +900,13 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				String key = buf.readUtf();
 				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
-				fields.put(key, new Tuple<>(type, obj));
+				getters.put(key, new Tuple<>(type, obj));
+			}
+			// Read inventory
+			this.inventory = new ArrayList<>();
+			int inventorySize = buf.readInt();
+			for (int i = 0; i < inventorySize; ++i) {
+				inventory.add(buf.readItem());
 			}
 		}
 		
@@ -907,21 +914,26 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		public void write(FriendlyByteBuf buf) 
 		{
 			buf.writeInt(entityId);
-			// Read synched data
+			// Write synched data
 			buf.writeInt(dataCap.synchedData.size());
 			for (var entry: dataCap.synchedData.entrySet()) {
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().getA().getKey().toString());
 				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
 			}
-			// Read synched fields
-			buf.writeInt(dataCap.synchedFieldAccessors.size());
-			for (var entry: dataCap.synchedFieldAccessors.entrySet()) {
+			// Write synched getters
+			buf.writeInt(dataCap.synchedGetterAccessors.size());
+			for (var entry: dataCap.synchedGetterAccessors.entrySet()) {
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().getA().getKey().toString());
 				// Access the value and write
 				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB().get());
 			}
+			// Write inventory
+			buf.writeInt(this.inventory.size());
+            for (ItemStack itemStack : this.inventory) {
+                buf.writeItemStack(itemStack, true);
+            }
 		}
 
 		@Override

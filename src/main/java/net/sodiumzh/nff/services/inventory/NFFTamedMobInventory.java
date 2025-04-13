@@ -4,12 +4,16 @@ import javax.annotation.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NFFTamedMobInventory extends SimpleContainer
 {
@@ -238,4 +242,26 @@ public class NFFTamedMobInventory extends SimpleContainer
 	{
 		return (T) this;
 	}
+
+	/**
+	 * Convert inventory to item stack list..
+	 */
+	public List<ItemStack> toList() {
+		List<ItemStack> list = new ArrayList<>();
+		for (int i = 0; i < this.getContainerSize(); ++i) {
+			list.add(this.getItem(i));
+		}
+		return list;
+	}
+
+	/**
+	 * Set items from item stack list. If list is shorter, the additional item stacks will keep unchanged.
+	 * If the list is longer, the longer part will be ignored.
+	 */
+	public void fromList(List<ItemStack> list) {
+		for (int i = 0; i < list.size(); ++i) {
+			if (i < this.getContainerSize()) this.setItem(i, list.get(i));
+		}
+	}
+
 }
