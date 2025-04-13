@@ -59,6 +59,9 @@ public class NFFClientGamePacketHandler
 		e.getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
 			for (var entry: packet.objects.entrySet())
 				c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
+			for (var entry: packet.getters.entrySet())
+				c.setSynchedGetterClient(entry.getKey(), entry. getValue());
+			c.getAdditionalInventory().fromList(packet.inventory);
 		});
 	}
 }
