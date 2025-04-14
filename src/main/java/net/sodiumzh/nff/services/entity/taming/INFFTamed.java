@@ -505,22 +505,24 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 *  Set mob data from befriendedInventory.
 	 *  <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#syncToMob} instead.
+	 * @deprecated Use {@code getAdditionalInventory().syncToMob(this.asMob())}.
 	 */
+	@Deprecated
 	@DontOverride
 	public default void updateFromInventory()
 	{
-		if (!this.asMob().level.isClientSide)
-			this.getAdditionalInventory().syncToMob(this.asMob());
+		this.getAdditionalInventory().syncToMob(this.asMob());
 	}
 	
 	/** Set befriendedInventory from mob data, usually for initializing
 	 * <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#getFromMob} instead.
+	 * @deprecated Use {@code getAdditionalInventory().getFromMob(this.asMob())}.
 	 */
 	@DontOverride
+	@Deprecated
 	public default void setInventoryFromMob()
 	{
-		if (!this.asMob().level.isClientSide)
-			this.getAdditionalInventory().getFromMob(this.asMob());
+		this.getAdditionalInventory().getFromMob(this.asMob());
 	}
 
 	@Nullable
