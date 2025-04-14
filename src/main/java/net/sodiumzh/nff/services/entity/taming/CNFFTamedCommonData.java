@@ -808,9 +808,15 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				// TODO remove this. It's for porting legacy format.
 				if (this.getOwnerName() == "" && this.getBM().isOwnerInDimension())
 					this.setOwnerName(this.getBM().getOwnerInDimension().getName().getString());
-				// Sync inventory. This is to prevent cases when inventory is not correctly synched to mob.
-				this.getAdditionalInventory().syncToMob(this.getEntity());
 			}
+			// Sync inventory. This is to prevent cases when inventory is not correctly synched to mob.
+			this.getAdditionalInventory().syncToMob(this.getEntity());
+		}
+
+		@Override
+		public TickingSide getTickingSide()
+		{
+			return TickingSide.BOTH;
 		}
 
 		@Override
