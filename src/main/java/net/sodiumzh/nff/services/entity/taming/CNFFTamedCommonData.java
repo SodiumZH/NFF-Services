@@ -243,7 +243,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	/**
 	 * Define a synched getter. Synched getters get from a {@link Supplier} every tick from server and store it on client.
 	 * They are not saved into data.
-	 * <p>When a field is accessed on the client, it will read the cache value synched from server (if no synching happened,
+	 * <p>When a synched getter is accessed on the client, it will read the cache value synched from server (if no synching happened,
 	 * it's the default value).
 	 */
 	public <T> void createSynchedGetter(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
