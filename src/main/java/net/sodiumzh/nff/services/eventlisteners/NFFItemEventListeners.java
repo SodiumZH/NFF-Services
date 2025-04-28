@@ -6,10 +6,9 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.mixin.event.entity.EntityTickEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityTickEvent;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.event.entity.ServerEntityTickEvent;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 

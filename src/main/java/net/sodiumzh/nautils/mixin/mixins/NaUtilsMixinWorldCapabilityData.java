@@ -10,7 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.WorldCapabilityData;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.level.WorldCapabilityDataLoadEvent;
+import net.sodiumzh.nautils.mixin.events.level.WorldCapabilityDataLoadEvent;
 
 @Mixin(WorldCapabilityData.class)
 public class NaUtilsMixinWorldCapabilityData implements NaUtilsMixin<WorldCapabilityData>

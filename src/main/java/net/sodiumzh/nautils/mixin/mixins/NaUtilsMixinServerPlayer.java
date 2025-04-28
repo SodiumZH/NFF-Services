@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.MonsterPreventSleepEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MonsterPreventSleepEvent;
 
 @Mixin(ServerPlayer.class)
 public class NaUtilsMixinServerPlayer implements NaUtilsMixin<ServerPlayer>

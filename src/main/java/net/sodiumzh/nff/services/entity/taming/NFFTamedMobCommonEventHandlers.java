@@ -2,9 +2,9 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.mixin.event.entity.MobCheckDespawnEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MobSunBurnTickEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MonsterPreventSleepEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobCheckDespawnEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MonsterPreventSleepEvent;
 import net.sodiumzh.nff.services.NFFServices;
 
 /**
@@ -19,7 +19,7 @@ public class NFFTamedMobCommonEventHandlers
 	@SubscribeEvent
 	public static void preventSleep(MonsterPreventSleepEvent event)
 	{
-		INFFTamed.ifBM(event.getEntity(), bm -> {
+		INFFTamed.ifTamed(event.getEntity(), bm -> {
 			if (bm.getOwnerUUID().equals(event.getPlayer().getUUID()) || bm.canPreventOtherPlayersSleep(event.getPlayer()))
 				event.setCanceled(true);
 		});
@@ -31,7 +31,7 @@ public class NFFTamedMobCommonEventHandlers
 	@SubscribeEvent
 	public static void checkDespawn(MobCheckDespawnEvent event)
 	{
-		INFFTamed.ifBM(event.getEntity(), bm -> event.setCanceled(true));
+		INFFTamed.ifTamed(event.getEntity(), bm -> event.setCanceled(true));
 	}
 	
 	/**

@@ -8,7 +8,6 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Table;
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.LogicalSide;
@@ -38,7 +37,7 @@ import javax.swing.plaf.PanelUI;
  */
 public class VanillaTradeRegistry
 {
-	private static final RandomSource RND = RandomSource.create();
+	private static final Random RND = new Random();
 	private final SetMultimap<Tuple2<ResourceLocation, VillagerProfession>, VanillaTradeListingCollection<?>> table;
 
 	@Nullable
@@ -188,7 +187,7 @@ public class VanillaTradeRegistry
 						VillagerProfession prof =
 								NaUtilsDataStatics.getOptional(elem.getAsJsonObject(), "profession", JsonElement::getAsString)
 										.map(ResourceLocation::new)
-										.map(ForgeRegistries.VILLAGER_PROFESSIONS::getValue)
+										.map(ForgeRegistries.PROFESSIONS::getValue)
 										.orElse(lastProf);
 						Set<VanillaTradeListingCollection<?>> collections =
 								NaUtilsDataStatics.getOptionalList(elem.getAsJsonObject(), "collections", JsonElement::getAsString,

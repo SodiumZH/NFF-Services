@@ -9,7 +9,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.ProjectileHitEvent;
+import net.sodiumzh.nautils.mixin.events.entity.ProjectileHitEvent;
 
 @Mixin(Projectile.class)
 public class NaUtilsMixinProjectile implements NaUtilsMixin<Projectile>

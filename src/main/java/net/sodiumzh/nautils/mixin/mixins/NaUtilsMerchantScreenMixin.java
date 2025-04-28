@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.client.entity.MerchantOfferUnavailableInfoEvent;
+import net.sodiumzh.nautils.mixin.events.client.entity.MerchantOfferUnavailableInfoEvent;
 
 @Mixin(MerchantScreen.class)
 public class NaUtilsMerchantScreenMixin implements NaUtilsMixin<MerchantScreen>

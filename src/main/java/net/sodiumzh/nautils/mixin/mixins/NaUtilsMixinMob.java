@@ -1,7 +1,6 @@
 package net.sodiumzh.nautils.mixin.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,11 +17,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
 import net.sodiumzh.nautils.mixin.NaUtilsMixinHooks;
-import net.sodiumzh.nautils.mixin.event.entity.MobCheckDespawnEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MobFinalizePickingUpItemEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MobInteractEvent;
-import net.sodiumzh.nautils.mixin.event.entity.MobPickUpItemEvent;
-import net.sodiumzh.nautils.mixin.events.entity.MobRegisterGoalsEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobCheckDespawnEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobFinalizePickingUpItemEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobInteractEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobPickUpItemEvent;
 
 @Mixin(Mob.class)
 public class NaUtilsMixinMob implements NaUtilsMixin<Mob>

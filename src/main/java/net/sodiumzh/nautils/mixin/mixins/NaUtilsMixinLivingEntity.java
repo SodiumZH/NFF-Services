@@ -13,8 +13,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.LivingStartDeathEvent;
-import net.sodiumzh.nautils.mixin.event.entity.LootCheckPlayerKillEvent;
+import net.sodiumzh.nautils.mixin.events.entity.LivingStartDeathEvent;
+import net.sodiumzh.nautils.mixin.events.entity.LootCheckPlayerKillEvent;
 
 @Mixin(LivingEntity.class)
 public class NaUtilsMixinLivingEntity implements NaUtilsMixin<LivingEntity>

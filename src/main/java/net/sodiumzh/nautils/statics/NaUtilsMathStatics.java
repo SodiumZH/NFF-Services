@@ -3,6 +3,7 @@ package net.sodiumzh.nautils.statics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import com.mojang.logging.LogUtils;
@@ -334,7 +335,7 @@ public class NaUtilsMathStatics
 	 * @param unique If true, each element of the output sequence will be unique.
 	 * @param rnd Random source.
 	 */
-	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique, RandomSource rnd) {
+	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique, Random rnd) {
 		if (amount > maxEx && unique)
 			throw new IllegalArgumentException("getRandomIntegerSequence unique requires amount <= maxEx");
 		List<Integer> all = NaUtilsContainerStatics.intRangeList(0, amount, 1);

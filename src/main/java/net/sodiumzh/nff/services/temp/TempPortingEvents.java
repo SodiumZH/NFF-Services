@@ -2,8 +2,8 @@ package net.sodiumzh.nff.services.temp;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.mixin.event.entity.EntityFinalizeLoadingEvent;
-import net.sodiumzh.nautils.mixin.event.entity.EntityLoadEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityFinalizeLoadingEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
@@ -28,7 +28,7 @@ public class TempPortingEvents
 	@SubscribeEvent
 	public static void afterLoad(EntityFinalizeLoadingEvent event)
 	{
-		INFFTamed.ifBM(event.getEntity(), bm -> {
+		INFFTamed.ifTamed(event.getEntity(), bm -> {
 			bm.updateFromInventory();
 			bm.init(bm.getOwnerUUID(), null);
 			bm.setInit();

@@ -2,7 +2,6 @@ package net.sodiumzh.nautils.mixin.mixins;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nautils.item.INaUtilsItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
-import net.sodiumzh.nautils.mixin.event.entity.LivingEntitySweepHurtEvent;
+import net.sodiumzh.nautils.mixin.events.entity.LivingEntitySweepHurtEvent;
 
 @Mixin(Player.class)
 public abstract class NaUtilsMixinPlayer implements NaUtilsMixin<Player>

@@ -8,20 +8,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
-import net.minecraft.CrashReport;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nautils.mixin.NaUtilsMixin;
 import net.sodiumzh.nautils.mixin.NaUtilsMixinHooks;
-import net.sodiumzh.nautils.mixin.event.entity.EntityFinalizeLoadingEvent;
-import net.sodiumzh.nautils.mixin.event.entity.EntityLoadEvent;
-import net.sodiumzh.nautils.mixin.event.entity.EntityTickEvent;
-import net.sodiumzh.nautils.registries.NaUtilsConfigs;
+import net.sodiumzh.nautils.mixin.events.entity.EntityFinalizeLoadingEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
+import net.sodiumzh.nautils.mixin.events.entity.EntityTickEvent;
 
 @Mixin(Entity.class)
 public class NaUtilsMixinEntity implements NaUtilsMixin<Entity> {
