@@ -88,6 +88,7 @@ public abstract class NFFTamedGUI extends AbstractContainerScreen<NFFTamedInvent
 	 * GuiPos version of blit
 	 * @deprecated use {@code drawSprite} instead which has identical functions.
 	 */
+	@Deprecated
 	public void blit(PoseStack poseStack, GuiPos xy, GuiPos uvOffset, GuiPos uvSize)
 	{
 		blit(poseStack, xy.x, xy.y, uvOffset.x, uvOffset.y, uvSize.x, uvSize.y);
