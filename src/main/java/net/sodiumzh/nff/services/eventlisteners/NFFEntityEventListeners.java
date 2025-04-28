@@ -11,7 +11,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.TickEvent;
@@ -30,7 +29,8 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nautils.entity.anger.MobAngerReason;
 import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nautils.mixin.event.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nautils.mixin.events.entity.LivingStartDeathEvent;
+import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
 import net.sodiumzh.nautils.mixin.events.entity.EntityDiscardEvent;
 import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
@@ -48,9 +48,6 @@ import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import java.util.UUID;
 
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

@@ -1,4 +1,4 @@
-package net.sodiumzh.nautils.mixin.event.entity;
+package net.sodiumzh.nautils.mixin.events.entity;
 
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.sodiumzh.nautils.events.NaUtilsEntityEvent;

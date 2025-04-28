@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 
 import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.sodiumzh.nautils.containers.MapPair;
 import net.sodiumzh.nautils.math.RandomSelection;
 import net.sodiumzh.nautils.math.WeightedRandomSelector;
@@ -20,7 +19,7 @@ import net.sodiumzh.nautils.math.WeightedRandomSelector;
  */
 public class NaUtilsContainerStatics
 {
-	private static final RandomSource RND = RandomSource.create();
+	private static final Random RND = new Random();
 	
 	/**
 	 * Remove all elements meeting a condition from a set
@@ -522,15 +521,6 @@ public class NaUtilsContainerStatics
 		fillInto.clear();
 		fillInto.addAll(list.stream().map(cast).toList());
 	}
-	
-	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
-	{
-		if (subsetSize > parent.size())
-			throw new IllegalArgumentException("subsetSize is larger than parent size.");
-		List<Integer> pickedIndexes = NaUtilsMathStatics.getRandomIntegerSequence(parent.size(), subsetSize, true);
-		List<T> list = parent.stream().toList();
-		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
-	}
 
 	public static <T> Set<T> getRandomSubset(Set<T> parent, int subsetSize)
 	{
@@ -540,7 +530,7 @@ public class NaUtilsContainerStatics
 		return pickedIndexes.stream().map(list::get).collect(Collectors.toSet());
 	}
 
-	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize, RandomSource rnd)
+	public static <T> Set<T> getWeightedRandomSubset(Map<T, Double> valuesAndWeights, int subsetSize, Random rnd)
 	{
 		if (subsetSize > valuesAndWeights.size())
 			return new HashSet<>(valuesAndWeights.keySet());

@@ -28,6 +28,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class NaUtilsDataStatics {
 
@@ -61,17 +62,20 @@ public class NaUtilsDataStatics {
     {
         ResourceManager mgr = getResourceManager(side).orElse(null);
         if (mgr == null) return;
-        List<Resource> resources = mgr.getResourceStack(location);
-        for (Resource r: resources)
-        {
-            try (InputStream input = r.open()){
-                Reader inputReader = new InputStreamReader(input);
-                JsonElement json = JsonParser.parseReader(inputReader);
-                reader.accept(json);
-            } catch (RuntimeException e) {
-                if (!suppressStackTrace)
-                    e.printStackTrace();
+        try {
+            List<Resource> resources = mgr.getResources(location);
+            for (Resource r : resources) {
+                try (InputStream input = r.getInputStream()) {
+                    Reader inputReader = new InputStreamReader(input);
+                    JsonElement json = JsonParser.parseReader(inputReader);
+                    reader.accept(json);
+                } catch (RuntimeException e) {
+                    if (!suppressStackTrace)
+                        e.printStackTrace();
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -229,9 +233,18 @@ public class NaUtilsDataStatics {
         List<Tuple2<ResourceLocation, JsonElement>> res = new ArrayList<>();
         ResourceManager mgr = getResourceManager(side).orElse(null);
         if (mgr == null) return res;
-        mgr.listResourceStacks(path, l -> l.getPath().endsWith(".json")).entrySet().forEach(entry -> {
+        Map<ResourceLocation, List<Resource>> resourceMap = new HashMap<>();
+        mgr.listResources(path, l -> l.endsWith(".json")).stream()
+                .forEach(loc -> {
+                    try {
+                        resourceMap.put(loc, mgr.getResources(loc));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        resourceMap.entrySet().forEach(entry -> {
             entry.getValue().stream().map(r -> {
-                try (InputStream input = r.open()) {
+                try (InputStream input = r.getInputStream()) {
                     Reader inputReader = new InputStreamReader(input);
                     return JsonParser.parseReader(inputReader);
                 } catch (IOException | RuntimeException e) {

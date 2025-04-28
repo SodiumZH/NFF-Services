@@ -1,4 +1,4 @@
-package net.sodiumzh.nautils.mixin.event.level;
+package net.sodiumzh.nautils.mixin.events.level;
 
 import javax.annotation.Nonnull;
 

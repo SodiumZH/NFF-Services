@@ -1,4 +1,4 @@
-package net.sodiumzh.nautils.mixin.event.client.entity;
+package net.sodiumzh.nautils.mixin.events.client.entity;
 
 import java.util.List;
 
