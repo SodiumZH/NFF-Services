@@ -20,7 +20,7 @@
     "NaUtilsMixinServerPlayer",
     "NaUtilsMixinTagBuilder",
     "NaUtilsMixinThrownTrident",
-    "NaUtilsMixinWorldCapabilityData"
+    "NaUtilsMixinWorldCapabilityData",
     "NaUtilsMixinServerPlayerGameMode",
     "NaUtilsMixinThrownTrident"
   ],
