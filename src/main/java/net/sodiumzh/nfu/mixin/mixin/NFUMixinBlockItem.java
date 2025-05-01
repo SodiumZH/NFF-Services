@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(BlockItem.class)
-public class NFUBlockItemMixin implements NFUMixin<BlockItem> {
+public class NFUMixinBlockItem implements NFUMixin<BlockItem> {
 
     @WrapOperation(method = "place(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/InteractionResult;",
         at = @At(value = "INVOKE", target = "net/minecraft/world/item/ItemStack.shrink (I)V"))
