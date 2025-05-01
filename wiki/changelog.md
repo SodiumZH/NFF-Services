@@ -1,5 +1,13 @@
 # Change Log
 
+### 0.2.29.1
+
+##### NFF Services
+
+Now mob's inventory is synched from server to client.
+
+Now items are synched from inventory to mob equipment on both sides instead of server only.
+
 ### 0.x.29
 
 ##### NFF Services
@@ -8,9 +16,9 @@ Now mobs will auto save their locations to the owner.
 
 Now anchored patrol radius is 16 instead of 64 by default.
 
-##### NFE Library
+##### NFU Library
 
-NaUtils is now named "NFE Library". NFE stands for "Natrium Forge Extension". Now code is not renamed yet.
+NaUtils is now named "NFU Library". NFU stands for "Natrium Forge Utilities". Now code is not renamed yet.
 
 Added Mixin Events: `EntityLoadFailedEvent`, `GrindstoneAcceptItemEvent`, `LivingRendererCheckSitEvent`, `EnderManStartSettingTargetEvent`
 
