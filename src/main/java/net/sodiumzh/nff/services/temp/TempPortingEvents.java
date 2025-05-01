@@ -2,8 +2,8 @@ package net.sodiumzh.nff.services.temp;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.mixin.events.entity.EntityFinalizeLoadingEvent;
-import net.sodiumzh.nautils.mixin.events.entity.EntityLoadEvent;
+import net.sodiumzh.nfu.mixin.event.entity.EntityFinalizeLoadingEvent;
+import net.sodiumzh.nfu.mixin.event.entity.EntityLoadEvent;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 

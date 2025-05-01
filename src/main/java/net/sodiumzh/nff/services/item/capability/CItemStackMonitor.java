@@ -11,8 +11,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nautils.annotation.DontOverride;
-import net.sodiumzh.nautils.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 

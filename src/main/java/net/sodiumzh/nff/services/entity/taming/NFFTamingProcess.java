@@ -1,46 +1,27 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.capability.CEntityTimerCapability;
-import net.sodiumzh.nautils.entity.anger.MobAngerReason;
-import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nautils.entity.anger.MobSetAngerResult;
-import net.sodiumzh.nautils.entity.taming.ITamingProcess;
-import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nautils.math.RandomSelection;
-import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
+import net.sodiumzh.nfu.capability.CEntityTimerCapability;
+import net.sodiumzh.nfu.entity.anger.MobAngerReason;
+import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.entity.taming.ITamingProcess;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.BMHooks;
-import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.text.html.Option;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>
@@ -83,7 +64,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		//ClientboundTamedInitPacket packet = new ClientboundTamedInitPacket(target);
 		
 		// Do conversion
-		Mob newMob = NaUtilsEntityStatics.replaceMob(newType, target);
+		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
 		if(!(newMob instanceof INFFTamed))
 			throw new RuntimeException("Befriending: Entity type after befriending not implementing INFFTamed interface.");
 		INFFTamed bm = (INFFTamed)newMob;
@@ -199,6 +180,6 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	 */
 	protected void debugPrint(Player printTo, String info) {
 		if (printTo.getOffhandItem().is(NFFItemRegistry.NFF_DEBUG_SIGN.get()))
-			NaUtilsMiscStatics.printToScreen(info, printTo);
+			NFUMiscStatics.printToScreen(info, printTo);
 	}
 }

@@ -1,0 +1,17 @@
+package net.sodiumzh.nfu.annotation;
+
+import static java.lang.annotation.ElementType.METHOD;
+
+import java.lang.annotation.Target;
+
+/**
+ * Labels that the default method is not recommended to override.
+ * Continue overriding these methods may cause unexpected errors.
+ */
+@Target(METHOD)
+public @interface DontOverride {
+
+// TODO Implement as a compile-time check which throws error if the user is overriding the method with this annotation without adding {@link @SuppressWarnings("override")}
+
+}
+

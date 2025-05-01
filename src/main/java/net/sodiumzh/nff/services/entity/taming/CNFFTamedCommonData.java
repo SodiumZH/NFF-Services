@@ -33,14 +33,14 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nautils.annotation.DontCallManually;
-import net.sodiumzh.nautils.capability.CEntityTickingCapability;
-import net.sodiumzh.nautils.function.MutablePredicate;
-import net.sodiumzh.nautils.network.NaUtilsDataSerializer;
-import net.sodiumzh.nautils.network.NaUtilsDataSerializers;
-import net.sodiumzh.nautils.object.CastableObject;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
-import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.function.MutablePredicate;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
+import net.sodiumzh.nfu.network.NFUDataSerializers;
+import net.sodiumzh.nfu.object.CastableObject;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
@@ -221,7 +221,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	 * @param dataSerialzier Data serializer applied.
 	 * @param initValue Default value if not set.
 	 */
-	public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerialzier, T initValue);	
+	public <T> void createSynchedData(String key, NFUDataSerializer<T> dataSerialzier, T initValue);
 
 	public <T> boolean hasSynchedData(String key, Class<T> dataType);
 
@@ -237,7 +237,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	 */
 	public <T> void setSynchedData(String key, Class<T> dataClass, T value);
 	
-	public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value);
+	public void setSynchedDataClient(String key, NFUDataSerializer<?> serializer, Object value);
 
 	/**
 	 * Define a synched getter. Synched getters get from a {@link Supplier} every tick from server and store it on client.
@@ -245,7 +245,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	 * <p>When a field is accessed on the client, it will read the cache value synched from server (if no synching happened,
 	 * it's the default value).
 	 */
-	public <T> void createSynchedGetter(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
+	public <T> void createSynchedGetter(String key, NFUDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer);
 
 	/**
 	 * Get synched getter from key and type.
@@ -333,10 +333,10 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		// Misc
 		private boolean hasInit = false;
 		// Syncher
-		private Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> synchedData = new HashMap<>();
+		private Map<String, Tuple<NFUDataSerializer<?>, Object>> synchedData = new HashMap<>();
 			// Suppliers are only called on server. On client, this table is present for keeping a serializer instance
 			// to decode, but the suppliers will never be called.
-		private Map<String, Tuple<NaUtilsDataSerializer<?>, Supplier<?>>> synchedGetterAccessors = new HashMap<>();
+		private Map<String, Tuple<NFUDataSerializer<?>, Supplier<?>>> synchedGetterAccessors = new HashMap<>();
 			// only called on client
 		private Map<String, Object> synchedGetterCache = new HashMap<>();
 		private int syncInterval = 1;
@@ -351,12 +351,12 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			this.anchor = mob.asMob().position();
 			this.nbt = new CompoundTag();
 			this.inventory = this.getBM().createAdditionalInventory();
-			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NaUtilsDataSerializers.UUID, EMPTY_UUID);
-			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NaUtilsDataSerializers.STRING, "");
-			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NaUtilsDataSerializers.INT_ARRAY, new int[] {2023, 1, 1});
-			this.createSynchedData(AI_STATE_SYNCHED_KEY, NaUtilsDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString());
-			this.createSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, NaUtilsDataSerializers.INT, -1,
+			this.createSynchedData(IDENTIFIER_SYNCHED_KEY, NFUDataSerializers.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_UUID_SYNCHED_KEY, NFUDataSerializers.UUID, EMPTY_UUID);
+			this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NFUDataSerializers.STRING, "");
+			this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NFUDataSerializers.INT_ARRAY, new int[] {2023, 1, 1});
+			this.createSynchedData(AI_STATE_SYNCHED_KEY, NFUDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString());
+			this.createSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, NFUDataSerializers.INT, -1,
 					() -> Optional.ofNullable(this.getEntity().getTarget())
 							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
@@ -378,7 +378,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		private boolean isEntityFirstTick()
 		{
-			return NaUtilsReflectionStatics.forceGet(this.getBM().asMob(), Entity.class, "f_19803_").cast();
+			return NFUReflectionStatics.forceGet(this.getBM().asMob(), Entity.class, "f_19803_").cast();
 		}
 		
 		@Override
@@ -397,7 +397,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			//if (this.getEncounteredDate() != null) save.putIntArray("encounteredDate", getEncounteredDate()); 
 			//else save.putIntArray("encounteredDate", new int[] {0, 0, 0});	// TODO: remove after 0.x.30
 			// Behavior
-			NaUtilsNBTStatics.putVec3(save, "randomStrollAnchor", this.getAnchor());
+			NFUNBTStatics.putVec3(save, "randomStrollAnchor", this.getAnchor());
 			//save.putString("aiState", this.getAIState().getId().toString());
 			// Inventory
 			this.getAdditionalInventory().saveToTag(save, "additionalInventory");
@@ -416,7 +416,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				//this.setOwnerName(nbt.getString("ownerName"));
 				//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
 				//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
-				this.setAnchor(NaUtilsNBTStatics.getVec3(nbt, "randomStrollAnchor"));
+				this.setAnchor(NFUNBTStatics.getVec3(nbt, "randomStrollAnchor"));
 				//this.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
 				this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
 			}
@@ -469,7 +469,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			{
 				CompoundTag entryNBT = new CompoundTag();
 				entryNBT.putString("serializer", entry.getValue().getA().getKey().toString());
-				entryNBT.put("value", NaUtilsDataSerializer.toTagUnchecked(entry.getValue().getA(), entry.getValue().getB()));
+				entryNBT.put("value", NFUDataSerializer.toTagUnchecked(entry.getValue().getA(), entry.getValue().getB()));
 				nbt.put(entry.getKey(), entryNBT);
 			}
 			return nbt;
@@ -480,7 +480,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			for (String key: nbt.getAllKeys())
 			{
 				CompoundTag entryNBT = nbt.getCompound(key);
-				NaUtilsDataSerializer<?> s = NaUtilsDataSerializer.fromId(new ResourceLocation(entryNBT.getString("serializer")));
+				NFUDataSerializer<?> s = NFUDataSerializer.fromId(new ResourceLocation(entryNBT.getString("serializer")));
 				this.synchedData.put(key, new Tuple<>(s, s.fromTag(entryNBT.get("value"))));
 			}
 		}
@@ -698,7 +698,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 		
 		@Override
-		public <T> void createSynchedData(String key, NaUtilsDataSerializer<T> dataSerializer, T defaultValue)
+		public <T> void createSynchedData(String key, NFUDataSerializer<T> dataSerializer, T defaultValue)
 		{
 			this.synchedData.put(key, new Tuple<>(dataSerializer, defaultValue));
 		}
@@ -741,7 +741,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		@SuppressWarnings("resource")
 		@Override
-		public void setSynchedDataClient(String key, NaUtilsDataSerializer<?> serializer, Object value)
+		public void setSynchedDataClient(String key, NFUDataSerializer<?> serializer, Object value)
 		{
 			if (!this.isClientSide())
 				throw new IllegalStateException("CNFFTamedCommonData synched data: setSynchedDataClient only on client. On server use setSynchedData() instead.");
@@ -759,7 +759,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
-		public <T> void createSynchedGetter(String key, NaUtilsDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
+		public <T> void createSynchedGetter(String key, NFUDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
 			this.synchedGetterAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
 			this.synchedGetterCache.put(key, defaultValue);
 		}
@@ -870,7 +870,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	{
 		public final CNFFTamedCommonData.Values dataCap;	// Only on server
 		public final int entityId;
-		public final Map<String, Tuple<NaUtilsDataSerializer<?>, Object>> objects; // Synched data, only on client
+		public final Map<String, Tuple<NFUDataSerializer<?>, Object>> objects; // Synched data, only on client
 		public final Map<String, Object> getters; // Synched getters, only on client
 		public final List<ItemStack> inventory;
 
@@ -895,7 +895,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			for (int i = 0; i < dataSize; ++i)
 			{
 				String key = buf.readUtf();
-				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
+				NFUDataSerializer<?> type = NFUDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
 				objects.put(key, new Tuple<>(type, obj));
 			}
@@ -903,7 +903,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			int fieldSize = buf.readInt();
 			for (int i = 0; i < fieldSize; ++i) {
 				String key = buf.readUtf();
-				NaUtilsDataSerializer<?> type = NaUtilsDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
+				NFUDataSerializer<?> type = NFUDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
 				getters.put(key, new Tuple<>(type, obj));
 			}
@@ -924,7 +924,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			for (var entry: dataCap.synchedData.entrySet()) {
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().getA().getKey().toString());
-				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
+				NFUDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
 			}
 			// Write synched getters
 			buf.writeInt(dataCap.synchedGetterAccessors.size());
@@ -932,7 +932,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				buf.writeUtf(entry.getKey());
 				buf.writeUtf(entry.getValue().getA().getKey().toString());
 				// Access the value and write
-				NaUtilsDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB().get());
+				NFUDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB().get());
 			}
 			// Write inventory
 			buf.writeInt(this.inventory.size());
@@ -968,7 +968,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	{
 		try {
 			CompoundTag synched = getCapFromMobTag(mobTag).getCompound("synchedData");
-			NaUtilsDataSerializer<?> serializer = NaUtilsDataSerializer.fromId(new ResourceLocation(synched.getCompound(key).getString("serializer")));
+			NFUDataSerializer<?> serializer = NFUDataSerializer.fromId(new ResourceLocation(synched.getCompound(key).getString("serializer")));
 			Object res = serializer.fromTag(synched.getCompound(key).get("value"));
 			return (T) res;
 		} catch (RuntimeException e)

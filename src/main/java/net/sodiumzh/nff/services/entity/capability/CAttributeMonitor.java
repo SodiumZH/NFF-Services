@@ -6,10 +6,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nautils.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
 import org.apache.commons.lang3.mutable.MutableObject;
-import net.sodiumzh.nautils.annotation.DontCallManually;
-import net.sodiumzh.nautils.annotation.DontOverride;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 

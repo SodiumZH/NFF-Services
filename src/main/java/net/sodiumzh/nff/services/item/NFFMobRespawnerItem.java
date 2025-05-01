@@ -10,11 +10,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.sodiumzh.nautils.item.NaUtilsItem;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
+import net.sodiumzh.nfu.item.NFUItem;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
-public class NFFMobRespawnerItem extends NaUtilsItem
+public class NFFMobRespawnerItem extends NFUItem
 {
 
 	protected static final String RESPAWNER_NBT_KEY = "respawner_info";
@@ -74,7 +74,7 @@ public class NFFMobRespawnerItem extends NaUtilsItem
 						if (!bef.getAdditionalInventory().isEmpty())
 							bef.getAdditionalInventory().clearContent();
 						bef.updateFromInventory();
-						NaUtilsEntityStatics.removeAllEquipment(bef.asMob());
+						NFUEntityStatics.removeAllEquipment(bef.asMob());
 					}
 					bef.setInit();
 				}

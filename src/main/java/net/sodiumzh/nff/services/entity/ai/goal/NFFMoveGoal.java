@@ -3,7 +3,7 @@ package net.sodiumzh.nff.services.entity.ai.goal;
 import java.util.function.Predicate;
 
 import net.minecraft.world.level.block.Blocks;
-import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
+import net.sodiumzh.nfu.util.NFUMathStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
 
@@ -104,7 +104,7 @@ public abstract class NFFMoveGoal extends NFFGoal
 		super.onStart();
 		if (isAmphibious)
 		{
-			if (mob.asMob().isInWater() && mob.asMob().level().getBlockState(NaUtilsMathStatics.getBlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
+			if (mob.asMob().isInWater() && mob.asMob().level().getBlockState(NFUMathStatics.getBlockPos(mob.asMob().getEyePosition())).is(Blocks.WATER))
 				((INFFTamedAmphibious)mob).switchNav(true);
 			else ((INFFTamedAmphibious)mob).switchNav(false);		
 		}

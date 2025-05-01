@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nff.services.NFFServices;
 
 public class NFFTamedMobAIState {
@@ -64,9 +64,9 @@ public class NFFTamedMobAIState {
 	protected static final HashMap<NFFTamedMobAIState, MutableComponent> DISPLAY_INFO = new HashMap<NFFTamedMobAIState, MutableComponent>();
 	static
 	{
-		DISPLAY_INFO.put(WAIT, NaUtilsInfoStatics.createTranslatable("info.nffservices.mob_wait"));
-		DISPLAY_INFO.put(FOLLOW, NaUtilsInfoStatics.createTranslatable("info.nffservices.mob_follow"));
-		DISPLAY_INFO.put(WANDER, NaUtilsInfoStatics.createTranslatable("info.nffservices.mob_wander"));
+		DISPLAY_INFO.put(WAIT, NFUInfoStatics.createTranslatable("info.nffservices.mob_wait"));
+		DISPLAY_INFO.put(FOLLOW, NFUInfoStatics.createTranslatable("info.nffservices.mob_follow"));
+		DISPLAY_INFO.put(WANDER, NFUInfoStatics.createTranslatable("info.nffservices.mob_wander"));
 	}
 	
 	public static void putDisplayInfo(NFFTamedMobAIState state, MutableComponent info)
@@ -81,7 +81,7 @@ public class NFFTamedMobAIState {
 		else
 		{
 			NFFServices.LOGGER.error("AI State missing display info: " + this.toString());
-			return NaUtilsInfoStatics.createText("");			
+			return NFUInfoStatics.createText("");
 		}
 	}
 

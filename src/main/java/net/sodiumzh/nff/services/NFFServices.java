@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.sodiumzh.nautils.savedata.redirector.SaveDataLocationRedirector;
+import net.sodiumzh.nfu.savedata.redirector.SaveDataLocationRedirector;
 import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 

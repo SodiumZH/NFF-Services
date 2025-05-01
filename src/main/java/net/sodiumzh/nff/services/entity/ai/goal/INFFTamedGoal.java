@@ -1,7 +1,7 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sodiumzh.nautils.annotation.DontOverride;
+import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 

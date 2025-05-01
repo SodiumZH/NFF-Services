@@ -12,8 +12,8 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.capability.NaUtilsEntitySerializableCapProvider;
-import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
+import net.sodiumzh.nfu.capability.NFUEntitySerializableCapProvider;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.*;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
@@ -83,7 +83,7 @@ public class NFFCapabilityAttachments {
 					&& !(mob instanceof INFFTamed)) 
 			{
 				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_TAMABLE),
-						new NaUtilsEntitySerializableCapProvider<>(event.getObject(), NFFCapRegistry.CAP_BEFRIENDABLE_MOB,
+						new NFUEntitySerializableCapProvider<>(event.getObject(), NFFCapRegistry.CAP_BEFRIENDABLE_MOB,
 								() -> new CNFFTamableImpl(mob, NFFTamingMapping.getProcess(mob).getAngerRules())));
 			}
 
@@ -144,7 +144,7 @@ public class NFFCapabilityAttachments {
 	}
 
 	public static Map<ResourceLocation, ICapabilityProvider> getExistingCaps(AttachCapabilitiesEvent<?> event) {
-		return NaUtilsReflectionStatics.forceGet(event, AttachCapabilitiesEvent.class, "caps")
+		return NFUReflectionStatics.forceGet(event, AttachCapabilitiesEvent.class, "caps")
 				.cast();
 	}
 }

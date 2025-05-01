@@ -16,11 +16,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityTypeTest;
-import net.sodiumzh.nautils.object.NaUtilsMapper;
-import net.sodiumzh.nautils.registries.NaUtilsCaps;
-import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
+import net.sodiumzh.nfu.object.FilteredMapper;
+import net.sodiumzh.nfu.registry.NFUCapabilities;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.core.BlockPos;
@@ -42,16 +42,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nautils.annotation.DontCallManually;
-import net.sodiumzh.nautils.annotation.DontOverride;
-import net.sodiumzh.nautils.containers.CyclicSwitch;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
-import net.sodiumzh.nautils.entity.MobApplicableItemTable;
+import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
-import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
@@ -65,8 +65,8 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	/**
 	 * Mapper to test if a mob is {@code INFFTamed}, and cast it to {@code INFFTamed}.
 	 */
-	public static final NaUtilsMapper<Object, INFFTamed> IS_TAMED_MAPPER =
-			NaUtilsMapper.unconditionalNoVararg(Object.class, INFFTamed.class, obj -> {
+	public static final FilteredMapper<Object, INFFTamed> IS_TAMED_MAPPER =
+			FilteredMapper.unconditionalNoVararg(Object.class, INFFTamed.class, obj -> {
 				if (obj instanceof INFFTamed tamed) return tamed;
 				else return null;
 	});
@@ -795,7 +795,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	public default void recordLocationToOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
 				c.getNBT().put("tamedMobLocations", new CompoundTag());
 			MobLocationInfo info = MobLocationInfo.fromMob(this);
@@ -809,7 +809,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	public default void removeLocationOnOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
 		});
 	}
@@ -819,12 +819,12 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
 		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
 				new AtomicReference<>(new HashMap<>());
-		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
-			res.set(NaUtilsNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
+			res.set(NFUNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
 					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
 		});
-		return NaUtilsContainerStatics.iterableToMap(res.get().values().stream()
+		return NFUContainerStatics.iterableToMap(res.get().values().stream()
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.filter(MobLocationInfo::isValid)
@@ -854,8 +854,8 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
 		if (!(player.level() instanceof ServerLevel sl)) return;
-		player.getCapability(NaUtilsCaps.CAP_ENTITY_DATA).ifPresent(c -> {
-			List<UUID> levelLoadedIdentifiers = NaUtilsEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
+			List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
 							e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
 					.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
 					.map(INFFTamed::getIdentifier).toList();

@@ -3,7 +3,7 @@ package net.sodiumzh.nff.services.entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.sodiumzh.nautils.entity.MobRespawnInfo;
+import net.sodiumzh.nfu.entity.MobRespawnInfo;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import org.jetbrains.annotations.Nullable;
 
