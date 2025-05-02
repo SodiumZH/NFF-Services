@@ -1,17 +1,15 @@
 package net.sodiumzh.nff.services.inventory;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +83,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 		tag.put("size", IntTag.valueOf(this.getContainerSize()));
 		for (int i = 0; i < this.getContainerSize(); ++i) 
 		{
-			NaUtilsNBTStatics.saveItemStack(this.getItem(i), tag, Integer.toString(i));
+			NFUNBTStatics.saveItemStack(this.getItem(i), tag, Integer.toString(i));
 		}
 		return tag;
 	}
@@ -109,7 +107,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 		for (int i = 0; i < getContainerSize(); ++i)
 		{
 			if (tag.contains(Integer.toString(i)))
-				this.setItem(i, NaUtilsNBTStatics.readItemStack(tag, Integer.toString(i)));
+				this.setItem(i, NFUNBTStatics.readItemStack(tag, Integer.toString(i)));
 			else this.setItem(i, ItemStack.EMPTY);
 		}
 		updateOwner();

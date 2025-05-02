@@ -12,8 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
-import net.sodiumzh.nautils.math.GuiPos;
-import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
+import net.sodiumzh.nfu.math.GuiPos;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 
@@ -49,7 +49,7 @@ public abstract class NFFTamedGui extends AbstractContainerScreen<NFFTamedInvent
 	public NFFTamedGui(NFFTamedInventoryMenu pMenu, Inventory pPlayerInventory,
 			INFFTamed mob, boolean rendersName)
 	{
-		super(pMenu, pPlayerInventory, rendersName ? ((LivingEntity)mob).getName() : NaUtilsInfoStatics.createText(""));
+		super(pMenu, pPlayerInventory, rendersName ? ((LivingEntity)mob).getName() : NFUInfoStatics.createText(""));
 		this.mob = mob;
 		this.passEvents = false;
 	}
@@ -157,7 +157,7 @@ public abstract class NFFTamedGui extends AbstractContainerScreen<NFFTamedInvent
 	{
 		int hp = (int) ((LivingEntity)mob).getHealth();
 		int maxHp = (int) ((LivingEntity)mob).getMaxHealth();
-		Component info = NaUtilsInfoStatics.createText("HP: " + hp + " / " + maxHp);
+		Component info = NFUInfoStatics.createText("HP: " + hp + " / " + maxHp);
 		font.draw(poseStack, info, position.x, position.y, color);
 	}
 	
@@ -178,12 +178,12 @@ public abstract class NFFTamedGui extends AbstractContainerScreen<NFFTamedInvent
 		String maxHp = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.MAX_HEALTH)));
 		String atk = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		String def = Long.toString(Math.round(mob.asMob().getAttributeValue(Attributes.ARMOR)));
-		Component hpcomp = NaUtilsInfoStatics.createTranslatable("info.nffservices.gui_health")
-				.append(NaUtilsInfoStatics.createText(": " + hp + " / " + maxHp));
-		Component atkcomp = NaUtilsInfoStatics.createTranslatable("info.nffservices.gui_atk")
-				.append(NaUtilsInfoStatics.createText(": " + atk));
-		Component defcomp = NaUtilsInfoStatics.createTranslatable("info.nffservices.gui_armor")
-				.append(NaUtilsInfoStatics.createText(": " + def));
+		Component hpcomp = NFUInfoStatics.createTranslatable("info.nffservices.gui_health")
+				.append(NFUInfoStatics.createText(": " + hp + " / " + maxHp));
+		Component atkcomp = NFUInfoStatics.createTranslatable("info.nffservices.gui_atk")
+				.append(NFUInfoStatics.createText(": " + atk));
+		Component defcomp = NFUInfoStatics.createTranslatable("info.nffservices.gui_armor")
+				.append(NFUInfoStatics.createText(": " + def));
 		font.draw(poseStack, hpcomp, pos.x, pos.y, color);
 		pos = pos.addY(textRowWidth);
 		font.draw(poseStack, atkcomp, pos.x, pos.y, color);

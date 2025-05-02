@@ -1,17 +1,16 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.event.entity.ai.NFFGoalCheckCanUseEvent;
+
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.function.Predicate;
 
 public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 

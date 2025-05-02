@@ -1,34 +1,28 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNetworkStatics;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import net.sodiumzh.nfu.util.NFUNetworkStatics;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.network.ClientboundNFFGuiOpenPacket;
 import net.sodiumzh.nff.services.network.NFFChannels;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A function library for befriended mobs
@@ -100,7 +94,7 @@ public class NFFTamedStatics
 	 */
 	public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt) {
 		
-		if (nbt.contains("bm_common", NaUtilsNBTStatics.TAG_COMPOUND_ID))
+		if (nbt.contains("bm_common", NFUNBTStatics.TAG_COMPOUND_ID))
 		{
 			if (nbt.getCompound("bm_common").getUUID("owner") == null)
 			{
@@ -134,7 +128,7 @@ public class NFFTamedStatics
 		target.asMob().saveWithoutId(mobTag);
 		// Do convertion
 		
-		Mob newMob = NaUtilsEntityStatics.replaceMob(newType, target.asMob());
+		Mob newMob = NFUEntityStatics.replaceMob(newType, target.asMob());
 		if (!(newMob instanceof INFFTamed))
 			throw new UnsupportedOperationException("NFFTamedStatics::convertToOtherBefriendedType supports mobs implementing INFFTamed.");
 		newMob.load(mobTag);
@@ -173,7 +167,7 @@ public class NFFTamedStatics
 			sp.nextContainerCounter();
 			ClientboundNFFGuiOpenPacket packet = new ClientboundNFFGuiOpenPacket(sp.containerCounter,
 					mob.getAdditionalInventory().getContainerSize(), living.getId());
-			NaUtilsNetworkStatics.sendToPlayer(NFFChannels.CHANNEL, packet, sp);
+			NFUNetworkStatics.sendToPlayer(NFFChannels.CHANNEL, packet, sp);
 			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
 			if (sp.containerMenu == null)
 				return;
@@ -225,12 +219,12 @@ public class NFFTamedStatics
 	}
 	
 	/**
-	 * @deprecated Use {@link NaUtilsEntityStatics#getNameFromNbt} instead
+	 * @deprecated Use {@link NFUEntityStatics#getNameFromNbt} instead
 	 */
 	@Deprecated
 	public static Component getNameFromNbt(CompoundTag nbt, EntityType<?> type)
 	{
-		return NaUtilsEntityStatics.getNameFromNbt(nbt, type);
+		return NFUEntityStatics.getNameFromNbt(nbt, type);
 	}
 	
 	/**
@@ -244,7 +238,7 @@ public class NFFTamedStatics
 	{
 		if (!mob.isOwnerInDimension())
 			return Optional.empty();
-		List<Entity> list = mob.asMob().level.getEntities(mob.asMob(), NaUtilsEntityStatics.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
+		List<Entity> list = mob.asMob().level.getEntities(mob.asMob(), NFUEntityStatics.getNeighboringArea(mob.asMob(), radius), e -> e == mob.getOwner());
 		if (list.isEmpty())
 			return Optional.empty();
 		else if (!sphericalArea)

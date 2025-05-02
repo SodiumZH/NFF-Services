@@ -2,7 +2,7 @@ package net.sodiumzh.nff.services.entity.ai.goal;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
-import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
 import java.util.EnumSet;
@@ -76,7 +76,7 @@ public class NFFGoalWrapper<T extends Goal> extends NFFGoal {
     }
 
     protected int adjustedTickDelay(int pAdjustment) {
-        return NaUtilsReflectionStatics.forceInvokeRetVal(this.getGoal(), Goal.class, "m_183277_", // adjustedTickDelay
+        return NFUReflectionStatics.forceInvokeRetVal(this.getGoal(), Goal.class, "m_183277_", // adjustedTickDelay
                 int.class, pAdjustment).cast();
     }
 }

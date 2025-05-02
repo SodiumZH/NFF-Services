@@ -1,16 +1,15 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Supplier;
-
-import javax.annotation.Nonnull;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /** Defines entity types before and after taming. Mobs which are registered to be a tamable type (type before
  * taming) will be automatically attached a {@link CNFFTamable} capability.

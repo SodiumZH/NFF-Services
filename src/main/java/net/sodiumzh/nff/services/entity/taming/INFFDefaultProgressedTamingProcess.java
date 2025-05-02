@@ -2,9 +2,9 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.sodiumzh.nautils.capability.EntityTimerAccessor;
-import net.sodiumzh.nautils.entity.taming.ITamingProcessWithProgress;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
+import net.sodiumzh.nfu.capability.EntityTimerAccessor;
+import net.sodiumzh.nfu.entity.taming.ITamingProcessWithProgress;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -96,7 +96,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
 
     public default void setProgressValueIfPlayerAbsent(T mob, UUID playerUUID, double value) {
         if (this.getOngoingPlayerUUID(mob)
-                .map(uuid -> NaUtilsEntityStatics.findPlayerInAllDimensions(uuid, mob.level)
+                .map(uuid -> NFUEntityStatics.findPlayerInAllDimensions(uuid, mob.level)
                 .isEmpty()).orElse(true)) {
             this.removeProgressValue(mob);
             this.setProgressValue(mob, playerUUID, value);
@@ -132,7 +132,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     public default Optional<Player> getOngoingPlayer(T mob) {
         UUID uuid = getOngoingPlayerUUID(mob).orElse(null);
         if (uuid == null) return Optional.empty();
-        return NaUtilsEntityStatics.findPlayerInAllDimensions(uuid, mob.level);
+        return NFUEntityStatics.findPlayerInAllDimensions(uuid, mob.level);
     }
 
     /**

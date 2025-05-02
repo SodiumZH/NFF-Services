@@ -1,17 +1,17 @@
 package net.sodiumzh.nff.services.item;
 
-import java.util.function.BiPredicate;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nautils.item.NaUtilsItem;
+import net.sodiumzh.nfu.item.NFUItem;
 import net.sodiumzh.nff.services.item.event.MobCatcherCatchMobEvent;
 
-public class MobCatcherItem extends NaUtilsItem
+import java.util.function.BiPredicate;
+
+public class MobCatcherItem extends NFUItem
 {
 	
 	protected BiPredicate<Mob, Player> canCatchCondition = null;

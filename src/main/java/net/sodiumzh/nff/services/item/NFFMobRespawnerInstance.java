@@ -1,10 +1,5 @@
 package net.sodiumzh.nff.services.item;
 
-import java.util.UUID;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -13,18 +8,21 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nff.services.entity.NFFMobRespawnInfo;
+import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerAfterConstructEvent;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerBeforeConstructEvent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * Wrapper of item stack of mob respawner
@@ -145,7 +143,7 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 		// Update position first, otherwise the generated mob will perform teleporting
 		// away and back
 		Vec3 posV = new Vec3((double) pos.getX() + 0.5D, (double) (pos.getY() + 1), (double) pos.getZ() + 0.5D);
-		NaUtilsNBTStatics.putVec3(nbt, "Pos", posV);
+		NFUNBTStatics.putVec3(nbt, "Pos", posV);
 		return nbt;
 	}
 
@@ -171,7 +169,7 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 	
 	public Component getName()
 	{
-		return NaUtilsEntityStatics.getNameFromNbt(getMobNbt(), getType());
+		return NFUEntityStatics.getNameFromNbt(getMobNbt(), getType());
 	}
 	
 	public UUID getUUID()

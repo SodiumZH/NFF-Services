@@ -6,13 +6,13 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.sodiumzh.nautils.entity.MobApplicableItemTable;
-import net.sodiumzh.nautils.entity.taming.ITamingProcess;
-import net.sodiumzh.nautils.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
-import net.sodiumzh.nautils.statics.NaUtilsItemStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
-import net.sodiumzh.nautils.statics.NaUtilsParticleStatics;
+import net.sodiumzh.nfu.entity.MobApplicableItemTable;
+import net.sodiumzh.nfu.entity.taming.ITamingProcess;
+import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
+import net.sodiumzh.nfu.util.NFUItemStatics;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
+import net.sodiumzh.nfu.util.NFUParticleStatics;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -52,7 +52,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 				if (this.isOtherPresentingPlayerOngoing(mob, player.getUUID()))
 				{
 					sendParticlesOnActionCooldown(mob);
-					NaUtilsMiscStatics.printToScreen(NaUtilsInfoStatics.createTranslatable(
+					NFUMiscStatics.printToScreen(NFUInfoStatics.createTranslatable(
 							"info.nffservices.other_player_ongoing", this.getOngoingPlayer(mob).map(Player::getName).orElseThrow()),
 							player);
 					result.setHandled();
@@ -91,9 +91,9 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 						// Handle item consume
 						if (!player.isCreative() && shouldItemConsumeInternal(player.getMainHandItem(), mob)) {
 							player.getMainHandItem().shrink(1);
-							NaUtilsItemStatics.giveOrDrop(player, player.getMainHandItem().getCraftingRemainingItem());
+							NFUItemStatics.giveOrDrop(player, player.getMainHandItem().getCraftingRemainingItem());
 						}
-						NaUtilsItemStatics.giveOrDrop(player, getReturnedItem(player, mob, givenCopy, oldProgress, currentProgress));
+						NFUItemStatics.giveOrDrop(player, getReturnedItem(player, mob, givenCopy, oldProgress, currentProgress));
 						// Assign the progress
 						if (currentProgress > 0)
 							this.setProgressValue(mob, player.getUUID(), currentProgress);
@@ -256,27 +256,27 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 
 	public void sendParticlesOnAngry(Mob target)
 	{
-		NaUtilsParticleStatics.sendAngryParticlesToEntityDefault(target);
+		NFUParticleStatics.sendAngryParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesOnActionCooldown(Mob target)
 	{
-		NaUtilsParticleStatics.sendSmokeParticlesToEntityDefault(target);
+		NFUParticleStatics.sendSmokeParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesOnItemReceived(Mob target)
 	{
-		NaUtilsParticleStatics.sendGlintParticlesToEntityDefault(target);
+		NFUParticleStatics.sendGlintParticlesToEntityDefault(target);
 	}
 
 	public void sendParticlesOnInterrupted(Mob target)
 	{
-		NaUtilsParticleStatics.sendAngryParticlesToEntityDefault(target);
+		NFUParticleStatics.sendAngryParticlesToEntityDefault(target);
 	}
 	
 	public void sendParticlesForProgressHeart(Mob target)
 	{
-		NaUtilsParticleStatics.sendParticlesToEntity(target, ParticleTypes.HEART, target.getBbHeight() - 0.5, 0.2d, 1, 1d);
+		NFUParticleStatics.sendParticlesToEntity(target, ParticleTypes.HEART, target.getBbHeight() - 0.5, 0.2d, 1, 1d);
 	}
 
 	/**

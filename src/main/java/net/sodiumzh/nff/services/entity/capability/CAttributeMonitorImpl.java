@@ -1,9 +1,9 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.HashMap;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+
+import java.util.HashMap;
 
 public class CAttributeMonitorImpl implements CAttributeMonitor {
 

@@ -1,7 +1,5 @@
 package net.sodiumzh.nff.services.inventory;
 
-import java.util.function.Predicate;
-
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,9 +7,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.math.GuiPos;
+import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.subsystems.baublesystem.BaubleSystem;
+import net.sodiumzh.nff.services.subsystem.baublesystem.BaubleSystem;
+
+import java.util.function.Predicate;
 
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 

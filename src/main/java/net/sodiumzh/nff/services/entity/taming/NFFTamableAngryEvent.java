@@ -2,13 +2,13 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nautils.entity.anger.MobAngerReason;
-import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
+import net.sodiumzh.nfu.entity.anger.MobAngerReason;
+import net.sodiumzh.nfu.event.NFULivingEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class NFFTamableAngryEvent extends NaUtilsLivingEvent<Mob> {
+public class NFFTamableAngryEvent extends NFULivingEvent<Mob> {
 
     @Nullable
     private final MobAngerReason reason;
