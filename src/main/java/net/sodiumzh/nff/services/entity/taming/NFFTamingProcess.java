@@ -6,19 +6,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.capability.CEntityTimerCapability;
-import net.sodiumzh.nautils.entity.anger.MobAngerReason;
-import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nautils.entity.taming.ITamingProcess;
-import net.sodiumzh.nautils.statics.NaUtilsEntityStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
-import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
+import net.sodiumzh.nfu.capability.CEntityTimerCapability;
+import net.sodiumzh.nfu.entity.anger.MobAngerReason;
+import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.entity.taming.ITamingProcess;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -69,7 +69,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		//ClientboundTamedInitPacket packet = new ClientboundTamedInitPacket(target);
 		
 		// Do conversion
-		Mob newMob = NaUtilsEntityStatics.replaceMob(newType, target);
+		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
 		if(!(newMob instanceof INFFTamed))
 			throw new RuntimeException("Befriending: Entity type after befriending not implementing INFFTamed interface.");
 		INFFTamed bm = (INFFTamed)newMob;
@@ -84,7 +84,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, bm.asMob()));
 		bm.setInit();
 		// Sync the recorded properties UNIMPLEMENTED
-		//NaUtilsNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);
+		//NFUNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);
 		return bm.asMob();
 	}
 
@@ -185,6 +185,6 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	 */
 	protected void debugPrint(Player printTo, String info) {
 		if (printTo.getOffhandItem().is(NFFItemRegistry.NFF_DEBUG_SIGN.get()))
-			NaUtilsMiscStatics.printToScreen(info, printTo);
+			NFUMiscStatics.printToScreen(info, printTo);
 	}
 }

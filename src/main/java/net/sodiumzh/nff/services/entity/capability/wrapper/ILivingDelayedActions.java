@@ -1,10 +1,10 @@
 package net.sodiumzh.nff.services.entity.capability.wrapper;
 
-import java.util.function.Consumer;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+
+import java.util.function.Consumer;
 
 /**
  * A wrapper interface of {@link CLivingEntityDelayedActionHandler}. Living Entities implementing this interface will be automatically 

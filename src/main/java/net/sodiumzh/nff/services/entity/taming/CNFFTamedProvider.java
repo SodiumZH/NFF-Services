@@ -1,10 +1,10 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.function.Supplier;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;
-import net.sodiumzh.nautils.capability.SerializableCapabilityProvider;
+import net.sodiumzh.nfu.capability.SerializableCapabilityProvider;
+
+import java.util.function.Supplier;
 
 public class CNFFTamedProvider extends SerializableCapabilityProvider<CompoundTag, CNFFTamed>
 {

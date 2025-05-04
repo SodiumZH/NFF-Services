@@ -1,7 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -9,9 +7,11 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.pathfinder.Path;
-import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUMathStatics;
+
+import java.util.EnumSet;
 
 public class NFFMeleeAttackGoal extends NFFGoal
 {
@@ -103,7 +103,7 @@ public class NFFMeleeAttackGoal extends NFFGoal
 					// If the attack can reach now, pass
 					/*if (this.getAttackReachSqr(livingentity) >= getPathfinder().distanceToSqr(livingentity.getX(),
 							livingentity.getY(), livingentity.getZ()))*/
-					if (NaUtilsMathStatics.getBoxSurfaceDistSqr(this.mob.asMob().getBoundingBox(), livingentity.getBoundingBox()) <= this.getAttackMaxSurfaceDistSqr(livingentity))
+					if (NFUMathStatics.getBoxSurfaceDistSqr(this.mob.asMob().getBoundingBox(), livingentity.getBoundingBox()) <= this.getAttackMaxSurfaceDistSqr(livingentity))
 						return true;
 					else
 						return false;
@@ -246,7 +246,7 @@ public class NFFMeleeAttackGoal extends NFFGoal
 
 	protected void checkAndPerformAttack(LivingEntity pEnemy) {
 		double maxDistSqr = this.getAttackMaxSurfaceDistSqr(pEnemy);
-		double distSqr = NaUtilsMathStatics.getBoxSurfaceDistSqr(mob.asMob().getBoundingBox(), pEnemy.getBoundingBox());
+		double distSqr = NFUMathStatics.getBoxSurfaceDistSqr(mob.asMob().getBoundingBox(), pEnemy.getBoundingBox());
 		if (distSqr <= maxDistSqr && this.ticksUntilNextAttack <= 0)
 		{
 			this.resetAttackCooldown();

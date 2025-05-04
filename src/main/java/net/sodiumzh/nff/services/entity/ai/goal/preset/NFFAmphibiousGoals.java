@@ -1,10 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-import java.util.Random;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -18,6 +13,10 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.Random;
 
 public abstract class NFFAmphibiousGoals {
 

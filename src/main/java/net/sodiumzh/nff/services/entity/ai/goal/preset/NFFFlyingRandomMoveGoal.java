@@ -1,12 +1,12 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sodiumzh.nautils.statics.NaUtilsLevelStatics;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFULevelStatics;
+
+import java.util.EnumSet;
 
 
 // Ported from HMaG
@@ -85,13 +85,13 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 		if (heightLimit <= 0)
 			return blockpos1;
 		// No height limit if it's above the void
-		else if (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) == -1)
+		else if (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) == -1)
 			return blockpos1;
-		else if (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
+		else if (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
 		{
 			// If it's already too high, fly to the height limit first
 			int it = 32;
-			while (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
+			while (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
 			{
 				blockpos1 = blockpos1.below();
 				it--;
@@ -102,7 +102,7 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 			if (it <= 0)
 			{
 				blockpos1 = new BlockPos(blockpos);
-				while (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
+				while (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
 					blockpos1 = blockpos1.below();
 			}
 			return blockpos1;
@@ -110,7 +110,7 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 		else
 		{
 			int it = 32;	// To avoid potential infinite loop 				
-			while (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
+			while (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
 			{
 				// Search until an acceptable
 				blockpos1 = blockpos.offset(
@@ -122,7 +122,7 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 					break;
 			}
 			// If failed, find below to get an acceptable position
-			while (NaUtilsLevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
+			while (NFULevelStatics.getHeightToGround(blockpos1, mob.asMob()) > heightLimit)
 				blockpos1 = blockpos1.below();
 			return blockpos1;
 		}
@@ -136,7 +136,7 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 		{
 			BlockPos blockpos1 = getWantedPosition();
 			
-			if (shouldAvoidSun.test(mob) && NaUtilsLevelStatics.isUnderSun(blockpos1, mob.asMob()))
+			if (shouldAvoidSun.test(mob) && NFULevelStatics.isUnderSun(blockpos1, mob.asMob()))
 				continue;
 			
 			if (mob.asMob().level.isEmptyBlock(blockpos1))

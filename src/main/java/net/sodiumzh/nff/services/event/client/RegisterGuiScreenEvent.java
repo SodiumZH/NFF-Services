@@ -1,7 +1,5 @@
 package net.sodiumzh.nff.services.event.client;
 
-import java.util.function.Function;
-
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -9,6 +7,8 @@ import net.sodiumzh.nff.services.client.gui.screen.NFFGUIConstructorRegistry;
 import net.sodiumzh.nff.services.client.gui.screen.NFFTamedGUI;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
+
+import java.util.function.Function;
 
 public class RegisterGuiScreenEvent extends Event implements IModBusEvent
 {

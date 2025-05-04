@@ -1,11 +1,5 @@
 package net.sodiumzh.nff.services.entity.taming.preset;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,12 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.AreaEffectCloud;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PowerableMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -43,6 +32,11 @@ import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 
 public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed, PowerableMob
 {

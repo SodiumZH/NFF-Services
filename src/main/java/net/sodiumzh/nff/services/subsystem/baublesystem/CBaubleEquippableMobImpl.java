@@ -1,14 +1,13 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 {

@@ -1,14 +1,13 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.ItemStack;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * NFFServices - BaubleSystem is a system for equipping "bauble" items on <b>mobs</b> just like for players in Curios API.

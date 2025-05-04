@@ -1,14 +1,13 @@
  package net.sodiumzh.nff.services.registry;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.sodiumzh.nautils.item.NaUtilsItem;
-import net.sodiumzh.nautils.statics.NaUtilsInfoStatics;
-import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.item.NFFInstantTamerItem;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Rarity;
+ import net.minecraftforge.registries.DeferredRegister;
+ import net.minecraftforge.registries.ForgeRegistries;
+ import net.minecraftforge.registries.RegistryObject;
+ import net.sodiumzh.nff.services.NFFServices;
+ import net.sodiumzh.nff.services.item.NFFInstantTamerItem;
+ import net.sodiumzh.nfu.item.NFUItem;
 
 public class NFFItemRegistry {
 
@@ -16,7 +15,7 @@ public class NFFItemRegistry {
 	
 	public static final RegistryObject<NFFInstantTamerItem> DEBUG_BEFRIENDER = ITEMS.register("instant_taming_tool", () -> new NFFInstantTamerItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
 			.descTranslatable("info.nffservices.item.instant_taming_tool").cast());
-	public static final RegistryObject<NaUtilsItem> NFF_DEBUG_SIGN = ITEMS.register("nff_debug_sign", () -> new NaUtilsItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
+	public static final RegistryObject<NFUItem> NFF_DEBUG_SIGN = ITEMS.register("nff_debug_sign", () -> new NFUItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
 			.descTranslatable("info.nffservices.item.debug_sign"));
 	//public static final RegistryObject<Item> DEBUG_AI_SWITCH = ITEMS.register("debug_ai_switch", () -> new Item(new Item.Properties().stacksTo(1)));
 	//public static final RegistryObject<Item> EXAMPLE_ZOMBIE_BEFRIENDING_ITEM = ITEMS.register("example_zombie_befriending_item", () -> new Item(new Item.Properties()));

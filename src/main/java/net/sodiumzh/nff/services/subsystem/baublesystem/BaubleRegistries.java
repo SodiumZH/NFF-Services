@@ -1,27 +1,20 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.ToDoubleFunction;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.containers.Tuple4;
-import net.sodiumzh.nautils.exceptions.DuplicateRegistryEntryException;
-import net.sodiumzh.nautils.statics.NaUtilsContainerStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
-import net.sodiumzh.nautils.containers.Tuple4;
+import net.sodiumzh.nfu.container.Tuple4;
+import net.sodiumzh.nfu.exception.DuplicateRegistryEntryException;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.ToDoubleFunction;
 
 class BaubleRegistries
 {
@@ -101,7 +94,7 @@ class BaubleRegistries
 		{
 			ToDoubleFunction<Tuple4<Double, ResourceLocation, IBaubleRegistryEntry, BaubleEquippingCondition>> func = t -> t.a;
 			var sorted = SINGLE_REGISTRY.get(item).stream().sorted(Comparator.comparingDouble(func).reversed()).toList();
-			SINGLE_REGISTRY.put(item, NaUtilsContainerStatics.modifiablize(sorted));
+			SINGLE_REGISTRY.put(item, NFUContainerStatics.modifiablize(sorted));
 		}
 	}
 	

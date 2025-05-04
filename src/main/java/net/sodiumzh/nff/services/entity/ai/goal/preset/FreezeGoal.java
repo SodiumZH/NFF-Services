@@ -1,11 +1,10 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
 import com.google.common.base.Predicate;
-
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+
+import java.util.EnumSet;
 
 public class FreezeGoal extends Goal
 {

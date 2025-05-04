@@ -1,14 +1,13 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.sodiumzh.nfu.container.Tuple3;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.sodiumzh.nautils.containers.Tuple3;
 
 /**
  * A {@code BaubleAttributeModifier} is a wrapped attribute modifier which is dynamically added and removed in bauble ticks. 

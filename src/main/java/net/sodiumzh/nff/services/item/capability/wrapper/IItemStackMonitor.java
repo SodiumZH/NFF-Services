@@ -1,11 +1,11 @@
 package net.sodiumzh.nff.services.item.capability.wrapper;
 
-import java.util.function.Supplier;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+
+import java.util.function.Supplier;
 
 /**
  * A wrapper interface of {@link CItemStackMonitor}. Living Entities implementing this interface will be automatically 

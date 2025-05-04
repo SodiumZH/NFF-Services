@@ -1,10 +1,10 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
-import java.util.function.Predicate;
-
 import net.minecraft.world.level.block.Blocks;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
+
+import java.util.function.Predicate;
 
 /**
  * The base class of all befriended mob goals for moving to somewhere,

@@ -2,8 +2,8 @@ package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.sodiumzh.nautils.statics.NaUtilsLevelStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFULevelStatics;
 
 public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 {
@@ -27,7 +27,7 @@ public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 			return false;
 		if (!level.getBlockState(mob.asMob().blockPosition().below()).isAir())
 			return false;
-		if (NaUtilsLevelStatics.isAboveVoid(mob.asMob().blockPosition(), mob.asMob()))
+		if (NFULevelStatics.isAboveVoid(mob.asMob().blockPosition(), mob.asMob()))
 			return false;
 		if (mob.asMob().getTarget() != null)
 			return false;
@@ -41,7 +41,7 @@ public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 			return;	// Prevent potential nullptr crash
 		if (mob.asMob().getMoveControl().hasWanted())
 			return;
-		if (NaUtilsLevelStatics.isAboveVoid(mob.asMob().blockPosition(), mob.asMob()))
+		if (NFULevelStatics.isAboveVoid(mob.asMob().blockPosition(), mob.asMob()))
 			return;
 		BlockPos pos = mob.asMob().blockPosition();
 		while (mob.asMob().level.getBlockState(pos).isAir() && pos.getY() >= mob.asMob().level.getMinBuildHeight())

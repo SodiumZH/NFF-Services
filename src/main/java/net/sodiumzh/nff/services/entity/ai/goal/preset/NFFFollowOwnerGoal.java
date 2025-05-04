@@ -1,9 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
-import javax.annotation.Nonnull;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -13,9 +9,12 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
-import net.sodiumzh.nautils.statics.NaUtilsLevelStatics;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFULevelStatics;
+
+import javax.annotation.Nonnull;
+import java.util.EnumSet;
 
 /** Adjusted from vanilla FollowOwnerGoal for TameableAnimal.
  * <p>This goal is for non-flying mobs.
@@ -99,7 +98,7 @@ public class NFFFollowOwnerGoal extends NFFMoveGoal {
 				} 
 				else 
 				{
-					if (!shouldAvoidSun.test(mob) || !NaUtilsLevelStatics.isEntityUnderSun(mob.getOwner()))
+					if (!shouldAvoidSun.test(mob) || !NFULevelStatics.isEntityUnderSun(mob.getOwner()))
 						this.getPathfinder().getNavigation().moveTo(mob.getOwner(), this.speedModifier);
 				}
 			}
@@ -116,7 +115,7 @@ public class NFFFollowOwnerGoal extends NFFMoveGoal {
 			int l = this.randomIntInclusive(-3, 3);
 			BlockPos wanted = new BlockPos(blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
 			// Don't teleport to positions under sun if avoiding
-			if (shouldAvoidSun.test(mob) && NaUtilsLevelStatics.isUnderSun(wanted, mob.asMob()) && !NaUtilsLevelStatics.isAboveWater(wanted, mob.asMob()))
+			if (shouldAvoidSun.test(mob) && NFULevelStatics.isUnderSun(wanted, mob.asMob()) && !NFULevelStatics.isAboveWater(wanted, mob.asMob()))
 				continue;
 			boolean flag = this.tryTeleportTo(blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
 			if (flag) {

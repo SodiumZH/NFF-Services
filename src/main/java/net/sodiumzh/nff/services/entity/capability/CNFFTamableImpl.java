@@ -1,7 +1,6 @@
 package net.sodiumzh.nff.services.entity.capability;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.Tuple;
@@ -9,16 +8,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nautils.entity.anger.MobAngerHandler;
-import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nautils.entity.anger.MobForgiveResult;
-import net.sodiumzh.nautils.entity.anger.MobSetAngerResult;
-import net.sodiumzh.nautils.exceptions.MissingRegistryException;
-import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 import net.sodiumzh.nff.services.entity.taming.NFFTamableAngryEvent;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
+import net.sodiumzh.nfu.entity.anger.MobAngerHandler;
+import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.entity.anger.MobForgiveResult;
+import net.sodiumzh.nfu.entity.anger.MobSetAngerResult;
+import net.sodiumzh.nfu.exception.MissingRegistryException;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,7 +149,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	public void setTimer(String key, int ticks) {
 		String actualKey = key;
 		if (key.contains("|")) {
-			NaUtilsDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal general timer " +
+			NFUDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal general timer " +
 					"\"%s\". \"|\" is reserved for player-specific timers. Removed \"|\".", key));
 			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
 		}
@@ -178,7 +177,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 	public void putPlayerTimer(UUID uuid, String key, int ticks) {
 		String actualKey = key;
 		if (key.contains("|")) {
-			NaUtilsDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal player timer " +
+			NFUDebugStatics.errorOnce(CNFFTamableImpl.class, String.format("CNFFTamableImpl: illegal player timer " +
 					"\"%s\". \"|\" is reserved for player-specific timers only for separating the player uuid and key. Removed \"|\".", key));
 			actualKey = String.copyValueOf(key.toCharArray()).replaceAll("\\|", "");
 		}
@@ -213,7 +212,7 @@ public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 		return this.timer.keySet().stream()
 				.filter(key -> this.timer.get(key) != 0 && key.contains("|"))
 				.map(key -> key.split("\\|"))
-				.map(split -> split.length > 0 ? NaUtilsMiscStatics.toOptionalUUID(split[0]).orElse(EMPTY_UUID) : EMPTY_UUID)
+				.map(split -> split.length > 0 ? NFUMiscStatics.toOptionalUUID(split[0]).orElse(EMPTY_UUID) : EMPTY_UUID)
 				.filter(uuid -> uuid != EMPTY_UUID).distinct().toList();
 	}
 

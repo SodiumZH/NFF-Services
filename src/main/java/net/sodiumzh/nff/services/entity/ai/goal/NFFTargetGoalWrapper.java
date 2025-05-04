@@ -2,16 +2,11 @@ package net.sodiumzh.nff.services.entity.ai.goal;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.level.pathfinder.Node;
-import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.scores.Team;
-import net.sodiumzh.nautils.statics.NaUtilsReflectionStatics;
-import net.sodiumzh.nff.services.entity.ai.goal.NFFTargetGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -26,13 +21,13 @@ public class NFFTargetGoalWrapper<T extends TargetGoal> extends NFFTargetGoal {
 
     private NFFTargetGoalWrapper(INFFTamed mob, T goal) {
         super(mob,
-                NaUtilsReflectionStatics.forceGet(goal, TargetGoal.class, "f_26136_"/*"mustSee"*/).cast(),
-                NaUtilsReflectionStatics.forceGet(goal, TargetGoal.class, "f_26131_"/*"mustReach"*/).cast());
+                NFUReflectionStatics.forceGet(goal, TargetGoal.class, "f_26136_"/*"mustSee"*/).cast(),
+                NFUReflectionStatics.forceGet(goal, TargetGoal.class, "f_26131_"/*"mustReach"*/).cast());
         this.goal = goal;
     }
 
     public static <T extends TargetGoal> NFFTargetGoalWrapper<T> create(INFFTamed mob, T goal) {
-        Mob goalMob = NaUtilsReflectionStatics.forceGet(goal, TargetGoal.class, "f_26135_"/*"mob"*/).cast();
+        Mob goalMob = NFUReflectionStatics.forceGet(goal, TargetGoal.class, "f_26135_"/*"mob"*/).cast();
         if (!INFFTamed.isTamedAnd(goalMob, m -> Objects.equals(m, mob)))
             throw new IllegalArgumentException("NFFTargetGoalWrapper#create: input goal's mob isn't equal to " +
                     "the input tamed mob.");
@@ -89,18 +84,18 @@ public class NFFTargetGoalWrapper<T extends TargetGoal> extends NFFTargetGoal {
     }
 
     protected int adjustedTickDelay(int pAdjustment) {
-        return NaUtilsReflectionStatics.forceInvokeRetVal(this.getGoal(), Goal.class, "m_183277_", // adjustedTickDelay
+        return NFUReflectionStatics.forceInvokeRetVal(this.getGoal(), Goal.class, "m_183277_", // adjustedTickDelay
                 int.class, pAdjustment).cast();
     }
 
     protected double getFollowDistance() {
-        return NaUtilsReflectionStatics.forceInvokeRetVal(
+        return NFUReflectionStatics.forceInvokeRetVal(
                 this.getGoal(), TargetGoal.class, "m_7623_").cast();
     }
 
 
     protected boolean canAttack(@Nullable LivingEntity pPotentialTarget, TargetingConditions pTargetPredicate) {
-        return NaUtilsReflectionStatics.forceInvokeRetVal(
+        return NFUReflectionStatics.forceInvokeRetVal(
                 this.getGoal(), TargetGoal.class, "m_26150_",
                 LivingEntity.class, pPotentialTarget, TargetingConditions.class, pTargetPredicate).cast();
     }

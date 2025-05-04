@@ -1,0 +1,83 @@
+package net.sodiumzh.nfu.mixin.mixin;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
+import net.sodiumzh.nfu.item.INFUItem;
+import net.sodiumzh.nfu.mixin.NFUMixin;
+import net.sodiumzh.nfu.mixin.event.entity.LivingEntitySweepHurtEvent;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+
+@Mixin(Player.class)
+public abstract class NFUMixinPlayer implements NFUMixin<Player>
+{
+
+	@Shadow public abstract InteractionResult interactOn(Entity pEntityToInteractOn, InteractionHand pHand);
+
+	@Shadow public abstract void increaseScore(int pScore);
+
+	// Last condition is "this.distanceToSqr(livingentity) < entityReachSq", so make it false if cancelled
+	@WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V",
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/player/Player;canHit(Lnet/minecraft/world/entity/Entity;D)Z",
+			remap = false))
+	private boolean acceptSweepDamage(Player caller, Entity entity, double amount, Operation<Boolean> original)
+	{
+		// If originally true, all sweeping conditions are satisfied, so post event and check if cancelled
+		if (original.call(caller, entity, amount))
+		{
+			if (entity instanceof LivingEntity living && MinecraftForge.EVENT_BUS.post(new LivingEntitySweepHurtEvent(living, this.caller())))
+				return false;
+			else return true;
+		}
+		// If originally false, it shouldn't take sweep hurt at all, so no posting and return false
+		else return false;
+	}
+
+	// INFUItem usage skipping features
+
+	@WrapOperation(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+			at = @At(value = "INVOKE",
+					target = "net/minecraftforge/common/ForgeHooks.onInteractEntity(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+			remap = false))
+	private InteractionResult cancelEntityInteractEvent(Player player, Entity entity, InteractionHand hand, Operation<InteractionResult> original){
+		if (player.getItemInHand(hand).getItem() instanceof INFUItem item
+				&& item.shouldSkipEntityInteract(player, entity, hand))
+			return null;
+		return original.call(player, entity, hand);
+	}
+
+	@WrapOperation(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/world/entity/Entity;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+	private InteractionResult cancelEntityInteract(Entity instance, Player player, InteractionHand hand, Operation<InteractionResult> original){
+		if (player.getItemInHand(hand).getItem() instanceof INFUItem item
+			&& item.shouldSkipEntityInteract(player, instance, hand))
+			return InteractionResult.PASS;
+		return original.call(instance, player, hand);
+	}
+/*
+	@WrapOperation(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+			at = @At(value = "INVOKE",
+					target = "net/minecraft/world/item/ItemStack.interactLivingEntity (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+	private InteractionResult cancelItemInteractLiving(ItemStack instance, Player player, LivingEntity entity, InteractionHand hand, Operation<InteractionResult> original){
+		if (player.getItemInHand(hand).getItem() instanceof INFUItem item
+				&& item.shouldSkipUsagePhase(INFUItem.UsagePhase.ITEM_X_INTERACTION_LIVING, INFUItem.UsageContext.forInteractEntity(player, hand, entity)))
+			return InteractionResult.PASS;
+		return original.call(instance, player, entity, hand);
+	}
+*/
+
+
+
+
+
+
+}

@@ -1,19 +1,18 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.function.BiPredicate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.item.NaUtilsItem;
+import net.sodiumzh.nfu.item.NFUItem;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.BiPredicate;
 
 /**
  * Base class for dedicated items as baubles. It's behaviors can be defined in subclasses and can be directly registered to BaubleSystem.
  */
-public abstract class DedicatedBaubleItem extends NaUtilsItem implements IBaubleRegistryEntry
+public abstract class DedicatedBaubleItem extends NFUItem implements IBaubleRegistryEntry
 {
 
 	public DedicatedBaubleItem(Properties pProperties)

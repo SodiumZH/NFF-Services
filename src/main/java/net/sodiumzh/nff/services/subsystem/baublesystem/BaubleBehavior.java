@@ -1,13 +1,12 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.function.BiPredicate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.BiPredicate;
 
 /**
  * A {@code BaubleBehavior} is an {@link IBaubleRegsitryEntry} implementation that's not defined together with specific {@link Item} class.

@@ -1,19 +1,17 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-
-import javax.annotation.Nullable;
-
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.sodiumzh.nautils.containers.Tuple4;
+import net.sodiumzh.nfu.container.Tuple4;
+
+import javax.annotation.Nullable;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 /**
  * Fired after {@link RegisterBaublesEvent} and bauble registry clear-up, allowing to modify bauble behaviors after registration.
  */

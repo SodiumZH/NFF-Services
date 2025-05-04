@@ -5,12 +5,12 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sodiumzh.nautils.capability.CEntityTickingCapability;
-import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nff.services.entity.capability.*;
 import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 
 public class NFFCapRegistry {
 

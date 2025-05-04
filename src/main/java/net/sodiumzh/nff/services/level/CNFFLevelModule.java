@@ -1,9 +1,5 @@
 package net.sodiumzh.nff.services.level;
 
-import java.util.HashSet;
-
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -14,17 +10,20 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumzh.nautils.statics.NaUtilsDebugStatics;
-import net.sodiumzh.nautils.statics.NaUtilsNBTStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickEndEvent;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickStartEvent;
-import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
-import net.sodiumzh.nff.services.eventlisteners.NFFServerEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFServerEventListeners;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.HashSet;
 
 /**
  * Comprehensive serializable module for levels in BM.
@@ -126,7 +125,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 		@Override
 		public boolean tryReturnSuspendedRespawner(String key) {
 			CompoundTag container = this.getNbt().getCompound("suspended_respawners");
-			if (!container.contains(key, NaUtilsNBTStatics.TAG_COMPOUND_ID))
+			if (!container.contains(key, NFUNBTStatics.TAG_COMPOUND_ID))
 				return false;	// No such entry
 			ItemStack stack = ItemStack.of(container.getCompound(key));
 			if (stack == null)
@@ -175,7 +174,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 			
 			// Debug output time
 			if (NFFServices.IS_DEBUG_MODE && getTickCount() % 200 == 0 && getLevel().players().size() > 0)
-				NaUtilsDebugStatics.debugPrintToScreen("Time (s) : " + Long.toString(getTickCount()), getLevel().players().get(0));
+				NFUDebugStatics.debugPrintToScreen("Time (s) : " + Long.toString(getTickCount()), getLevel().players().get(0));
 			
 			MinecraftForge.EVENT_BUS.post(new NFFLevelModuleTickEndEvent(level));
 		}

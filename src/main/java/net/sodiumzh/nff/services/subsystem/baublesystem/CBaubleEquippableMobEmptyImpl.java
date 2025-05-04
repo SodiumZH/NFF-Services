@@ -1,9 +1,9 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
+import net.minecraft.world.entity.Mob;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import net.minecraft.world.entity.Mob;
 
 /**
  * Used when {@code IBaubleEquippableMob} trying to access the capability when it's not present,

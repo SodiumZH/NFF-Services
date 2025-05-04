@@ -1,16 +1,15 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.Optional;
 
 /** Adjusted from HMaG-LeapAtTargetGoal2 */
 public abstract class NFFLeapAtGoal extends NFFMoveGoal

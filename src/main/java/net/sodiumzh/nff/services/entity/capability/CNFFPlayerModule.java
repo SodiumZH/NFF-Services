@@ -7,8 +7,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import org.apache.commons.lang3.mutable.MutableObject;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 public interface CNFFPlayerModule extends INBTSerializable<CompoundTag>
 {

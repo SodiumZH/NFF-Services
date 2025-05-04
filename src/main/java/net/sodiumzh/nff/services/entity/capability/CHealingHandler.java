@@ -5,12 +5,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.extensions.IForgeItem;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nautils.statics.NaUtilsItemStatics;
-import net.sodiumzh.nautils.statics.NaUtilsParticleStatics;
+import net.sodiumzh.nfu.util.NFUItemStatics;
+import net.sodiumzh.nfu.util.NFUParticleStatics;
 
 import javax.annotation.Nullable;
 
@@ -49,7 +48,7 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 					ItemStack remaining = stack.getItem().getContainerItem(stack);
 					stack.shrink(1);
 					if (player != null)
-						NaUtilsItemStatics.giveOrDrop(player, remaining);
+						NFUItemStatics.giveOrDrop(player, remaining);
 				}
 				getOwner().heal(event.healValue);
 				if (event.sendDefaultParticles)
@@ -69,14 +68,14 @@ public interface CHealingHandler extends INBTSerializable<IntTag>
 	
 	public default void sendParticlesOnSuccess()
 	{
-		//NaUtilsEntityStatics.sendGlintParticlesToLivingDefault(getOwner());
-		NaUtilsParticleStatics.sendGlintParticlesToEntityDefault(getOwner());
+		//NFUEntityStatics.sendGlintParticlesToLivingDefault(getOwner());
+		NFUParticleStatics.sendGlintParticlesToEntityDefault(getOwner());
 	}
 	
 	public default void sendParticlesOnFailure()
 	{
-		//NaUtilsEntityStatics.sendSmokeParticlesToLivingDefault(getOwner());
-		NaUtilsParticleStatics.sendSmokeParticlesToEntityDefault(getOwner());
+		//NFUEntityStatics.sendSmokeParticlesToLivingDefault(getOwner());
+		NFUParticleStatics.sendSmokeParticlesToEntityDefault(getOwner());
 	}
 	
 	// Get expected cooldown time each healing 

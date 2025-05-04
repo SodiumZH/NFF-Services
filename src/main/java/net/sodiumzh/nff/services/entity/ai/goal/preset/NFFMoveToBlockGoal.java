@@ -1,13 +1,13 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.LevelReader;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+
+import java.util.EnumSet;
 
 public abstract class NFFMoveToBlockGoal extends NFFMoveGoal
 {

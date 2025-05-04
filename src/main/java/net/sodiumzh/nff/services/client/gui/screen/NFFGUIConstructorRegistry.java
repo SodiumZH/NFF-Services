@@ -1,9 +1,9 @@
 package net.sodiumzh.nff.services.client.gui.screen;
 
+import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
+
 import java.util.HashMap;
 import java.util.function.Function;
-
-import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 
 public class NFFGUIConstructorRegistry
 {

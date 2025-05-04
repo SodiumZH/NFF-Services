@@ -2,10 +2,10 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nautils.mixin.events.entity.MobCheckDespawnEvent;
-import net.sodiumzh.nautils.mixin.events.entity.MobSunBurnTickEvent;
-import net.sodiumzh.nautils.mixin.events.entity.MonsterPreventSleepEvent;
 import net.sodiumzh.nff.services.NFFServices;
+import net.sodiumzh.nfu.mixin.event.entity.MobCheckDespawnEvent;
+import net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nfu.mixin.event.entity.MonsterPreventSleepEvent;
 
 /**
  * Common event listeners for {@link INFFTamed}.

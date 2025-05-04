@@ -7,14 +7,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumzh.nautils.capability.CEntityTimerCapability;
-import net.sodiumzh.nautils.capability.EntityTimerAccessor;
-import net.sodiumzh.nautils.entity.anger.CMobAngerHandler;
-import net.sodiumzh.nautils.entity.anger.MobAngerRules;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
-import net.sodiumzh.nff.services.eventlisteners.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.capability.CEntityTimerCapability;
+import net.sodiumzh.nfu.capability.EntityTimerAccessor;
+import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
+import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -153,7 +153,7 @@ public interface CNFFTamable extends CEntityTimerCapability<Mob>, CMobAngerHandl
 		if (!rawKey.contains("|")) return Optional.empty();
 		String[] split = rawKey.split("\\|");
 		if (split.length != 2) return Optional.empty();
-		return NaUtilsMiscStatics.toOptionalUUID(split[0]).map(uuid -> new Tuple<>(uuid, split[1]));
+		return NFUMiscStatics.toOptionalUUID(split[0]).map(uuid -> new Tuple<>(uuid, split[1]));
 	}
 
 	public static EntityTimerAccessor getTimerAccessor(String key) {

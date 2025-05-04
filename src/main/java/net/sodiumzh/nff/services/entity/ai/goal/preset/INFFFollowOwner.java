@@ -6,11 +6,11 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumzh.nautils.statics.NaUtilsLevelStatics;
-import net.sodiumzh.nautils.statics.NaUtilsMathStatics;
-import net.sodiumzh.nautils.annotation.DontOverride;
-import net.sodiumzh.nautils.exceptions.UnimplementedException;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.exception.UnimplementedException;
+import net.sodiumzh.nfu.util.NFULevelStatics;
+import net.sodiumzh.nfu.util.NFUMathStatics;
 
 /**
  * Sound methods for all follow-owner goals.
@@ -103,7 +103,7 @@ public interface INFFFollowOwner
 			
 		for (int i = 0; i < 20; ++i) {
 			Vec3 pos = ownerPos.add(teleportOffset());
-			if (goal().shouldAvoidSun.test(goal().getMob()) && NaUtilsLevelStatics.isUnderSun(new BlockPos(pos), mob))
+			if (goal().shouldAvoidSun.test(goal().getMob()) && NFULevelStatics.isUnderSun(new BlockPos(pos), mob))
 				continue;
 			if (tryTeleportToOwner())
 				return;
@@ -118,7 +118,7 @@ public interface INFFFollowOwner
 	@DontOverride
 	public default Vec3 teleportOffsetDefault()
 	{
-		return NaUtilsMathStatics.randomOvalVector(3, 1, 3).scale(goal().getMob().asMob().getRandom().nextDouble());
+		return NFUMathStatics.randomOvalVector(3, 1, 3).scale(goal().getMob().asMob().getRandom().nextDouble());
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public interface INFFFollowOwner
 		Vec3 targetPos = owner.position().add(new Vec3(0, 1, 0)).add(teleportOffset());
 		if (!this.posNoCollision(targetPos))
 			return false;
-		if (goal().shouldAvoidSun.test(goal().getMob()) && NaUtilsLevelStatics.isUnderSun(new BlockPos(targetPos), mob))
+		if (goal().shouldAvoidSun.test(goal().getMob()) && NFULevelStatics.isUnderSun(new BlockPos(targetPos), mob))
 			return false;
 		else {
 			mob.moveTo(targetPos);

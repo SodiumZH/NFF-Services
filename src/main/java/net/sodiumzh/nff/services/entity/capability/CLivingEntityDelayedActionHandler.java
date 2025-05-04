@@ -1,20 +1,17 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.function.Consumer;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.function.Consumer;
 
 public interface CLivingEntityDelayedActionHandler
 {

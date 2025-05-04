@@ -2,7 +2,7 @@ package net.sodiumzh.nff.services.subsystem.baublesystem;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
+import net.sodiumzh.nfu.event.NFULivingEvent;
 
 
 /**
@@ -10,7 +10,7 @@ import net.sodiumzh.nautils.events.NaUtilsLivingEvent;
  * <p><b>Note: DO NOT directly listen to this event!</b> It will post 4 times each tick, 
  * including pre-tick, pre-slot-tick, post-slot-tick, post-tick successively. Listen to specific events instead.
  */
-public abstract class BaubleEquippableMobTickEvent extends NaUtilsLivingEvent<Mob>
+public abstract class BaubleEquippableMobTickEvent extends NFULivingEvent<Mob>
 {
 	public final CBaubleEquippableMob capability;
 	

@@ -1,10 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
 
-import java.util.EnumSet;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -16,6 +11,10 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFTargetGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.function.Predicate;
 
 public class NFFNearestAttackableTargetGoal<T extends LivingEntity> extends NFFTargetGoal {
   // private static final int DEFAULT_RANDOM_INTERVAL = 10;

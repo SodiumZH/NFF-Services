@@ -1,20 +1,18 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
+import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+import net.sodiumzh.nfu.container.Tuple4;
+
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
-import com.mojang.logging.LogUtils;
-
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.containers.Tuple4;
 
 class BaubleEquippableMobRegistries
 {

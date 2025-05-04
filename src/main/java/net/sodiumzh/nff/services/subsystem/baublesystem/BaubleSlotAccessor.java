@@ -1,12 +1,11 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nautils.containers.NaUtilsImmutableMap;
 
 /**
  * An accessor for dynamically getting current bauble ItemStacks from slots.
@@ -54,7 +53,7 @@ public class BaubleSlotAccessor
 	public Map<String, Function<Mob, ItemStack>> getAccessors()
 	{
 		refresh();
-		return new NaUtilsImmutableMap<>(accessorsCache);
+		return Map.copyOf(accessorsCache);
 	}
 	
 	/**
@@ -68,7 +67,7 @@ public class BaubleSlotAccessor
 		HashMap<String, ItemStack> map = new HashMap<>();
 		for (var entry: itemsCache.entrySet())
 			map.put(entry.getKey(), entry.getValue());
-		return new NaUtilsImmutableMap<>(map);
+		return Map.copyOf(map);
 	}
 	
 	/**

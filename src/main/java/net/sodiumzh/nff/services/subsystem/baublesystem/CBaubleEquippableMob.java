@@ -1,12 +1,11 @@
 package net.sodiumzh.nff.services.subsystem.baublesystem;
 
-import java.util.Set;
+import net.minecraft.world.entity.Mob;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.util.NFUMiscStatics;
 
 import javax.annotation.Nonnull;
-
-import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nautils.statics.NaUtilsMiscStatics;
-import net.sodiumzh.nautils.annotation.DontOverride;
+import java.util.Set;
 
 /**
  * Capability for all mobs that can equip baubles. Mobs registered in {@link RegisterBaubleEvent} will be automatically added this capability.
@@ -82,7 +81,7 @@ interface CBaubleEquippableMob
 	@Nonnull
 	static CBaubleEquippableMob getCapability(Mob mob)
 	{
-		return NaUtilsMiscStatics.getValueOrDefault(mob.getCapability(BaubleSystemCapabilities.CAP_BAUBLE_EQUIPPABLE_MOB), 
+		return NFUMiscStatics.getValueOrDefault(mob.getCapability(BaubleSystemCapabilities.CAP_BAUBLE_EQUIPPABLE_MOB),
 				() -> new CBaubleEquippableMobEmptyImpl(mob));
 	}
 }
