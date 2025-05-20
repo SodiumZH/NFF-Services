@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.baublesystem;
+package net.sodiumzh.nfu.item.bauble;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
@@ -20,23 +20,23 @@ public class ClonedBaubleBehavior extends BaubleBehavior
 
 	private final IBaubleRegistryEntry source;
 	
-	private ClonedBaubleBehavior(IBaubleRegistryEntry source, ResourceLocation key, 
-			@Nullable Item item, @Nullable BiPredicate<Item, ItemStack> multiItemCondition, 
-			BaubleEquippingCondition equippingCondition)
+	private ClonedBaubleBehavior(IBaubleRegistryEntry source, ResourceLocation key,
+                                 @Nullable Item item, @Nullable BiPredicate<Item, ItemStack> multiItemCondition,
+                                 BaubleEquippingCondition equippingCondition)
 	{
 		super(key, item, multiItemCondition, equippingCondition);
 		this.source = source;
 	}
 
-	public static ClonedBaubleBehavior clone(IBaubleRegistryEntry source, 
-			@Nonnull Item item, ResourceLocation key, BaubleEquippingCondition equippingCondition)
+	public static ClonedBaubleBehavior clone(IBaubleRegistryEntry source,
+                                             @Nonnull Item item, ResourceLocation key, BaubleEquippingCondition equippingCondition)
 	{
 		return new ClonedBaubleBehavior(source, key, item, null, equippingCondition);
 	}
 	
-	public static ClonedBaubleBehavior clone(IBaubleRegistryEntry source, 
-			@Nonnull BiPredicate<Item, ItemStack> condition, ResourceLocation key,
-			BaubleEquippingCondition equippingCondition)
+	public static ClonedBaubleBehavior clone(IBaubleRegistryEntry source,
+                                             @Nonnull BiPredicate<Item, ItemStack> condition, ResourceLocation key,
+                                             BaubleEquippingCondition equippingCondition)
 	{
 		return new ClonedBaubleBehavior(source, key, null, condition, equippingCondition);
 	}
