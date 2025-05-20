@@ -1,4 +1,4 @@
-package net.sodiumzh.nfu.item.bauble;
+package net.sodiumzh.nff.services.subsystem.bauble;
 
 import java.util.function.BiPredicate;
 
@@ -79,14 +79,14 @@ public class ClonedBaubleBehavior extends BaubleBehavior
 	}
 
 	@Override
-	public BaubleAttributeModifier[] getNonDuplicableModifiers(Mob mob)
+	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob)
 	{
-		return source.getNonDuplicableModifiers(mob);
+		return source.getNonDuplicatableModifiers(mob);
 	}
 	
 	@Override
-	public BaubleAttributeModifier[] getDuplicableModifiers(BaubleProcessingArgs args) {
-		return source.getDuplicableModifiers(args);
+	public BaubleAttributeModifier[] getDuplicatableModifiers(BaubleProcessingArgs args) {
+		return source.getDuplicatableModifiers(args);
 	}
 
 

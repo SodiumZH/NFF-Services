@@ -1,4 +1,4 @@
-package net.sodiumzh.nfu.item.bauble;
+package net.sodiumzh.nff.services.subsystem.bauble;
 
 import java.util.HashMap;
 import java.util.HashSet;

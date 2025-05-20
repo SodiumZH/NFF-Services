@@ -1,4 +1,4 @@
-package net.sodiumzh.nfu.item.bauble;
+package net.sodiumzh.nff.services.subsystem.bauble;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,7 +68,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		}
 		allMatchedEntries.forEach(entry ->
 		{
-			BaubleAttributeModifier[] mods = entry.getNonDuplicableModifiers(this.getMob());
+			BaubleAttributeModifier[] mods = entry.getNonDuplicatableModifiers(this.getMob());
 			if (mods != null)
 			{
 				for (int i = 0; i < mods.length; ++i)
@@ -82,7 +82,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		{
 			BaubleRegistries.forEachMatchedEntry(this, key, entry -> 
 			{
-				BaubleAttributeModifier[] mods = entry.getDuplicableModifiers(new BaubleProcessingArgs(getBaubleSlotAccessor().getItemStack(key),
+				BaubleAttributeModifier[] mods = entry.getDuplicatableModifiers(new BaubleProcessingArgs(getBaubleSlotAccessor().getItemStack(key),
 						this, key));
 				if (mods != null)
 				{

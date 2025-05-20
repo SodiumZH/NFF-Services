@@ -1,4 +1,4 @@
-package net.sodiumzh.nfu.item.bauble;
+package net.sodiumzh.nff.services.subsystem.bauble;
 
 import java.util.function.BiPredicate;
 
@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * A {@code BaubleBehavior} is an {@link IBaubleRegistryEntry} implementation that's not defined together with specific {@link Item} class.
+ * A {@code BaubleBehavior} is an {@link IBaubleRegsitryEntry} implementation that's not defined together with specific {@link Item} class.
  * It's used to define behaviors as baubles for existing items, or add other effects to existing {@link DedicatedBaubleItem}s.
  */
 public abstract class BaubleBehavior implements IBaubleRegistryEntry
@@ -37,7 +37,7 @@ public abstract class BaubleBehavior implements IBaubleRegistryEntry
 	}
 	
 	/**
-	 * @param item Item type taking this BaubleBehavior.
+	 * @param Item Item type taking this BaubleBehavior.
 	 * @param key Key in registry. Must be unique.
 	 * @param equippingCondition Condition if a slot for a mob can equip this bauble.
 	 */
@@ -101,13 +101,11 @@ public abstract class BaubleBehavior implements IBaubleRegistryEntry
 		return key;
 	}
 
-	@Nullable
 	@Override
 	public final Item getItem() {
 		return item;
 	}
 
-	@Nullable
 	@Override
 	public final BiPredicate<Item, ItemStack> getMultiItemCondition() {
 		return multiItemCondition;

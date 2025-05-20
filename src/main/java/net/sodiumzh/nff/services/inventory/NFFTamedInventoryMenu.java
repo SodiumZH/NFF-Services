@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nfu.item.bauble.BaubleSystem;
+import net.sodiumzh.nff.services.subsystem.bauble.BaubleSystem;
 
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 

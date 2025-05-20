@@ -1,4 +1,4 @@
-package net.sodiumzh.nfu.item.bauble;
+package net.sodiumzh.nff.services.subsystem.bauble;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -97,8 +97,8 @@ public class BaubleAttributeModifier
 	 * and it creates a 2-element array.
 	 * <p>The AttributeModifier argument can accept various forms:
 	 * <p>(a) {@link AttributeModifier.Operation} enum.
-	 * <p>(b) String: "+", "a", "add" or "addition" for ADDITION; "*", "m", "mb", "multiply_base" for MULTIPLY_BASE;
-	 * "**", "mt" or "multiply_total" for MULTIPLY_TOTAL.
+	 * <p>(b) String: "a", "add" or "addition" for ADDITION; "m", "mb", "multiply_base" for MULTIPLY_BASE;
+	 * "mt" or "multiply_total" for MULTIPLY_TOTAL.
 	 * <p>(c) Index: 0 for ADDITION, 1 for MULTIPLY_BASE, 2 for MULTIPLY_TOTAL.
 	 * <p>(d) Omitted: ADDITION by default.
 	 */
@@ -148,11 +148,11 @@ public class BaubleAttributeModifier
 				else if (args[i] instanceof String str)
 				{
 					String strl = str.toLowerCase();
-					if (strl.equals("+") || strl.equals("a") || strl.equals("add") || strl.equals("addition"))
+					if (strl.equals("a") || strl.equals("add") || strl.equals("addition"))
 						current.c = AttributeModifier.Operation.ADDITION;
-					else if (strl.equals("*") || strl.equals("m") || strl.equals("mb") || strl.equals("multiply_base") || strl.equals("multiply base") || strl.equals("multiplybase"))
+					else if (strl.equals("m") || strl.equals("mb") || strl.equals("multiply_base") || strl.equals("multiply base") || strl.equals("multiplybase"))
 						current.c = AttributeModifier.Operation.MULTIPLY_BASE;
-					else if (strl.equals("**") || strl.equals("mt") || strl.equals("multiply_total") || strl.equals("multiply total") || strl.equals("multiplytotal"))
+					else if (strl.equals("mt") || strl.equals("multiply_total") || strl.equals("multiply total") || strl.equals("multiplytotal"))
 						current.c = AttributeModifier.Operation.MULTIPLY_TOTAL;
 					else throw new IllegalArgumentException("BaubleAttributeModifier#makeModifiers: Illegal string argument at position " + Integer.toString(i)
 					+ ": \"" + str + "\"");

@@ -9,7 +9,6 @@ import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeListing;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeListingCollection;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeRegistry;
-import net.sodiumzh.nfu.item.bauble.IBaubleRegistryEntry;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 
 import java.util.function.Function;
@@ -61,7 +60,7 @@ public class NFURegistries {
                     .setLoadAfter(VANILLA_TRADE_LISTINGS);
 
     /**
-     * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade collections.
+     * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade listings.
      */
     public static final NFURegistry<VanillaTradeRegistry> VANILLA_TRADE_REGISTRIES =
             new NFURegistry<VanillaTradeRegistry>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "vanilla_trade_registries"))
@@ -74,13 +73,12 @@ public class NFURegistries {
     public static final NFURegistry<MobAngerReason> MOB_ANGER_REASONS =
         new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "mob_anger_reasons"));
 
+
     public static final NFURegistry<MobAngerRules> MOB_ANGER_RULES =
         new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "mob_anger_rules"));
 
     public static final NFURegistry<EntityAttributeProvider> ENTITY_ATTRIBUTE_PROVIDERS =
             new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "entity_attribute_providers"));
 
-    public static final NFURegistry<IBaubleRegistryEntry> BAUBLES =
-        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "baubles"));
 
 }
