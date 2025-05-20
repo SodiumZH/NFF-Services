@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.baublesystem;
+package net.sodiumzh.nfu.item.bauble;
 
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;

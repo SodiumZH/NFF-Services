@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.baublesystem;
+package net.sodiumzh.nfu.item.bauble;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.Mob;
@@ -59,7 +59,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		HashSet<IBaubleRegistryEntry> allMatchedEntries = new HashSet<>();
 		for (String key: getBaubleSlotAccessor().getAccessors().keySet())
 		{
-			BaubleRegistries.forEachMatchedEntry(this, key, entry -> 
+			BaubleRegistries.forEachMatchedEntry(this, key, entry ->
 			{
 				if (!allMatchedEntries.contains(entry))
 					allMatchedEntries.add(entry);
