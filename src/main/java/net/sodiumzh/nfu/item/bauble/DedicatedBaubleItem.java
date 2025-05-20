@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.bauble;
+package net.sodiumzh.nfu.item.bauble;
 
 import java.util.function.BiPredicate;
 
@@ -50,6 +50,6 @@ public abstract class DedicatedBaubleItem extends NFUItem implements IBaubleRegi
 
 	@Override
 	@Nullable
-	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob) {return null;}
+	public BaubleAttributeModifier[] getNonDuplicableModifiers(Mob mob) {return null;}
 	
 }
