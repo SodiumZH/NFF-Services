@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.bauble;
+package net.sodiumzh.nfu.item.bauble;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;

@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.bauble;
+package net.sodiumzh.nfu.item.bauble;
 
 import java.util.function.BiPredicate;
 
@@ -103,13 +103,13 @@ public interface IBaubleRegistryEntry
 	 * Getter of {@link BaubleAttributeModifier}s that should be added once no matter how many this bauble is equipped.
 	 */
 	@Nullable
-	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob);
+	public BaubleAttributeModifier[] getNonDuplicableModifiers(Mob mob);
 	
 	/**
 	 * Getter of {@link BaubleAttributeModifier}s that should be added each this bauble is added.
 	 */
 	@Nullable
-	public BaubleAttributeModifier[] getDuplicatableModifiers(BaubleProcessingArgs args);
+	public BaubleAttributeModifier[] getDuplicableModifiers(BaubleProcessingArgs args);
 	
 	// Utilities
 	

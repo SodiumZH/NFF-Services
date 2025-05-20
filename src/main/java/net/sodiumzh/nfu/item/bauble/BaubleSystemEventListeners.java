@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.bauble;
+package net.sodiumzh.nfu.item.bauble;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;

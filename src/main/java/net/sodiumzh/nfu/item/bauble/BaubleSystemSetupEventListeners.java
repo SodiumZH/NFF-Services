@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.subsystem.bauble;
+package net.sodiumzh.nfu.item.bauble;
 
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
