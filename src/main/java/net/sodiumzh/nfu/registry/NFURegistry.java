@@ -2,15 +2,18 @@ package net.sodiumzh.nfu.registry;
 
 import com.google.common.collect.HashBiMap;
 import com.mojang.logging.LogUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import net.sodiumzh.nfu.eventhandler.NFUSetupEventHandlers;
 import net.sodiumzh.nfu.exception.DuplicateRegistryEntryException;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.object.DirectedGraphNode;
 import net.sodiumzh.nfu.object.LimitedMutable;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
@@ -18,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 /**
@@ -363,11 +368,11 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
         Accessor<T> validate() {this.validated = true; return this;}
     }
 
-    public enum SetupPhase {
+    public static enum SetupPhase {
         COMMON_SETUP, CLIENT_SETUP, SERVER_SETUP;
     }
 
-    public enum AvailableSide {
+    public static enum AvailableSide {
         SERVER, CLIENT, BOTH
     }
 
@@ -389,6 +394,40 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
             }
             return sort;
         }
+    }
+
+    /**
+     * Indicates how it should handle sync. This record should exist on both sides no matter on which side
+     * the registry is available.
+     * @param shouldSync If true, it will sync the data to another side.
+     * @param from Where the data is posted from.
+     * @param encoder How the data should be written to buffer.
+     * @param decoder How the data should be generated from buffer.
+     */
+    public static record SyncPolicy<T>(boolean shouldSync, LogicalSide from, BiConsumer<FriendlyByteBuf, T> encoder, Function<FriendlyByteBuf, T> decoder) {
+
+        public static <T> SyncPolicy<T> noSync() {
+            return new SyncPolicy<>(false, null, null, null);
+        }
+
+        public static <T> SyncPolicy<T> fromServer(@Nonnull BiConsumer<FriendlyByteBuf, T> encoder,
+                                                   @Nonnull Function<FriendlyByteBuf, T> decoder) {
+            return new SyncPolicy<>(true, LogicalSide.SERVER, encoder, decoder);
+        }
+
+        public static <T> SyncPolicy<T> fromServer(NFUDataSerializer<T> serializer) {
+            return fromServer(serializer::write, serializer::read);
+        }
+
+        public static <T> SyncPolicy<T> fromClient(@Nonnull BiConsumer<FriendlyByteBuf, T> encoder,
+                                                   @Nonnull Function<FriendlyByteBuf, T> decoder) {
+            return new SyncPolicy<>(true, LogicalSide.CLIENT, encoder, decoder);
+        }
+
+        public static <T> SyncPolicy<T> fromClient(NFUDataSerializer<T> serializer) {
+            return fromClient(serializer::write, serializer::read);
+        }
+
     }
 
 }

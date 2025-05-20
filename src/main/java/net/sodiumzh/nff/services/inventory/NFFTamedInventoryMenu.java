@@ -9,9 +9,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.subsystem.baublesystem.BaubleSystem;
-
 import java.util.function.Predicate;
+import net.sodiumzh.nfu.item.bauble.BaubleSystem;
 
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 
