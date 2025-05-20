@@ -12,6 +12,7 @@ import net.sodiumzh.nff.services.subsystem.baublesystem.BaubleSystem;
 import net.sodiumzh.nfu.math.GuiPos;
 
 import java.util.function.Predicate;
+import net.sodiumzh.nfu.item.bauble.BaubleSystem;
 
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 
