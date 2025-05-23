@@ -30,14 +30,17 @@ public class NFUDebugStatics {
 	 * @param callerClass The class in which the error is reported. Usually
 	 * {@code this.getClass()} or {@code CallingClass.class}.
 	 * @param msg Error message.
+	 * @return Whether printed.
 	 */
-	public static void errorOnce(Class<?> callerClass, String msg)
+	public static boolean errorOnce(Class<?> callerClass, String msg)
 	{
 		if (!REPORTED_ERROR_MSG.contains(msg))
 		{
 			LoggerFactory.getLogger(callerClass).error(msg);
 			REPORTED_ERROR_MSG.add(msg);
+			return true;
 		}
+		else return false;
 	}
 
 	/**
@@ -45,14 +48,17 @@ public class NFUDebugStatics {
 	 * @param callerClass The class in which the warning is reported. Usually
 	 * {@code this.getClass()} or {@code CallingClass.class}.
 	 * @param msg Warning message.
+	 * @return Whether printed.
 	 */
-	public static void warnOnce(Class<?> callerClass, String msg)
+	public static boolean warnOnce(Class<?> callerClass, String msg)
 	{
 		if (!REPORTED_WARNING_MSG.contains(msg))
 		{
 			LoggerFactory.getLogger(callerClass).warn(msg);
 			REPORTED_WARNING_MSG.add(msg);
+			return true;
 		}
+		else return false;
 	}
 
 }

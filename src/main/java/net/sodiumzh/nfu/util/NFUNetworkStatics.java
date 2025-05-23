@@ -52,7 +52,7 @@ public class NFUNetworkStatics
 					}
 					catch (Exception e)
 					{
-						throw new IllegalArgumentException("NaUtilsNetworkStatics::registerDefaultPacket packet class missing constructor.", e);
+						throw new IllegalArgumentException("NFUNetworkStatics::registerDefaultPacket packet class missing constructor.", e);
 					}
                 },
                 (pack, ctx) -> {
