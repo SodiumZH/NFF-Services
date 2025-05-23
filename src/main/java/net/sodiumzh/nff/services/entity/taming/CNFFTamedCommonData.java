@@ -35,10 +35,12 @@ import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import net.sodiumzh.nfu.object.CastableObject;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
@@ -253,17 +255,16 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	 * <p>Note: this includes an unsafe casting. Double-check the type before using.
 	 * Return {@code null} if not present.
 	 */
-	public <T> Optional<T> getSynchedGetter(String key, Class<T> type);
+	public <T> T getSynchedGetter(String key, Class<T> type);
 
 	/**
-	 * Get a synched getter as a raw {@link CastableObject}.
+	 * Get a synched getter as a raw {@link Object}.
 	 * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
 	 * and on client it will be read from the cached field which is updated on synching.
-	 * <p> This method will never return {@code null}, but if the field is not present, return an empty {@link CastableObject}
-	 * of which {@code cast()} and {@code castTo} always return {@code null}.
+	 * <p> Null if the key doesn't exist.
 	 */
-	@Nonnull
-	public CastableObject getSynchedGetter(String key);
+	@Nullable
+	public Object getSynchedGetter(String key);
 
 	/**
 	 * Set the key-value pair in the synched getter cache on client.
@@ -335,9 +336,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private Map<String, Tuple<NFUDataSerializer<?>, Object>> synchedData = new HashMap<>();
 			// Suppliers are only called on server. On client, this table is present for keeping a serializer instance
 			// to decode, but the suppliers will never be called.
-		private Map<String, Tuple<NFUDataSerializer<?>, Supplier<?>>> synchedGetterAccessors = new HashMap<>();
-			// only called on client
-		private Map<String, Object> synchedGetterCache = new HashMap<>();
+		private Map<String, SynchedGetter> synchedGetters = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
 		private MutablePredicate<INFFTamedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
@@ -678,7 +677,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		@Override
 		public LivingEntity getAttackTarget() {
 			if (this.getEntity().level.isClientSide) {
-				int id = this.getSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
+				int id = Optional.ofNullable(this.getSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, Integer.class)).orElse(-1);
 				if (id < 0) return null;
 				Entity e = this.getEntity().level.getEntity(id);
 				return e instanceof LivingEntity living ? living : null;
@@ -759,30 +758,52 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public <T> void createSynchedGetter(String key, NFUDataSerializer<T> serializer, @Nonnull T defaultValue, Supplier<T> accessorOnServer) {
-			this.synchedGetterAccessors.put(key, new Tuple<>(serializer, accessorOnServer));
-			this.synchedGetterCache.put(key, defaultValue);
+			this.synchedGetters.put(key,
+				new SynchedGetter(key, serializer, accessorOnServer, defaultValue, defaultValue));
+		}
+
+		/**
+		 * Get value from a synched getter.
+		 * @param key Synched getter key.
+		 * @param type Object type to get.
+		 * @return Gotten value. Null if the getter doesn't exist, or accessing encountered an error.
+		 */
+		@Nullable
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T> T getSynchedGetter(String key, Class<T> type) {
+			if (!this.synchedGetters.containsKey(key)) return null;
+			Object raw = null;
+			try {
+				if (this.getEntity().level.isClientSide())
+					raw = this.synchedGetters.get(key).cache;
+				else
+					raw = this.synchedGetters.getOrDefault(key, SynchedGetter.dummy()).accessor.get();
+			} catch (RuntimeException e) {
+				// Exceptions thrown by accessor calling
+				NFUDebugStatics.errorOnce(CNFFTamedCommonData.class, e.getMessage());
+				raw = null;
+			}
+			try {
+				return (T)raw;
+			} catch (ClassCastException e) {
+				// Exception thrown when accessor calling succeeded but type mismatched
+				throw new IllegalArgumentException(String.format("CNFFTamedCommonData#getSynchedGetter: illegal getting class %s. Found object class: %s",
+					type.getName(), raw.getClass().getName()), e);
+			}
+
 		}
 
 		@Override
 		@Nullable
-		@SuppressWarnings("unchecked")
-		public <T> Optional<T> getSynchedGetter(String key, Class<T> type) {
-			if (this.getEntity().level.isClientSide())
-				return Optional.ofNullable((T) this.synchedGetterCache.get("key"));
-			else return Optional.ofNullable((T) this.synchedGetterAccessors.getOrDefault("key", new Tuple<>(null, () -> (T)null))
-					.getB().get());
-		}
-
-		@Override
-		@Nonnull
-		public CastableObject getSynchedGetter(String key) {
+		public Object getSynchedGetter(String key) {
 			// Raw casting to Object is safe
-			return new CastableObject(this.getSynchedGetter(key, Object.class));
+			return this.getSynchedGetter(key, Object.class);
 		}
 
 		@Override
 		public void setSynchedGetterClient(String key, @Nonnull Object o) {
-			this.synchedGetterCache.put(key, o);
+			this.synchedGetters.get(key).setCacheValue(o);
 		}
 
 		@Override
@@ -904,7 +925,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				String key = buf.readUtf();
 				NFUDataSerializer<?> type = NFUDataSerializer.fromId(new ResourceLocation(buf.readUtf()));
 				Object obj = type.read(buf);
-				getters.put(key, new Tuple<>(type, obj));
+				getters.put(key, obj);
 			}
 			// Read inventory
 			this.inventory = new ArrayList<>();
@@ -926,12 +947,20 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				NFUDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB());
 			}
 			// Write synched getters
-			buf.writeInt(dataCap.synchedGetterAccessors.size());
-			for (var entry: dataCap.synchedGetterAccessors.entrySet()) {
-				buf.writeUtf(entry.getKey());
-				buf.writeUtf(entry.getValue().getA().getKey().toString());
-				// Access the value and write
-				NFUDataSerializer.writeUnchecked(entry.getValue().getA(), buf, entry.getValue().getB().get());
+			/* Getters may throw exception on getting, and at this time this getter should be skipped.
+			 So the values should be gathered first and the amount will depend on valid entry amount instead
+			 of overall getter amount. */
+			List<Tuple2<String, Object>> getters = new ArrayList<>(20);
+			for (var entry: dataCap.synchedGetters.entrySet()) {
+				Optional.ofNullable(dataCap.getSynchedGetter(entry.getKey()))
+					.ifPresent(o -> getters.add(Tuple2.of(entry.getKey(), o)));	// Get value and collect if valid
+			}
+			buf.writeInt(getters.size());
+			for (Tuple2<String, Object> entry: getters) {
+				var serializer = dataCap.synchedGetters.get(entry.getA()).serializer;
+				buf.writeUtf(entry.getA());	// Write key
+				buf.writeUtf(serializer.getKey().toString());	// Write serializer key
+				NFUDataSerializer.writeUnchecked(serializer, buf, entry.getB());	// Write value
 			}
 			// Write inventory
 			buf.writeInt(this.inventory.size());
@@ -1009,5 +1038,29 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		CompoundTag capTag = getCapFromMobTag(mobTag);
 		if (capTag == null) return null;
 		return capTag.getString("modId");
+	}
+
+	static class SynchedGetter  {
+		private String key;
+		private NFUDataSerializer<?> serializer;
+		private Supplier<?> accessor;
+		private Object cache;
+		private Object defaultValue;
+
+		public <T> SynchedGetter(String key, NFUDataSerializer<T> serializer, Supplier<? extends T> accessor, T cache, T defaultValue) {
+			this.key = key;
+			this.serializer = serializer;
+			this.accessor = accessor;
+			this.cache = cache;
+			this.defaultValue = defaultValue;
+		}
+
+		public static SynchedGetter dummy() {
+			return new SynchedGetter(null, null, null, null, null);
+		}
+
+		public void setCacheValue(Object value) {
+			this.cache = value;
+		}
 	}
 }
