@@ -4,13 +4,22 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
+import net.sodiumzh.nfu.registry.NFURegistries;
+import org.w3c.dom.Attr;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * An {@code EntityAttributeProvider} is a supplier of {@link AttributeSupplier.Builder}. It allows to pre-register
+ * attributes instead of defining a static method for each entity type.
+ * <p>Register-able. In {@link NFURegistries#ENTITY_ATTRIBUTE_PROVIDERS}.
+ */
 public class EntityAttributeProvider implements Supplier<AttributeSupplier.Builder> {
 
     private final Supplier<AttributeSupplier.Builder> base;
@@ -64,6 +73,11 @@ public class EntityAttributeProvider implements Supplier<AttributeSupplier.Build
 
     public EntityAttributeProvider add(Attribute attribute, Supplier<Double> valueSupplier) {
         values.put(attribute, valueSupplier);
+        return this;
+    }
+
+    public EntityAttributeProvider apply(Consumer<EntityAttributeProvider> action) {
+        action.accept(this);
         return this;
     }
 

@@ -355,4 +355,24 @@ public class NFUMathStatics
 	public static List<Integer> getRandomIntegerSequence(int maxEx, int amount, boolean unique) {
 		return getRandomIntegerSequence(maxEx, amount, unique, RND);
 	}
+
+	/**
+	 * Convert a number to Roman representation. 1-3999 supported.
+	 */
+	public static String intToRoman(int num) {
+		final int[] vals = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+		final String[] symbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+		if (num < 1 || num > 3999) {
+			throw new IllegalArgumentException("Supports only 1-3999.");
+		}
+		StringBuilder roman = new StringBuilder();
+		for (int i = 0; i < vals.length; i++) {
+			while (num >= vals[i]) {
+				roman.append(symbols[i]);
+				num -= vals[i];
+			}
+		}
+		return roman.toString();
+	}
 }
