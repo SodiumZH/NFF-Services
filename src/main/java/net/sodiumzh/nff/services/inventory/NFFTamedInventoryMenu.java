@@ -9,8 +9,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import java.util.function.Predicate;
-import net.sodiumzh.nfu.item.bauble.BaubleSystem;
+import net.sodiumzh.nfu.item.bauble.NFUBaubleAPI;
 
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 
@@ -41,7 +40,7 @@ public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 		addSlot(new Slot(container, slot, pos.x, pos.y) {			
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return BaubleSystem.canEquipOn(stack, mob.asMob(), key) && additionalCondition.test(stack);
+				return NFUBaubleAPI.canEquipOn(stack, mob.asMob(), key) && additionalCondition.test(stack);
 			}			
 			@Override
 			public int getMaxStackSize() {
