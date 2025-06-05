@@ -116,6 +116,15 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
     }
 
     /**
+     * Get all values.
+     * <p>If a value appears twice in the registry, it will appear twice in this list. Null values will be removed.
+     * <p>Note: this method will cause all entries to generate values. Take care of the timing if the values are valid!
+     */
+    public List<? extends T> values() {
+        return table.values().stream().map(Entry::get).filter(Objects::nonNull).toList();
+    }
+
+    /**
      * Register an object from supplier.
      * @return An {@code Accessor} for getting the object, so that you can assign it to a
      * static field. Its usage is similar to {@link RegistryObject}.
