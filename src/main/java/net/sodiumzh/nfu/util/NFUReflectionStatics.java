@@ -1,10 +1,12 @@
 package net.sodiumzh.nfu.util;
 
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.sodiumzh.nfu.container.ArrayIterationHelper;
+import net.sodiumzh.nfu.container.ArrayIterable;
 import net.sodiumzh.nfu.object.CastableObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,7 +196,7 @@ public class NFUReflectionStatics
 		Class<?> currentClz = obj.getClass();
 		try {
 			do {
-				List<Field> flds = (NFUContainerStatics.iterableToList(ArrayIterationHelper.of(currentClz.getDeclaredFields())));
+				List<Field> flds = (NFUContainerStatics.iterableToList(ArrayIterable.of(currentClz.getDeclaredFields())));
 				allFlds.addAll(flds);
 				if (currentClz != Object.class)
 					currentClz = currentClz.getSuperclass();
@@ -230,4 +232,37 @@ public class NFUReflectionStatics
 			}
 		} 
 	}
+
+	/**
+	 * Check if the program is currently running inside a specified method call
+	 * of a specified class.
+	 * <p>Note: it cannot distinguish methods with same name.
+	 * @param classNameSrg SRG name of the class. It requires <b>fully qualified name</b>, like {@code package.name.ClassName}.
+	 */
+	public static boolean isRunningInMethod(String classNameSrg, String methodNameSrg) {
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		for (StackTraceElement elem: stackTrace) {
+			if (elem.getClassName().equals(classNameSrg) && elem.getMethodName().equals(methodNameSrg))
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the program is currently running inside a specified method call
+	 * of a specified class.
+	 * <p>Note: it cannot distinguish methods with same name.
+	 */
+	public static boolean isRunningInMethod(Class<?> clazz, String methodNameSrg) {
+		return isRunningInMethod(clazz.getName(), methodNameSrg);
+	}
+
+	/**
+	 * Check if the program is currently running inside a specific method call.
+	 * <p>Note: it cannot distinguish methods with same name.
+	 */
+	public static boolean isRunningInMethod(Method method) {
+		return isRunningInMethod(method.getDeclaringClass(), method.getName());
+	}
+
 }

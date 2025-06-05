@@ -5,20 +5,20 @@ import java.util.Iterator;
 /**
  * A wrapper of array for iteration. Also can be used to input as argument for {@code Iterable}.
  */
-public class ArrayIterationHelper<T> implements Iterable<T>
+public class ArrayIterable<T> implements Iterable<T>
 {
 
 	private T[] array;
 	
-	public ArrayIterationHelper(T[] array)
+	public ArrayIterable(T[] array)
 	{
 		this.array = array;
 	}
 	
 	@SafeVarargs
-	public static <S> ArrayIterationHelper<S> of(S... elems)
+	public static <S> ArrayIterable<S> of(S... elems)
 	{
-		return new ArrayIterationHelper<>(elems);
+		return new ArrayIterable<>(elems);
 	}
 	
 	@Override

@@ -112,32 +112,34 @@ public class NFUMiscStatics {
 	/**
 	 * Get the value from a {@link LazyOptional}.
 	 * If the value isn't present, return null.
+	 * @deprecated Use orElse instead.
 	 */
 	@Nullable
+	@Deprecated
 	public static <T> T getValue(LazyOptional<T> optional)
 	{
-		MutableObject<T> wrp = new MutableObject<>(null);
-		optional.ifPresent(t -> {
-			wrp.setValue(t);
-		});
-		return wrp.getValue();
+		return optional.orElse(null);
 	}
 	
 	/**
 	 * Get the value from a {@link LazyOptional}.
 	 * If the value isn't present, return a default instance defined by supplier.
+	 * @deprecated Use orElse instead.
 	 */
 	@Nonnull
+	@Deprecated
 	public static <T> T getValueOrDefault(LazyOptional<T> optional, NonNullSupplier<T> defaultSupplier)
 	{
-		T val = getValue(optional);
-		if (val != null) return val;
-		else return defaultSupplier.get();
+		return optional.orElseGet(defaultSupplier);
 	}
-	
+
+	/**
+	 * @deprecated Use Optional operations instead
+	 */
+	@Deprecated
 	public static <T> T nullThen(T test, T forNull)
 	{
-		return test == null ? forNull : test;
+		return Optional.ofNullable(test).orElse(forNull);
 	}
 	
 	/**
@@ -162,14 +164,20 @@ public class NFUMiscStatics {
 	{
 		return (T)obj;
 	}
-	
+
+	/**
+	 * @deprecated Use Optional operations instead
+	 */
+	@Deprecated
 	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access, T fallback)
 	{
-		MutableObject<T> res = new MutableObject<>(fallback);
-		target.getCapability(holder).ifPresent(cap -> res.setValue(access.apply(cap)));
-		return res.getValue();
+		return target.getCapability(holder).map(access::apply).orElse(fallback);
 	}
-	
+
+	/**
+	 * @deprecated Use Optional operations instead
+	 */
+	@Deprecated
 	public static <C, T> T getValueFromCapability(Entity target, Capability<C> holder, Function<C, T> access)
 	{
 		return getValueFromCapability(target, holder, access, null);

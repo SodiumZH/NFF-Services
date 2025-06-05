@@ -43,6 +43,19 @@ public class NFUDebugStatics {
 		else return false;
 	}
 
+	public static boolean errorOnce(String msg)
+	{
+		Class<?> callerClass;
+		boolean missingClass = false;
+		try {
+			callerClass = Class.forName(Thread.currentThread().getStackTrace()[1].getClassName());
+		} catch (Exception e) {
+            callerClass = NFUDebugStatics.class;
+			missingClass = true;
+        }
+        return errorOnce(callerClass, (missingClass ? "<Missing Source Class> " : "") + msg);
+	}
+
 	/**
 	 * Report a warning to logger if it has not been reported by this method.
 	 * @param callerClass The class in which the warning is reported. Usually
@@ -61,4 +74,16 @@ public class NFUDebugStatics {
 		else return false;
 	}
 
+	public static boolean warnOnce(String msg)
+	{
+		Class<?> callerClass;
+		boolean missingClass = false;
+		try {
+			callerClass = Class.forName(Thread.currentThread().getStackTrace()[1].getClassName());
+		} catch (Exception e) {
+			callerClass = NFUDebugStatics.class;
+			missingClass = true;
+		}
+		return warnOnce(callerClass, (missingClass ? "<Missing Source Class> " : "") + msg);
+	}
 }
