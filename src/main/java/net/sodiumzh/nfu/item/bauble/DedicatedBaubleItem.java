@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.item.NFUItem;
 
 /**
- * Base class for dedicated items as baubles. It's behaviors can be defined in subclasses and can be directly registered to BaubleSystem.
+ * Base class for dedicated items as baubles. It's behaviors can be defined in subclasses and can be directly registered to NFUBaubleAPI.
  */
 public abstract class DedicatedBaubleItem extends NFUItem implements IBaubleRegistryEntry
 {
