@@ -9,7 +9,6 @@ import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.mixin.event.entity.EntityLoadEvent;
 import net.sodiumzh.nfu.mixin.event.level.WorldCapabilityDataLoadEvent;
-import net.sodiumzh.nfu.registry.NFUConfigs;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
@@ -28,7 +27,7 @@ public class SaveDataLocationRedirectorEventListeners
 		Set<String> keys = NFUContainerStatics.iterableToSet(capTags.getAllKeys());
 		for (String key: keys)
 		{
-			ResourceLocation newKey = new ResourceLocation(key);
+			ResourceLocation newKey = new ResourceLocation(key);	// Namespace has been ported here
 			if (SaveDataLocationRedirectorRegistries.ENTITY_CAPABILITY_MAPPING.containsKey(newKey))
 				newKey = SaveDataLocationRedirectorRegistries.ENTITY_CAPABILITY_MAPPING.get(newKey);
 			if (SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.containsKey(newKey.getNamespace()))
@@ -43,7 +42,6 @@ public class SaveDataLocationRedirectorEventListeners
 	@SubscribeEvent
 	public static void doPortLevelCapabilities(WorldCapabilityDataLoadEvent event)
 	{
-		if (!NFUConfigs.CACHED_ENABLES_SAVE_DATA_PORTER) return;
 		if (SaveDataLocationRedirectorRegistries.LEVEL_CAPABILITY_MAPPING.isEmpty() && SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return;
 		Set<String> keys = NFUContainerStatics.iterableToSet(event.getNbt().getAllKeys());
 		for (String key: keys)
@@ -66,7 +64,6 @@ public class SaveDataLocationRedirectorEventListeners
 	 */
 	public static void doPortItems(CompoundTag originalItemNBT)
 	{
-		if (!NFUConfigs.CACHED_ENABLES_SAVE_DATA_PORTER) return;
 		if (SaveDataLocationRedirectorRegistries.ITEM_MAPPING.isEmpty() && SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return;
 		if (!originalItemNBT.contains("id", Tag.TAG_STRING)) return;
 		ResourceLocation key = new ResourceLocation(originalItemNBT.getString("id"));
@@ -83,7 +80,6 @@ public class SaveDataLocationRedirectorEventListeners
 	 */
 	public static void doPortEntityTypes(CompoundTag original)
 	{
-		if (!NFUConfigs.CACHED_ENABLES_SAVE_DATA_PORTER) return;
 		if (SaveDataLocationRedirectorRegistries.ENTITY_TYPE_MAPPING.isEmpty() && SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return;
 		if (!original.contains("id", Tag.TAG_STRING)) return;
 		ResourceLocation key = new ResourceLocation(original.getString("id"));
@@ -94,5 +90,10 @@ public class SaveDataLocationRedirectorEventListeners
 		if (!key.toString().equals(original.getString("id")))
 			original.putString("id", key.toString());
 	}
-	
+
+	public static String doPortNamespace(String original) {
+		if (SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return original;
+		String res = SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.get(original);
+		return res != null ? res : original;
+	}
 }
