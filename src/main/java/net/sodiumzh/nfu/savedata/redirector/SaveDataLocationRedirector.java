@@ -1,6 +1,7 @@
 package net.sodiumzh.nfu.savedata.redirector;
 
 import net.minecraft.resources.ResourceLocation;
+import net.sodiumzh.nfu.object.LimitedMutable;
 
 /**
  * NaUtils - SaveDataLocationRedirector is a utility module to simplify redirect object registry location in save data
@@ -11,7 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 public class SaveDataLocationRedirector
 {
 	private static final SaveDataLocationRedirector INSTANCE = new SaveDataLocationRedirector();
-	
+	private static LimitedMutable<Boolean> LOADING_COMPLETED = new LimitedMutable<>(false, 1);
+
 	private SaveDataLocationRedirector() {}
 	
 	public static SaveDataLocationRedirector get() {
@@ -62,5 +64,13 @@ public class SaveDataLocationRedirector
 		SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.put(oldNamespace, newNamespace);
 		return this;
 	}
-	
+
+	static void setLoadingCompleted() {
+		LOADING_COMPLETED.trySet(true);
+	}
+
+	public static boolean isLoadingCompleted() {
+		return LOADING_COMPLETED.get();
+	}
+
 }
