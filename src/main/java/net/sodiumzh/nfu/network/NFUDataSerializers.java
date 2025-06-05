@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class NFUDataSerializers {
     public static NFURegistryEntryCollection<NFUDataSerializer<?>> SERIALIZERS =
-            NFURegistryEntryCollection.create(NFURegistries.DATA_SERIALIZERS, NFULibrary.MOD_ID_LEGACY);
+            NFURegistryEntryCollection.create(NFURegistries.DATA_SERIALIZERS, NFULibrary.MOD_ID);
 
     public static final NFUDataSerializer<Boolean> BOOLEAN = NFUDataSerializer.create(
             Boolean.class, ByteTag.class,

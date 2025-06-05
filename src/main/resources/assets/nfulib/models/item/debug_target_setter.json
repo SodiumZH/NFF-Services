@@ -1,6 +1,6 @@
 {
 	"parent": "minecraft:item/handheld",
 	"textures": {
-		"layer0": "nautils:item/debug_target_setter"
+		"layer0": "nfulib:item/debug_target_setter"
 	}
 }

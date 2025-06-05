@@ -12,13 +12,13 @@ import net.sodiumzh.nfu.capability.CEntityDataCapability;
 import net.sodiumzh.nfu.entity.anger.CMobAngerHandlerProvider;
 import net.sodiumzh.nfu.entity.anger.IUsesDefaultAngerHandler;
 
-@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class NFUCapabilityAttachment {
 
     public static final ResourceLocation KEY_DATA_CAPABILITY
-            = new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "data_capability");
+            = new ResourceLocation(NFULibrary.MOD_ID, "data_capability");
     public static final ResourceLocation KEY_DEFAULT_ANGER_HANDLER
-            = new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "default_anger_handler");
+            = new ResourceLocation(NFULibrary.MOD_ID, "default_anger_handler");
 
     @SubscribeEvent
     public static void attachCaps(AttachCapabilitiesEvent<Entity> event) {

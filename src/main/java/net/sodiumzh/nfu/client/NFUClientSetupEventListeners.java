@@ -10,7 +10,7 @@ import net.sodiumzh.nfu.registry.NFURegistryGenerateValuesEvent;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NFUClientSetupEventListeners {
 
     @SubscribeEvent

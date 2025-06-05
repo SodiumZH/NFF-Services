@@ -17,16 +17,15 @@ import net.sodiumzh.nfu.registry.NFUConfigs;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
 import net.sodiumzh.nfu.registry.NFUItems;
 import net.sodiumzh.nfu.registry.NFURegistries;
+import net.sodiumzh.nfu.savedata.redirector.SaveDataLocationRedirector;
 
 import javax.annotation.Nullable;
 
-@Mod(NFULibrary.MOD_ID_LEGACY)
+@Mod(NFULibrary.MOD_ID)
 public class NFULibrary {
 
-	// TODO: change to "nautils" after separation
+	public static final String MOD_ID = "nfulib";
 	public static final String MOD_ID_LEGACY = "nautils";
-	@Deprecated
-	public static final String MOD_ID_FINAL = MOD_ID_LEGACY;
 	private static MinecraftServer server = null;
 
 	public NFULibrary() {
@@ -38,6 +37,7 @@ public class NFULibrary {
 		// Custom registry related
 		NFURegistries.init();
 		mergeCustomRegistries();
+		portSaveDataKeys();
 	}
 
 	private void mergeCustomRegistries()
@@ -53,16 +53,17 @@ public class NFULibrary {
 	 * return null.
 	 */
 	@Nullable
+	@Deprecated
 	public static MinecraftServer getServer() {
 		if (server == null) return null;
 		return server.isSameThread() ? server : null;
 	}
 
 	private void portSaveDataKeys() {
-
+		SaveDataLocationRedirector.get().redirectNamespace(MOD_ID_LEGACY, MOD_ID);
 	}
 
-	@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.FORGE)
+	@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class ForgeEventListeners {
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
 		public static void onServerAboutToStart(ServerAboutToStartEvent event) {

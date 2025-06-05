@@ -12,7 +12,7 @@ import net.sodiumzh.nfu.item.debug.DebugTargetSetterItem;
 
 public class NFUItems
 {
-	public static final DeferredRegister<Item> NAUTILS_ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NFULibrary.MOD_ID_LEGACY);
+	public static final DeferredRegister<Item> NAUTILS_ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NFULibrary.MOD_ID);
 	
 	public static final RegistryObject<DebugAISwitchItem> DEBUG_AI_SWITCH = NAUTILS_ITEMS.register("debug_ai_switch",
 			() -> new DebugAISwitchItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
