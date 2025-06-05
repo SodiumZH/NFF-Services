@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  * <p>Note: It's recommended to <u>only use this as static fields</u>. Get the accessor instance as non-static field
  * is allowed, but <u>do never call {@EntityTimerAccessor#addOnExpireAction} as it will add an </u>
  */
-@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EntityTimerAccessor {
 
     private static final List<EntityTimerAccessor> ALL_ACCESSORS = new ArrayList<>();

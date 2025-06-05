@@ -18,7 +18,7 @@ import java.util.Map;
 public class MobAngerRules {
 
     public static final int DEFAULT_FORGIVING_TICKS = 5 * 60 * 20; // 5 min
-    public static final NFURegistryEntryCollection<MobAngerRules> RULES = NFURegistryEntryCollection.create(NFURegistries.MOB_ANGER_RULES, NFULibrary.MOD_ID_LEGACY);
+    public static final NFURegistryEntryCollection<MobAngerRules> RULES = NFURegistryEntryCollection.create(NFURegistries.MOB_ANGER_RULES, NFULibrary.MOD_ID);
 
     public static final NFURegistry.Accessor<MobAngerRules> NO_ANGER = RULES.register("no_anger", MobAngerRules::new);
 

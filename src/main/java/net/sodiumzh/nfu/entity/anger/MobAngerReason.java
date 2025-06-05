@@ -13,7 +13,7 @@ import net.sodiumzh.nfu.registry.NFURegistryEntryCollection;
 public class MobAngerReason {
 
     public static final NFURegistryEntryCollection<MobAngerReason> REASONS = NFURegistryEntryCollection.create(
-            NFURegistries.MOB_ANGER_REASONS, NFULibrary.MOD_ID_LEGACY);
+            NFURegistries.MOB_ANGER_REASONS, NFULibrary.MOD_ID);
 
     /**
      * The anger target attacked the mob and dealt damage.

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  * for entity attributes.
  * <p>Note that this registration will overwrite the attributes registered in {@link EntityAttributeCreationEvent}
  */
-@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DeferredEntityAttributes {
 
     private static final Map<Supplier<EntityType<? extends LivingEntity>>, Supplier<AttributeSupplier.Builder>> TABLE = new HashMap<>();
@@ -44,7 +44,7 @@ public class DeferredEntityAttributes {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID_LEGACY, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientListener {
 
         public static void mergeClient(FMLClientSetupEvent event) {

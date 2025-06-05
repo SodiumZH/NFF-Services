@@ -10,7 +10,7 @@ import net.sodiumzh.nfu.math.LinearColor;
 public class NFUEntityDataSerializers
 {
 	public static final DeferredRegister<EntityDataSerializer<?>> SERIALIZERS = 
-			DeferredRegister.create(ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, NFULibrary.MOD_ID_LEGACY);
+			DeferredRegister.create(ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, NFULibrary.MOD_ID);
 
 	public static final RegistryObject<EntityDataSerializer<LinearColor>> LINEAR_COLOR = SERIALIZERS.register("linear_color", () -> 
 		EntityDataSerializer.simple((buf, color) -> {

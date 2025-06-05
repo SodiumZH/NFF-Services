@@ -13,6 +13,7 @@ import net.sodiumzh.nfu.item.bauble.IBaubleRegistryEntry;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class NFURegistries {
 
@@ -24,14 +25,14 @@ public class NFURegistries {
      * and between byte buffer.
      */
     public static final NFURegistry<NFUDataSerializer<?>> DATA_SERIALIZERS =
-            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "data_serializers"));
+            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "data_serializers"));
 
     /**
      * Registry for {@link MobApplicableItemTable}s. This is a table to define a set of actions in which an item is applied
      * to a mob, and the consequence of the actions.
      */
     public static final NFURegistry<MobApplicableItemTable> MOB_APPLICABLE_ITEM_TABLES =
-            new NFURegistry<MobApplicableItemTable>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "mob_applicable_item_tables"))
+            new NFURegistry<MobApplicableItemTable>(new ResourceLocation(NFULibrary.MOD_ID, "mob_applicable_item_tables"))
                     .setShouldGenerateOnServerSetup()
                     .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
                     .setSide(NFURegistry.AvailableSide.SERVER);
@@ -41,20 +42,23 @@ public class NFURegistries {
      * any type check before running. Ensure the types match before running.
      */
     public static final NFURegistry<Function<?, ?>> FUNCTIONS =
-            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "functions"));
+            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "functions"));
+
+    public static final NFURegistry<Predicate<?>> PREDICATES =
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "predicates"));
 
     /**
      * Registry for trade listing  (from vanilla trade system). A trade listing is a generator for providing random trade offers
      * for mobs.
      */
     public static final NFURegistry<VanillaTradeListing> VANILLA_TRADE_LISTINGS =
-        new NFURegistry<VanillaTradeListing>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "vanilla_trade_listings"))
+        new NFURegistry<VanillaTradeListing>(new ResourceLocation(NFULibrary.MOD_ID, "vanilla_trade_listings"))
                 .setShouldGenerateOnServerSetup()
                 .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
                 .setSide(NFURegistry.AvailableSide.SERVER);
 
     public static final NFURegistry<VanillaTradeListingCollection<?>> VANILLA_TRADE_LISTING_COLLECTIONS =
-            new NFURegistry<VanillaTradeListingCollection<?>>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "vanilla_trade_listing_collections"))
+            new NFURegistry<VanillaTradeListingCollection<?>>(new ResourceLocation(NFULibrary.MOD_ID, "vanilla_trade_listing_collections"))
                     .setShouldGenerateOnServerSetup()
                     .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
                     .setSide(NFURegistry.AvailableSide.SERVER)
@@ -64,7 +68,7 @@ public class NFURegistries {
      * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade collections.
      */
     public static final NFURegistry<VanillaTradeRegistry> VANILLA_TRADE_REGISTRIES =
-            new NFURegistry<VanillaTradeRegistry>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "vanilla_trade_registries"))
+            new NFURegistry<VanillaTradeRegistry>(new ResourceLocation(NFULibrary.MOD_ID, "vanilla_trade_registries"))
                     .setShouldGenerateOnServerSetup()
                     .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
                     .setSide(NFURegistry.AvailableSide.SERVER)
@@ -72,15 +76,15 @@ public class NFURegistries {
                     .setLoadAfter(VANILLA_TRADE_LISTING_COLLECTIONS);
 
     public static final NFURegistry<MobAngerReason> MOB_ANGER_REASONS =
-        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "mob_anger_reasons"));
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "mob_anger_reasons"));
 
     public static final NFURegistry<MobAngerRules> MOB_ANGER_RULES =
-        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "mob_anger_rules"));
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "mob_anger_rules"));
 
     public static final NFURegistry<EntityAttributeProvider> ENTITY_ATTRIBUTE_PROVIDERS =
-            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "entity_attribute_providers"));
+            new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "entity_attribute_providers"));
 
     public static final NFURegistry<IBaubleRegistryEntry> BAUBLES =
-        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "baubles"));
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "baubles"));
 
 }

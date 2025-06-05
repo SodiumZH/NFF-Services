@@ -11,7 +11,7 @@ import net.sodiumzh.nfu.capability.NFUEntitySerializableCapProvider;
 import net.sodiumzh.nfu.entity.anger.CMobAngerHandlerProvider;
 import net.sodiumzh.nfu.registry.NFUCaps;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFULibrary.MOD_ID_LEGACY)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFULibrary.MOD_ID)
 public class TamingProcessEventListeners {
 
     public static final String ANGER_HANDLER_KEY = "vanillaTamableAnimalAngerHandler";
