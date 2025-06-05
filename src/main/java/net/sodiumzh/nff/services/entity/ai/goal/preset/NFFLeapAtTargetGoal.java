@@ -11,6 +11,7 @@ public class NFFLeapAtTargetGoal extends NFFLeapAtGoal
 	public NFFLeapAtTargetGoal(INFFTamed mob, float yd, float xzd, float maxAttackDistance, int chance)
 	{
 		super(mob, yd, xzd, maxAttackDistance, chance);
+		this.allowAllStatesExceptWait();
 	}
 
 	@Override
