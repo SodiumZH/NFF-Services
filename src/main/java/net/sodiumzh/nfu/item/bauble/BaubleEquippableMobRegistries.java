@@ -187,7 +187,7 @@ class BaubleEquippableMobRegistries
 		{
 			for (IBaubleRegistryEntry entry: set)
 			{
-				if (entry.getEquippingCondition().test(new BaubleProcessingArgs(test, BaubleSystem.getCapability(mob), key)))
+				if (entry.getEquippingCondition().test(new BaubleProcessingArgs(test, NFUBaubleAPI.getCapability(mob), key)))
 					return true;
 			}
 			return false;

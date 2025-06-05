@@ -1,5 +1,13 @@
 package net.sodiumzh.nfu.item.bauble;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,7 +21,7 @@ import java.util.function.Consumer;
  * NFFServices - BaubleSystem is a system for equipping "bauble" items on <b>mobs</b> just like for players in Curios API.
  * <p>This class involves some common static methods.
  */
-public class BaubleSystem
+public class NFUBaubleAPI
 {
 	/**
 	 * Get the Bauble-handling capability of a mob.
@@ -25,24 +33,32 @@ public class BaubleSystem
 	{
 		return CBaubleEquippableMob.getCapability(mob);
 	}
-	
+
+	/**
+	 * Get the Bauble-handling capability of a mob.
+	 * @return Bauble-handling capability ({@link CBaubleEquippableMob}).
+	 * If the mob isn't bauble-equippable (not registered or is pending removal, etc.), return an empty instance that won't do anything.
+	 */
+	@Nonnull
+	static Optional<CBaubleEquippableMob> getOptionalCapability(Mob mob)
+	{
+		return CBaubleEquippableMob.getOptionalCapability(mob);
+	}
+
 	/**
 	 * Check if a mob has the Bauble-handling capability ({@link CBaubleEquippableMob}).
 	 */
 	public static boolean isCapabilityPresent(Mob mob)
 	{
-		return getCapability(mob).isValid();
+		return getOptionalCapability(mob).isPresent();
 	}
 	
 	/**
 	 * Do something if a mob has the Bauble-handling capability ({@link CBaubleEquippableMob}).
 	 */
-	public static void ifCapabilityPresent(Mob mob, Runnable action)
+	public static void ifCapabilityPresent(Mob mob, Consumer<Mob> action)
 	{
-		if (isCapabilityPresent(mob))
-		{
-			action.run();
-		}
+		getOptionalCapability(mob).ifPresent(m -> action.accept(m.getMob()));
 	}
 	
 	/**
@@ -68,9 +84,9 @@ public class BaubleSystem
 	/**
 	 * Do an operation to all bauble registry entries that should take effect to a given slot of a given mob.
 	 */
-	public static void forEachMatchedEntry(CBaubleEquippableMob mob, String slot, Consumer<IBaubleRegistryEntry> operationForEach)
+	public static void forEachMatchedEntry(Mob mob, String slot, Consumer<IBaubleRegistryEntry> operationForEach)
 	{
-		BaubleRegistries.forEachMatchedEntry(mob, slot, operationForEach);
+		getOptionalCapability(mob).ifPresent(m -> BaubleRegistries.forEachMatchedEntry(m, slot, operationForEach));
 	}
 	
 	/**
