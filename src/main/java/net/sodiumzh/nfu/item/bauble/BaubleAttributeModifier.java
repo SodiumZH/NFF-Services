@@ -1,7 +1,17 @@
 package net.sodiumzh.nfu.item.bauble;
 
+import java.util.ArrayList;
+import java.util.UUID;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.container.Tuple3;
 
 import javax.annotation.Nullable;
@@ -147,11 +157,13 @@ public class BaubleAttributeModifier
 				else if (args[i] instanceof String str)
 				{
 					String strl = str.toLowerCase();
-					if (strl.equals("a") || strl.equals("add") || strl.equals("addition"))
+					if (strl.equals("a") || strl.equals("add") || strl.equals("addition") || strl.equals("+"))
 						current.c = AttributeModifier.Operation.ADDITION;
-					else if (strl.equals("m") || strl.equals("mb") || strl.equals("multiply_base") || strl.equals("multiply base") || strl.equals("multiplybase"))
+					else if (strl.equals("m") || strl.equals("mb") || strl.equals("multiply_base") || strl.equals("multiply base")
+						|| strl.equals("multiplybase") || str.equals("*"))
 						current.c = AttributeModifier.Operation.MULTIPLY_BASE;
-					else if (strl.equals("mt") || strl.equals("multiply_total") || strl.equals("multiply total") || strl.equals("multiplytotal"))
+					else if (strl.equals("mt") || strl.equals("multiply_total") || strl.equals("multiply total")
+						|| strl.equals("multiplytotal") || strl.equals("**") || strl.equals("*+") || strl.equals("+*"))
 						current.c = AttributeModifier.Operation.MULTIPLY_TOTAL;
 					else throw new IllegalArgumentException("BaubleAttributeModifier#makeModifiers: Illegal string argument at position " + Integer.toString(i)
 					+ ": \"" + str + "\"");
@@ -219,5 +231,48 @@ public class BaubleAttributeModifier
 	public String toString() {
 		return ("BaubleAttributeModifier{Attribute=" + this.attribute.getDescriptionId() + "; Amount=" + Double.toString(this.modifier.getAmount()) 
 				+ "; Operation=" + this.modifier.getOperation().toString() + "}");
+	}
+
+	@Nullable
+	public static BaubleAttributeModifier fromJson(JsonElement inJson) {
+		try {
+			JsonObject inJsonObj = inJson.getAsJsonObject();
+			Attribute attr = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(inJsonObj.get("attribute").getAsString()));
+			double amount = inJsonObj.get("amount").getAsDouble();
+			AttributeModifier.Operation operation = null;
+			switch (inJsonObj.get("operation").getAsString()) {
+				case "a": case "add": case "addition": case "+": {
+					operation = AttributeModifier.Operation.ADDITION;
+					break;
+				}
+				case "m": case "mb": case "multiply_base": case "multiply base":
+				case "multiplybase": case "*": {
+					operation = AttributeModifier.Operation.MULTIPLY_BASE;
+					break;
+				}
+				case "mt": case "multiply_total": case "multiply total": case "multiplytotal":
+				case "**": case "*+": case "+*": {
+					operation = AttributeModifier.Operation.MULTIPLY_TOTAL;
+					break;
+				}
+				default: {}
+			}
+			if (attr == null || operation == null) return null;
+			return new BaubleAttributeModifier(attr, amount, operation);
+		} catch (Throwable t) {
+			return null;
+		}
+	}
+
+	public Attribute getAttribute() {
+		return attribute;
+	}
+
+	public double getAmount() {
+		return this.modifier.getAmount();
+	}
+
+	public AttributeModifier.Operation getOperation() {
+		return this.modifier.getOperation();
 	}
 }
