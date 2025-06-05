@@ -13,6 +13,7 @@ import net.sodiumzh.nfu.item.bauble.IBaubleRegistryEntry;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class NFURegistries {
 
@@ -42,6 +43,9 @@ public class NFURegistries {
      */
     public static final NFURegistry<Function<?, ?>> FUNCTIONS =
             new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "functions"));
+
+    public static final NFURegistry<Predicate<?>> PREDICATES =
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "predicates"));
 
     /**
      * Registry for trade listing  (from vanilla trade system). A trade listing is a generator for providing random trade offers
@@ -81,6 +85,6 @@ public class NFURegistries {
             new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "entity_attribute_providers"));
 
     public static final NFURegistry<IBaubleRegistryEntry> BAUBLES =
-        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID_LEGACY, "baubles"));
+        new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "baubles"));
 
 }

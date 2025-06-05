@@ -13,7 +13,7 @@ import net.sodiumzh.nfu.entity.anger.CMobAngerHandlerProvider;
 import net.sodiumzh.nfu.entity.anger.IUsesDefaultAngerHandler;
 
 @Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class NFUCapAttachment {
+public class NFUCapabilityAttachment {
 
     public static final ResourceLocation KEY_DATA_CAPABILITY
             = new ResourceLocation(NFULibrary.MOD_ID, "data_capability");

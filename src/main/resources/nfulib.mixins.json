@@ -2,7 +2,7 @@
   "required": true,
   "package": "net.sodiumzh.nfu.mixin.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "NFU.refmap.json",
+  "refmap": "nfulib.refmap.json",
   "mixins": [
     "NFUBlockItemMixin",
     "NFUMixinEnderMan",
@@ -15,6 +15,7 @@
     "NFUMixinMob",
     "NFUMixinPlayer",
     "NFUMixinProjectile",
+    "NFUMixinResourceLocation",
     "NFUMixinServerPlayer",
     "NFUMixinServerPlayerGameMode",
     "NFUMixinTagBuilder",

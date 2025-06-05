@@ -17,17 +17,15 @@ import net.sodiumzh.nfu.registry.NFUConfigs;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
 import net.sodiumzh.nfu.registry.NFUItemRegistry;
 import net.sodiumzh.nfu.registry.NFURegistries;
+import net.sodiumzh.nfu.savedata.redirector.SaveDataLocationRedirector;
 
 import javax.annotation.Nullable;
 
 @Mod(NFULibrary.MOD_ID)
 public class NFULibrary {
 
-	// TODO: change to "nautils" after separation
-	public static final String MOD_ID = "nautils";
-	@Deprecated
-	public static final String MOD_ID_FINAL = MOD_ID;
-	private static final String MOD_ID_LEGACY = "befriendmobs";
+	public static final String MOD_ID = "nfulib";
+	public static final String MOD_ID_LEGACY = "nautils";
 	private static MinecraftServer server = null;
 
 	public NFULibrary() {
@@ -39,6 +37,7 @@ public class NFULibrary {
 		// Custom registry related
 		NFURegistries.init();
 		mergeCustomRegistries();
+		portSaveDataKeys();
 	}
 
 	private void mergeCustomRegistries()
@@ -54,6 +53,7 @@ public class NFULibrary {
 	 * return null.
 	 */
 	@Nullable
+	@Deprecated
 	public static MinecraftServer getServer() {
 		if (server == null) return null;
 		return server.isSameThread() ? server : null;

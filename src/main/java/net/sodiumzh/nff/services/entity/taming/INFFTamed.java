@@ -813,7 +813,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		});
 	}
 
-	/** Only on server, get all nffgirls mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
+	/** Only on server, get all NFF mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
 	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
 		if (!(player.level instanceof ServerLevel sl)) return new HashMap<>();
 		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
