@@ -558,10 +558,8 @@ public class VanillaTradeListingCollectionHelper {
                                         break;
                                     }
                                     case "convert": {
-                                        ItemStack[] from = readItem(jsonObject.get("item"), true);
-                                        ItemStack[] to = readItem(jsonObject.get("result"), true);
-                                        if (from.length != 1 || to.length != 1)
-                                            throw new UnsupportedOperationException("VanillaTradeListingCollectionHelper converting doesn't support multi-item.");
+                                        ItemStack[] from = readItem(jsonObject.get("item"), false);
+                                        ItemStack[] to = readItem(jsonObject.get("result"), false);
                                         int[] price = readAmountRange(jsonObject.get("price"));
                                         int[] amount = readAmountRange(jsonObject.get("amount"));
                                         int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
@@ -603,7 +601,7 @@ public class VanillaTradeListingCollectionHelper {
      * @param allowsArray Whether allows array format. If false, it will always output {@code ItemStack[1]}.
      * @return
      */
-    private static ItemStack[] readItem(JsonElement element, boolean allowsArray) {
+    private static ItemStack[]  readItem(JsonElement element, boolean allowsArray) {
         try {
             // Case of a single item type
             if (element.isJsonPrimitive()) {
