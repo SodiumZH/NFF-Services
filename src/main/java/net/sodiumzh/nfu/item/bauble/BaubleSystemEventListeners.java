@@ -7,10 +7,10 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nff.services.NFFServices;
+import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 
-@Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 class BaubleSystemEventListeners
 {
 
@@ -24,7 +24,7 @@ class BaubleSystemEventListeners
 			if (BaubleEquippableMobRegistries.containsMobType(mob.getClass()))
 			{
 				CBaubleEquippableMobPrvd prvd = new CBaubleEquippableMobPrvd(mob);
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, "cap_bauble_equippable_mob")
+				event.addCapability(new ResourceLocation(NFULibrary.MOD_ID, "cap_bauble_equippable_mob")
 						, prvd);
 			}
 		}

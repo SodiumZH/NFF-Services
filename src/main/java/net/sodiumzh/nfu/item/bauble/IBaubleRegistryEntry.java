@@ -100,15 +100,17 @@ public interface IBaubleRegistryEntry
 	
 	/**
 	 * Getter of {@link BaubleAttributeModifier}s that should be added once no matter how many this bauble is equipped.
+	 * <p>Note: It must return <b>new instances</b> of {@link BaubleAttributeModifier}s on each call!!
 	 */
 	@Nullable
-	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob);
+	public BaubleAttributeModifier[] getUnrepeatableModifiers(Mob mob);
 	
 	/**
 	 * Getter of {@link BaubleAttributeModifier}s that should be added each this bauble is added.
+	 * <p>Note: It must return <b>new instances</b> of {@link BaubleAttributeModifier}s on each call!!
 	 */
 	@Nullable
-	public BaubleAttributeModifier[] getDuplicatableModifiers(BaubleProcessingArgs args);
+	public BaubleAttributeModifier[] getRepeatableModifiers(BaubleProcessingArgs args);
 	
 	// Utilities
 	

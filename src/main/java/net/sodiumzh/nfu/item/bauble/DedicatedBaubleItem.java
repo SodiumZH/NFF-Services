@@ -49,6 +49,6 @@ public abstract class DedicatedBaubleItem extends NFUItem implements IBaubleRegi
 
 	@Override
 	@Nullable
-	public BaubleAttributeModifier[] getNonDuplicatableModifiers(Mob mob) {return null;}
+	public BaubleAttributeModifier[] getUnrepeatableModifiers(Mob mob) {return null;}
 	
 }
