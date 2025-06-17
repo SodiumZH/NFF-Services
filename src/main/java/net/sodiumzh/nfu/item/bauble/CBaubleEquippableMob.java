@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
- * Capability for all mobs that can equip baubles. Mobs registered in {@link RegisterBaubleEvent} will be automatically added this capability.
+ * Capability for all mobs that can equip baubles. Mobs registered in {@link RegisterBaublesEvent} will be automatically added this capability.
  */
 public interface CBaubleEquippableMob
 {
