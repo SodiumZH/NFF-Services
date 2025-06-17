@@ -68,7 +68,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		}
 		allMatchedEntries.forEach(entry ->
 		{
-			BaubleAttributeModifier[] mods = entry.getNonDuplicableModifiers(this.getMob());
+			BaubleAttributeModifier[] mods = entry.getUnrepeatableModifiers(this.getMob());
 			if (mods != null)
 			{
 				for (int i = 0; i < mods.length; ++i)
@@ -82,7 +82,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		{
 			BaubleRegistries.forEachMatchedEntry(this, key, entry -> 
 			{
-				BaubleAttributeModifier[] mods = entry.getDuplicableModifiers(new BaubleProcessingArgs(getBaubleSlotAccessor().getItemStack(key),
+				BaubleAttributeModifier[] mods = entry.getRepeatableModifiers(new BaubleProcessingArgs(getBaubleSlotAccessor().getItemStack(key),
 						this, key));
 				if (mods != null)
 				{

@@ -79,14 +79,14 @@ public class ClonedBaubleBehavior extends BaubleBehavior
 	}
 
 	@Override
-	public BaubleAttributeModifier[] getNonDuplicableModifiers(Mob mob)
+	public BaubleAttributeModifier[] getUnrepeatableModifiers(Mob mob)
 	{
-		return source.getNonDuplicableModifiers(mob);
+		return source.getUnrepeatableModifiers(mob);
 	}
 	
 	@Override
-	public BaubleAttributeModifier[] getDuplicableModifiers(BaubleProcessingArgs args) {
-		return source.getDuplicableModifiers(args);
+	public BaubleAttributeModifier[] getRepeatableModifiers(BaubleProcessingArgs args) {
+		return source.getRepeatableModifiers(args);
 	}
 
 

@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Mob;
 import net.sodiumzh.nfu.annotation.DontOverride;
 
 /**
- * Capability for all mobs that can equip baubles. Mobs registered in {@link RegisterBaubleEvent} will be automatically added this capability.
+ * Capability for all mobs that can equip baubles. Mobs registered in {@link RegisterBaublesEvent} will be automatically added this capability.
  */
 public interface CBaubleEquippableMob
 {

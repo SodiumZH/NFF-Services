@@ -3,6 +3,7 @@ package net.sodiumzh.nfu.item.bauble;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +55,7 @@ public class BaubleSlotAccessor
 	public Map<String, Function<Mob, ItemStack>> getAccessors()
 	{
 		refresh();
-		return new NaUtilsImmutableMap<>(accessorsCache);
+		return Map.copyOf(accessorsCache);
 	}
 	
 	/**
@@ -65,10 +66,8 @@ public class BaubleSlotAccessor
 	public Map<String, ItemStack> getItemStacks()
 	{
 		refresh();
-		HashMap<String, ItemStack> map = new HashMap<>();
-		for (var entry: itemsCache.entrySet())
-			map.put(entry.getKey(), entry.getValue());
-		return new NaUtilsImmutableMap<>(map);
+		return Map.copyOf(itemsCache.entrySet().stream()
+			.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy())));
 	}
 	
 	/**

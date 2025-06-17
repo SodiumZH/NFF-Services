@@ -1,5 +1,6 @@
 package net.sodiumzh.nfu.item.bauble;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -68,11 +69,11 @@ public class NFUBaubleAPI
 	/**
 	 * Get all slot keys and equipping items.
 	 */
-	@Nullable
+	@Nonnull
 	public static Map<String, ItemStack> getAllSlotItems(Mob mob)
 	{
 		//Map<String, ItemStack> map = new HashMap<>();
-		return getCapability(mob).getBaubleSlotAccessor().getItemStacks();
+		return getOptionalCapability(mob).map(c -> c.getBaubleSlotAccessor().getItemStacks()).orElseGet(HashMap::new);
 	}
 	
 	/**
