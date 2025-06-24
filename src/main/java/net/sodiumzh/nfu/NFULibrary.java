@@ -69,7 +69,7 @@ public class NFULibrary {
 			.redirectNamespace(MOD_ID_LEGACY, MOD_ID)
 			.redirectEntityCapability(new ResourceLocation("nffservices", "cap_bauble_equippable_mob"), new ResourceLocation(NFULibrary.MOD_ID, "cap_bauble_equippable_mob"));
 	}
-	
+
 	@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 	public static class ForgeEventListeners {
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
