@@ -9,8 +9,12 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.netty.handler.ipfilter.IpSubnetFilter;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
+import net.sodiumzh.nfu.NFULibrary;
+import net.sodiumzh.nfu.registry.NFURegistry;
 
 /**
  * NFFServices - BaubleSystem is a system for equipping "bauble" items on <b>mobs</b> just like for players in Curios API.
@@ -18,6 +22,11 @@ import net.minecraft.world.item.ItemStack;
  */
 public class NFUBaubleAPI
 {
+	public static void init() {}
+
+	public static final NFURegistry<BaubleEquippingCondition> EQUIPPING_CONDITIONS
+		= new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "bauble_equipping_conditions"));
+
 	/**
 	 * Get the Bauble-handling capability of a mob.
 	 * @return Bauble-handling capability ({@link CBaubleEquippableMob}).
