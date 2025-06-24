@@ -39,13 +39,13 @@ public class DebugMobRemoverItem extends NFUItem {
             // If not set or targeting non-ongoing mob, reset to the target
             if (removingUUID.equals(EMPTY_UUID) || !removingUUID.equals(target.getUUID())) {
                 stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, target.getUUID());
-                NFUInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_selected",
+                NFUInfoStatics.printMessageTranslatable(player, "info.nfulib.item.debug_mob_remover_selected",
                         target.getName().getString(), getModeInfo(stack).getString());
                 return InteractionResult.sidedSuccess(player.level.isClientSide);
             }
             // Confirmed, remove
             else {
-                NFUInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_removed", target.getName().getString());
+                NFUInfoStatics.printMessageTranslatable(player, "info.nfulib.item.debug_mob_remover_removed", target.getName().getString());
                 if (isDiscardMode(stack)) {
                     target.discard();
                 } else {
@@ -68,14 +68,14 @@ public class DebugMobRemoverItem extends NFUItem {
         if (player.isShiftKeyDown()) {
             stack.getOrCreateTag().putBoolean(KEY_IS_DISCARD_MODE, !isDiscardMode(stack));
             stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, EMPTY_UUID);
-            NFUInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_mode_switched",
+            NFUInfoStatics.printMessageTranslatable(player, "info.nfulib.item.debug_mob_remover_mode_switched",
                     getModeInfo(stack).getString());
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
         }
         else {
             if (!getOngoingMobUUID(stack).equals(EMPTY_UUID)) {
                 stack.getOrCreateTag().putUUID(KEY_REMOVING_MOB_UUID, EMPTY_UUID);
-                NFUInfoStatics.printMessageTranslatable(player, "info.nautils.item.debug_mob_remover_reset");
+                NFUInfoStatics.printMessageTranslatable(player, "info.nfulib.item.debug_mob_remover_reset");
                 return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
             }
         }
@@ -107,15 +107,15 @@ public class DebugMobRemoverItem extends NFUItem {
         if (!(stack.getItem() instanceof DebugMobRemoverItem))
             throw new ClassCastException("NFU#DebugMobRemoverItem: Illegal static method call, not a correct item.");
         return NFUInfoStatics.createTranslatable(isDiscardMode(stack) ?
-                "info.nautils.item.debug_mob_remover_discard_mode" :
-                "info.nautils.item.debug_mob_remover_kill_mode");
+                "info.nfulib.item.debug_mob_remover_discard_mode" :
+                "info.nfulib.item.debug_mob_remover_kill_mode");
     }
 
     public static Component getModeDesc(ItemStack stack) {
         if (!(stack.getItem() instanceof DebugMobRemoverItem))
             throw new ClassCastException("NFU#DebugMobRemoverItem: Illegal static method call, not a correct item.");
         return NFUInfoStatics.createTranslatable(isDiscardMode(stack) ?
-                "info.nautils.item.debug_mob_remover_discard_mode_desc" :
-                "info.nautils.item.debug_mob_remover_kill_mode_desc");
+                "info.nfulib.item.debug_mob_remover_discard_mode_desc" :
+                "info.nfulib.item.debug_mob_remover_kill_mode_desc");
     }
 }

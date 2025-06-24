@@ -24,8 +24,8 @@ public class DebugAISwitchItem extends NFUItem
 		if (!player.level.isClientSide && target instanceof Mob mob)
 		{
 			mob.setNoAi(!mob.isNoAi());
-			String key = mob.isNoAi() ? "info.nautils.item.debug_ai_switch_off" : "info.nautils.item.debug_ai_switch_on";
-			MutableComponent info = NFUInfoStatics.createTranslatable(key, target.getName().getString());
+			String key = mob.isNoAi() ? "info.nfulib.item.debug_ai_switch_off" : "info.nfulib.item.debug_ai_switch_on";
+			MutableComponent info = Component.translatable(key, target.getName().getString());
 			NFUInfoStatics.printMessage(player, info);
 			return InteractionResult.sidedSuccess(player.level.isClientSide);
 		}

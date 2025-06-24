@@ -29,8 +29,9 @@ public class NFUSetupEventHandlers {
                     .filter(reg -> reg.shouldGenerateOnSetup() && reg.getGenerateOnSetupPhase() == 0)
                     .toList();
             shouldGenerate = NFURegistry.sortByLoadingOrder(shouldGenerate);
-            shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.Common(reg)));
+            shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.CommonBefore(reg)));
             shouldGenerate.forEach(NFURegistry::generateAllValues);
+            shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.CommonAfter(reg)));
         });
     }
 

@@ -2,6 +2,7 @@ package net.sodiumzh.nfu.item;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,15 +19,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.mixin.mixin.NFUMixinItemInput;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class NFUBlockItem extends ItemNameBlockItem implements INFUItem {
     protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
@@ -35,6 +35,8 @@ public class NFUBlockItem extends ItemNameBlockItem implements INFUItem {
     protected boolean shouldUseBlockDescriptionId = true;
     protected Optional<Supplier<String>> blockDescriptionIdOverride = Optional.empty();
     protected Optional<Supplier<ItemStack>> defaultInstanceSupplier = Optional.empty();
+    @Nullable
+    protected BiFunction<ItemStack, MutableComponent, MutableComponent> nameStyle = null;
 
     public NFUBlockItem(Block pBlock, Properties pProperties) {
         super(pBlock, pProperties);
@@ -244,4 +246,23 @@ public class NFUBlockItem extends ItemNameBlockItem implements INFUItem {
     @OnlyIn(Dist.CLIENT)
     public void beforeAddingHoveringDescriptions(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {}
 
+    @OnlyIn(Dist.CLIENT)
+    @Nullable
+    @Override
+    public BiFunction<ItemStack, MutableComponent, MutableComponent> getNameStyle() {
+        return this.nameStyle;
+    }
+
+    public NFUBlockItem setNameStyle(BiFunction<ItemStack, MutableComponent, MutableComponent> styleModifier) {
+        this.nameStyle = styleModifier;
+        return this;
+    }
+
+    @Override
+    public @Nonnull Component getName(ItemStack pStack) {
+        Component c = super.getName(pStack);
+        if (c instanceof MutableComponent mc)
+            return Optional.ofNullable(getNameStyle()).map(f -> f.apply(pStack, mc)).orElse(mc);
+        else return c;
+    }
 }

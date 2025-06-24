@@ -140,6 +140,18 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
     }
 
     /**
+     * Register an object from supplier if it's not present.
+     * @return An {@code Optional<Accessor>} if registered. {@code Optional#empty()} if the entry exists.
+     */
+    public <U extends T> Optional<Accessor<U>> registerIfAbsent(ResourceLocation key, Supplier<U> supplier)
+    {
+        if (this.containsKey(key)) return Optional.empty();
+        Entry<U> entry = new Entry<>(this, supplier, key);
+        this.table.put(key, entry);
+        return Optional.of(new Accessor<>(entry));
+    }
+
+    /**
      * Only for {@link NFURegistryEntryCollection}.
      */
     void registerRaw(ResourceLocation key, Entry<? extends T> value)

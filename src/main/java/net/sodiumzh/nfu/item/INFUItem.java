@@ -1,6 +1,7 @@
 package net.sodiumzh.nfu.item;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -16,9 +17,7 @@ import net.sodiumzh.nfu.object.ICastable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Base interface for NFU item templates. This is only a template, and all implementations are done in subclasses.
@@ -194,5 +193,30 @@ public interface INFUItem extends ICastable, ItemLike {
         }
     }
 */
+
+    /**
+     * If non-null, it will override rarity and style the item name.
+     * Implemented through {@NFUGuiMixin#onItemNameStyle}.
+     * <p>Note: the input {@link Component} of the bi-function is already formatted by the rarity style. Use the function
+     * to re-format it.
+     */
+    @Nullable
+    public BiFunction<ItemStack, MutableComponent, MutableComponent> getNameStyle();
+
+
+    public INFUItem setNameStyle(BiFunction<ItemStack, MutableComponent, MutableComponent> styleModifier);
+
+    public default INFUItem setNameStyle(UnaryOperator<MutableComponent> styleModifier) {
+        return setNameStyle((i, c) -> {return styleModifier.apply(c);});
+    }
+
+    public default INFUItem setNameStyle(Consumer<MutableComponent> styleModifier) {
+        return setNameStyle((i, c) -> {styleModifier.accept(c); return c;});
+    }
+
+    public default INFUItem setNameStyle(BiConsumer<ItemStack, MutableComponent> styleModifier) {
+        return setNameStyle((i, c) -> {styleModifier.accept(i, c); return c;});
+    }
+
 
 }

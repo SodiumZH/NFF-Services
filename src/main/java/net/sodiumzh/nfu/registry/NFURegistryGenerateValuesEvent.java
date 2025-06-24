@@ -14,8 +14,17 @@ public abstract class NFURegistryGenerateValuesEvent extends Event {
     /**
      * Posted right before a registry generates its values on common setup phase.
      */
-    public static class Common extends NFURegistryGenerateValuesEvent implements IModBusEvent {
-        public Common(NFURegistry<?> registry) {
+    public static class CommonBefore extends NFURegistryGenerateValuesEvent implements IModBusEvent {
+        public CommonBefore(NFURegistry<?> registry) {
+            super(registry);
+        }
+    }
+
+    /**
+     * Posted right after a registry generates its values on common setup phase.
+     */
+    public static class CommonAfter extends NFURegistryGenerateValuesEvent implements IModBusEvent {
+        public CommonAfter(NFURegistry<?> registry) {
             super(registry);
         }
     }
@@ -23,8 +32,17 @@ public abstract class NFURegistryGenerateValuesEvent extends Event {
     /**
      * Posted right before a registry generates its values on client setup phase.
      */
-    public static class Client extends NFURegistryGenerateValuesEvent implements IModBusEvent {
-        public Client(NFURegistry<?> registry) {
+    public static class ClientBefore extends NFURegistryGenerateValuesEvent implements IModBusEvent {
+        public ClientBefore(NFURegistry<?> registry) {
+            super(registry);
+        }
+    }
+
+    /**
+     * Posted right after a registry generates its values on client setup phase.
+     */
+    public static class ClientAfter extends NFURegistryGenerateValuesEvent implements IModBusEvent {
+        public ClientAfter(NFURegistry<?> registry) {
             super(registry);
         }
     }
@@ -32,8 +50,17 @@ public abstract class NFURegistryGenerateValuesEvent extends Event {
     /**
      * Posted right before a registry generates its values on server setup phase.
      */
-    public static class Server extends NFURegistryGenerateValuesEvent {
-        public Server(NFURegistry<?> registry) {
+    public static class ServerBefore extends NFURegistryGenerateValuesEvent {
+        public ServerBefore(NFURegistry<?> registry) {
+            super(registry);
+        }
+    }
+
+    /**
+     * Posted right after a registry generates its values on server setup phase.
+     */
+    public static class ServerAfter extends NFURegistryGenerateValuesEvent {
+        public ServerAfter(NFURegistry<?> registry) {
             super(registry);
         }
     }

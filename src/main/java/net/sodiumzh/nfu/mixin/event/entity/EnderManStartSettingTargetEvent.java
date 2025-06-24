@@ -4,7 +4,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.sodiumzh.nff.services.entity.taming.preset.NFFTamedEnderManPreset;
 import net.sodiumzh.nfu.event.NFULivingEvent;
 
 /**
@@ -15,7 +14,7 @@ import net.sodiumzh.nfu.event.NFULivingEvent;
  * is posted. This event is posted before these operations, allowing to cancel them.
  * <p>Cancellable. If cancelled, the whole target setting operation will be cancelled,
  * and {@link LivingChangeTargetEvent} will not be posted.
- * <p>Note: {@link NFFTamedEnderManPreset} will not post this, its {@code super.setTarget()}
+ * <p>Note: {@code NFFTamedEnderManPreset} will not post this, its {@code super.setTarget()}
  * is invoked first.
  * @see  EnderMan#setTarget
  */

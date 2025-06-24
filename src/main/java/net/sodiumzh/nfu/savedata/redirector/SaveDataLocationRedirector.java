@@ -51,13 +51,17 @@ public class SaveDataLocationRedirector
 	
 	/**
 	 * Port all items, entity types, entity and level capabilities
-	 * from a namespace to another. Note this operation is <i>after</i> single-key redirection e.g. {@code portItem}.
+	 * from a namespace to another. Note this operation is <i>before</i> single-key redirection e.g. {@code portItem} because
+	 * the namespace redirection is done in {@link ResourceLocation} creating i.e. the old {@link ResourceLocation}s will
+	 * be totally impossible to create.
 	 * <p>For example, single-key redirection maps {@code "oldmod:some_item"} to {@code "oldmod:some_other_item"}, and namespace porting
-	 * maps {@code "oldmod"} to {@code "newmod"}, then finally it will be {@code "newmod:some_other_item"}.
-	 * <p>For another example, single-key redirection maps {@code "oldmod:some_item"} to {@code "newmod:some_other_item"}, and namespace redirection
-	 * maps {@code "oldmod"} to {@code "othermod"}, then finally it will be {@code "newmod:some_other_item"}. The new namespace 
-	 * will be {@code "newmod"} instead of {@code "othermod"} because single-key redirection has mapped the namespace to {@code "newmod"} and 
-	 * thus the new namespace isn't affected by namespace renaming of {@code "oldmod"}.
+	 * maps {@code "oldmod"} to {@code "newmod"}, then finally it will be {@code "newmod:some_item"}. This is because
+	 * namespace redirection has ported {@code "oldmod:some_item" to "newmod:some_item"} and thus doesn't hit the single-key
+	 * redirection.
+	 * <p>For another example, single-key redirection maps {@code "newmod:some_item"} to {@code "newmod:some_other_item"}, and namespace redirection
+	 * maps {@code "oldmod"} to {@code "newmod"}, then finally {@code "oldmod:some_item"} will be {@code "newmod:some_other_item"}. The namespace
+	 * porting first ports {@code "oldmod:some_item"} to {@code "newmod:some_item"}, then single-key ports {@code "newmod:some_item"}
+	 * to {@code "newmod:some_other_item"}.
 	 */
 	public SaveDataLocationRedirector redirectNamespace(String oldNamespace, String newNamespace)
 	{

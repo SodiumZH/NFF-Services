@@ -31,7 +31,8 @@ public class NFUServerEventListeners {
 				.filter(reg -> reg.shouldGenerateOnSetup() && reg.getGenerateOnSetupPhase() == 1)
 				.toList();
 		shouldGenerate = NFURegistry.sortByLoadingOrder(shouldGenerate);
-		shouldGenerate.forEach(reg -> MinecraftForge.EVENT_BUS.post(new NFURegistryGenerateValuesEvent.Server(reg)));
+		shouldGenerate.forEach(reg -> MinecraftForge.EVENT_BUS.post(new NFURegistryGenerateValuesEvent.ServerBefore(reg)));
 		shouldGenerate.forEach(NFURegistry::generateAllValues);
+		shouldGenerate.forEach(reg -> MinecraftForge.EVENT_BUS.post(new NFURegistryGenerateValuesEvent.ServerAfter(reg)));
 	}
 }

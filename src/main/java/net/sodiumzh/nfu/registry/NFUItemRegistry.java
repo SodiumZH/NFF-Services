@@ -16,19 +16,19 @@ public class NFUItemRegistry
 	
 	public static final RegistryObject<DebugAISwitchItem> DEBUG_AI_SWITCH = NAUTILS_ITEMS.register("debug_ai_switch",
 			() -> new DebugAISwitchItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
-					.descTranslatable("info.nautils.item.debug_ai_switch_desc")
+					.descTranslatable("info.nfulib.item.debug_ai_switch_desc")
 					.cast());
 
 	public static final RegistryObject<DebugTargetSetterItem> DEBUG_TARGET_SETTER = NAUTILS_ITEMS.register("debug_target_setter",
 			() -> new DebugTargetSetterItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
-					.descTranslatable("info.nautils.item.debug_target_setter_desc")
+					.descTranslatable("info.nfulib.item.debug_target_setter_desc")
 					.cast());
 
 	public static final RegistryObject<DebugMobRemoverItem> DEBUG_MOB_REMOVER = NAUTILS_ITEMS.register("debug_mob_remover",
 			() -> new DebugMobRemoverItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC))
-					.descTranslatable("info.nautils.item.debug_mob_remover_desc")
+					.descTranslatable("info.nfulib.item.debug_mob_remover_desc")
 					.description(DebugMobRemoverItem::getModeInfo)
 					.description(DebugMobRemoverItem::getModeDesc)
-					.descTranslatable("info.nautils.item.debug_mob_remover_switch_mode")
+					.descTranslatable("info.nfulib.item.debug_mob_remover_switch_mode")
 					.cast());
 }
