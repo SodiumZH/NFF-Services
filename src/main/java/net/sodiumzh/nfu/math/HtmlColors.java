@@ -327,7 +327,7 @@ public class HtmlColors
 	
 	public static MutableComponent getTranslationKey(String key)
 	{
-		return NFUInfoStatics.createTranslatable("color.nautils.html." + key);
+		return NFUInfoStatics.createTranslatable("color.nfulib.html." + key);
 	}
 	
 	public static String getNearestHtmlColor(LinearColor color)

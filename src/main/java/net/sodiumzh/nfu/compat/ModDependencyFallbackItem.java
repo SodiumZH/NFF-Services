@@ -28,7 +28,7 @@ public class ModDependencyFallbackItem extends Item {
         if (pLevel.isClientSide)
         {
             NFUMiscStatics.printToScreen(NFUInfoStatics.createTranslatable(
-                    "info.nautils.item_missing_dependency", this.dependencyName), pPlayer);
+                    "info.nfulib.item_missing_dependency", this.dependencyName), pPlayer);
             return InteractionResultHolder.sidedSuccess(pPlayer.getItemInHand(pUsedHand), pLevel.isClientSide);
         }
         return InteractionResultHolder.pass(pPlayer.getItemInHand(pUsedHand));

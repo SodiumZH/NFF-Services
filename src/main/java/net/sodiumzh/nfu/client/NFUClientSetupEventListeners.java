@@ -21,7 +21,8 @@ public class NFUClientSetupEventListeners {
                 .filter(reg -> reg.shouldGenerateOnSetup() && reg.getGenerateOnSetupPhase() == 2)
                 .toList();
         shouldGenerate = NFURegistry.sortByLoadingOrder(shouldGenerate);
-        shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.Client(reg)));
+        shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.ClientBefore(reg)));
         shouldGenerate.forEach(NFURegistry::generateAllValues);
+        shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.ClientAfter(reg)));
     }
 }

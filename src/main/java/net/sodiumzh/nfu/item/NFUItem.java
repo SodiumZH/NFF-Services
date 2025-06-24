@@ -1,7 +1,17 @@
 package net.sodiumzh.nfu.item;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.*;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.text.html.Option;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -37,9 +47,12 @@ public class NFUItem extends Item implements ICastable, INFUItem
 	protected List<Function<ItemStack, ? extends Component>> descriptions = new ArrayList<>();
 	protected Predicate<ItemStack> shouldBeFoil = null;
 	protected boolean shouldGiveCommandUseDefaultInstance = false;
+	@Nullable
+	protected BiFunction<ItemStack, Component, Component> MutableComponent = null;
 
 	protected Optional<Supplier<ItemStack>> defaultInstanceSupplier = Optional.empty();
-
+	@Nullable
+	protected BiFunction<ItemStack, MutableComponent, MutableComponent> nameStyle = null;
 	public NFUItem(Properties pProperties)
 	{
 		super(pProperties);
@@ -277,7 +290,27 @@ public class NFUItem extends Item implements ICastable, INFUItem
 				list.add(cpnt);
 		}
 	}
-	
+
+	@OnlyIn(Dist.CLIENT)
+	@Nullable
+	@Override
+	public BiFunction<ItemStack, MutableComponent, MutableComponent> getNameStyle() {
+		return this.nameStyle;
+	}
+
+	public NFUItem setNameStyle(BiFunction<ItemStack, MutableComponent, MutableComponent> styleModifier) {
+		this.nameStyle = styleModifier;
+		return this;
+	}
+
+	@Override
+	public @Nonnull Component getName(ItemStack pStack) {
+		Component c = super.getName(pStack);
+		if (c instanceof MutableComponent mc)
+			return Optional.ofNullable(getNameStyle()).map(f -> f.apply(pStack, mc)).orElse(mc);
+		else return c;
+	}
+
 	/**
 	 * Invoked before adding description text to hovering text. No action by default.
 	 */

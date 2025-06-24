@@ -9,6 +9,7 @@ import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeListing;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeListingCollection;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeRegistry;
+import net.sodiumzh.nfu.function.RegistrablePredicate;
 import net.sodiumzh.nfu.item.bauble.IBaubleRegistryEntry;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 
@@ -44,7 +45,7 @@ public class NFURegistries {
     public static final NFURegistry<Function<?, ?>> FUNCTIONS =
             new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "functions"));
 
-    public static final NFURegistry<Predicate<?>> PREDICATES =
+    public static final NFURegistry<RegistrablePredicate<?>> PREDICATES =
         new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "predicates"));
 
     /**
