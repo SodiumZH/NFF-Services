@@ -1,6 +1,7 @@
 package net.sodiumzh.nfu.item.bauble;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -37,11 +38,19 @@ public class BaubleAttributeModifier
 	/** Additional condition to apply this modifier. Null = always true. */
 	@Nullable
 	private Predicate<BaubleProcessingArgs> additionalCondition = null;
-	
+
+	/** This optional additional ID is for checking identity on handling unrepeatable modifiers. Modifiers
+	 * with the same identifier will be applied only once, even if they are from different types of
+	 * baubles. Ignored in repeatable modifiers.
+	 */
+	@Nullable
+	private ResourceLocation additionalID = null;
+
+
 	/** Bauble info this modifier is added from. */
 	@Nullable
 	private BaubleProcessingArgs appliedArgs = null;
-	
+
 	public BaubleAttributeModifier(Attribute attr, double amount, AttributeModifier.Operation operation)
 	{
 		UUID uuid = UUID.randomUUID();
@@ -56,7 +65,7 @@ public class BaubleAttributeModifier
 	}
 	
 	/** Put this BaubleModifier to a mob using given args. */
-	public void addTo(BaubleProcessingArgs args)
+	void startApplying(BaubleProcessingArgs args)
 	{
 		args.getCapability().getModifiers().add(this);
 		this.appliedArgs = args;
@@ -64,18 +73,16 @@ public class BaubleAttributeModifier
 	}
 	
 	/** Tick update */
-	public void tick()
+	void tick()
 	{
 		if (this.appliedArgs != null && this.appliedArgs.user() != null 
-				&& this.appliedArgs.user() != null && this.appliedArgs.user().isAlive())
+			&& this.appliedArgs.user() != null && this.appliedArgs.user().isAlive()
+			&& this.appliedArgs.user().getAttribute(attribute) != null)
 		{
-			if (this.additionalCondition == null || this.additionalCondition.test(appliedArgs))
-			{
+			if (this.additionalCondition == null || this.additionalCondition.test(appliedArgs)) {
 				if (!this.appliedArgs.user().getAttribute(attribute).hasModifier(modifier))
 					this.appliedArgs.user().getAttribute(attribute).addTransientModifier(modifier);
-			}
-			else
-			{
+			} else {
 				this.appliedArgs.user().getAttribute(attribute).removeModifier(modifier);
 			}
 		}
@@ -85,13 +92,33 @@ public class BaubleAttributeModifier
 	 * Remove the AttributeModifier from the mob, but not removing this BaubleModifier from CBaubleEquippableMob modifier set.
 	 * Invoked before clearing the BaubleModifier set in CBaubleEquippableMob on refreshing modifiers.
 	 */
-	public void clear()
+	void stopApplying()
 	{
 		if (this.appliedArgs != null && this.appliedArgs.user() != null 
 				&& this.appliedArgs.user() != null && this.appliedArgs.user().isAlive())
 			this.appliedArgs.user().getAttribute(attribute).removeModifier(modifier);
 	}
-	
+
+	/**
+	 * Set the additional ID. This optional additional ID is for checking identity on handling unrepeatable
+	 * modifiers. Modifiers with the same identifier will be applied only once, even if they are from different types of
+	 * baubles. Ignored in repeatable modifiers.
+	 */
+	public BaubleAttributeModifier setAdditionalID(@Nullable ResourceLocation id) {
+		this.additionalID = id;
+		return this;
+	}
+
+	/**
+	 * Get the additional ID. This optional additional ID is for checking identity on handling unrepeatable
+	 * modifiers. Modifiers with the same identifier will be applied only once, even if they are from different types of
+	 * baubles. Ignored in repeatable modifiers.
+	 */
+	public Optional<ResourceLocation> getAdditionalID() {
+		return Optional.ofNullable(this.additionalID);
+	}
+
+
 	// ========== Utilities =================
 	
 	

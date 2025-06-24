@@ -35,7 +35,7 @@ public abstract class DedicatedBaubleItem extends NFUItem implements IBaubleRegi
 	@Nonnull
 	public BaubleEquippingCondition getEquippingCondition()
 	{
-		return BaubleEquippingCondition.always();
+		return BaubleEquippingConditions.CONDITION_ALWAYS.get();
 	}
 
 	@Override

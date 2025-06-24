@@ -1,13 +1,13 @@
 package net.sodiumzh.nfu.item.bauble;
 
+import java.util.*;
+
 import com.mojang.logging.LogUtils;
+
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 {
@@ -48,23 +48,20 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 	@Override
 	public void modifierTick()
 	{
-		getModifiers().forEach(m -> m.tick());
+		getModifiers().forEach(BaubleAttributeModifier::tick);
 	}
 	
 	private void refreshSlotModifiers()
 	{
-		modifiers.forEach(mod -> mod.clear());
+		modifiers.forEach(BaubleAttributeModifier::stopApplying);
 		modifiers.clear();
-		// Collect all entries to be applied with no duplication, for adding non-duplicatable modifiers
+		// Collect all entries to be applied with no duplication, for adding unrepeatable modifiers
 		HashSet<IBaubleRegistryEntry> allMatchedEntries = new HashSet<>();
 		for (String key: getBaubleSlotAccessor().getAccessors().keySet())
 		{
-			BaubleRegistries.forEachMatchedEntry(this, key, entry ->
-			{
-				if (!allMatchedEntries.contains(entry))
-					allMatchedEntries.add(entry);
-			});
+			BaubleRegistries.forEachMatchedEntry(this, key, allMatchedEntries::add);
 		}
+		Set<ResourceLocation> appliedModifiersWithID = new HashSet<>();
 		allMatchedEntries.forEach(entry ->
 		{
 			BaubleAttributeModifier[] mods = entry.getUnrepeatableModifiers(this.getMob());
@@ -72,11 +69,15 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 			{
 				for (int i = 0; i < mods.length; ++i)
 				{
-					mods[i].addTo(new BaubleProcessingArgs(null, this, null));
+					ResourceLocation id = mods[i].getAdditionalID().orElse(null);
+					if (appliedModifiersWithID.contains(id)) continue; // Filter modifiers with the same ID
+					mods[i].startApplying(new BaubleProcessingArgs(null, this, null));
+					if (id != null)
+						appliedModifiersWithID.add(id);
 				}
 			}
 		});
-		// Then add duplicatable modifiers by slots
+		// Then add repeatable modifiers by slots
 		for (String key: getBaubleSlotAccessor().getAccessors().keySet())
 		{
 			BaubleRegistries.forEachMatchedEntry(this, key, entry -> 
@@ -87,7 +88,7 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 				{
 					for (int i = 0; i < mods.length; ++i)
 					{
-						mods[i].addTo(new BaubleProcessingArgs(this.getBaubleSlotAccessor().getItemStack(key), this, key));
+						mods[i].startApplying(new BaubleProcessingArgs(this.getBaubleSlotAccessor().getItemStack(key), this, key));
 					}
 				}
 			});
