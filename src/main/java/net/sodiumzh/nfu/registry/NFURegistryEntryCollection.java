@@ -13,11 +13,8 @@ import java.util.function.Supplier;
  * Defines a collection of entries that should be registered into a
  * given registry ({@link NFURegistry}). Note that the keys are <i>paths</i> of the resource
  * location while the mod id (namespace) is predefined.
- * <p>It's usage is similar to {@link DeferredRegister}s, and use {@code merge} in mod loading e.g. {@link FMLCommonSetupEvent} to
- * merge the entries into the registry.
- * <p>Note: Do not use {@code merge} in mod main class's constructor. {@link NFURegistry} doesn't use suppliers as values,
- * and it's not really deferred-registered. Therefore it must be registered <i>after</i> Forge registries, so that
- * the Forge registry entries are ensured to be valid.
+ * <p>It's usage is similar to {@link DeferredRegister}s, and use {@code merge} in mod main class to add
+ * the entries to registry. Like {@link DeferredRegister}, it also uses suppliers.
  */
 public class NFURegistryEntryCollection<T>
 {

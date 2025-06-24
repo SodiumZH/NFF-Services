@@ -1,16 +1,23 @@
 package net.sodiumzh.nfu.info;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUInfoStatics;
+import org.spongepowered.asm.mixin.Mutable;
 
 /**
  * A {@code ComponentBuilder} is a builder for simplifying the creation of complex {@link MutableComponent}s. It allows chain coding.
  * <p> Usage example: 
- * <p> {@code MutableComponent comp = ComponentBuilder.create().appendText("Text and ").appendTranslatable("info.nautils.key").build();} 
- * <p> and add translation in {@code lang} files like: {@code "info.nautils.key" : "Translation"}, then the result is "Text and Translation". 
+ * <p> {@code MutableComponent comp = ComponentBuilder.create().appendText("Text and ").appendTranslatable("info.nfulib.key").build();} 
+ * <p> and add translation in {@code lang} files like: {@code "info.nfulib.key" : "Translation"}, then the result is "Text and Translation". 
  */
 public class ComponentBuilder
 {
@@ -57,13 +64,65 @@ public class ComponentBuilder
 		}
 		else throw new IllegalArgumentException("ComponentBuilder only supports MutableComponent.");
 	}
-	
+
+	public ComponentBuilder insertAt(int index, Component component) {
+		if (component instanceof MutableComponent mc)
+		{
+			components.add(index, mc);
+			return this;
+		}
+		else throw new IllegalArgumentException("ComponentBuilder only supports MutableComponent.");
+	}
+
+	public ComponentBuilder appendAtStart(Component component) {
+		return insertAt(0, component);
+	}
+
+	public MutableComponent getAt(int index) {
+		return components.get(index);
+	}
+
+	public ComponentBuilder removeAt(int index) {
+		components.remove(index);
+		return this;
+	}
+
+	public List<Integer> getIndexIf(Predicate<MutableComponent> condition) {
+		return NFUContainerStatics.toIndexMap(components).entrySet().stream().filter(entry  -> condition.test(entry.getValue()))
+			.map(Map.Entry::getKey).toList();
+	}
+
+	public ComponentBuilder removeIf(Predicate<MutableComponent> condition) {
+		var newList = components.stream().filter(condition).toList();
+		components.clear();
+		components.addAll(newList);
+		return this;
+	}
+
+	public ComponentBuilder removeIfEmpty(Predicate<MutableComponent> condition) {
+		return removeIf(mc -> mc.getString().isEmpty());
+	}
+
+	public ComponentBuilder modifyIf(Predicate<MutableComponent> condition, UnaryOperator<MutableComponent> action) {
+		NFUContainerStatics.toIndexMap(components).entrySet().forEach(e -> {
+			if (condition.test(e.getValue())) components.set(e.getKey(), action.apply(e.getValue()));
+		});
+		return this;
+	}
+
+	public ComponentBuilder modifyIf(Predicate<MutableComponent> condition, Consumer<MutableComponent> action) {
+		return modifyIf(condition, mc -> {
+			action.accept(mc);
+			return mc;
+		});
+	}
+
 	/**
 	 * Generate MutableComponent from current builder.
 	 */
 	public MutableComponent build()
 	{
-		if (components.size() == 0)
+		if (components.isEmpty())
 			return NFUInfoStatics.createText("");
 		MutableComponent res = components.get(0);
 		for (int i = 1; i < components.size(); ++i)

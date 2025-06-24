@@ -1,5 +1,6 @@
 package net.sodiumzh.nfu;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -12,6 +13,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.item.bauble.BaubleEquippingConditions;
+import net.sodiumzh.nfu.item.bauble.NFUBaubleAPI;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import net.sodiumzh.nfu.registry.NFUConfigs;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
@@ -38,6 +41,7 @@ public class NFULibrary {
 		NFURegistries.init();
 		mergeCustomRegistries();
 		portSaveDataKeys();
+		NFUBaubleAPI.init();
 	}
 
 	private void mergeCustomRegistries()
@@ -45,6 +49,7 @@ public class NFULibrary {
 		NFUDataSerializers.SERIALIZERS.merge();
 		MobAngerReason.REASONS.merge();
 		MobAngerRules.RULES.merge();
+		BaubleEquippingConditions.CONDITION_REGISTRY_COLLECTION.merge();
 	}
 
 
@@ -60,7 +65,9 @@ public class NFULibrary {
 	}
 
 	private void portSaveDataKeys() {
-		SaveDataLocationRedirector.get().redirectNamespace(MOD_ID_LEGACY, MOD_ID);
+		SaveDataLocationRedirector.get()
+			.redirectNamespace(MOD_ID_LEGACY, MOD_ID)
+			.redirectEntityCapability(new ResourceLocation("nffservices", "cap_bauble_equippable_mob"), new ResourceLocation(NFULibrary.MOD_ID, "cap_bauble_equippable_mob"));
 	}
 
 	@Mod.EventBusSubscriber(modid = NFULibrary.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

@@ -1,8 +1,11 @@
 package net.sodiumzh.nfu.mixin.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.sodiumzh.nfu.item.INFUItem;
+import net.sodiumzh.nfu.mixin.event.entity.LivingEntityDamageTakenEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -75,6 +78,14 @@ public abstract class NFUMixinPlayer implements NFUMixin<Player>
 		return original.call(instance, player, entity, hand);
 	}
 */
+	@WrapOperation(method = "actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",
+	at = @At(value = "INVOKE", target = "net/minecraft/world/entity/player/Player.setHealth (F)V"))
+	private void postDamageTakenEvent(Player instance, float v, Operation<Void> original,
+		@Local(argsOnly = true) DamageSource damageSource, @Local(ordinal = 1) float amount) {
+		original.call(instance, v);
+		if (amount > 0)
+			MinecraftForge.EVENT_BUS.post(new LivingEntityDamageTakenEvent(instance, amount, damageSource));
+	}
 
 
 
