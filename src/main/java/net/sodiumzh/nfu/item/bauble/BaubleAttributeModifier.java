@@ -34,9 +34,12 @@ public class BaubleAttributeModifier
 	@Nullable
 	private Predicate<BaubleProcessingArgs> additionalCondition = null;
 
-	/** This optional additional ID is for checking identity on handling unrepeatable modifiers. Modifiers
+	/**
+	 * This optional additional ID is for checking identity on handling unrepeatable modifiers. Modifiers
 	 * with the same identifier will be applied only once, even if they are from different types of
 	 * baubles. Ignored in repeatable modifiers.
+	 * <p>Note: Modifiers sharing the same ID must be of the same type (same attribute, operation and condition,
+	 * and only varying on amount)
 	 */
 	@Nullable
 	private ResourceLocation additionalID = null;
@@ -297,5 +300,10 @@ public class BaubleAttributeModifier
 
 	public AttributeModifier.Operation getOperation() {
 		return this.modifier.getOperation();
+	}
+
+	@Nullable
+	public Predicate<BaubleProcessingArgs> getAdditionalCondition() {
+		return this.additionalCondition;
 	}
 }
