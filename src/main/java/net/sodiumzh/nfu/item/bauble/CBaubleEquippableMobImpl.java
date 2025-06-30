@@ -61,22 +61,39 @@ class CBaubleEquippableMobImpl implements CBaubleEquippableMob
 		{
 			BaubleRegistries.forEachMatchedEntry(this, key, allMatchedEntries::add);
 		}
-		Set<ResourceLocation> appliedModifiersWithID = new HashSet<>();
+		Map<ResourceLocation, BaubleAttributeModifier> modifiersWithID = new HashMap<>();
+		// Iterate all unrepeatable modifiers
 		allMatchedEntries.forEach(entry ->
 		{
 			BaubleAttributeModifier[] mods = entry.getUnrepeatableModifiers(this.getMob());
 			if (mods != null)
 			{
+				// Non-IDed modifiers are directly applied, IDed modifiers are collected
 				for (int i = 0; i < mods.length; ++i)
 				{
 					ResourceLocation id = mods[i].getAdditionalID().orElse(null);
-					if (appliedModifiersWithID.contains(id)) continue; // Filter modifiers with the same ID
-					mods[i].startApplying(new BaubleProcessingArgs(null, this, null));
-					if (id != null)
-						appliedModifiersWithID.add(id);
+					if (id != null) {
+						if (!modifiersWithID.containsKey(id))
+							modifiersWithID.put(id, mods[i]);
+						// Check if the modifiers are compatible. Crash if not.
+						else if (mods[i].getAttribute() != modifiersWithID.get(id).getAttribute()
+							|| mods[i].getOperation() != modifiersWithID.get(id).getOperation()
+							// As predicates are hard to check equality, just check if they're present here
+							|| (mods[i].getAdditionalCondition() == null) == (modifiersWithID.get(id).getAdditionalCondition() != null)) {
+							throw new UnsupportedOperationException("CBaubleEquippableMob: Incompatible modifiers with the same ID.");
+						}
+						// Overwrite if larger
+						else if (mods[i].getAmount() > modifiersWithID.get(id).getAmount()) {
+							modifiersWithID.put(id, mods[i]);
+						}
+					}
+					// Modifiers without ID are directly applied.
+					else mods[i].startApplying(new BaubleProcessingArgs(null, this, null));
 				}
 			}
 		});
+		// Finally apply IDed modifiers
+		modifiersWithID.values().forEach(m -> m.startApplying(new BaubleProcessingArgs(null, this, null)));
 		// Then add repeatable modifiers by slots
 		for (String key: getBaubleSlotAccessor().getAccessors().keySet())
 		{
