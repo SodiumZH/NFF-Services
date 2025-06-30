@@ -1,20 +1,44 @@
 package net.sodiumzh.nfu.util;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class NFUParticleStatics {
-	
+
+	public static final RandomSource RND = RandomSource.create();
+
+	/**
+	 * Only on client, add a particle with randomized position and velocity
+	 */
+	public static void addRandomizedParticle(Level level, ParticleOptions type, Vec3 position, Vec3 posRandomScale, Vec3 maxVelocity, Vec3 velocityRandomScale) {
+		if (level instanceof ClientLevel cl) {
+			cl.addParticle(type, position.x + RND.nextGaussian() * posRandomScale.x, position.y + RND.nextGaussian() * posRandomScale.y,
+				position.z + RND.nextGaussian() * posRandomScale.z, maxVelocity.x * RND.nextGaussian() * velocityRandomScale.x,
+				maxVelocity.y * RND.nextGaussian() * velocityRandomScale.y, maxVelocity.z * RND.nextGaussian() * velocityRandomScale.z);
+		}
+	}
+
+	/**
+	 * Side-safe adding particles.
+	 */
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 positionOffset, Vec3 rndScale,
 			int amount, double speed) {
-		if (entity.level.isClientSide)
-			return;
+		if (amount <= 0) return;
 		Vec3 pos = entity.position();
-		((ServerLevel) (entity.level)).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
+		if (entity.level().isClientSide && entity.level() instanceof ClientLevel cl) {
+			for (int i = 0; i < amount; ++i) {
+				addRandomizedParticle(cl, options, pos.add(positionOffset), rndScale, new Vec3(speed, speed, speed), new Vec3(1d, 1d, 1d));
+			}
+		}
+		else if (!entity.level().isClientSide && entity.level() instanceof ServerLevel sl)
+		sl.sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}
 	
@@ -23,6 +47,7 @@ public class NFUParticleStatics {
 			double speed) {
 		sendParticlesToEntity(entity, options, new Vec3(posOffsetX, posOffsetY, posOffsetZ),
 				new Vec3(rndScaleX, rndScaleY, rndScaleZ), amount, speed);
+
 	}
 
 	public static void sendParticlesToEntity(Entity entity, ParticleOptions options, Vec3 posOffset, double rndScale,
