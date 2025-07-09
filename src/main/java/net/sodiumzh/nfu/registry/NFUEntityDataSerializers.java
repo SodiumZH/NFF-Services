@@ -2,12 +2,16 @@ package net.sodiumzh.nfu.registry;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.math.LinearColor;
+
+import javax.swing.text.html.parser.Entity;
+import java.util.*;
 
 public class NFUEntityDataSerializers
 {
@@ -38,4 +42,42 @@ public class NFUEntityDataSerializers
 			double b = buf.readDouble();
 			return LinearColor.fromNormalized(r, g, b);
 		}));
+
+
+	public static <T> EntityDataSerializer<Optional<T>> optionalOf(EntityDataSerializer<T> original) {
+		return EntityDataSerializer.optional(original::write, original::read);
+	}
+
+	public static <T> EntityDataSerializer<List<T>> listOf(EntityDataSerializer<T> original) {
+		return EntityDataSerializer.simple((buf, list) -> {
+			buf.writeInt(list.size());
+			list.forEach(e -> original.write(buf, e));
+		}, buf -> {
+			int size = buf.readInt();
+			List<T> res = new ArrayList<>(size * 2);
+			for (int i = 0; i < size; ++i)
+				res.add(original.read(buf));
+			return res;
+		});
+	}
+
+	public static <K, V> EntityDataSerializer<Map<K, V>> mapOf(EntityDataSerializer<K> keySerializer, EntityDataSerializer<V> valSerializer) {
+		return EntityDataSerializer.simple((buf, map) -> {
+			buf.writeInt(map.size());
+			map.entrySet().forEach(entry -> {
+				keySerializer.write(buf, entry.getKey());
+				valSerializer.write(buf, entry.getValue());
+			});
+		}, buf -> {
+			int size = buf.readInt();
+			Map<K, V> res = new HashMap<>();
+			for (int i = 0; i < size; ++i) {
+				K key = keySerializer.read(buf);
+				V val = valSerializer.read(buf);
+				res.put(key, val);
+			}
+			return res;
+		});
+	}
+
 }
