@@ -3,7 +3,7 @@ package net.sodiumzh.nff.services.entity.ai.goal.preset;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
-public class NFFLeapAtOwnerGoal extends NFFLeapAtGoal implements INFFFollowOwner
+public class NFFLeapAtOwnerGoal extends NFFLeapAtGoal implements INFFFollowOwnerGoal
 {
 
 	public NFFLeapAtOwnerGoal(INFFTamed mob, float yd, float xzd, float maxAttackDistance, int chance)

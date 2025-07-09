@@ -6,7 +6,7 @@ import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
-public class NFFFlyingFollowOwnerGoal extends NFFFlyingMoveGoal implements INFFFollowOwner
+public class NFFFlyingFollowOwnerGoal extends NFFFlyingMoveGoal implements INFFFollowOwnerGoal
 {
 	public double teleportDistance = 12d;
 	public double noFollowOnCombatDistance = 6d;

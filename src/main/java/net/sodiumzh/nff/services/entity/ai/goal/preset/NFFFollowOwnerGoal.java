@@ -19,7 +19,7 @@ import java.util.EnumSet;
 /** Adjusted from vanilla FollowOwnerGoal for TameableAnimal.
  * <p>This goal is for non-flying mobs.
  */
-public class NFFFollowOwnerGoal extends NFFMoveGoal {
+public class NFFFollowOwnerGoal extends NFFMoveGoal implements INFFFollowOwnerGoal {
 
 	protected final LevelReader level;
 	protected int timeToRecalcPath;
@@ -105,10 +105,10 @@ public class NFFFollowOwnerGoal extends NFFMoveGoal {
 		}
 	}
 
-	protected void teleportToOwner() {
-		if (!mob.isOwnerPresent())
+	public void teleportToOwner() {
+		if (!mob.isOwnerInDimension())
 			return;
-		BlockPos blockpos = mob.getOwner().blockPosition();
+		BlockPos blockpos = mob.getOwnerInDimension().blockPosition();
 		for (int i = 0; i < 20; ++i) {
 			int j = this.randomIntInclusive(-3, 3);
 			int k = this.randomIntInclusive(-1, 1);
@@ -165,12 +165,7 @@ public class NFFFollowOwnerGoal extends NFFMoveGoal {
 		else return false;
 	}
 
-	protected boolean allowTeleport()
-	{
-		return true;
-	}
-	
-	protected int randomIntInclusive(int pMin, int pMax) {
+    protected int randomIntInclusive(int pMin, int pMax) {
 		return getPathfinder().getRandom().nextInt(pMax - pMin + 1) + pMin;
 	}
 }
