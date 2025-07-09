@@ -14,7 +14,7 @@ import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 /**
  * Sound methods for all follow-owner goals.
  */
-public interface INFFFollowOwner
+public interface INFFFollowOwnerGoal
 {
 	
 	/**
@@ -32,7 +32,7 @@ public interface INFFFollowOwner
 	{
 		if (this instanceof NFFMoveGoal bg)
 			return bg;
-		else throw new RuntimeException("INFFFollowOwner interface can only attached to NFFMoveGoal.");
+		else throw new RuntimeException("INFFFollowOwnerGoal interface can only attached to NFFMoveGoal.");
 	}
 
 	/**
@@ -72,7 +72,7 @@ public interface INFFFollowOwner
 		}
 		else 
 		{
-			throw new UnimplementedException("INFFFollowOwner: the mob is neither PathfinderMob nor FlyingMob, so doesn't have a movement preset. Please implement INFFFollowOwner::moveToOwner for custom types.");
+			throw new UnimplementedException("INFFFollowOwnerGoal: the mob is neither PathfinderMob nor FlyingMob, so doesn't have a movement preset. Please implement INFFFollowOwnerGoal::moveToOwner for custom types.");
 		}
 	}
 	

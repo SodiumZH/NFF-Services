@@ -8,16 +8,20 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
+import net.sodiumzh.nfu.util.NFULevelStatics;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class NFFAmphibiousGoals {
 
@@ -27,6 +31,7 @@ public abstract class NFFAmphibiousGoals {
 		private double wantedZ;
 		private final double speedModifier;
 		private final Level level;
+
 
 		public GoToWaterGoal(INFFTamed pMob, double pSpeedModifier) {
 			super(pMob);
@@ -94,12 +99,12 @@ public abstract class NFFAmphibiousGoals {
 		}
 	}
 
-	public static class GoToBeachGoal extends MoveToBlockGoal {
+	public static class GoToBeachGoal extends NFFMoveToBlockGoal {
 		protected final INFFTamedAmphibious amph;
 		protected final PathfinderMob pathfinder;
 
 		public GoToBeachGoal(INFFTamed mob, double pSpeedModifier) {
-			super((PathfinderMob) mob, pSpeedModifier, 8, 2);
+			super(mob, pSpeedModifier, 8, 2);
 			this.amph = (INFFTamedAmphibious) mob;
 			this.pathfinder = (PathfinderMob) mob;
 		}
@@ -109,8 +114,8 @@ public abstract class NFFAmphibiousGoals {
 		 * necessary for execution in this method as well.
 		 */
 		@Override
-		public boolean canUse() {
-			return super.canUse() 
+		public boolean checkCanUse() {
+			return super.canUse()
 					&& !((INFFTamed) this.mob).asMob().level().isDay()
 					&& pathfinder.isInWaterOrBubble()
 					&& pathfinder.getY() >= pathfinder.level().getSeaLevel() - 3;
@@ -120,7 +125,7 @@ public abstract class NFFAmphibiousGoals {
 		 * Returns whether an in-progress EntityAIBase should continue executing
 		 */
 		@Override
-		public boolean canContinueToUse() {
+		public boolean checkCanContinueToUse() {
 			return super.canContinueToUse();
 		}
 
@@ -135,11 +140,12 @@ public abstract class NFFAmphibiousGoals {
 					: false;
 		}
 
+
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		@Override
-		public void start() {
+		public void onStart() {
 
 			amph.switchNav(false);
 
@@ -151,7 +157,7 @@ public abstract class NFFAmphibiousGoals {
 		 * another one
 		 */
 		@Override
-		public void stop() {
+		public void onStop() {
 			super.stop();
 		}
 	}
@@ -233,8 +239,34 @@ public abstract class NFFAmphibiousGoals {
 		         }
 		      }
 		      return false;
-		   }
-		 
+		 }
+	}
+
+	public static class FollowOwnerGoal extends NFFFollowOwnerGoal {
+
+		public final INFFTamedAmphibious amph;
+		public final int walkBelowDepth;
+
+		public FollowOwnerGoal(@NotNull INFFTamed inMob, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly, int walkBelowDepth) {
+			super(inMob, pSpeedModifier, pStartDistance, pStopDistance, pCanFly);
+			this.amph = (INFFTamedAmphibious)(mob.asMob());
+			this.walkBelowDepth = walkBelowDepth;
+		}
+
+		public FollowOwnerGoal(@NotNull INFFTamed inMob, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly) {
+			this(inMob, pSpeedModifier, pStartDistance, pStopDistance, pCanFly, 1);
+		}
+
+		public void onTick() {
+			super.onTick();
+			BlockPos pos = this.getMob().asMob().blockPosition();
+			BlockState blockState = this.getMob().asMob().level().getBlockState(pos);
+			BlockState blockStateBelow = this.getMob().asMob().level().getBlockState(pos.below());
+			if (NFULevelStatics.getWaterDepth(this.getMob().asMob()) <= this.walkBelowDepth)
+				this.amph.switchNav(false);
+
+		}
+
 	}
 
 }
