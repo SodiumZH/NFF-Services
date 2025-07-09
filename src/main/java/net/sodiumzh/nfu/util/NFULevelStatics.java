@@ -1,5 +1,21 @@
 package net.sodiumzh.nfu.util;
 
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import org.apache.commons.lang3.mutable.MutableObject;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -337,4 +353,79 @@ public class NFULevelStatics
 	public static Optional<HitResult> eyeTrace(@Nonnull Entity entity, double maxDistance) {
 		return lineTrace(entity, entity.getEyePosition(), entity.getViewVector(1f), maxDistance, false);
 	}
+
+	public static boolean hasBlockCollision(BlockPos pos, @Nonnull Entity context) {
+		return !context.level().getBlockState(pos).getShape(context.level(), pos, CollisionContext.of(context)).isEmpty();
+	}
+
+	/**
+	 * Check if a pos is solid-collision (i.e. non-empty collision) to an entity.
+	 */
+	public static boolean isSolidCollision(BlockPos pos, @Nonnull Entity context) {
+		return !context.level().getBlockState(pos).getBlock()
+			.getCollisionShape(context.level().getBlockState(pos),
+				context.level(), pos, CollisionContext.of(context)).isEmpty();
+	}
+	/**
+	 * Check if a pos is water-collision (i.e. water, no collision) to an entity.
+	 */
+	public static boolean isWaterCollision(BlockPos pos, @Nonnull Entity context) {
+		BlockState state = context.level().getBlockState(pos);
+		if (state.is(Blocks.WATER)) return true;
+		else if (!state.hasProperty(BlockStateProperties.WATERLOGGED) ||
+			!state.getValue(BlockStateProperties.WATERLOGGED)) return false;
+		else return !hasBlockCollision(pos, context);
+	}
+
+	/**
+	 * Check if a pos is liquid-collision (i.e. any liquid, no collision) to an entity.
+	 */
+	public static boolean isLiquidCollision(BlockPos pos, @Nonnull Entity context) {
+		return isWaterCollision(pos, context) || (context.level().getBlockState(pos).liquid() && !hasBlockCollision(pos, context));
+	}
+
+	/**
+	 * Check if a pos is air-collision (i.e. non-liquid, no collision) to an entity.
+	 */
+	public static boolean isAirCollision(BlockPos pos, @Nonnull Entity context) {
+		return !context.level().getBlockState(pos).liquid() && !isSolidCollision(pos, context);
+	}
+
+	/**
+	 * Find the water depth for an entity's position.
+	 */
+	public static int getWaterDepth(BlockPos pos, @Nonnull Entity context) {
+		BlockPos currentPos = pos;
+		// If air or liquid, go down and find a solid block, or go through a water layer
+		if (!isSolidCollision(pos, context)) {
+			boolean wentThroughWater = false;
+			while(true) {
+				if (isSolidCollision(currentPos, context) || (wentThroughWater && !isWaterCollision(currentPos, context)))
+					break;
+				else if (isWaterCollision(currentPos, context))
+					wentThroughWater = true;
+				currentPos = currentPos.below();
+			}
+		} else {
+			// If solid, go up to find a non-solid block
+			do {
+				currentPos = currentPos.above();
+			} while (isSolidCollision(currentPos, context));
+			// Now it's the bottom non-solid, then go to the top solid
+			currentPos = currentPos.below();
+		}
+		// Now the pos is "the bottom of the water", i.e. the block right below the bottom water block;
+		int i = 0;	// Depth counter
+		currentPos = currentPos.above();
+		while (isWaterCollision(currentPos, context)) {
+			i++;
+			currentPos = currentPos.above();
+		}
+		return i;
+	}
+
+	public static int getWaterDepth( @Nonnull Entity context) {
+		return getWaterDepth(context.blockPosition(), context);
+	}
+
 }
