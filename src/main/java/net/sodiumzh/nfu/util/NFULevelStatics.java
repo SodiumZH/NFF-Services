@@ -2,8 +2,10 @@ package net.sodiumzh.nfu.util;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.sodiumzh.nfu.container.Tuple2;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import net.minecraft.core.BlockPos;
@@ -417,4 +420,53 @@ public class NFULevelStatics
 		return getWaterDepth(context.blockPosition(), context);
 	}
 
+	/**
+	 * Get a mapping as a tuple stream of the pos and Block States in a given area. Note that if the area is large,
+	 * the filter should better remove most positions, otherwise it may impact the performance.
+	 * <p>Note: the Block Pos in output stream's each tuple is a copy of the stream pos value. They are not {@link BlockPos.MutableBlockPos}.
+	 */
+	public static Stream<Tuple2<BlockPos, BlockState>> getBlockPosAndStates(Level level, AABB area, BiPredicate<BlockPos, BlockState> filter) {
+		Stream<BlockPos> stream = BlockPos.betweenClosedStream(area);
+		if (filter != null)
+			stream = stream.filter(pos -> filter.test(pos, level.getBlockState(pos)));
+		return stream.map(pos -> new Tuple2<>(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), level.getBlockState(pos)));
+	}
+
+	/**
+	 * Get a mapping as a tuple stream of the pos and Block States in a given area. Note that if the area is large,
+	 * the filter should better remove most positions, otherwise it may impact the performance.
+	 * <p>Note: the Block Pos in output stream's each tuple is a copy of the stream pos value. They are not {@link BlockPos.MutableBlockPos}.
+	 */
+	public static Stream<Tuple2<BlockPos, BlockState>> getBlockPosAndStates(Level level, AABB area, Predicate<BlockState> filter) {
+		Stream<BlockPos> stream = BlockPos.betweenClosedStream(area);
+		if (filter != null)
+			stream = stream.filter(pos -> filter.test(level.getBlockState(pos)));
+		return stream.map(pos -> new Tuple2<>(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), level.getBlockState(pos)));
+	}
+
+	/**
+	 * Get a mapping as a tuple stream of the pos and Block States in a spherical area of a given center and radius. Note that if the area is large,
+	 * the filter should better remove most positions, otherwise it may impact the performance.
+	 * <p>Note: the Block Pos in output stream's each tuple is a copy of the stream pos value. They are not {@link BlockPos.MutableBlockPos}.
+	 */
+	public static Stream<Tuple2<BlockPos, BlockState>> getSphericalBlockStates(Level level, BlockPos center, int radius, BiPredicate<BlockPos, BlockState> filter) {
+		Stream<BlockPos> stream = BlockPos.betweenClosedStream(center.offset(radius, radius, radius), center.offset(-radius, -radius, -radius))
+			.filter(pos -> pos.distSqr(center) <= radius * radius);
+		if (filter != null)
+			stream = stream.filter(pos -> filter.test(pos, level.getBlockState(pos)));
+		return stream.map(pos -> new Tuple2<>(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), level.getBlockState(pos)));
+	}
+
+	/**
+	 * Get a mapping as a tuple stream of the pos and Block States in a spherical area of a given center and radius. Note that if the area is large,
+	 * the filter should better remove most positions, otherwise it may impact the performance.
+	 * <p>Note: the Block Pos in output stream's each tuple is a copy of the stream pos value. They are not {@link BlockPos.MutableBlockPos}.
+	 */
+	public static Stream<Tuple2<BlockPos, BlockState>> getSphericalBlockStates(Level level, BlockPos center, int radius, Predicate<BlockState> filter) {
+		Stream<BlockPos> stream = BlockPos.betweenClosedStream(center.offset(radius, radius, radius), center.offset(-radius, -radius, -radius))
+			.filter(pos -> pos.distSqr(center) <= radius * radius);
+		if (filter != null)
+			stream = stream.filter(pos -> filter.test(level.getBlockState(pos)));
+		return stream.map(pos -> new Tuple2<>(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), level.getBlockState(pos)));
+	}
 }
