@@ -31,6 +31,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nff.services.event.entity.NFFTamedDeathEvent;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
 import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
@@ -289,6 +290,8 @@ public class NFFEntityEventListeners
 			if (event.getEntity() instanceof INFFTamed bef) {
 				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
+					if (event.getEntity().getHealth() < 0.00001f)
+						event.getEntity().setHealth(1f);
 					return;
 				}
 				// Befriended mobs should not kill each other with same owner, or get killed by
