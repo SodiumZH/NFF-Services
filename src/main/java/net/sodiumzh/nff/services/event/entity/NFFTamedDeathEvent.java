@@ -1,4 +1,4 @@
-package net.sodiumzh.nff.services.eventlistener;
+package net.sodiumzh.nff.services.event.entity;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.eventbus.api.Cancelable;
