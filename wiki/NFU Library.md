@@ -4,20 +4,18 @@
 
 NFU (Natrium Forge Utilities) is a library of Minecraft utilities. It contains many different useful classes and methods mainly about the gameplay mechanics.
 
-Now in code it's called "NaUtils" (Natrium Utilities), but will be changed to NFU some time.
+## NFU Registry API
 
-## NaUtils Registry API
+NFU provides a simple registry system like the forge registry, mainly for the global registration of custom-defined data types.
 
-NaUtils provides a simple registry system like the forge registry, mainly for the global registration of custom-defined data types.
-
-### `NaUtilsRegistry`
+### `NFURegistry`
 
 The registry class. Use the code below to declare a custom registry:
 
 #### Declaration
 
 ```java
-public static final NaUtilsRegistry<YourDataType> YOUR_REGISTRY = new NaUtilsRegistry<YourDataType>(new ResourceLocation("your_mod_id", "your_registry_key"));
+public static final NFURegistry<YourDataType> YOUR_REGISTRY = new NFURegistry<YourDataType>(new ResourceLocation("your_mod_id", "your_registry_key"));
 ```
 
 This defines a registry for data type `YourDataType` with key `"your_mod_id:your_registry_key"`. Please note this key is the key of *this registry*, or it's key in the registry of all registries. (The "registry registry" is internal.)
@@ -36,17 +34,17 @@ public static final RegistryEntryCollection<YourDataType> REGISTER = RegistryEnt
 
 This defines a `RegistryEntryCollection` for registry `YOUR_REGISTRY` with namespace `"your_mod_id"`.
 
-##### Registering
+##### Registration
 
-Registering should be declared in the same class of `RegistryEntryCollection` and below it.
+Registration should be declared in the same class of `RegistryEntryCollection` and below it.
 
 ```java
-public static final NaUtilsRegistry.Accessor<YourDataType> YOUR_ENTRY = REGISTER.register("your_entry", () -> new YourDataType(...));
+public static final NFURegistry.Accessor<YourDataType> YOUR_ENTRY = REGISTER.register("your_entry", () -> new YourDataType(...));
 ```
 
-This action registers `YourDataType(...)` with key `your_mod_id:your_entry` into `REGISTER`. Like Forge registry, `NaUtilsRegistry` also uses `Supplier`s instead of instances.
+This action registers `YourDataType(...)` with key `your_mod_id:your_entry` into `REGISTER`. Like Forge registry, `NFURegistry` also uses `Supplier`s instead of instances.
 
-It returns a `NaUtilsRegistry.Accessor` which is similar to `RegistryObject` for Forge registry. You can call `get()` to access the value.
+It returns a `NFURegistry.Accessor` which is similar to `RegistryObject` for Forge registry. You can call `get()` to access the value.
 
 ##### Merging
 
@@ -54,7 +52,7 @@ Registering above only adds entries into `RegistryEntryCollection`, and you need
 
 #### Access
 
-As `NaUtilsRegistry` uses `Supplier`s as values, it must generate values before accessing. By default, this will be done at the first time you call `NaUtilsRegistry#Accessor#get()`. Note that once the `NaUtilsRegistry.Accessor` outputs a non-null instance, the `Supplier` will be no longer called and the output results will no longer change.
+As `NFURegistry` uses `Supplier`s as values, it must generate values before accessing. By default, this will be done at the first time you call `NFURegistry#Accessor#get()`. Note that once the `NFURegistry.Accessor` outputs a non-null instance, the `Supplier` will be no longer called and the output results will no longer change.
 
 ##### Pre-generating
 
@@ -62,33 +60,35 @@ Optionally, you can manually generate all instances for a registry at a given ph
 
 #### Built-in registries
 
-NaUtils built-in registries are declared in `NaUtilsRegistries `class.
+NFU built-in registries are declared in `NFURegistries `class.
 
 ### Misc
 
-There are also some registries or utilities for registration that are not in `NaUtilsRegistry`.
+There are also some registries or utilities for registration that are not in `NFURegistry`.
 
 #### `DeferredEntityAttributeRegisterEvent`
 
 Event for registering `AttributeSupplier`s that should be added on server start, not on mod setup. This is for attributes depending on data which is not available on mod setup (e.g. config attributes).
 
-## NaUtils Item Template
+## NFU Item Template
 
-NaUtils provides a template for items, including utility methods, some of which are implemented by mixin.
+NFU provides a template for items, including utility methods, some of which are implemented by mixin.
 
-#### `INaUtilsItem`
+#### `INFUItem`
 
-Base interface of NaUtils Item Templates. External implementations of features recognize the templated items by trying casting to this interface.
+Base interface of NFU Item Templates. External implementations of features recognize the templated items by trying casting to this interface.
 
 ### Features
 
-##### Dynamic tooltips
+##### Styling on initialization
 
 On item initialization, you can call description- and foiling- related methods to dynamically add tooltips (allowing chaining). Each addition operation adds a new row of tooltip.
 
+Item name styling can also be done on initialization.
+
 ##### Default instance operation
 
-NaUtils item template allows to manipulate the behavior of default instances, including:
+NFU item template allows to manipulate the behavior of default instances, including:
 
 a) On-initialization setting of default instances: overriding, redirecting to another item, removing (setting to air).
 
@@ -135,7 +135,7 @@ Then the capability will be auto ticked by calling `CEntityTickingCapability#tic
 
 ## Mixin Events
 
-NaUtils provides some event hooks implemented by Mixin.
+NFU provides some event hooks implemented by Mixin.
 
 ### Client
 
@@ -252,6 +252,10 @@ Posted on a `LivingEntity` dies, before dropping items from the loot table, afte
 
 Not cancellable, but having a result. `ALLOW` = always regarding as player-killed; `DENY` = always regarding as non-player-killed; `DEFAULT` = original value.
 
+##### `LivingEntityDamageTakenEvent`
+
+Posted after a `LivingEntity` **really** takes a damage. NOT cancellable.
+
 #### Mob
 
 ##### `MobSunBurnTickEvent`
@@ -306,7 +310,7 @@ Posted before an `ItemStack` of `BlockItem` is about to be consumed after being 
 
 Cancellable. If cancelled, the item will not be consumed, but the placed block will still be there.
 
-## Vanilla Trade System
+## Vanilla Trade API
 
 Vanilla Trade System allows to enable Vanilla Villager-like trade on any mobs. It is Implemented by Forge Capability.
 
@@ -316,21 +320,21 @@ Vanilla Trade System allows to enable Vanilla Villager-like trade on any mobs. I
 
 #### Usage
 
-
+(Under construction)
 
 ## In-Game Debug Items
 
-NaUtils provides some in-game debug utilities. The items are available only by `/give` command.
+NFU provides some in-game debug utilities. The items are available only by `/give` command.
 
 ### AI Switch
 
-Item key: `nautils:debug_ai_switch`
+Item key: `nfulib:debug_ai_switch`
 
 Right click to enable/disable a mob's AI. The effect is the same as changing the mob's `isNoAi` tag and calling `setNoAi()` method.
 
 ### Target Setter 
 
-Item key: `nautils:debug_target_setter`
+Item key: `nfulib:debug_target_setter`
 
 Used to specify a mob's attack target.
 
@@ -338,7 +342,7 @@ Right click a mob to select, and then right click another mob to make the former
 
 ### Mob Remover
 
-Item key: `nautils:debug_mob_remover`
+Item key: `nfulib:debug_mob_remover`
 
 Used to remove a mob.
 
@@ -352,7 +356,7 @@ In killing mode, the mob will be killed (same as using `/kill` command). The act
 
 ## Utility Method Libs
 
-### `NaUtilsContainerStatics`
+### `NFUContainerStatics`
 
 This lib includes methods for simplifying operations on containers.
 

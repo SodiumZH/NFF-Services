@@ -1,5 +1,25 @@
 # Change Log
 
+### 0.x.30
+
+##### Common
+
+Modified the package names and paths.
+
+​	-Root package of NFU: `net.sodiumzh.nautils` -> `net.sodiumzh.nfu`
+
+​	-Removed all plurals. Example: `net.sodiumzh.nfu.entities` -> `net.sodiumzh.nfu.entity`.
+
+​	-Changed all `NaUtils` prefixes to `NFU`. Example: `NaUtilsEntityStatics` -> `NFUEntityStatics`
+
+​	-Moved static library classes from `net.sodiumzh.nautils.statics` to `net.sodiumzh.nfu.util` as `static` is not a valid package name.
+
+​	-Moved the Bauble system from NFF to NFU: `net.sodiumzh.nff.services.subsystem.bauble` -> `net.sodiumzh.nfu.item.bauble` as it doesn't depend on any NFF mechanics.
+
+##### NFU Library
+
+Added Mixin Events: `LivingEntityDamageTakenEvent`
+
 ### 0.2.29.1
 
 ##### NFF Services
