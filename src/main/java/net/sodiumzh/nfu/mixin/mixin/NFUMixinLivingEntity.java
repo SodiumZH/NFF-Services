@@ -2,7 +2,7 @@ package net.sodiumzh.nfu.mixin.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.sodiumzh.nfu.mixin.event.entity.LivingEntityDamageTakenEvent;
+import net.sodiumzh.nfu.mixin.event.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,8 +17,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nfu.mixin.NFUMixin;
-import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
-import net.sodiumzh.nfu.mixin.event.entity.LootCheckPlayerKillEvent;
 
 @Mixin(LivingEntity.class)
 public abstract class NFUMixinLivingEntity implements NFUMixin<LivingEntity>
@@ -53,4 +51,15 @@ public abstract class NFUMixinLivingEntity implements NFUMixin<LivingEntity>
 		if (amount > 0f)
 			MinecraftForge.EVENT_BUS.post(new LivingEntityDamageTakenEvent(instance, amount, damageSource));
 	}
+
+	@Inject(method = "aiStep()V", at = @At("HEAD"))
+	private void postStartBaseAiStepEvent(CallbackInfo ci) {
+		MinecraftForge.EVENT_BUS.post(new LivingStartBaseAiStepEvent(caller()));
+	}
+
+	@Inject(method = "aiStep()V", at = @At("TAIL"))
+	private void postEndBaseAiStepEvent(CallbackInfo ci) {
+		MinecraftForge.EVENT_BUS.post(new LivingEndBaseAiStepEvent(caller()));
+	}
+
 }

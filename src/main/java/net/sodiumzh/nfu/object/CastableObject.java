@@ -15,7 +15,10 @@ public class CastableObject implements ICastable
 {
 	@Nullable
 	private final Object obj;
-	
+	private static final CastableObject EMPTY = new CastableObject(null);
+
+	public static CastableObject empty() { return EMPTY; }
+
 	public CastableObject(@Nullable Object obj)
 	{
 		this.obj = obj;

@@ -11,10 +11,11 @@ import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeListingCollection;
 import net.sodiumzh.nfu.entity.vanillatrade.VanillaTradeRegistry;
 import net.sodiumzh.nfu.function.RegistrablePredicate;
 import net.sodiumzh.nfu.item.bauble.IBaubleRegistryEntry;
+import net.sodiumzh.nfu.math.IFieldPattern3D;
+import net.sodiumzh.nfu.math.IInequalityPattern3D;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class NFURegistries {
 
@@ -87,5 +88,15 @@ public class NFURegistries {
 
     public static final NFURegistry<IBaubleRegistryEntry> BAUBLES =
         new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "baubles"));
+
+    /**
+     * A shortcut to {@link IInequalityPattern3D#REGISTRY}.
+     */
+    public static final NFURegistry<IInequalityPattern3D> INEQUALITY_PATTERNS = IInequalityPattern3D.REGISTRY;
+
+    /**
+     * A shortcut to {@link IFieldPattern3D#REGISTRY}.
+     */
+    public static final NFURegistry<IFieldPattern3D> FIELD_PATTERNS = IFieldPattern3D.REGISTRY;
 
 }

@@ -6,9 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Labels the interface is a capability interface.
+ * Label this class is a dedicated registry entry. Any instances of this class must be registered and accessed
+ * through registry, and it should never be constructed during runtime without registration.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
-public @interface CapabilityInterface {
+public @interface MustBeRegistered {
 }

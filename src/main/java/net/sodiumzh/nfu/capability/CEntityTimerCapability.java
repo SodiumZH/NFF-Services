@@ -82,11 +82,13 @@ public interface CEntityTimerCapability<T extends Entity> extends CEntityTicking
                 map.put(key, oldVal - 1);
             else if (oldVal == 0) {
                 removal.add(key);
-                MinecraftForge.EVENT_BUS.post(new ExpireEvent(this, key));
             }
         }
         for (String key: removal) {
             map.remove(key);
+        }
+        for (String key: removal) {
+            MinecraftForge.EVENT_BUS.post(new ExpireEvent(this, key));
         }
     }
 
