@@ -24,7 +24,6 @@ import javax.annotation.Nonnull;
 import java.util.Random;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
 
@@ -162,17 +161,6 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	 */
 	public void onPlayerTimerExpire(Mob mob, UUID playerUUID, String key) {}
 
-	@SubscribeEvent
-	public static void notifyTimerExpire(CEntityTimerCapability.ExpireEvent event) {
-		if (event.getCapability() instanceof CNFFTamable tamable) {
-			var playerInfo = CNFFTamable.parsePlayerSpecificTimerKey(event.getKey());
-			playerInfo.ifPresent(info -> tamable.getTamingProcess().onPlayerTimerExpire(tamable.getEntity(), info.getA(), info.getB()));
-			if (playerInfo.isEmpty()) {
-				tamable.getTamingProcess().onGeneralTimerExpire(tamable.getEntity(), event.getKey());
-			}
- 		}
-	}
-
 	/**
 	 * Get the tamable capability of a mob. It's a shortcut of {@link CNFFTamable#get}.
 	 */
@@ -186,5 +174,19 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	protected void debugPrint(Player printTo, String info) {
 		if (printTo.getOffhandItem().is(NFFItemRegistry.NFF_DEBUG_SIGN.get()))
 			NFUMiscStatics.printToScreen(info, printTo);
+	}
+
+	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
+	public static class EventListeners {
+		@SubscribeEvent
+		public static void notifyTimerExpire(CEntityTimerCapability.ExpireEvent event) {
+			if (event.getCapability() instanceof CNFFTamable tamable) {
+				var playerInfo = CNFFTamable.parsePlayerSpecificTimerKey(event.getKey());
+				playerInfo.ifPresent(info -> tamable.getTamingProcess().onPlayerTimerExpire(tamable.getEntity(), info.getA(), info.getB()));
+				if (playerInfo.isEmpty()) {
+					tamable.getTamingProcess().onGeneralTimerExpire(tamable.getEntity(), event.getKey());
+				}
+			}
+		}
 	}
 }
