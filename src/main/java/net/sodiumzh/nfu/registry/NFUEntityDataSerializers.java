@@ -3,14 +3,20 @@ package net.sodiumzh.nfu.registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sodiumzh.nfu.NFULibrary;
+import net.sodiumzh.nfu.math.Field3D;
+import net.sodiumzh.nfu.math.Inequality3D;
 import net.sodiumzh.nfu.math.LinearColor;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
+import net.sodiumzh.nfu.network.NFUDataSerializers;
 
 import javax.swing.text.html.parser.Entity;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class NFUEntityDataSerializers
@@ -31,6 +37,7 @@ public class NFUEntityDataSerializers
 			double z = buf.readDouble();
 			return new Vec3(x, y, z);
 		}));
+
 	public static final RegistryObject<EntityDataSerializer<LinearColor>> LINEAR_COLOR = SERIALIZERS.register("linear_color", () -> 
 		EntityDataSerializer.simple((buf, color) -> {
 			buf.writeDouble(color.r);
@@ -43,6 +50,22 @@ public class NFUEntityDataSerializers
 			return LinearColor.fromNormalized(r, g, b);
 		}));
 
+	public static final RegistryObject<EntityDataSerializer<AABB>> BOUNDING_BOX =
+		SERIALIZERS.register("bounding_box", () -> fromNFUSerializer(NFUDataSerializers.BOUNDING_BOX));
+	public static final RegistryObject<EntityDataSerializer<Optional<AABB>>> OPTIONAL_BOUNDING_BOX =
+		SERIALIZERS.register("optional_bounding_box", () -> optionalOf(BOUNDING_BOX.get()));
+	public static final RegistryObject<EntityDataSerializer<Inequality3D>> INEQUALITY_3D =
+		SERIALIZERS.register("inequality_3d", () -> fromNFUSerializer(NFUDataSerializers.INEQUALITY_3D));
+	public static final RegistryObject<EntityDataSerializer<Optional<Inequality3D>>> OPTIONAL_INEQUALITY_3D =
+		SERIALIZERS.register("optional_inequality_3d", () -> optionalOf(INEQUALITY_3D.get()));
+	public static final RegistryObject<EntityDataSerializer<Field3D>> FIELD_3D =
+		SERIALIZERS.register("field_3d", () -> fromNFUSerializer(NFUDataSerializers.FIELD_3D));
+	public static final RegistryObject<EntityDataSerializer<Optional<Field3D>>> OPTIONAL_FIELD_3D =
+		SERIALIZERS.register("optional_field_3d", () -> optionalOf(FIELD_3D.get()));
+
+	public static <T> EntityDataSerializer<T> fromNFUSerializer(NFUDataSerializer<T> serializer) {
+		return serializer.asEntityDataSerializer();
+	}
 
 	public static <T> EntityDataSerializer<Optional<T>> optionalOf(EntityDataSerializer<T> original) {
 		return EntityDataSerializer.optional(original::write, original::read);

@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public class NFUMathStatics
 {
-	private static final RandomSource RND = RandomSource.create();
+	public static final RandomSource RND = RandomSource.create();
 	
 	public static double max(double... vals)
 	{
@@ -108,6 +108,8 @@ public class NFUMathStatics
 		return getBlockPos(v.x, v.y, v.z);
 	}
 
+	// 3D Geometry //
+
 	/**
 	 * Get the squared closest distance of the surfaces of two boxes.
 	 */
@@ -191,7 +193,24 @@ public class NFUMathStatics
 		return new Vec3(Math.cos(initAngleRadian + angleRadians), 0d, Math.sin(initAngleRadian + angleRadians))
 				.scale(xzScale).add(0, v.y, 0);
 	}
-	
+
+	/**
+	 * Transform a position's internal coordination in a box (center=(0,0,0), corners=(1,1,1),(-1,-1,-1) etc.)
+	 * to the absolute coordination.
+	 */
+	public static Vec3 relToAbs(Vec3 rel, AABB box) {
+		return box.getCenter().add(box.getCenter().subtract(box.minX, box.minY, box.minZ).multiply(rel));
+	}
+
+	/**
+	 * Transform a bounding box defined with internal coordination in another box (center=(0,0,0),
+	 * corners=(1,1,1),(-1,-1,-1) etc.) to the absolute coordination.
+	 */
+	public static AABB relToAbs(AABB rel, AABB box) {
+		return new AABB(relToAbs(new Vec3(rel.minX, rel.minY, rel.minZ), box),
+			relToAbs(new Vec3(rel.maxX, rel.maxY, rel.maxZ), box));
+	}
+
 	/**
 	 * Referred to UE4
 	 */
@@ -226,7 +245,8 @@ public class NFUMathStatics
 			);
 	}
 	
-	
+	// Random //
+
 	/**
 	 * Get a random unit vector with uniform-distribution on sphere surface area.
 	 */
@@ -285,6 +305,11 @@ public class NFUMathStatics
 			}
 		}
 		return res;
+	}
+
+	public static Vec3 rndPosition(AABB border) {
+		return new Vec3(rndRangedDouble(border.minX, border.maxX), rndRangedDouble(border.minY, border.maxY),
+			rndRangedDouble(border.minZ, border.maxZ));
 	}
 
 	/**
