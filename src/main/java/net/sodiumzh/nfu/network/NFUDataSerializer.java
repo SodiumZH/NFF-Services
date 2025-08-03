@@ -1,15 +1,21 @@
 package net.sodiumzh.nfu.network;
 
 import com.google.common.base.Function;
+import com.machinezoo.noexception.optional.OptionalToDoubleBiFunction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
+import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 /**
  * Defines a data type that can serialized both into nbt and FriendlyByteBuf.
@@ -178,6 +184,35 @@ public interface NFUDataSerializer<T>
 				(buf) -> aToB.apply(original.read(buf)),
 				b -> original.toTag(bToA.apply(b)),
 				t -> aToB.apply(original.fromTag(t)));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <O> NFUDataSerializer<Optional<O>> optionalOf(final NFUDataSerializer<O> original) {
+		Class<?> clazz = Optional.class;
+		return NFUDataSerializer.create((Class<Optional<O>>)clazz, CompoundTag.class,
+			(FriendlyByteBuf b, Optional<O> optional) -> {
+				optional.ifPresentOrElse(o -> {
+					b.writeBoolean(true);
+					original.write(b, o);
+				}, () -> b.writeBoolean(false));
+			}, (FriendlyByteBuf b) -> {
+				if (b.readBoolean())
+					return Optional.of(original.read(b));
+				else return Optional.empty();
+			}, (Optional<O> optional) -> {
+				CompoundTag res = new CompoundTag();
+				optional.ifPresent(o -> res.put("value", original.toTag(o)));
+				return res;
+			}, (CompoundTag t) -> {
+				if (t.contains("value"))
+					return Optional.of(original.fromTag(t.get("value")));
+				else return Optional.empty();
+			});
+	}
+
+	@DontOverride
+	public default EntityDataSerializer<T> asEntityDataSerializer() {
+		return EntityDataSerializer.simple(this::write, this::read);
 	}
 
 }

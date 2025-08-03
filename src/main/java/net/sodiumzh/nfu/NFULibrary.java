@@ -16,10 +16,7 @@ import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.item.bauble.BaubleEquippingConditions;
 import net.sodiumzh.nfu.item.bauble.NFUBaubleAPI;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
-import net.sodiumzh.nfu.registry.NFUConfigs;
-import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
-import net.sodiumzh.nfu.registry.NFUItemRegistry;
-import net.sodiumzh.nfu.registry.NFURegistries;
+import net.sodiumzh.nfu.registry.*;
 import net.sodiumzh.nfu.savedata.redirector.SaveDataLocationRedirector;
 
 import javax.annotation.Nullable;
@@ -36,6 +33,7 @@ public class NFULibrary {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, NFUConfigs.CONFIG);
 		NFUItemRegistry.NAUTILS_ITEMS.register(modEventBus);
 		NFUEntityDataSerializers.SERIALIZERS.register(modEventBus);
+		NFUEntityTypes.ENTITY_TYPES.register(modEventBus);
 
 		// Custom registry related
 		NFURegistries.init();
