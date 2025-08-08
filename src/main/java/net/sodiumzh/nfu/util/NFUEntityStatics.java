@@ -4,8 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -14,6 +16,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
@@ -39,6 +43,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.sodiumzh.nfu.network.NFUNetworkChannels;
+import net.sodiumzh.nfu.network.packet.ClientboundEntityMotionUpdatePacket;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -881,4 +887,20 @@ public class NFUEntityStatics
 		}
 		return res;
 	}
+
+	/**
+	 * Set a mob's motion on server. Client motion will be auto synched. Do nothing on client.
+	 */
+	public static void setMotionOnServer(Entity target, Vec3 newPos, Vec3 newVelocity) {
+		if (target.level().isClientSide) return;
+		target.setPos(target.position().add(newPos));
+		target.addDeltaMovement(newVelocity);
+		ClientboundEntityMotionUpdatePacket packet = new ClientboundEntityMotionUpdatePacket(target.getId(), newPos, newVelocity);
+		NFUNetworkStatics.sendToAllPlayers(target.level(), NFUNetworkChannels.CHANNEL, packet);
+	}
+
+	public static void setPosOnServer(Entity target, Vec3 newPos) {
+		setMotionOnServer(target, newPos, target.getDeltaMovement());
+	}
+
 }

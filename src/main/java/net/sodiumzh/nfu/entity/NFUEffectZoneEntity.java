@@ -1,39 +1,42 @@
 package net.sodiumzh.nfu.entity;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.minecraftforge.common.util.TriPredicate;
+import net.sodiumzh.nfu.exception.ReflectionFailedException;
 import net.sodiumzh.nfu.math.Field3D;
 import net.sodiumzh.nfu.math.IFieldPattern3D;
 import net.sodiumzh.nfu.math.IInequalityPattern3D;
 import net.sodiumzh.nfu.math.Inequality3D;
+import net.sodiumzh.nfu.object.IChainModifiable;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
+import net.sodiumzh.nfu.registry.NFUEntityTypes;
 import net.sodiumzh.nfu.util.NFUMathStatics;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-// TODO Move this to NFU
-public class NFUEffectZoneEntity extends ThrowableItemProjectile {
+public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<NFUEffectZoneEntity> {
 
     protected static final EntityDataAccessor<ParticleOptions> PARTICLE
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.PARTICLE);
@@ -45,10 +48,26 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.INEQUALITY_3D.get());
     protected static final EntityDataAccessor<Optional<AABB>> PARTICLE_AREA_BOUNDING_BOX
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.OPTIONAL_BOUNDING_BOX.get());
+    protected static final EntityDataAccessor<Float> GRAVITY
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
+    protected static final EntityDataAccessor<Float> SCALE_WIDTH
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
+    protected static final EntityDataAccessor<Float> SCALE_HEIGHT
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
+    protected static final EntityDataAccessor<String> STRING_IDENTIFIER
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.STRING);
 
+    protected static final Field FIELD_ENTITY_DIMENSIONS;
+    static {
+        try {
+            FIELD_ENTITY_DIMENSIONS = Entity.class.getDeclaredField(NFUReflectionStatics.remapFieldName("f_19815_"));
+            FIELD_ENTITY_DIMENSIONS.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new ReflectionFailedException(e);
+        }
+    }
 
-    private float gravity = 0.03F;
-    private int lifetime = 10 * 20;
+        private int lifetime = 10 * 20;
     @Nullable
     private Consumer<NFUEffectZoneEntity> onServerTick = null;
     @Nullable
@@ -56,35 +75,41 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
     @Nullable
     private BiConsumer<NFUEffectZoneEntity, LivingEntity> onOverlapLiving = null;
     @Nullable
-    private BiPredicate<BlockPos, BlockState> blockOverlapFilter = null;
+    private TriPredicate<NFUEffectZoneEntity, BlockPos, BlockState> blockOverlapFilter = null;
+    @Nullable
+    private BiPredicate<NFUEffectZoneEntity, Entity> entityOverlapFilter = null;
+    @Nullable
+    private BiPredicate<NFUEffectZoneEntity, LivingEntity> livingOverlapFilter = null;
     @Nullable
     private TriConsumer<NFUEffectZoneEntity, BlockPos, BlockState> onOverlapBlock = null;
-    private boolean onlyAffectsLivingEntity = false;
+    private final Multimap<Integer, Consumer<NFUEffectZoneEntity>> scheduledServerActions = HashMultimap.create();
+    private boolean overlapIgnoresOwner = true;
 
     public NFUEffectZoneEntity(EntityType<? extends NFUEffectZoneEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
+    public static NFUEffectZoneEntity create(Level level) {
+        return new NFUEffectZoneEntity(NFUEntityTypes.DEFAULT_EFFECT_ZONE.get(), level);
+    }
+
+    public static NFUEffectZoneEntity create(LivingEntity owner) {
+        var res = new NFUEffectZoneEntity(NFUEntityTypes.DEFAULT_EFFECT_ZONE.get(), owner.level());
+        res.setOwner(owner);
+        return res;
+    }
+
     @Override
     protected void defineSynchedData() {
-        super.defineSynchedData();
         this.entityData.define(PARTICLE, ParticleTypes.ASH);
         this.entityData.define(PARTICLE_AMOUNT, 0);
         this.entityData.define(PARTICLE_SPEED_FUNCTION, Optional.empty());
         this.entityData.define(PARTICLE_AREA, Inequality3D.limitedInOne());
         this.entityData.define(PARTICLE_AREA_BOUNDING_BOX, Optional.empty());
-    }
-
-    @Override
-    protected Item getDefaultItem() {
-        return Items.AIR;
-    }
-
-
-
-    public NFUEffectZoneEntity setDisplayedItem(@Nonnull ItemStack itemStack) {
-        this.setItem(itemStack);
-        return this;
+        this.entityData.define(GRAVITY, 0f);
+        this.entityData.define(SCALE_WIDTH, 1f);
+        this.entityData.define(SCALE_HEIGHT, 1f);
+        this.entityData.define(STRING_IDENTIFIER, "");
     }
 
     public NFUEffectZoneEntity particle(@Nonnull ParticleOptions type, int frequency) {
@@ -139,11 +164,6 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    public ItemStack getItem() {
-        return this.getItemRaw();
-    }
-
-    @Override
     public void tick() {
         super.tick();
         // Handle server actions
@@ -153,8 +173,8 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
             if (this.onServerTick != null)
                 this.onServerTick.accept(this);
             if (this.onOverlapEntity != null || this.onOverlapLiving != null) {
-                this.level().getEntities(this, this.getBoundingBox().inflate(20))
-                    .stream().filter(e -> e.getBoundingBox().intersects(this.getBoundingBox()))
+                this.level().getEntities(this, this.getBoundingBox().inflate(20)).stream()
+                    .filter(e -> e.getBoundingBox().intersects(this.getBoundingBox()) && this.canOverlapEntity(e))
                     .forEach(e -> {
                         if (this.onOverlapEntity != null)
                             this.onOverlapEntity.accept(this, e);
@@ -166,9 +186,10 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
                 var stream = BlockPos.betweenClosedStream(this.getBoundingBox());
                 Level level = this.level();
                 if (this.blockOverlapFilter != null)
-                    stream = stream.filter(p -> blockOverlapFilter.test(p, level.getBlockState(p)));
+                    stream = stream.filter(p -> blockOverlapFilter.test(this, p, level.getBlockState(p)));
                 stream.forEach(p -> this.onOverlapBlock.accept(this, p, level.getBlockState(p)));
             }
+            this.scheduledServerActions.get(this.tickCount).forEach(c -> c.accept(this));
         }
         // Handle particles
         else if (this.entityData.get(PARTICLE_AMOUNT) > 0) {
@@ -191,7 +212,10 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
                     speed.x, speed.y, speed.z);
             }
         }
-
+        // Handle motion
+        this.setPos(this.position().add(this.getDeltaMovement()));
+        this.addDeltaMovement(new Vec3(0.0, -this.getGravity(), 0.0));
+        this.updateEntitySize();
     }
 
     private Vec3 randomParticlePos(Inequality3D shape, AABB shapeBB) {
@@ -203,14 +227,13 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
         return res;
     }
 
-
-    @Override
     public float getGravity() {
-        return this.gravity;
+        return this.entityData.get(GRAVITY);
     }
 
     public NFUEffectZoneEntity setGravity(float value) {
-        this.gravity = value;
+        this.entityData.set(GRAVITY, value);
+        this.setNoGravity(value > 0f);
         return this;
     }
 
@@ -261,9 +284,40 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
      * As block overlapping must be handled every tick for every overlapping block, it may cause performance issues
      * if the action is costly and the effect zone is large. Use this filter to reduce the block amount to process.
      */
-    public NFUEffectZoneEntity setBlockOverlapFilter(@Nullable BiPredicate<BlockPos, BlockState> filter) {
+    public NFUEffectZoneEntity setBlockOverlapFilter(@Nullable TriPredicate<NFUEffectZoneEntity, BlockPos, BlockState> filter) {
         this.blockOverlapFilter = filter;
         return this;
+    }
+
+    /**
+     * If block overlapping needs to be handled, set which types of blocks should be processed.
+     * As block overlapping must be handled every tick for every overlapping block, it may cause performance issues
+     * if the action is costly and the effect zone is large. Use this filter to reduce the block amount to process.
+     */
+    public NFUEffectZoneEntity setEntityOverlapFilter(@Nullable BiPredicate<NFUEffectZoneEntity, Entity> filter) {
+        this.entityOverlapFilter = filter;
+        return this;
+    }
+
+    /**
+     * If block overlapping needs to be handled, set which types of blocks should be processed.
+     * As block overlapping must be handled every tick for every overlapping block, it may cause performance issues
+     * if the action is costly and the effect zone is large. Use this filter to reduce the block amount to process.
+     */
+    public NFUEffectZoneEntity setLivingOverlapFilter(@Nullable BiPredicate<NFUEffectZoneEntity, LivingEntity> filter) {
+        this.livingOverlapFilter = filter;
+        return this;
+    }
+
+    protected boolean canOverlapEntity(Entity e) {
+        if (overlapIgnoresOwner && e.equals(this.getOwner())) return false;
+        if (entityOverlapFilter != null && entityOverlapFilter.test(this, e)) return false;
+        if (livingOverlapFilter != null && e instanceof LivingEntity l && livingOverlapFilter.test(this, l)) return false;
+        return true;
+    }
+
+    protected boolean canOverlapBlock(BlockPos pos, BlockState bs) {
+        return this.blockOverlapFilter != null && this.blockOverlapFilter.test(this, pos, bs);
     }
 
     /**
@@ -274,6 +328,137 @@ public class NFUEffectZoneEntity extends ThrowableItemProjectile {
      */
     public NFUEffectZoneEntity setServerBlockOverlap(@Nullable TriConsumer<NFUEffectZoneEntity, BlockPos, BlockState> action) {
         this.onOverlapBlock = action;
+        return this;
+    }
+
+    public NFUEffectZoneEntity setOverlapIgnoresOwner(boolean value) {
+        this.overlapIgnoresOwner = value;
+        return this;
+    }
+
+
+
+    public Inequality3D getParticleArea() {
+        return this.entityData.get(PARTICLE_AREA).relToAbs(this.getBoundingBox());
+    }
+
+    public Field3D getSpeedFunction() {
+        return this.entityData.get(PARTICLE_SPEED_FUNCTION).orElse(Field3D.zero());
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    /**
+     * Set this entity's center to be a given center.
+     * @param shouldSync Set this true if you're running this method ONLY ON SERVER, and the value will be set on
+     *                   the server and synched to the client, and on client it won't do anything. False if you're running
+     *                   this method on both sides without synching.
+     */
+    public NFUEffectZoneEntity alignCenterTo(Vec3 center, boolean shouldSync) {
+        Vec3 targetPos = center.subtract(0, this.getBoundingBox().getYsize() / 2d, 0);
+        if (shouldSync && !this.level().isClientSide)
+            ServerEntityMotion.movement(targetPos.subtract(this.position())).apply(this);
+        else if (!shouldSync)
+            this.setPos(targetPos);
+        return this;
+    }
+
+    /**
+     * Set this entity's center to be a given center. Not synched.
+     */
+    public NFUEffectZoneEntity alignCenterTo(Vec3 center) {
+        return alignCenterTo(center, false);
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pPose) {
+        return super.getDimensions(pPose).scale(this.entityData.get(SCALE_WIDTH), this.entityData.get(SCALE_HEIGHT));
+    }
+
+    protected void updateEntitySize() {
+        try {
+            FIELD_ENTITY_DIMENSIONS.set(this, EntityDimensions.scalable(this.entityData.get(SCALE_WIDTH), this.entityData.get(SCALE_HEIGHT)));
+            this.setBoundingBox(this.makeBoundingBox());
+        } catch (IllegalAccessException e) {
+            throw new ReflectionFailedException(e);
+        }
+    }
+
+    public NFUEffectZoneEntity setScale(double width, double height) {
+        this.entityData.set(SCALE_WIDTH, (float)width);
+        this.entityData.set(SCALE_HEIGHT, (float)height);
+        updateEntitySize();
+        return this;
+    }
+
+    @Override
+    public AABB makeBoundingBox() {
+        return super.makeBoundingBox();
+    }
+
+    /**
+     * Set position on server, and sync to client. Will not do anything on client.
+     * <p>Note: this action will send a packet, and frequent calling this method may cause lag or
+     * async issues. If you need to set position and velocity on server multiple times
+     * in a single method, use {@link ServerEntityMotion} to collect all motions and apply together.
+     */
+    public void setPosSynched(Vec3 pos) {
+        ServerEntityMotion.zero().setExactPos(this, pos).apply(this);
+    }
+
+    /**
+     * Set position on server, and sync to client. Will not do anything on client.
+     * <p>Note: this action will send a packet, and frequent calling this method may cause lag or
+     * async issues. If you need to set position and velocity on server multiple times
+     * in a single method, use {@link ServerEntityMotion} to collect all motions and apply together.
+     */
+    public void setPosSynched(double x, double y, double z) {
+        ServerEntityMotion.zero().setExactPos(this, x, y, z).apply(this);
+    }
+
+    /**
+     * Set velocity on server, and sync to client. Will not do anything on client.
+     * <p>Note: this action will send a packet, and frequent calling this method may cause lag or
+     * async issues. If you need to set position and velocity on server multiple times
+     * in a single method, use {@link ServerEntityMotion} to collect all motions and apply together.
+     */
+    public void setVelocitySynched(Vec3 vel) {
+        ServerEntityMotion.zero().setExactVelocity(this, vel).apply(this);
+    }
+
+    /**
+     * Set velocity on server, and sync to client. Will not do anything on client.
+     * <p>Note: this action will send a packet, and frequent calling this method may cause lag or
+     * async issues. If you need to set position and velocity on server multiple times
+     * in a single method, use {@link ServerEntityMotion} to collect all motions and apply together.
+     */
+    public void setVelocitySynched(double x, double y, double z) {
+        ServerEntityMotion.zero().setExactVelocity(this, x, y, z).apply(this);
+    }
+
+    /**
+     * Get the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     */
+    @Nullable
+    public String getStringIdentifier() {
+        return this.entityData.get(STRING_IDENTIFIER);
+    }
+
+    /**
+     * Set the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     */
+    public NFUEffectZoneEntity setStringIdentifier(@Nonnull String identifier) {
+        this.entityData.set(STRING_IDENTIFIER, identifier);
+        return this;
+    }
+
+    public NFUEffectZoneEntity scheduleServerAction(int timePoint, Consumer<NFUEffectZoneEntity> action) {
+        this.scheduledServerActions.put(timePoint, action);
         return this;
     }
 

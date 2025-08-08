@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class WeightedRandomSelector<T>
 {
-	private static final RandomSource RND = RandomSource.create();
+	private static final RandomSource RND = new ThreadSafeRandomSource();
 	private final Map<T, Double> objs = new HashMap<>();
 	private double nullWeight = 0d;
 	
