@@ -1,5 +1,4 @@
-{   
-
+{
  "item.nfulib.debug_ai_switch": "AI Switch (Debug)",
  "item.nfulib.debug_target_setter": "Target Setter (Debug)",
  "item.nfulib.debug_mob_remover": "Mob Remover (Debug)",
@@ -19,6 +18,9 @@
  "info.nfulib.item.debug_mob_remover_kill_mode_desc": "Kill the mob. Actions on mob death will be invoked.",
  "info.nfulib.item.debug_mob_remover_reset": "Target reset.",
 
+ "entity.nfulib.attached_item_displayer": "Item Displayer",
+ "entity.nfulib.default_item_projectile": "Item Projectile",
+ "entity.nfulib.default_effect_zone": "Effect Zone",
 
  "info.nfulib.item_missing_dependency": "This item depends on mod %1$s. Install %1$s to enable this item.",
 

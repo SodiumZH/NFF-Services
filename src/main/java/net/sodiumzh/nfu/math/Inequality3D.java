@@ -109,15 +109,15 @@ public class Inequality3D implements Predicate<Vec3> {
     }
 
     public Inequality3D setBaseDefDomainX(double x1, double x2) {
-        return this.setBaseDefDomain(x1, -Double.MAX_VALUE, -Double.MAX_VALUE, x2, Double.MAX_VALUE, Double.MAX_VALUE);
+        return this.setBaseDefDomain(x1, this.defDomain.minY, this.defDomain.minZ, x2, this.defDomain.maxY, this.defDomain.maxZ);
     }
 
     public Inequality3D setBaseDefDomainY(double y1, double y2) {
-        return this.setBaseDefDomain(-Double.MAX_VALUE, y1, -Double.MAX_VALUE, Double.MAX_VALUE, y2, Double.MAX_VALUE);
+        return this.setBaseDefDomain(this.defDomain.minX, y1, this.defDomain.minZ, this.defDomain.maxX, y2, this.defDomain.maxZ);
     }
 
     public Inequality3D setBaseDefDomainZ(double z1, double z2) {
-        return this.setBaseDefDomain(-Double.MAX_VALUE, -Double.MAX_VALUE, z1, Double.MAX_VALUE, Double.MAX_VALUE, z2);
+        return this.setBaseDefDomain(this.defDomain.minX, this.defDomain.minY, z1, this.defDomain.maxX, this.defDomain.minY, z2);
     }
 
     public Inequality3D limitInOne() {
@@ -125,8 +125,9 @@ public class Inequality3D implements Predicate<Vec3> {
     }
     @Override
     public boolean test(Vec3 v) {
-        if (!this.defDomain.contains(v)) return false;
-        return this.pattern.test(v.subtract(this.translation).multiply(1.0 / this.scale.x, 1.0 / this.scale.y, 1.0 / this.scale.z));
+        Vec3 baseV = v.subtract(this.translation).multiply(1.0 / this.scale.x, 1.0 / this.scale.y, 1.0 / this.scale.z);
+        if (!this.defDomain.contains(baseV)) return false;
+        return this.pattern.test(baseV);
     }
 
     public static Inequality3D fullSpace() {
@@ -134,4 +135,13 @@ public class Inequality3D implements Predicate<Vec3> {
     }
 
     public static Inequality3D limitedInOne() {return new Inequality3D(IInequalityPattern3D.BOX.get());}
+
+    /**
+     * Use this inequality as a new pattern.
+     * <p>WARNING: Only use this when doing calculation or registering new patterns! Unregistered patterns should never
+     * be present in any inequalities to be synched, otherwise it will cause an exception.
+     */
+    public IInequalityPattern3D asNewPattern() {
+        return this::test;
+    }
 }

@@ -14,6 +14,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.container.Tuple3;
+import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 import net.sodiumzh.nfu.util.NFUDataStatics;
@@ -32,7 +33,7 @@ import javax.annotation.Nullable;
  */
 public class VanillaTradeRegistry
 {
-	private static final RandomSource RND = RandomSource.create();
+	private static final RandomSource RND = new ThreadSafeRandomSource();
 	private final SetMultimap<Tuple2<ResourceLocation, VillagerProfession>, VanillaTradeListingCollection<?>> table;
 
 	@Nullable

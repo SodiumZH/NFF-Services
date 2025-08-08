@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.entity.AttachedItemDisplayerEntity;
+import net.sodiumzh.nfu.entity.NFUEffectZoneEntity;
 import net.sodiumzh.nfu.entity.NFUItemProjectileEntity;
 
 public class NFUEntityTypes {
@@ -34,5 +35,12 @@ public class NFUEntityTypes {
         .updateInterval(1)
         .build(new ResourceLocation(NFULibrary.MOD_ID, "default_item_projectile").toString()));
 
-
+    public static final RegistryObject<EntityType<NFUEffectZoneEntity>> DEFAULT_EFFECT_ZONE
+        = ENTITY_TYPES.register("default_effect_zone", () -> EntityType.Builder
+        .of(NFUEffectZoneEntity::new, MobCategory.MISC)
+        .sized(1f, 1f)
+        .noSave()
+        .noSummon()
+        .updateInterval(1)
+        .build(new ResourceLocation(NFULibrary.MOD_ID, "default_effect_zone").toString()));
 }

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.sodiumzh.nfu.container.MapPair;
+import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.math.WeightedRandomSelector;
 
 /**
@@ -19,7 +20,7 @@ import net.sodiumzh.nfu.math.WeightedRandomSelector;
 public class NFUContainerStatics
 {
 	
-	private static final RandomSource RND = RandomSource.create();
+	private static final RandomSource RND = new ThreadSafeRandomSource();
 	
 	/**
 	 * Remove all elements meeting a condition from a set

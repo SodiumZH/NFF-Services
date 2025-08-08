@@ -7,6 +7,7 @@ import net.sodiumzh.nfu.exception.ReflectionFailedException;
 import net.sodiumzh.nfu.object.CastableObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -195,7 +196,51 @@ public class NFUReflectionStatics
 	}
 
 	/**
+	 * Find a field if declared in a given class (not including superclasses).
+	 * <p>Note: this action may be costly if called frequently. If a specific field is accessed frequently, it's recommended
+	 * to cache the result.
+	 * @param declaredClass Class in which the field is declared.
+	 * @param fieldNameSrg Field to find. Use SRG name which can be looked up at: <a href="https://linkie.shedaniel.dev/mappings?namespace=mojang_srg&version=1.20.1&search=">...</a>
+	 * @return An {@link Optional} of the result field, or empty if absent.
+	 * @param <T>
+	 */
+	public static <T> Optional<Field> findFieldIfDeclared(Class<?> declaredClass, String fieldNameSrg) {
+		try {
+			Field f = declaredClass.getDeclaredField(remapFieldName(fieldNameSrg));
+			f.setAccessible(true);
+			return Optional.of(f);
+		} catch (NoSuchFieldException e) {
+            return Optional.empty();
+        } catch (Exception t) {
+			throw new ReflectionFailedException(t);
+		}
+    }
+
+	/**
+	 * Find public non-static field if present in the given class or superclasses. Including protected/private fields
+	 * in this class, but not in superclasses.
+	 * <p>Note: this action may be costly if called frequently. If a specific field is accessed frequently, it's recommended
+	 * to cache the result.
+	 * @param clazz Class to find.
+	 * @param fieldNameSrg Field to set. Use SRG name which can be looked up at: <a href="https://linkie.shedaniel.dev/mappings?namespace=mojang_srg&version=1.20.1&search=">...</a>
+	 * @return An {@link Optional} of the result field, or empty if absent.
+	 */
+	public static <T> Optional<Field> findPublicFieldIfInherited(Class<?> clazz, String fieldNameSrg) {
+		try {
+			Field f = clazz.getField(remapFieldName(fieldNameSrg));
+			f.setAccessible(true);
+			return Optional.of(f);
+		} catch (NoSuchFieldException e) {
+			return Optional.empty();
+		} catch (Exception t) {
+			throw new ReflectionFailedException(t);
+		}
+	}
+
+	/**
 	 * Get a field value no matter if it's public.
+	 * <p>Note: this action may be costly if called frequently. If a specific field is accessed frequently, it's recommended
+	 * to cache the field by calling {@link NFUReflectionStatics#findFieldIfDeclared}.
 	 * @param obj Target object.
 	 * @param declaredClass Class in which the field is defined. (Not always equals to {code obj.class}!)
 	 * @param fieldNameSrg Field to get. Use SRG name which can be looked up at: <a href="https://linkie.shedaniel.dev/mappings?namespace=mojang_srg&version=1.20.1&search=">...</a>
@@ -216,9 +261,11 @@ public class NFUReflectionStatics
 	}
 
 	/**
-	 * Force set a non-public field value
+	 * Set a field value.
+	 * <p>Note: this action may be costly if called frequently. If a specific field is accessed frequently, it's recommended
+	 * to cache the field by calling {@link NFUReflectionStatics#findFieldIfDeclared}.
 	 * @param obj Target object.
-	 * @param declaredClass Class in which the field is defined. (Not always equals to {code obj.class}!)
+	 * @param declaredClass Class in which the field is declared. (Not always equals to {code obj.class}!)
 	 * @param fieldNameSrg Field to set. Use SRG name which can be looked up at: <a href="https://linkie.shedaniel.dev/mappings?namespace=mojang_srg&version=1.20.1&search=">...</a>
 	 * @param value New value to set.
 	 */
@@ -235,7 +282,7 @@ public class NFUReflectionStatics
 	}
 
 	/**
-	 * Invoke a method of a given object, including superclasses, NOT including static or superclass private methods.
+	 * Invoke a method of a given object, including superclasses, NOT including static or superclass non-public methods.
 	 * @param obj Target object. Non-null.
 	 * @param methodNameSrg Method to run. Use SRG name which can be looked up at: <a href="https://linkie.shedaniel.dev/mappings?namespace=mojang_srg&version=1.20.1&search=">...</a>
 	 * @param paramTypesThenValues Parameter names followed by values. For example, if a method is foo(String, int), then use : {@code String.class, int.class, "str", 0}
@@ -243,7 +290,7 @@ public class NFUReflectionStatics
 	 * <p>Usage example: for method {@code foo(String str, int integer)} in class {@code Clazz}, call:
 	 * <p>{@code forceInvokeRetVal(object, Clazz.class, noStackTrace, "foo", String.class, Integer.class, "str", 0);}
 	 */
-	public static <T> CastableObject invokeInheritedMethod(T obj, String methodNameSrg, Object... paramTypesThenValues) {
+	public static <T> CastableObject invokeInheritedPublicMethod(T obj, String methodNameSrg, Object... paramTypesThenValues) {
 		Object result = null;
 		try
 		{
@@ -300,17 +347,17 @@ public class NFUReflectionStatics
 	}
 
 	/**
-	 * Find a method if it's present in the object's class, including superclasses, NOT including static or superclass private methods.
-	 * @param obj Target object. Non-null.
+	 * Find a method if it's present in the object's class, including superclasses, NOT including static or superclass non-public methods.
+	 * @param clazz Target class. Non-null.
 	 * @param methodNameSrg SRG name if the method is remapped (i.e. from vanilla MC).
 	 *                         Or original name if not (i.e. from Forge or other mods).
 	 * @param argTypes Method argument types.
 	 * @return an {@link Optional} of the method if present. Or {@link Optional#empty()} if not.
 	 */
-	public static Optional<Method> findMethodIfInherited(Object obj, String methodNameSrg, Class<?>... argTypes) {
+	public static Optional<Method> findPublicMethodIfInherited(Class<?> clazz, String methodNameSrg, Class<?>... argTypes) {
 		String remappedMethodName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, methodNameSrg);
 		try {
-			return Optional.of(obj.getClass().getMethod(remappedMethodName, argTypes));
+			return Optional.of(clazz.getMethod(remappedMethodName, argTypes));
 		} catch (NoSuchMethodException e) {
             return Optional.empty();
         } catch (RuntimeException e) {
@@ -319,16 +366,16 @@ public class NFUReflectionStatics
     }
 
 	/**
-	 * Invoke a method if it's present in the object's class, including superclasses, NOT including static or superclass private methods.
+	 * Invoke a method if it's present in the object's class, including superclasses, NOT including static or superclass non-public methods.
 	 * @param obj Target object. Non-null.
 	 * @param methodNameSrg SRG name if the method is remapped (i.e. from vanilla MC). Or original name if not (i.e. from Forge or other mods).
 	 * @param argsThenValues Parameter types followed by values. For example, if a method is foo(String, int), then use : {@code String.class, int.class, "str", 0}
 	 * @return an {@link Optional} of the return value if the method is present. Or {@link Optional#empty()} if not.
 	 * If the method invoked successfully but the return value is {@code null}, return an {@link Optional} containing an empty {@link CastableObject}.
 	 */
-	public static Optional<CastableObject> invokeMethodIfInherited(Object obj, String methodNameSrg, Object... argsThenValues) {
+	public static Optional<CastableObject> invokePublicMethodIfInherited(Object obj, String methodNameSrg, Object... argsThenValues) {
 		try {
-			return Optional.of(invokeInheritedMethod(obj, methodNameSrg, argsThenValues));
+			return Optional.of(invokeInheritedPublicMethod(obj, methodNameSrg, argsThenValues));
 		} catch (ReflectionFailedException e) {
 			if (e.getCause() instanceof NoSuchMethodException)
 				return Optional.empty();
@@ -423,23 +470,26 @@ public class NFUReflectionStatics
 	/**
 	 * Check if the program is currently running inside a specified method call
 	 * of a specified class.
+	 * <p>Note: Use this method only when the class doesn't need to be remapped (i.e. not vanilla-internal). For vanilla-internal
+	 * (remapping-requiring) classes, always use {@link NFUReflectionStatics#isRunningInMethod(Class, String)} instead,
+	 * otherwise it may encounter remapping issues.
 	 * <p>Note: it cannot distinguish methods with same name.
-	 * @param classNameSrg SRG name of the class. It requires <b>fully qualified name</b>, like {@code package.name.ClassName}.
+	 * @param className <b>Fully qualified name</b> of the class, like {@code package.name.ClassName}.
 	 */
-	public static boolean isRunningInMethod(String classNameSrg, String methodNameSrg) {
+	public static boolean isRunningInMethod(String className, String methodNameSrg) {
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-		String className = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, classNameSrg);
 		String methodName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, methodNameSrg);
-		for (StackTraceElement elem: stackTrace) {
-			if (elem.getClassName().equals(className) && elem.getMethodName().equals(methodName))
-				return true;
-		}
-		return false;
+		return StackWalker.getInstance().walk(frames ->
+			frames.anyMatch(frame -> frame.getClassName().equals(className)
+				&& frame.getMethodName().equals(methodName)));
 	}
 
 	/**
 	 * Check if the program is currently running inside a specified method call
 	 * of a specified class.
+	 * <p>Note: Use this version only when the class is vanilla-internal or present in a required dependency. For classes
+	 * in optional dependency or compatible modules, always use {@link NFUReflectionStatics#isRunningInMethod(String, String)} instead,
+	 * otherwise it may produce {@link NoClassDefFoundError}.
 	 * <p>Note: it cannot distinguish methods with same name.
 	 */
 	public static boolean isRunningInMethod(Class<?> clazz, String methodNameSrg) {
@@ -454,4 +504,39 @@ public class NFUReflectionStatics
 		return isRunningInMethod(method.getDeclaringClass(), method.getName());
 	}
 
+	/**
+	 * Invoke a method without need of try-catch block.
+	 */
+	public static CastableObject invokeMethod(Method m, Object obj, Object... args) {
+		try {
+			m.setAccessible(true);
+			return new CastableObject(m.invoke(obj, args));
+		} catch (Exception e) {
+			throw new ReflectionFailedException(e);
+		}
+    }
+
+	/**
+	 * Get a field value without need of try-catch block.
+	 */
+	public static CastableObject getValue(Field f, Object obj) {
+		try {
+			f.setAccessible(true);
+			return new CastableObject(f.get(obj));
+		} catch (Exception e) {
+			throw new ReflectionFailedException(e);
+		}
+	}
+
+	/**
+	 * Set a field value without need of try-catch block.
+	 */
+	public static void setValue(Field f, Object obj, Object val) {
+		try {
+			f.setAccessible(true);
+			f.set(obj, val);
+		} catch (Exception e) {
+			throw new ReflectionFailedException(e);
+		}
+	}
 }

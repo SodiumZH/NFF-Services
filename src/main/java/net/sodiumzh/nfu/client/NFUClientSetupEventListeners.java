@@ -7,6 +7,7 @@ import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sodiumzh.nfu.NFULibrary;
+import net.sodiumzh.nfu.client.renderer.EmptyEntityRenderer;
 import net.sodiumzh.nfu.registry.NFUEntityTypes;
 import net.sodiumzh.nfu.registry.NFURegistry;
 import net.sodiumzh.nfu.registry.NFURegistryGenerateValuesEvent;
@@ -29,8 +30,11 @@ public class NFUClientSetupEventListeners {
         shouldGenerate.forEach(reg -> ModLoader.get().postEvent(new NFURegistryGenerateValuesEvent.ClientAfter(reg)));
     }
 
+    @SubscribeEvent
     public static void onRegisterRenderer(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(NFUEntityTypes.ATTACHED_ITEM_DISPLAYER.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(NFUEntityTypes.DEFAULT_ITEM_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(NFUEntityTypes.DEFAULT_EFFECT_ZONE.get(), EmptyEntityRenderer::new);
+
     }
 }

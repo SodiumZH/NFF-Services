@@ -35,6 +35,7 @@ public class NFULibrary {
 		NFUEntityDataSerializers.SERIALIZERS.register(modEventBus);
 		NFUEntityTypes.ENTITY_TYPES.register(modEventBus);
 
+
 		// Custom registry related
 		NFURegistries.init();
 		mergeCustomRegistries();

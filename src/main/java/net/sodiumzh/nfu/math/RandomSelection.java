@@ -13,7 +13,7 @@ import net.minecraft.util.RandomSource;
 public class RandomSelection<T>
 {
 
-	protected static final RandomSource RND = RandomSource.create();
+	protected static final RandomSource RND = new ThreadSafeRandomSource();
 	protected ArrayList<Double> probSequence = new ArrayList<Double>();
 	protected ArrayList<T> valSequence = new ArrayList<T>();
 	protected T defaultVal = null;

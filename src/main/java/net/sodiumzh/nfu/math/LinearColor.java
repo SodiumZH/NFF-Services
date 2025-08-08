@@ -122,8 +122,8 @@ public class LinearColor
 	 * <p> Lightness: 0-1
 	 * <p> Saturation: 0-1
 	 * @return X=H, Y=L, Z=S
-	 * @see https://www.zhihu.com/question/265265004
-	 * @see https://www.jianshu.com/p/366ed43c67f6
+	 * @see <a href="https://www.zhihu.com/question/265265004">...</a>
+	 * @see <a href="https://www.jianshu.com/p/366ed43c67f6">...</a>
 	 */
 	public Vec3 toHLS()
 	{

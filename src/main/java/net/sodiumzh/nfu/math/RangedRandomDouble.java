@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  * distribution and truncated normal distribution.
  */
 public class RangedRandomDouble implements Supplier<Double> {
-    private static final RandomSource RND = RandomSource.create();
+    private static final RandomSource RND = new ThreadSafeRandomSource();
     private final double minValue;
     private final double maxValue;
     /**

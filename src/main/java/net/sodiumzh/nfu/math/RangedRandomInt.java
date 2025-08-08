@@ -19,7 +19,7 @@ import net.minecraft.util.RandomSource;
  */
 public class RangedRandomInt implements Supplier<Integer>
 {
-    private static final RandomSource RND = RandomSource.create();
+    private static final RandomSource RND = new ThreadSafeRandomSource();
     private final int minValue;	// Included
     private final int maxValue;	// Included
     private final double p;
