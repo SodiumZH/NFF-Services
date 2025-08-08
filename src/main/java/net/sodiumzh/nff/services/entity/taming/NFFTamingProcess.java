@@ -1,16 +1,19 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
+import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 import net.sodiumzh.nff.services.NFFServices;
@@ -20,13 +23,14 @@ import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 {
 
 	protected static final UUID EMPTY_UUID = new UUID(0L, 0L);
-	protected static final RandomSource RND = RandomSource.create();
+	protected static final RandomSource RND = new ThreadSafeRandomSource();
 
 	public NFFTamingProcess()
 	{	
@@ -174,6 +178,10 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 			NFUMiscStatics.printToScreen(info, printTo);
 	}
 
+	public boolean allowsToProgressOnRiding(Mob mob, @Nullable Entity mount) {
+		return mount instanceof Mob;	// Allow to tame on horse
+	}
+
 	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
 	public static class EventListeners {
 		@SubscribeEvent
@@ -185,6 +193,27 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 					tamable.getTamingProcess().onGeneralTimerExpire(tamable.getEntity(), event.getKey());
 				}
 			}
+		}
+
+		@SubscribeEvent
+		public static void onMobTick(LivingEvent.LivingTickEvent event) {
+			if (event.getEntity() instanceof Mob mob && !event.getEntity().level().isClientSide && mob.isPassenger())
+			{
+				NFFTamingProcess proc = NFFTamingMapping.getProcess(mob);
+				if (proc != null && proc.isInAnyProcess(mob) && !proc.allowsToProgressOnRiding(mob, mob.getVehicle()))
+					mob.stopRiding();
+			}
+		}
+
+		@SubscribeEvent
+		public static void onMobMount(EntityMountEvent event) {
+			if (event.isMounting() && !event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob)
+			{
+				NFFTamingProcess proc = NFFTamingMapping.getProcess(mob);
+				if (proc != null && proc.isInAnyProcess(mob) && !proc.allowsToProgressOnRiding(mob, mob.getVehicle()))
+					event.setCanceled(true);
+			}
+
 		}
 	}
 }
