@@ -135,6 +135,19 @@ public class Field3D implements UnaryOperator<Vec3> {
         Vec3 basePos = pos.subtract(this.translation)
             .multiply(1.0 / this.spaceScale.x, 1.0 / this.spaceScale.y, 1.0 / this.spaceScale.z);
         if (this.baseDefinitionDomain != null && !this.baseDefinitionDomain.test(basePos)) return Vec3.ZERO;
-        return this.pattern.apply(pos).multiply(this.valueScale).add(this.valueAddition);
+        return this.pattern.apply(basePos).multiply(this.valueScale).add(this.valueAddition);
+    }
+
+    public static Field3D zero() {
+        return IFieldPattern3D.ZERO.get().field();
+    }
+
+    /**
+     * Use this field as a new pattern.
+     * <p>WARNING: Only use this when doing calculation or registering new patterns! Unregistered patterns should never
+     * be present in any fields to be synched, otherwise it will cause an exception.
+     */
+    public IFieldPattern3D asNewPattern() {
+        return this::apply;
     }
 }

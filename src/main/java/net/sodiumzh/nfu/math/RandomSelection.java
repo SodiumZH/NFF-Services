@@ -11,7 +11,6 @@ import java.util.Random;
  */
 public class RandomSelection<T>
 {
-
 	protected static final Random RND = new Random();
 	protected ArrayList<Double> probSequence = new ArrayList<Double>();
 	protected ArrayList<T> valSequence = new ArrayList<T>();
