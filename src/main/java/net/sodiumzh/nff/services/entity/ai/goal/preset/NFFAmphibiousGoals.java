@@ -264,6 +264,8 @@ public abstract class NFFAmphibiousGoals {
 			BlockState blockStateBelow = this.getMob().asMob().level().getBlockState(pos.below());
 			if (NFULevelStatics.getWaterDepth(this.getMob().asMob()) <= this.walkBelowDepth)
 				this.amph.switchNav(false);
+			else if (this.getMob().asMob().isInWaterOrBubble())
+				this.amph.switchNav(true);
 
 		}
 
