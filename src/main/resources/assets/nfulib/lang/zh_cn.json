@@ -3,6 +3,12 @@
 	"item.nfulib.debug_target_setter": "攻击目标设置工具(调试)",
 	"item.nfulib.debug_mob_remover": "生物移除工具(调试)",
 
+	"entity.nfulib.attached_item_displayer": "物品展示实体",
+	"entity.nfulib.default_item_projectile": "物品弹射物",
+	"entity.nfulib.default_effect_zone": "效果区域",
+	"entity.nfulib.effect_zone.effect_zone": "效果区域",
+	"entity.nfulib.item_projectile.item_projectile": "物品弹射物",
+
 	"info.nfulib.item.debug_ai_switch_desc": "右键生物切换是否启用AI",
 	"info.nfulib.item.debug_ai_switch_on": "生物 %1$s AI已启用",
 	"info.nfulib.item.debug_ai_switch_off": "生物 %1$s AI已禁用",
