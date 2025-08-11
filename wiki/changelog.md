@@ -1,5 +1,27 @@
 # Change Log
 
+### 0.2.30.1
+
+##### NFU Library
+
+Added utilities for geometry calculation: `Inequality3D`, `Field3D`, and related data serializers.
+
+Added entity templates: `NFUItemProjectileEntity`, `NFUEffectZoneEntity`, `AttachedItemDisplayerEntity`
+
+Added Mixin Events: `LivingStartBaseAiStepEvent`, `LivingEndBaseAiStepEvent`.
+
+Added entity type tag: `nfulib:explosion_not_breaking_items`
+
+Added utility `ServerEntityMotion` to calculate and perform synched entity movement on server.
+
+Fixed potential issues on operating timers in `CEntityTimerCapability#ExpireEvent`.
+
+Fixed potential crashes caused by multithread `RandomSource` call.
+
+##### NFF Services
+
+Fixed `NFFTamingProcess#onGeneralTimerExpire` running multiple times for each timer expiration.
+
 ### 0.x.30
 
 ##### Common
@@ -19,6 +41,20 @@ Modified the package names and paths.
 ##### NFU Library
 
 Added Mixin Events: `LivingEntityDamageTakenEvent`
+
+Added Save Data Redirector feature - `ResourceLocation` redirection.
+
+Added Bauble features:
+
+​	-Equipping Conditions now have a registry.
+
+​    -Now each Equipping Condition can embed a `TranslatableComponent` for description. 
+
+​	-Added named modifier feature, allowing multiple baubles to share unrepeatable attribute modifiers
+
+##### NFF Services
+
+Fixed `NFFTamedDeathEvent` not preventing mobs from dying when cancelled.
 
 ### 0.2.29.1
 
