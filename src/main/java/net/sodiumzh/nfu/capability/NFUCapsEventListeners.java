@@ -2,6 +2,7 @@ package net.sodiumzh.nfu.capability;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.mixin.event.entity.EntityTickEvent;
 
 /**

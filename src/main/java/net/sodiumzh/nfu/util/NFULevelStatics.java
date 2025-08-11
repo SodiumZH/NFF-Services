@@ -358,22 +358,22 @@ public class NFULevelStatics
 	}
 
 	public static boolean hasBlockCollision(BlockPos pos, @Nonnull Entity context) {
-		return !context.level().getBlockState(pos).getShape(context.level(), pos, CollisionContext.of(context)).isEmpty();
+		return !context.level.getBlockState(pos).getShape(context.level, pos, CollisionContext.of(context)).isEmpty();
 	}
 
 	/**
 	 * Check if a pos is solid-collision (i.e. non-empty collision) to an entity.
 	 */
 	public static boolean isSolidCollision(BlockPos pos, @Nonnull Entity context) {
-		return !context.level().getBlockState(pos).getBlock()
-			.getCollisionShape(context.level().getBlockState(pos),
-				context.level(), pos, CollisionContext.of(context)).isEmpty();
+		return !context.level.getBlockState(pos).getBlock()
+			.getCollisionShape(context.level.getBlockState(pos),
+				context.level, pos, CollisionContext.of(context)).isEmpty();
 	}
 	/**
 	 * Check if a pos is water-collision (i.e. water, no collision) to an entity.
 	 */
 	public static boolean isWaterCollision(BlockPos pos, @Nonnull Entity context) {
-		BlockState state = context.level().getBlockState(pos);
+		BlockState state = context.level.getBlockState(pos);
 		if (state.is(Blocks.WATER)) return true;
 		else if (!state.hasProperty(BlockStateProperties.WATERLOGGED) ||
 			!state.getValue(BlockStateProperties.WATERLOGGED)) return false;
@@ -384,14 +384,14 @@ public class NFULevelStatics
 	 * Check if a pos is liquid-collision (i.e. any liquid, no collision) to an entity.
 	 */
 	public static boolean isLiquidCollision(BlockPos pos, @Nonnull Entity context) {
-		return isWaterCollision(pos, context) || (context.level().getBlockState(pos).liquid() && !hasBlockCollision(pos, context));
+		return isWaterCollision(pos, context) || (context.level.getBlockState(pos).getMaterial().isLiquid() && !hasBlockCollision(pos, context));
 	}
 
 	/**
 	 * Check if a pos is air-collision (i.e. non-liquid, no collision) to an entity.
 	 */
 	public static boolean isAirCollision(BlockPos pos, @Nonnull Entity context) {
-		return !context.level().getBlockState(pos).liquid() && !isSolidCollision(pos, context);
+		return !context.level.getBlockState(pos).getMaterial().isLiquid() && !isSolidCollision(pos, context);
 	}
 
 	/**

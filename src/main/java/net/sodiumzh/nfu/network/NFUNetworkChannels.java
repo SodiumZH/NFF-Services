@@ -4,7 +4,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.sodiumzh.nff.services.network.ClientboundNFFGUIOpenPacket;
 import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.network.packet.ClientboundEntityMotionUpdatePacket;
 import net.sodiumzh.nfu.util.NFUNetworkStatics;

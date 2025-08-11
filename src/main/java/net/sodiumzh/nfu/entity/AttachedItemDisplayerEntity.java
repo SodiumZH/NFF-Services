@@ -1,6 +1,8 @@
 package net.sodiumzh.nfu.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -78,8 +80,8 @@ public class AttachedItemDisplayerEntity extends Entity implements ItemSupplier 
 
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide) {
-            if (this.attachedTo == null || !this.attachedTo.isAlive() || !Objects.equals(this.level(), this.attachedTo.level())) {
+        if (!this.level.isClientSide) {
+            if (this.attachedTo == null || !this.attachedTo.isAlive() || !Objects.equals(this.level, this.attachedTo.level)) {
                 this.discard();
                 return;
             }
@@ -91,5 +93,19 @@ public class AttachedItemDisplayerEntity extends Entity implements ItemSupplier 
         this.setOffset(() -> offsetCenter.add(0d,
             amplitude * Math.sin((double)(this.tickCount % periodTicks) / (double)periodTicks), 0d));
         return this;
+    }
+
+    public Packet<?> getAddEntityPacket() {
+        Entity entity = this.attachedTo;
+        return new ClientboundAddEntityPacket(this, entity == null ? 0 : entity.getId());
+    }
+
+    public void recreateFromPacket(ClientboundAddEntityPacket pPacket) {
+        super.recreateFromPacket(pPacket);
+        Entity entity = this.level.getEntity(pPacket.getData());
+        if (entity != null) {
+            this.attachedTo = entity;
+        }
+
     }
 }

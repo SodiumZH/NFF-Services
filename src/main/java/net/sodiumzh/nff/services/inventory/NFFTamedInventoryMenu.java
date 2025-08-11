@@ -11,6 +11,8 @@ import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.item.bauble.NFUBaubleAPI;
 
+import java.util.function.Predicate;
+
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 
 	public final Container container;

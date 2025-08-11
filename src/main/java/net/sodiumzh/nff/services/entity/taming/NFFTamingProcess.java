@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -197,7 +198,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 		@SubscribeEvent
 		public static void onMobTick(LivingEvent.LivingTickEvent event) {
-			if (event.getEntity() instanceof Mob mob && !event.getEntity().level().isClientSide && mob.isPassenger())
+			if (event.getEntity() instanceof Mob mob && !event.getEntity().level.isClientSide && mob.isPassenger())
 			{
 				NFFTamingProcess proc = NFFTamingMapping.getProcess(mob);
 				if (proc != null && proc.isInAnyProcess(mob) && !proc.allowsToProgressOnRiding(mob, mob.getVehicle()))
@@ -207,7 +208,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 		@SubscribeEvent
 		public static void onMobMount(EntityMountEvent event) {
-			if (event.isMounting() && !event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob)
+			if (event.isMounting() && !event.getEntity().level.isClientSide && event.getEntity() instanceof Mob mob)
 			{
 				NFFTamingProcess proc = NFFTamingMapping.getProcess(mob);
 				if (proc != null && proc.isInAnyProcess(mob) && !proc.allowsToProgressOnRiding(mob, mob.getVehicle()))
