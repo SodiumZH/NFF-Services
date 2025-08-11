@@ -13,10 +13,10 @@ public class ClientboundEntityMotionUpdatePacket implements Packet<ClientGamePac
     private final Vec3 deltaPos;
     private final Vec3 deltaVelocity;
 
-    public ClientboundEntityMotionUpdatePacket(int id, Vec3 newPos, Vec3 newVelocity) {
+    public ClientboundEntityMotionUpdatePacket(int id, Vec3 deltaPos, Vec3 deltaVelocity) {
         this.id = id;
-        this.deltaPos = newPos;
-        this.deltaVelocity = newVelocity;
+        this.deltaPos = deltaPos;
+        this.deltaVelocity = deltaVelocity;
     }
 
     public ClientboundEntityMotionUpdatePacket(FriendlyByteBuf buf) {

@@ -21,6 +21,8 @@
  "entity.nfulib.attached_item_displayer": "Item Displayer",
  "entity.nfulib.default_item_projectile": "Item Projectile",
  "entity.nfulib.default_effect_zone": "Effect Zone",
+ "entity.nfulib.effect_zone.effect_zone": "Effect Zone",
+ "entity.nfulib.item_projectile.item_projectile": "Item Projectile",
 
  "info.nfulib.item_missing_dependency": "This item depends on mod %1$s. Install %1$s to enable this item.",
 
