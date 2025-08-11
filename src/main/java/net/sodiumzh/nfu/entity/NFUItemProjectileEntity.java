@@ -5,9 +5,11 @@ import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -23,6 +25,7 @@ import net.sodiumzh.nfu.exception.ReflectionFailedException;
 import net.sodiumzh.nfu.object.IChainModifiable;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
 import net.sodiumzh.nfu.registry.NFUEntityTypes;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
 import javax.annotation.Nonnull;
@@ -33,7 +36,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class NFUItemProjectileEntity extends Projectile implements ItemSupplier, IChainModifiable<NFUItemProjectileEntity> {
 
@@ -61,7 +63,7 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
         = SynchedEntityData.defineId(NFUItemProjectileEntity.class, EntityDataSerializers.FLOAT);
     protected static final EntityDataAccessor<Float> AIR_RESISTANCE_FACTOR
         = SynchedEntityData.defineId(NFUItemProjectileEntity.class, EntityDataSerializers.FLOAT);
-    protected static final EntityDataAccessor<String> STRING_IDENTIFIER
+    protected static final EntityDataAccessor<String> IDENTIFIER
         = SynchedEntityData.defineId(NFUItemProjectileEntity.class, EntityDataSerializers.STRING);
 
     protected static final Field FIELD_ENTITY_DIMENSIONS;
@@ -92,9 +94,10 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     private BiPredicate<NFUItemProjectileEntity, Entity> ignoresEntityIf = null;
     @Nullable
     private BiPredicate<NFUItemProjectileEntity, LivingEntity> ignoresLivingIf = null;
+    private boolean ignoresOwner = true;
     @Nullable
     private Consumer<NFUItemProjectileEntity> onTick = null;
-    private Multimap<Integer, Consumer<NFUItemProjectileEntity>> scheduledServerActions = HashMultimap.create();
+    private final Multimap<Integer, Consumer<NFUItemProjectileEntity>> scheduledServerActions = HashMultimap.create();
 
     public NFUItemProjectileEntity(EntityType<? extends NFUItemProjectileEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -124,7 +127,7 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
         this.entityData.define(IGNORES_PORTALS, true);
         this.entityData.define(LIQUID_RESISTANCE_FACTOR, 0.2f);
         this.entityData.define(AIR_RESISTANCE_FACTOR, 0.01f);
-        this.entityData.define(STRING_IDENTIFIER, "");
+        this.entityData.define(IDENTIFIER, "nfulib:item_projectile");
     }
 
     @Override
@@ -204,6 +207,7 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     public NFUItemProjectileEntity setHitIgnoresOwner(boolean shouldIgnoreOwner) {
         try {
             FIELD_HIT_IGNORES_OWNER.set(this, shouldIgnoreOwner);
+            this.ignoresOwner = shouldIgnoreOwner;
         } catch (IllegalAccessException e) {
             throw new ReflectionFailedException(e);
         }
@@ -298,6 +302,9 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         if (!this.level().isClientSide) {
+            if (this.ignoresOwner && pResult.getEntity().equals(this.getOwner())) return;
+            if (ignoresEntityIf != null && ignoresEntityIf.test(this, pResult.getEntity())) return;
+            if (ignoresLivingIf != null && pResult.getEntity() instanceof LivingEntity l && ignoresLivingIf.test(this, l)) return;
             Optional.ofNullable(this.onHitEntity).ifPresent(action -> action.accept(this, pResult));
             Optional.ofNullable(this.onHitBlockOrEntity).ifPresent(action -> action.accept(this, pResult));
             if (pResult.getEntity() instanceof LivingEntity) {
@@ -438,20 +445,20 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     }
 
     /**
-     * Get the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
-     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     * Get identifier. The identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code "nfulib:item_projectile"}.
      */
-    @Nullable
-    public String getStringIdentifier() {
-        return this.entityData.get(STRING_IDENTIFIER);
+    @Nonnull
+    public ResourceLocation getIdentifier() {
+        return new ResourceLocation(this.entityData.get(IDENTIFIER));
     }
 
     /**
-     * Set the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
-     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     * Set identifier. The identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code "nfulib:item_projectile"}.
      */
-    public NFUItemProjectileEntity setStringIdentifier(@Nonnull String identifier) {
-        this.entityData.set(STRING_IDENTIFIER, identifier);
+    public NFUItemProjectileEntity setIdentifier(@Nonnull ResourceLocation identifier) {
+        this.entityData.set(IDENTIFIER, identifier.toString());
         return this;
     }
 
@@ -478,5 +485,11 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     @Override
     public EntityDimensions getDimensions(Pose pPose) {
         return super.getDimensions(pPose).scale(this.entityData.get(SCALE_XZ), this.entityData.get(SCALE_Y));
+    }
+
+    @Override
+    public Component getName() {
+        ResourceLocation id = this.getIdentifier();
+        return NFUInfoStatics.createTranslatable("entity." + id.getNamespace() + ".item_projectile." + id.getPath());
     }
 }

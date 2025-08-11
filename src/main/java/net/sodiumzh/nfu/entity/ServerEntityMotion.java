@@ -114,7 +114,7 @@ public class ServerEntityMotion {
     }
 
     public void apply(Entity e) {
-        NFUEntityStatics.setMotionOnServer(e, this.movement, this.accel);
+        NFUEntityStatics.addMotionOnServer(e, this.movement, this.accel);
     }
 
 }

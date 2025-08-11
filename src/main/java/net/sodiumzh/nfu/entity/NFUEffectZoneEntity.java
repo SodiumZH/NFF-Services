@@ -5,9 +5,11 @@ import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
@@ -22,6 +24,7 @@ import net.sodiumzh.nfu.math.Inequality3D;
 import net.sodiumzh.nfu.object.IChainModifiable;
 import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
 import net.sodiumzh.nfu.registry.NFUEntityTypes;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nfu.util.NFUMathStatics;
 import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -54,7 +57,7 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
     protected static final EntityDataAccessor<Float> SCALE_HEIGHT
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
-    protected static final EntityDataAccessor<String> STRING_IDENTIFIER
+    protected static final EntityDataAccessor<String> IDENTIFIER
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.STRING);
 
     protected static final Field FIELD_ENTITY_DIMENSIONS;
@@ -109,7 +112,7 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
         this.entityData.define(GRAVITY, 0f);
         this.entityData.define(SCALE_WIDTH, 1f);
         this.entityData.define(SCALE_HEIGHT, 1f);
-        this.entityData.define(STRING_IDENTIFIER, "");
+        this.entityData.define(IDENTIFIER, "nfulib:effect_zone");
     }
 
     public NFUEffectZoneEntity particle(@Nonnull ParticleOptions type, int frequency) {
@@ -440,20 +443,20 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
     }
 
     /**
-     * Get the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
-     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     * Get identifier. The identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code "nfulib:effect_zone"}.
      */
-    @Nullable
-    public String getStringIdentifier() {
-        return this.entityData.get(STRING_IDENTIFIER);
+    @Nonnull
+    public ResourceLocation getIdentifier() {
+        return new ResourceLocation(this.entityData.get(IDENTIFIER));
     }
 
     /**
-     * Set the string identifier. The string identifier is an additional string for each entity for distinguishing from each other,
-     * as they cannot be distinguished by entity type. Default is {@code ""}.
+     * Set identifier. The identifier is an additional string for each entity for distinguishing from each other,
+     * as they cannot be distinguished by entity type. Default is {@code "nfulib:effect_zone"}.
      */
-    public NFUEffectZoneEntity setStringIdentifier(@Nonnull String identifier) {
-        this.entityData.set(STRING_IDENTIFIER, identifier);
+    public NFUEffectZoneEntity setIdentifier(@Nonnull ResourceLocation identifier) {
+        this.entityData.set(IDENTIFIER, identifier.toString());
         return this;
     }
 
@@ -462,4 +465,9 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
         return this;
     }
 
+    @Override
+    public Component getName() {
+        ResourceLocation id = this.getIdentifier();
+        return NFUInfoStatics.createTranslatable("entity." + id.getNamespace() + ".effect_zone." + id.getPath());
+    }
 }
