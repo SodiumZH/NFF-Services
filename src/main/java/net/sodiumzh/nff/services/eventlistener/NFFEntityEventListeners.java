@@ -27,6 +27,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.event.entity.NFFTamedDeathEvent;
+import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
 import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;

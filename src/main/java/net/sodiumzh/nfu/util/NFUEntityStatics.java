@@ -888,11 +888,11 @@ public class NFUEntityStatics
 	 * Add a mob's delta motion on server. Client motion will be auto synched. Do nothing on client.
 	 */
 	public static void addMotionOnServer(Entity target, Vec3 deltaPos, Vec3 deltaVelocity) {
-		if (target.level().isClientSide) return;
+		if (target.level.isClientSide) return;
 		target.setPos(target.position().add(deltaPos));
-		target.addDeltaMovement(deltaVelocity);
+		target.setDeltaMovement(target.getDeltaMovement().add(deltaVelocity));
 		ClientboundEntityMotionUpdatePacket packet = new ClientboundEntityMotionUpdatePacket(target.getId(), deltaPos, deltaVelocity);
-		NFUNetworkStatics.sendToAllPlayers(target.level(), NFUNetworkChannels.CHANNEL, packet);
+		NFUNetworkStatics.sendToAllPlayers(target.level, NFUNetworkChannels.CHANNEL, packet);
 	}
 
 	/**
@@ -913,7 +913,7 @@ public class NFUEntityStatics
 		Vec3 deltaPos = target.position().subtract(oldPos);
 		ClientboundEntityMotionUpdatePacket packet =
 			new ClientboundEntityMotionUpdatePacket(target.getId(), deltaPos, deltaVelocity);
-		NFUNetworkStatics.sendToAllPlayers(target.level(), NFUNetworkChannels.CHANNEL, packet);
+		NFUNetworkStatics.sendToAllPlayers(target.level, NFUNetworkChannels.CHANNEL, packet);
 	}
 
 }

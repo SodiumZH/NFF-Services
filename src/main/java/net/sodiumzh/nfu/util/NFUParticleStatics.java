@@ -37,12 +37,12 @@ public class NFUParticleStatics {
 			int amount, double speed) {
 		if (amount <= 0) return;
 		Vec3 pos = entity.position();
-		if (entity.level().isClientSide && entity.level() instanceof ClientLevel cl) {
+		if (entity.level.isClientSide && entity.level instanceof ClientLevel cl) {
 			for (int i = 0; i < amount; ++i) {
 				addRandomizedParticle(cl, options, pos.add(positionOffset), rndScale, new Vec3(speed, speed, speed), new Vec3(1d, 1d, 1d));
 			}
 		}
-		else if (!entity.level().isClientSide && entity.level() instanceof ServerLevel sl)
+		else if (!entity.level.isClientSide && entity.level instanceof ServerLevel sl)
 		sl.sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}

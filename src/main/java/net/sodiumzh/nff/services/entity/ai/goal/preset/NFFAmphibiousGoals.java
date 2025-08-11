@@ -115,7 +115,7 @@ public abstract class NFFAmphibiousGoals {
 		@Override
 		public boolean checkCanUse() {
 			return super.canUse()
-					&& !((INFFTamed) this.mob).asMob().level().isDay()
+					&& !this.mob.asMob().level.isDay()
 					&& pathfinder.isInWaterOrBubble()
 					&& pathfinder.getY() >= pathfinder.level.getSeaLevel() - 3;
 		}
@@ -259,8 +259,8 @@ public abstract class NFFAmphibiousGoals {
 		public void onTick() {
 			super.onTick();
 			BlockPos pos = this.getMob().asMob().blockPosition();
-			BlockState blockState = this.getMob().asMob().level().getBlockState(pos);
-			BlockState blockStateBelow = this.getMob().asMob().level().getBlockState(pos.below());
+			BlockState blockState = this.getMob().asMob().level.getBlockState(pos);
+			BlockState blockStateBelow = this.getMob().asMob().level.getBlockState(pos.below());
 			if (NFULevelStatics.getWaterDepth(this.getMob().asMob()) <= this.walkBelowDepth)
 				this.amph.switchNav(false);
 			else if (this.getMob().asMob().isInWaterOrBubble())

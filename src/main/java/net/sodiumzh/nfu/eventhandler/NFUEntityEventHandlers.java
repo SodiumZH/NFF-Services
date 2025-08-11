@@ -1,6 +1,5 @@
 package net.sodiumzh.nfu.eventhandler;
 
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nfu.NFULibrary;
@@ -13,7 +12,7 @@ public class NFUEntityEventHandlers {
     @SubscribeEvent
     public static void onItemEntityHurt(ItemEntityHurtEvent event) {
         // Handle tag "nfulib:explosion_not_breaking_items"
-        if (event.damageSource.is(DamageTypes.EXPLOSION) || event.damageSource.is(DamageTypes.PLAYER_EXPLOSION)) {
+        if (event.damageSource.isExplosion()) {
             if (event.damageSource.getEntity() != null
                 && event.damageSource.getEntity().getType().is(NFUTags.EXPLOSION_NOT_BREAKING_ITEMS)) {
                 event.setCanceled(true);

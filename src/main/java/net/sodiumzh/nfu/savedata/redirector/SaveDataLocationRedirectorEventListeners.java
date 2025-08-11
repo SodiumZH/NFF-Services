@@ -91,9 +91,9 @@ public class SaveDataLocationRedirectorEventListeners
 			original.putString("id", key.toString());
 	}
 
-	public static String doPortNamespace(String original) {
+	public static String[] doPortNamespace(String[] original) {
 		if (SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.isEmpty()) return original;
-		String res = SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.get(original);
-		return res != null ? res : original;
+		String res = SaveDataLocationRedirectorRegistries.NAMESPACE_MAPPING.get(original[0]);
+		return res != null ? new String[]{res, original[1]} : original;
 	}
 }
