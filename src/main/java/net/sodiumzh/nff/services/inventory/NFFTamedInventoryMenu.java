@@ -13,6 +13,8 @@ import net.sodiumzh.nfu.math.GuiPos;
 
 import java.util.function.Predicate;
 
+import java.util.function.Predicate;
+
 public abstract class NFFTamedInventoryMenu extends AbstractContainerMenu {
 
 	public final Container container;
