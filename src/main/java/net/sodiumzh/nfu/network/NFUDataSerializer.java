@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceLocation;
 import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.registry.NFUEntityDataSerializers;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 
@@ -212,7 +213,7 @@ public interface NFUDataSerializer<T>
 
 	@DontOverride
 	public default EntityDataSerializer<T> asEntityDataSerializer() {
-		return EntityDataSerializer.simple(this::write, this::read);
+		return NFUEntityDataSerializers.create(this::write, this::read);
 	}
 
 }

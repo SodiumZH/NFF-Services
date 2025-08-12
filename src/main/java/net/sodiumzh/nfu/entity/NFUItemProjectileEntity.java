@@ -50,7 +50,7 @@ public class NFUItemProjectileEntity extends Projectile implements ItemSupplier,
     protected static final EntityDataAccessor<Integer> PARTICLE_AMOUNT
         = SynchedEntityData.defineId(NFUItemProjectileEntity.class, EntityDataSerializers.INT);
     protected static final EntityDataAccessor<Vec3> PARTICLE_SPEED
-        = SynchedEntityData.defineId(NFUItemProjectileEntity.class, NFUEntityDataSerializers.VEC3.get());
+        = SynchedEntityData.defineId(NFUItemProjectileEntity.class, NFUEntityDataSerializers.VEC3);
     protected static final EntityDataAccessor<Float> PARTICLE_RANGE
         = SynchedEntityData.defineId(NFUItemProjectileEntity.class, EntityDataSerializers.FLOAT);
     protected static final EntityDataAccessor<Boolean> FIRE_IMMUNE

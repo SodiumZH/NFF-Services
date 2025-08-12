@@ -30,11 +30,11 @@ class EntityDefaultInstances {
     }
 
     @SubscribeEvent
-    private static void createDefaultInstances(TickEvent.LevelTickEvent event) {
+    private static void createDefaultInstances(TickEvent.WorldTickEvent event) {
         if (!TABLE.isEmpty()) return;
-        ForgeRegistries.ENTITY_TYPES.forEach(type -> {
+        ForgeRegistries.ENTITIES.forEach(type -> {
             try {
-                TABLE.put(type, type.create(event.level));
+                TABLE.put(type, type.create(event.world));
             } catch (Exception e) {
                 NFUDebugStatics.errorOnce("Failed to create default instance: " + type.getDescriptionId());
             }

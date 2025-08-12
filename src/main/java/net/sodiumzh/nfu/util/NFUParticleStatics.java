@@ -1,23 +1,19 @@
 package net.sodiumzh.nfu.util;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Random;
 
 public class NFUParticleStatics {
 
-	public static final RandomSource RND = new ThreadSafeRandomSource();
+	public static final Random RND = new Random();
 
 	/**
 	 * Only on client, add a particle with randomized position and velocity

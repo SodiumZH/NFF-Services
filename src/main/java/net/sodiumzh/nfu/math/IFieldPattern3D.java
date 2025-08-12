@@ -1,7 +1,6 @@
 package net.sodiumzh.nfu.math;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.annotation.MustBeRegistered;

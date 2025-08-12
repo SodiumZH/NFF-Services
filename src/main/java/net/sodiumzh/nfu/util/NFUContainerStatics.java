@@ -2,7 +2,6 @@ package net.sodiumzh.nfu.util;
 
 import net.minecraft.util.Mth;
 import net.sodiumzh.nfu.container.MapPair;
-import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.math.WeightedRandomSelector;
 
 import javax.annotation.Nullable;

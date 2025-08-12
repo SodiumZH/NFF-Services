@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.ArrayList;
 
@@ -149,7 +150,7 @@ public class NFUTagStatics
 		return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(modId, name));
 	}
 
-	public static <T> List<TagKey<T>> getAllTags(T block, IForgeRegistry<T> registry) {
+	public static <T extends IForgeRegistryEntry<T>> List<TagKey<T>> getAllTags(T block, IForgeRegistry<T> registry) {
 		if (registry.tags() == null) return List.of();
 		return Optional.ofNullable(registry.tags())
 			.flatMap(tags -> tags.getReverseTag(block).map(t -> t.getTagKeys().toList()))

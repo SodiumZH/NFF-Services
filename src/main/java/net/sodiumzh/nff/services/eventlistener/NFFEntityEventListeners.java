@@ -335,8 +335,8 @@ public class NFFEntityEventListeners
 			if (event.getEntity() instanceof INFFTamed bef) {
 				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
-					if (event.getEntity().getHealth() < 0.00001f)
-						event.getEntity().setHealth(1f);
+					if (event.getEntityLiving().getHealth() < 0.00001f)
+						event.getEntityLiving().setHealth(1f);
 					return;
 				}
 				// Befriended mobs should not kill each other with same owner, or get killed by

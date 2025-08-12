@@ -46,11 +46,11 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
     protected static final EntityDataAccessor<Integer> PARTICLE_AMOUNT
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.INT);
     protected static final EntityDataAccessor<Optional<Field3D>> PARTICLE_SPEED_FUNCTION
-        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.OPTIONAL_FIELD_3D.get());
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.OPTIONAL_FIELD_3D);
     protected static final EntityDataAccessor<Inequality3D> PARTICLE_AREA
-        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.INEQUALITY_3D.get());
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.INEQUALITY_3D);
     protected static final EntityDataAccessor<Optional<AABB>> PARTICLE_AREA_BOUNDING_BOX
-        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.OPTIONAL_BOUNDING_BOX.get());
+        = SynchedEntityData.defineId(NFUEffectZoneEntity.class, NFUEntityDataSerializers.OPTIONAL_BOUNDING_BOX);
     protected static final EntityDataAccessor<Float> GRAVITY
         = SynchedEntityData.defineId(NFUEffectZoneEntity.class, EntityDataSerializers.FLOAT);
     protected static final EntityDataAccessor<Float> SCALE_WIDTH

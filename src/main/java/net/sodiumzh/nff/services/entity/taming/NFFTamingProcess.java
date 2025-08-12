@@ -20,7 +20,6 @@ import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
-import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 
@@ -199,7 +198,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		}
 
 		@SubscribeEvent
-		public static void onMobTick(LivingEvent.LivingTickEvent event) {
+		public static void onMobTick(LivingEvent.LivingUpdateEvent event) {
 			if (event.getEntity() instanceof Mob mob && !event.getEntity().level.isClientSide && mob.isPassenger())
 			{
 				NFFTamingProcess proc = NFFTamingMapping.getProcess(mob);

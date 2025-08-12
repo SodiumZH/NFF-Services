@@ -14,7 +14,7 @@ import net.sodiumzh.nfu.entity.NFUItemProjectileEntity;
 
 public class NFUEntityTypes {
 
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES,
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES,
         NFULibrary.MOD_ID);
 
     public static final RegistryObject<EntityType<AttachedItemDisplayerEntity>> ATTACHED_ITEM_DISPLAYER =
