@@ -27,8 +27,8 @@ base {
 }
 
 mixin {
-    add sourceSets.main, "nautils.refmap.json"
-    config 'nautils.mixins.json'
+    add sourceSets.main, "nfulib.refmap.json"
+    config 'nfulib.mixins.json'
 }
 
 javadoc {
