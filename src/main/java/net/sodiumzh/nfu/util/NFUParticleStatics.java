@@ -23,8 +23,8 @@ public class NFUParticleStatics {
 	 * Only on client, add a particle with randomized position and velocity
 	 */
 	public static void addRandomizedParticle(Level level, ParticleOptions type, Vec3 position, Vec3 posRandomScale, Vec3 maxVelocity, Vec3 velocityRandomScale) {
-		if (level instanceof ClientLevel cl) {
-			cl.addParticle(type, position.x + RND.nextGaussian() * posRandomScale.x, position.y + RND.nextGaussian() * posRandomScale.y,
+		if (level.isClientSide) {
+			level.addParticle(type, position.x + RND.nextGaussian() * posRandomScale.x, position.y + RND.nextGaussian() * posRandomScale.y,
 				position.z + RND.nextGaussian() * posRandomScale.z, maxVelocity.x * RND.nextGaussian() * velocityRandomScale.x,
 				maxVelocity.y * RND.nextGaussian() * velocityRandomScale.y, maxVelocity.z * RND.nextGaussian() * velocityRandomScale.z);
 		}
@@ -37,13 +37,13 @@ public class NFUParticleStatics {
 			int amount, double speed) {
 		if (amount <= 0) return;
 		Vec3 pos = entity.position();
-		if (entity.level.isClientSide && entity.level instanceof ClientLevel cl) {
+		if (entity.level.isClientSide) {
 			for (int i = 0; i < amount; ++i) {
-				addRandomizedParticle(cl, options, pos.add(positionOffset), rndScale, new Vec3(speed, speed, speed), new Vec3(1d, 1d, 1d));
+				addRandomizedParticle(entity.level, options, pos.add(positionOffset), rndScale, new Vec3(speed, speed, speed), new Vec3(1d, 1d, 1d));
 			}
 		}
-		else if (!entity.level.isClientSide && entity.level instanceof ServerLevel sl)
-		sl.sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
+		else if (!entity.level.isClientSide)
+			((ServerLevel)(entity.level)).sendParticles(options, pos.x + positionOffset.x, pos.y + positionOffset.y,
 				pos.z + positionOffset.z, amount, rndScale.x, rndScale.y, rndScale.z, speed);
 	}
 	

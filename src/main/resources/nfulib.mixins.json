@@ -22,12 +22,9 @@
     "NFUMixinServerPlayer",
     "NFUMixinServerPlayerGameMode",
     "NFUMixinThrownTrident",
-    "NFUMixinGrindstoneMenuUpperSlot",
-    "NFUMixinGrindstoneMenuLowerSlot",
-    "NFUMixinLevelCapabilityData"
+    "NFUMerchantMenuMixin"
   ],
   "client": [
-    "NFUMerchantMenuMixin",
     "NFUMerchantScreenMixin",
     "NFUMixinLivingEntityRenderer"
   ],
