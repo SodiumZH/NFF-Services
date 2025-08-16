@@ -21,10 +21,10 @@
     "NFUMixinResourceLocation",
     "NFUMixinServerPlayer",
     "NFUMixinServerPlayerGameMode",
-    "NFUMixinThrownTrident"
+    "NFUMixinThrownTrident",
+    "NFUMerchantMenuMixin"
   ],
   "client": [
-    "NFUMerchantMenuMixin",
     "NFUMerchantScreenMixin",
     "NFUMixinLivingEntityRenderer"
   ],
