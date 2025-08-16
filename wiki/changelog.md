@@ -1,5 +1,17 @@
 # Change Log
 
+### 0.2.30.2
+
+##### NFU Library
+
+Fixed server issues in the Vanilla Trade API related to `MerchantMenu#playTradeSound` class casting error.
+
+##### NFF Services
+
+Fixed `nffservices:passive_to_nff_mobs` tag causing the mob to be passive to non-NFF mobs.
+
+Fixed tamable animals still attacking NFF mobs of the same owner.
+
 ### 0.2.30.1
 
 ##### NFU Library

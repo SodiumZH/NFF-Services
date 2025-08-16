@@ -21,7 +21,7 @@ build
 # other
 eclipse
 libs
-run
+run*
 
 !run/saves
 
