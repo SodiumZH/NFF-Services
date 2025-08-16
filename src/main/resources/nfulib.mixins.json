@@ -22,10 +22,10 @@
     "NFUMixinThrownTrident",
     "NFUMixinGrindstoneMenuLowerSlot",
     "NFUMixinGrindstoneMenuUpperSlot",
-    "NFUMixinWorldCapabilityData"
+    "NFUMixinWorldCapabilityData",
+    "NFUMerchantMenuMixin"
   ],
   "client": [
-    "NFUMerchantMenuMixin",
     "NFUMerchantScreenMixin",
     "NFUMixinLivingEntityRenderer"
   ],

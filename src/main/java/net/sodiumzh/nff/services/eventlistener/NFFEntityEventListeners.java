@@ -293,9 +293,9 @@ public class NFFEntityEventListeners
 	        }
 	        // Handle Golems End
 	        // Handle hostility tags
-			if (mob.getType().is(NFFTagRegistry.PASSIVE_TO_NFF_MOBS))
+			if (mob.getType().is(NFFTagRegistry.PASSIVE_TO_NFF_MOBS) && INFFTamed.get(target).isPresent())
 				event.setCanceled(true);
-	        if (mob.getType().is(NFFTagRegistry.NEUTRAL_TO_NFF_MOBS) && target instanceof INFFTamed && mob.getLastHurtByMob() != target)
+	        if (mob.getType().is(NFFTagRegistry.NEUTRAL_TO_NFF_MOBS) && INFFTamed.get(target).filter(t -> !t.asMob().equals(mob.getLastAttacker())).isPresent())
 	        	event.setCanceled(true);
 		}
 		// Handle mobs end //
