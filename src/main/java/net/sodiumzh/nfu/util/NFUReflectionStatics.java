@@ -477,7 +477,6 @@ public class NFUReflectionStatics
 	 * @param className <b>Fully qualified name</b> of the class, like {@code package.name.ClassName}.
 	 */
 	public static boolean isRunningInMethod(String className, String methodNameSrg) {
-		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		String methodName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, methodNameSrg);
 		return StackWalker.getInstance().walk(frames ->
 			frames.anyMatch(frame -> frame.getClassName().equals(className)
@@ -502,6 +501,15 @@ public class NFUReflectionStatics
 	 */
 	public static boolean isRunningInMethod(Method method) {
 		return isRunningInMethod(method.getDeclaringClass(), method.getName());
+	}
+
+	public static boolean isRunningInClass(String className) {
+		return StackWalker.getInstance().walk(frames ->
+			frames.anyMatch(frame -> frame.getClassName().equals(className)));
+	}
+
+	public static boolean isRunningInClass(Class<?> clazz) {
+		return isRunningInClass(clazz.getName());
 	}
 
 	/**
