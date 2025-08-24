@@ -5,11 +5,16 @@ import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
@@ -469,5 +474,10 @@ public class NFUEffectZoneEntity extends Projectile implements IChainModifiable<
     public Component getName() {
         ResourceLocation id = this.getIdentifier();
         return NFUInfoStatics.createTranslatable("entity." + id.getNamespace() + ".effect_zone." + id.getPath());
+    }
+
+    public DamageSource createDamageSource(ResourceKey<DamageType> type) {
+        return new DamageSource(this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type),
+            this, this.getOwner(), this.position());
     }
 }
