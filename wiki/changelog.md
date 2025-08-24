@@ -1,5 +1,11 @@
 # Change Log
 
+### 0.2.30.3
+
+##### NFU Library
+
+Added reflection utilities: `CachedFieldAccessor` and `CachedMethodAccessor`.
+
 ### 0.2.30.2
 
 ##### NFU Library
