@@ -5,9 +5,14 @@
   "refmap": "nfulib.refmap.json",
   "mixins": [
     "NFUBlockItemMixin",
+    "NFUMerchantMenuMixin",
+    "NFUMixinDeferredRegister",
     "NFUMixinEnderMan",
     "NFUMixinEntity",
     "NFUMixinEntityType",
+    "NFUMixinGameData",
+    "NFUMixinGrindstoneMenuLowerSlot",
+    "NFUMixinGrindstoneMenuUpperSlot",
     "NFUMixinItemEntity",
     "NFUMixinItemInput",
     "NFUMixinItemStack",
@@ -20,10 +25,7 @@
     "NFUMixinServerPlayerGameMode",
     "NFUMixinTagBuilder",
     "NFUMixinThrownTrident",
-    "NFUMixinGrindstoneMenuLowerSlot",
-    "NFUMixinGrindstoneMenuUpperSlot",
-    "NFUMixinWorldCapabilityData",
-    "NFUMerchantMenuMixin"
+    "NFUMixinWorldCapabilityData"
   ],
   "client": [
     "NFUMerchantScreenMixin",

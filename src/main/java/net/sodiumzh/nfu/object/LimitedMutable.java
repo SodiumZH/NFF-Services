@@ -1,5 +1,7 @@
 package net.sodiumzh.nfu.object;
 
+import java.util.function.Supplier;
+
 /**
  * A field that can be changed for limited times. If exceeded, the setter will not do anything.
  */
@@ -30,6 +32,15 @@ public class LimitedMutable<T> {
             return true;
         }
         else return false;
+    }
+
+    public void setOrThrow(T newValue, Supplier<? extends RuntimeException> exceptionSupplier) {
+        if (!trySet(newValue))
+            throw exceptionSupplier.get();
+    }
+
+    public void setOrThrow(T newValue) {
+        setOrThrow(newValue, () -> new IllegalStateException("LimitedMutable exceeded the max modification count: " + this.maxModification));
     }
 
 }
