@@ -1,5 +1,10 @@
 package net.sodiumzh.nfu.util;
 
+import java.util.*;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -17,79 +22,47 @@ import java.util.stream.Stream;
 public class NFUMathStatics
 {
 	public static final RandomSource RND = new ThreadSafeRandomSource();
-	
+
+	@Deprecated
 	public static double max(double... vals)
 	{
-		if (vals.length == 0)
-			throw new IllegalArgumentException("Missing params");
-		double res = vals[0];
-		for (int i = 1; i < vals.length; ++i)
-		{
-			res = Math.max(res, vals[i]);
-		}
-		return res;
+		return DoubleStream.of(vals).max().orElseThrow();
 	}
-	
+
+	@Deprecated
 	public static int max(int... vals)
 	{
-		if (vals.length == 0)
-			throw new IllegalArgumentException("Missing params");
-		int res = vals[0];
-		for (int i = 1; i < vals.length; ++i)
-		{
-			res = Math.max(res, vals[i]);
-		}
-		return res;
+		return IntStream.of(vals).max().orElseThrow();
 	}
-	
+
+	@Deprecated
 	public static double min(double... vals)
 	{
-		if (vals.length == 0)
-			throw new IllegalArgumentException("Missing params");
-		double res = vals[0];
-		for (int i = 1; i < vals.length; ++i)
-		{
-			res = Math.min(res, vals[i]);
-		}
-		return res;
+		return DoubleStream.of(vals).min().orElseThrow();
 	}
-	
+
+	@Deprecated
 	public static int min(int... vals)
 	{
-		if (vals.length == 0)
-			throw new IllegalArgumentException("Missing params");
-		int res = vals[0];
-		for (int i = 1; i < vals.length; ++i)
-		{
-			res = Math.min(res, vals[i]);
-		}
-		return res;
+		return IntStream.of(vals).min().orElseThrow();
 	}
-	
+
+	@Deprecated
 	public static int sum(int... vals)
 	{
-		int res = 0;
-		for (int i: vals)
-			res += i;
-		return res;
+		return IntStream.of(vals).sum();
 	}
-	
+
+	@Deprecated
 	public static double sum(double... vals)
 	{
-		double res = 0;
-		for (double i: vals)
-			res += i;
-		return res;
+		return DoubleStream.of(vals).sum();
 	}
-	
+
+	@Deprecated
 	public static double avr(double... vals)
 	{
-		double res = 0;
-		for (double i : vals)
-		{
-			res += (i / vals.length);
-		}
-		return res;
+		return DoubleStream.of(vals).average().orElseThrow();
 	}
 	
 	/**
@@ -148,9 +121,7 @@ public class NFUMathStatics
 			return 0;
 		}
 
-		double radians = Math.atan2(y, x);
-
-		return radians;
+        return Math.atan2(y, x);
 	}
 	
 	

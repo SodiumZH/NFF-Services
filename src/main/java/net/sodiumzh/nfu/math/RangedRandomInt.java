@@ -149,6 +149,25 @@ public class RangedRandomInt implements Supplier<Integer>
         return this.lastValue;
     }
 
+    public int getMinValue() {
+        return minValue;
+    }
+
+    public int getMaxValue() {
+        return maxValue;
+    }
+
+    /**
+     * Get the p factor of Poisson distribution. If it's not Poisson, always returns 0.5.
+     */
+    public double getPoissonP() {
+        return p;
+    }
+
+    public RandomizationType getRandomizationType() {
+        return rndType;
+    }
+
     @Override
     public String toString()
     {

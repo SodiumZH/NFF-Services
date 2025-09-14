@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 public class ServerEntityMotion {
     private Vec3 movement = Vec3.ZERO;
     private Vec3 accel = Vec3.ZERO;
-    @Nullable private Vec3 absPos = null;
-    @Nullable private Vec3 absVelocity = null;
 
     private ServerEntityMotion(){}
 
