@@ -1,5 +1,17 @@
 package net.sodiumzh.nfu.entity.vanillatrade;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -14,6 +26,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.NFULibrary;
+import net.sodiumzh.nfu.container.ITable2D;
+import net.sodiumzh.nfu.container.Table2D;
+import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.math.RandomSelection;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 
@@ -32,8 +47,8 @@ import java.util.Map;
  */
 public class RandomEnchantmentSelector
 {
-	private final Map<Enchantment, Map<Integer, Double>> table = new HashMap<>();
-	private RandomSelection<Tuple<Enchantment, Integer>> selector = null;
+	private final Table2D<Enchantment, Integer, Double> table = new Table2D<>();
+	private RandomSelection<Tuple2<Enchantment, Integer>> selector = null;
 	private Enchantment lastRegistered = null;
 	private boolean built = false;
 	
@@ -45,9 +60,7 @@ public class RandomEnchantmentSelector
 			throw new IllegalArgumentException("Non-positive level");
 		if (probabilityWeight < 0)
 			throw new IllegalArgumentException("Negative weight");
-		if (!table.containsKey(enc))
-			table.put(enc, new HashMap<>());
-		table.get(enc).put(level, probabilityWeight);
+		table.put(enc, level, probabilityWeight);
 		lastRegistered = enc;
 		return this;
 	}
@@ -70,15 +83,21 @@ public class RandomEnchantmentSelector
 	{
 		return add(level, 1.0d);
 	}
-	
+
+	public RandomEnchantmentSelector addEnchantment(Enchantment enchantment, Function<Integer, Double> levelWeightMapping) {
+		for (int level = 1; level <= enchantment.getMaxLevel(); ++level) {
+			this.add(enchantment, level, levelWeightMapping.apply(level));
+		}
+		return this;
+	}
+
+	public RandomEnchantmentSelector addEnchantment(Enchantment enchantment, double weightOverall) {
+		return this.addEnchantment(enchantment, i -> weightOverall / enchantment.getMaxLevel());
+	}
+
 	public RandomEnchantmentSelector remove(Enchantment enc, int level)
 	{
-		if (this.table.containsKey(enc))
-		{
-			this.table.get(enc).remove(level);
-			if (this.table.get(enc).isEmpty())
-				this.table.remove(enc);
-		}
+		this.table.remove(enc, level);
 		return this;
 	}
 	
@@ -101,35 +120,22 @@ public class RandomEnchantmentSelector
 		
 		if (table.isEmpty())
 			throw new IllegalArgumentException("build error - no valid entry available.");
-		double weightSum = 0d;
-		for (var e: table.entrySet())
-		{
-			for (var w: e.getValue().entrySet())
-			{
-				weightSum += w.getValue();
-			}
-		}
+		double weightSum = table.entryStream().map(ITable2D.Entry::value).reduce(0d, Double::sum);
 		if (weightSum == 0)
 			throw new IllegalArgumentException("build error - no valid entry available.");
-		this.selector = RandomSelection.create(null);
-		for (var e: table.entrySet())
-		{
-			for (var w: e.getValue().entrySet())
-			{
-				selector.add(new Tuple<>(e.getKey(), w.getKey()), w.getValue() / weightSum);
-			}
-		}
+		this.selector = new RandomSelection<>(null);
+		table.entryStream().forEach(entry -> this.selector.add(Tuple2.of(entry.rowKey(), entry.columnKey()), entry.value() / weightSum));
 		built = true;
 		return this;
 	}
 	
-	public Tuple<Enchantment, Integer> getValue()
+	public Tuple2<Enchantment, Integer> select()
 	{
 		if (!this.built || this.selector == null)
 			throw new IllegalStateException("getValue error - not built.");
 		for (int i = 0; i < 100; ++i)
 		{
-			Tuple<Enchantment, Integer> res = selector.getValue();
+			Tuple2<Enchantment, Integer> res = selector.select();
 			if (res != null)
 				return res;
 		}
@@ -215,6 +221,48 @@ public class RandomEnchantmentSelector
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	public static RandomEnchantmentSelector allEnchantments(
+		boolean includeTreasure,
+		boolean includeNonTreasure,
+		boolean includeCurse,
+		boolean includeNonCurse,
+		double treasureWeightScale,
+		Function<Integer, Double> levelWeightDistribution
+	) {
+		if (!includeTreasure && !includeNonTreasure)
+			throw new IllegalArgumentException("RandomEnchantmentSelector#allEnchantments: must include either treasure or non-treasure.");
+		if (!includeCurse && !includeNonCurse)
+			throw new IllegalArgumentException("RandomEnchantmentSelector#allEnchantments: must include either curse or non-curse.");
+		RandomEnchantmentSelector res = new RandomEnchantmentSelector();
+		Stream<Enchantment> allEnc = ForgeRegistries.ENCHANTMENTS.getValues().stream();
+		if (!includeTreasure)
+			allEnc = allEnc.filter(enc -> !enc.isTreasureOnly());
+		if (!includeNonTreasure)
+			allEnc = allEnc.filter(Enchantment::isTreasureOnly);
+		if (!includeCurse)
+			allEnc = allEnc.filter(enc -> !enc.isCurse());
+		if (!includeNonCurse)
+			allEnc = allEnc.filter(Enchantment::isCurse);
+		allEnc.forEach(enc -> {
+			double[] weights = IntStream.range(1, enc.getMaxLevel() + 1)
+				.mapToDouble(levelWeightDistribution::apply).toArray();
+			double weightSum = DoubleStream.of(weights).sum();
+			for (int i = 0; i < weights.length; ++i) {
+				weights[i] /= weightSum;
+				if (enc.isTreasureOnly())
+					weights[i] *= treasureWeightScale;
+				res.add(enc, i + 1, weights[i]);
+			}
+		});
+		res.build();
+		return res;
+	}
+
+	public ITable2D<Enchantment, Integer, Double> getTableSnapshot() {
+		return ITable2D.snapshotOf(this.table);
 	}
 
 }

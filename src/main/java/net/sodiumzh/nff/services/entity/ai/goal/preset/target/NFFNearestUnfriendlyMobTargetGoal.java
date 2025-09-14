@@ -1,5 +1,11 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
 
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -33,7 +39,7 @@ public class NFFNearestUnfriendlyMobTargetGoal extends NFFTargetGoal
 	 * targeted.
 	 */
 	protected TargetingConditions targetConditions;
-	/** Attacker state filter. It will try targeting only when the attack fulfills this check. */
+	/** Attacker state filter. It will try targeting only when the attacker meets this condition. */
 	protected Predicate<INFFTamed> stateConditions = m -> true;
 
 	public NFFNearestUnfriendlyMobTargetGoal(INFFTamed mob, boolean mustSee)
@@ -103,7 +109,7 @@ public class NFFNearestUnfriendlyMobTargetGoal extends NFFTargetGoal
 	protected void findTarget() {
 	      double followDist = mob.asMob().getAttributeValue(Attributes.FOLLOW_RANGE);
 	      AABB searchArea = new AABB(mob.asMob().position().subtract(new Vec3(followDist, followDist, followDist)), mob.asMob().position().add(new Vec3(followDist, followDist, followDist)));
-	      List<Entity> candidates = mob.asMob().level.getEntities(mob.asMob(), searchArea, (Entity e) -> 
+	      List<Entity> candidates = mob.asMob().level.getEntities(mob.asMob(), searchArea, (Entity e) ->
 	      {
 	    	  if (e instanceof Mob m)
 	    	  {
