@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.*;
 
@@ -13,6 +14,7 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.Resource;
@@ -25,6 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.NFULibrary;
+import net.sodiumzh.nfu.container.Tuple2;
 
 /**
  * A {@code MobApplicableItemTable} is a collection of information about if an {@link ItemStack}
@@ -128,7 +131,11 @@ public class MobApplicableItemTable
 		}
 		return map;
 	}
-	
+
+	public Map<Input, OutputGetter> getEntriesView() {
+		return Map.copyOf(this.entries);
+	}
+
 	public static class Builder
 	{
 		private HashMap<Input, OutputGetter> entries = new HashMap<>();
@@ -292,14 +299,17 @@ public class MobApplicableItemTable
 	}
 	
 	/**
-	 * An {@code Input} is a check for given {@link ItemStack}. 
+	 * A {@link MobApplicableItemTable.Input} is a <i>check</i> for given {@link ItemStack}.
 	 * If the input {@link ItemStack} satisfies a specific {@code Input}, the {@code ItemApplyingToMobTable} will return corresponding {@code OutputGetter}.
 	 * <p> It now accepts 4 types of checks: 
 	 * <p> a) {@link Item}, to check if the given {@link ItemStack} is this type of {@link Item}.
 	 * <p> b) {@link ResourceLocation} of item, browsing {@link Item} from registry and check if the {@link ItemStack} is the found {@link Item}.
 	 * It could be optional and can be applied for other mods' items. If the item is not found (e.g. due to the mod not loaded), it will be ignored and won't throw exceptions.
 	 * <p> c) {@link TagKey} to check if the given {@link ItemStack} has this tag.
-	 * <p> d) {@link Predicate<ItemStack>} to simply check if the given {@link ItemStack} satisfies the condition.
+	 * <p> d) {@link Predicate<ItemStack>} to simply check if the given {@link ItemStack} meets the condition.
+	 * <p> Note: This object is static and should be embedded in the corresponding {@link MobApplicableItemTable}. When
+	 * the item interaction actually happens, the item will be checked by each {@link MobApplicableItemTable.Input} to see
+	 * which {@link MobApplicableItemTable.OutputGetter}(s) it should use.
 	 */
 	public static class Input implements Predicate<ItemStack>
 	{
@@ -311,7 +321,10 @@ public class MobApplicableItemTable
 		private final TagKey<Item> tag;
 		// By checking if it's an item found in registry.
 		private final ResourceLocation key;
-		
+		// For getAllItems(). When this input is using a predicate, it may take resource to
+		// Iterate the whole registry to find applicable items. So cache it here to prevent repeated testing.
+		private List<Item> cachedApplicableItems;
+
 		private Input(Item item, Predicate<ItemStack> stackCheck, TagKey<Item> tag, ResourceLocation key)
 		{
 			this.item = item;
@@ -419,10 +432,61 @@ public class MobApplicableItemTable
 			out = out + "}";
 			return out;
 		}
+
+		/**
+		 * Get a list of all items that should be applicable in this input.
+		 * <p>Note: when this input is using a predicate, this method can <i>NOT</i>
+		 * recognize items of which the default instance is not applicable but only
+		 * applicable when having some kind of NBT.
+		 * @param refreshCache When this input is using a predicate, if true, it should iterate
+		 *                     the whole item registry each time, which may be resource-costly. Use this only
+		 *                     when you suspect the item registry itself may have changed after first calling
+		 *                     this method.
+		 */
+		public List<Item> getAllItems(boolean refreshCache) {
+			try {
+				if (item != null) return List.of(item);
+				else if (key != null)
+					return Optional.ofNullable(ForgeRegistries.ITEMS.getValue(key)).map(List::of).orElseGet(List::of);
+				else if (tag != null)
+					return Optional.ofNullable(ForgeRegistries.ITEMS.tags())
+						.map(t -> t.getTag(tag).stream().toList()).orElseGet(List::of);
+				else {
+					// Skip and don't cache if the item registry is not yet available,
+					// so it will always retry for the next time
+					if (ForgeRegistries.ITEMS.getValues().isEmpty()) return List.of();
+					if (this.cachedApplicableItems == null || refreshCache)
+						this.cachedApplicableItems = ForgeRegistries.ITEMS.getValues()
+							.stream().filter(item -> this.test(item.getDefaultInstance()))
+							.toList();
+					return this.cachedApplicableItems;
+				}
+			} catch (RuntimeException e) {
+				return List.of();
+			}
+		}
+
+		/**
+		 * Get a list of all items that should be applicable in this input.
+		 * <p>Note: when this input is using a predicate, this method can <i>NOT</i>
+		 * recognize items of which the default instance is not applicable but only
+		 * applicable when having some kind of NBT.
+		 * <p>Note: When this input is using a predicate, this operation will need
+		 * to iterate the whole Forge item registry, and it will cache the result on
+		 * the first run of {@code getAllItems()} by default to save resource. If you
+		 * suspect the Forge item registry itself changed after the first run, use
+		 * {@code getAllItems(true)} to refresh the cache.
+		 */
+		public List<Item> getAllItems() {
+			return this.getAllItems(false);
+		}
 	}
-	
+
 	/**
-	 * An {@code OutputGetter} is a collection of information how it should respond to a specific {@code Input}.
+	 * A {@link MobApplicableItemTable.OutputGetter} describes what should happen if
+	 * a specific {@link MobApplicableItemTable.Input} is applied to the mob, including a double "amount" value (can represent
+	 * anything you want), usage cooldown ticks, whether the item should be consumed, and extra action to take.
+	 * <p>This object should be static and embedded in the corresponding {@link MobApplicableItemTable}.
 	 */
 	public static class OutputGetter
 	{
@@ -469,6 +533,22 @@ public class MobApplicableItemTable
 		public boolean isNoConsume() { return noConsume; }
 
 		/**
+		 * Get the raw amount source, either a fixed value or a functional getter from mob.
+		 */
+		public Either<Double, Function<Mob, Double>> getAmountSource() {
+			return amountStatic.<Either<Double, Function<Mob, Double>>>map(Either::left)
+				.orElseGet(() -> Either.right(amountGetter));
+		}
+
+		/**
+		 * Get the raw cooldown source, either a fixed value or a functional getter from mob.
+		 */
+		public Either<Integer, Function<Mob, Integer>> getCooldownSource() {
+			return cooldownStatic.<Either<Integer, Function<Mob, Integer>>>map(Either::left)
+				.orElseGet(() -> Either.right(cooldownGetter));
+		}
+
+		/**
 		 * Get the function to generate the cool down ticks.
 		 */
 		public Function<Mob, Integer> getCooldownGetter() {
@@ -486,7 +566,8 @@ public class MobApplicableItemTable
 	}
 	
 	/**
-	 * An {@code Output} is a collections of results applying an {@code OutputGetter} to a {@link Mob}.
+	 * A {@link MobApplicableItemTable.Output} represents a result when the item is <i>actually</i> applied to the mob.
+	 *
 	 */
 	public static record Output(Double amount, int cooldown, boolean noConsume, Consumer<Mob> action)
 	{

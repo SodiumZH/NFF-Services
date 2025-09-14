@@ -24,6 +24,7 @@ public class RangedRandomDouble implements Supplier<Double> {
      * 1 recommended.
      */
     private final double concFactor;
+
     private final RangedRandomDouble.RandomizationType rndType;
     private double lastValue;
     private boolean lastValueValid = false;
@@ -172,6 +173,29 @@ public class RangedRandomDouble implements Supplier<Double> {
     @Override
     public Double get() {
         return this.getValue();
+    }
+
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+    /**
+     * This indicates that the distribution is truncated from a standard normal distribution at the position of
+     * (concFactor * sigma) and mapped to range [min, max].
+     * Higher value means the probability is more concentrated at the center of the range i.e. (max - min) / 2.
+     * 1 recommended.
+     */
+    public double getConcentrationFactor() {
+        return concFactor;
+    }
+
+    public RandomizationType getRandomizationType() {
+        return rndType;
     }
 
     public static enum RandomizationType

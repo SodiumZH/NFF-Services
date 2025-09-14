@@ -529,5 +529,54 @@ public class VanillaTradeListing implements IVanillaTradeListing
 		MinecraftServer.
 	}*/
 	
-	
+	// Getters
+
+	public ArrayList<ItemStack> getBaseCostA() {
+		return baseCostA;
+	}
+
+	public RangedRandomInt getACount() {
+		return aCount;
+	}
+
+	public ArrayList<ItemStack> getCostB() {
+		return costB;
+	}
+
+	public RangedRandomInt getBCount() {
+		return bCount;
+	}
+
+	public ArrayList<ItemStack> getResult() {
+		return result;
+	}
+
+	public RangedRandomInt getResultCount() {
+		return resCount;
+	}
+
+	public int getXpReward() {
+		return xpReward;
+	}
+
+	public int getMaxUses() {
+		return maxUses;
+	}
+
+	public int getRequiredLevel() {
+		return requiredLevel;
+	}
+
+	public boolean shouldMapBToResult() {
+		return mapBToResult;
+	}
+
+	public boolean shouldLinkBCountToResult() {
+		return linkBCountToResult;
+	}
+
+	public boolean shouldHaveB() {
+		return hasB;
+	}
+
 }

@@ -34,7 +34,7 @@ public class NFFNearestUnfriendlyMobTargetGoal extends NFFTargetGoal
 	 * targeted.
 	 */
 	protected TargetingConditions targetConditions;
-	/** Attacker state filter. It will try targeting only when the attack fulfills this check. */
+	/** Attacker state filter. It will try targeting only when the attacker meets this condition. */
 	protected Predicate<INFFTamed> stateConditions = m -> true;
 
 	public NFFNearestUnfriendlyMobTargetGoal(INFFTamed mob, boolean mustSee)
