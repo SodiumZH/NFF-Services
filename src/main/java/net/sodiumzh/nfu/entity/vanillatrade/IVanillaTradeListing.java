@@ -32,4 +32,10 @@ public interface IVanillaTradeListing extends VillagerTrades.ItemListing
 	 * Check if the listing is valid i.e. can provide a valid {@code MerchantOffer}.
 	 */
 	public boolean isValid();
+
+	/**
+	 * Default required level. This will be used when omitting the level parameter
+	 * on adding to the listing collection.
+	 */
+	public int getDefaultRequiredLevel();
 }

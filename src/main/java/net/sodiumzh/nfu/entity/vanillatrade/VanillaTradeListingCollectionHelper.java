@@ -18,14 +18,17 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nfu.NFULibrary;
 import net.sodiumzh.nfu.container.Tuple3;
+import net.sodiumzh.nfu.container.Tuple4;
 import net.sodiumzh.nfu.registry.NFUConfigs;
 import net.sodiumzh.nfu.registry.NFURegistries;
+import net.sodiumzh.nfu.util.NFUDataStatics;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.OpenOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +145,7 @@ public class VanillaTradeListingCollectionHelper {
 
     public VanillaTradeListingCollectionHelper addListing(VanillaTradeListing listing)
     {
-        return this.addListing(this.level, listing);
+        return this.addListing(listing.getDefaultRequiredLevel(), listing);
     }
 
     public VanillaTradeListingCollectionHelper attach(VanillaTradeListingCollection<? extends VanillaTradeListing> other)
@@ -448,10 +451,10 @@ public class VanillaTradeListingCollectionHelper {
         return this;
     }
 
-    /**
+    /*
      * A wrapped data reading option that should read an extra optional {@code "currency"} field and temporarily set currency.
      */
-    private Consumer<JsonObject> withCurrencyAndLevelOption(Consumer<JsonObject> action) {
+    /*private Consumer<JsonObject> withCurrencyAndLevelOption(Consumer<JsonObject> action) {
         return (JsonObject jo) ->
         {
             boolean withCurrency = jo.has("currency");
@@ -477,21 +480,27 @@ public class VanillaTradeListingCollectionHelper {
             if (withLevel)
                 this.setRequiredLevel(oldLevel);
         };
-    }
+    }*/
 
-    private void readSingleJson(JsonElement json, Tuple3<Boolean, Double, ItemStack> defaultSettings, boolean debug)
-    {
+    /**
+     * Read and add entries from a single json file.
+     */
+    private void readSingleJson(JsonElement json, Tuple3<Boolean, Double, ItemStack> defaultSettings, boolean debug) {
         try {
-            for (JsonElement element: json.getAsJsonArray())
-            {
+            for (JsonElement element : json.getAsJsonArray()) {
                 try {
-                    // "action" field defines what this entry stands for
+                    // "type" field defines what this entry stands for.
+                    // It was previously called "action", be compatible with the old format
+                    if (!element.isJsonObject()) continue;
                     JsonObject jo = element.getAsJsonObject();
-                    String action = jo.get("action").getAsString();
-                    switch (action)
-                    {
-                        // Setting modifications
-                        case "settings" : {	// Set currency
+                    String type = NFUDataStatics.getOptional(jo, "type", JsonElement::getAsString)
+                        .orElseGet(() -> NFUDataStatics.getOptional(jo, "action", JsonElement::getAsString)
+                            .orElse("settings"));
+
+                    switch (type) {
+
+                        // ===== Case default configurations ===== //
+                        case "settings": {
                             if (jo.has("currency")) {
                                 ItemStack[] item = readItem(jo.get("currency"), false);
                                 if (item.length != 1 || item[0] == null || item[0].isEmpty()) {
@@ -508,87 +517,50 @@ public class VanillaTradeListingCollectionHelper {
                                 this.setRequiredLevel(jo.get("level").getAsInt());
                             break;
                         }
-                        case "reset" : {
+                        case "reset": {
                             this.setCurrency(defaultSettings.c);
                             this.setRandomizationUsesPoisson(defaultSettings.a);
                             this.setPoissonFactor(defaultSettings.b);
                             break;
                         }
-                        case "link": case "attach": {
+                        case "link":
+                        case "attach": {
                             String target = jo.get("target").getAsString();
                             try {
                                 this.attach((VanillaTradeListingCollection<VanillaTradeListing>) NFURegistries
-                                        .VANILLA_TRADE_LISTING_COLLECTIONS.getValue(new ResourceLocation(target)));
+                                    .VANILLA_TRADE_LISTING_COLLECTIONS.getValue(new ResourceLocation(target)));
                             } catch (RuntimeException e) {
                                 e.printStackTrace();
                             }
                             break;
                         }
                         // Trade entry definitions
-                        case "registered": {	// Add an entry from predefined listing in registry
+                        case "registered": {    // Add an entry from predefined listing in registry
                             String key = jo.get("key").getAsString();
-                            if (NFURegistries.VANILLA_TRADE_LISTINGS.containsKey(new ResourceLocation(key)))
-                            {
-                                this.addListing(NFURegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key)));
+                            Optional<Integer> level = NFUDataStatics.getOptionalInt(jo, "level");
+                            if (NFURegistries.VANILLA_TRADE_LISTINGS.containsKey(new ResourceLocation(key))) {
+                                level.ifPresentOrElse(
+                                    lvl -> this.addListing(lvl, NFURegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key))),
+                                    () -> this.addListing(NFURegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key)))
+                                );
                             }
                             break;
                         }
-                        default : {
-                            this.withCurrencyAndLevelOption(jsonObject -> {
-                                switch (action) {
-                                    case "buy": {
-                                        ItemStack[] buys = readItem(jsonObject.get("item"), true);
-                                        int[] price = readAmountRange(jsonObject.get("price"));
-                                        int[] amount = readAmountRange(jsonObject.get("amount"));
-                                        int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
-                                        this.addBuys(buys, amount[0], amount[1], price[0], price[1], maxUses);
-                                        if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
-                                        break;
-                                    }
-                                    case "sell": {
-                                        ItemStack[] sells = readItem(jsonObject.get("item"), true);
-                                        int[] price = readAmountRange(jsonObject.get("price"));
-                                        int[] amount = readAmountRange(jsonObject.get("amount"));
-                                        int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
-                                        this.addSells(price[0], price[1], sells, amount[0], amount[1], maxUses);
-                                        if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
-                                        break;
-                                    }
-                                    case "convert": {
-                                        ItemStack[] from = readItem(jsonObject.get("item"), false);
-                                        ItemStack[] to = readItem(jsonObject.get("result"), false);
-                                        int[] price = readAmountRange(jsonObject.get("price"));
-                                        int[] amount = readAmountRange(jsonObject.get("amount"));
-                                        int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
-                                        this.addConverts(price[0], price[1], from[0], to[0], amount[0], amount[1], maxUses);
-                                        if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
-                                        break;
-                                    }
-                                    case "enchantmentBook": {
-                                        int[] price = readAmountRange(jsonObject.get("price"));
-                                        var enchantment = readEnchantment(jsonObject.get("enchantment"));
-                                        int maxUses = jsonObject.has("maxUses") ? jsonObject.get("maxUses").getAsInt() : 12;
-                                        if (enchantment != null) {
-                                            this.addEnchantsBook(price[0], price[1], enchantment.getA(), enchantment.getB(), maxUses);
-                                            if (jsonObject.has("weight")) this.weight(jsonObject.get("weight").getAsDouble());
-                                        }
-                                        break;
-                                    }
-                                    default: break;
-                                }
-                            }).accept(jo);
-                            break;
+                        // ===== Case entry reading ===== //
+                        default: {
+                            readListing(jo, this.getCurrency(), this.usesPoisson(), this.getPoissonFactor(), this.level)
+                                .ifPresent(this::addListing);
                         }
-
                     }
-                } catch (Exception | NoSuchMethodError | NoSuchFieldError e) {
+                } catch(Exception | NoSuchMethodError | NoSuchFieldError e){
                     if (debug) e.printStackTrace();
                 }
             }
-        } catch (Exception e){
+        } catch(Exception e){
             if (debug) e.printStackTrace();
         }
     }
+
 
     /**
      * Read ItemStack info from a JsonElement. Supports 3 formats: Primitive - {@link Item} key;
@@ -598,7 +570,7 @@ public class VanillaTradeListingCollectionHelper {
      * @param allowsArray Whether allows array format. If false, it will always output {@code ItemStack[1]}.
      * @return
      */
-    private static ItemStack[]  readItem(JsonElement element, boolean allowsArray) {
+    public static ItemStack[] readItem(JsonElement element, boolean allowsArray) {
         try {
             // Case of a single item type
             if (element.isJsonPrimitive()) {
@@ -639,7 +611,7 @@ public class VanillaTradeListingCollectionHelper {
         }
     }
 
-    private static int[] readAmountRange(JsonElement element) {
+    public static int[] readAmountRange(JsonElement element) {
         if (element == null)
             return new int[]{1, 1};
 
@@ -659,19 +631,109 @@ public class VanillaTradeListingCollectionHelper {
     }
 
     @Nullable
-    private static Tuple<Enchantment, Integer> readEnchantment(JsonElement element)
+    public static Tuple<Enchantment, Integer> readEnchantment(JsonElement element)
     {
         if (element == null) return null;
         if (element.isJsonObject())
         {
-            Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(element.getAsJsonObject().get("key").getAsString()));
+            Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(
+                NFUDataStatics.getOptionalString(element.getAsJsonObject(), "id").orElseGet(() ->
+                    NFUDataStatics.getOptionalString(element.getAsJsonObject(), "key").orElse("minecraft:none"))));
             if (e == null) return null;
             int lv = element.getAsJsonObject().has("level") ?
                     element.getAsJsonObject().get("level").getAsInt() : e.getMaxLevel();
             return new Tuple<>(e, lv);
+        } else if (element.isJsonPrimitive()) {
+            Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(element.getAsString()));
+            if (e == null) return null;
+            return new Tuple<>(e, e.getMaxLevel());
         }
         else throw new JsonParseException("invalid enchantment");
     }
+
+    /**
+     * Utility. Static reading a single listing without context parameters.
+     */
+    public static Optional<VanillaTradeListing> readListing(
+        JsonObject from,
+        @Nullable ItemStack defaultCurrency,
+        boolean defaultUsesPoisson,
+        double defaultPoissonP,
+        int defaultRequiredLevel)
+    {
+        ItemStack currency = (defaultCurrency != null && !defaultCurrency.isEmpty()) ?
+            defaultCurrency : Items.EMERALD.getDefaultInstance();
+        try {
+            ItemStack[] currencyArray = NFUDataStatics.getOptional(from, "currency", e -> readItem(e, false))
+                .orElse(new ItemStack[]{currency});
+            if (currencyArray.length != 1 || currencyArray[0] == null || currencyArray[0].isEmpty()) {
+                LogUtils.getLogger().error("VanillaTradeRegistry#readData set currency failed: missing or duplicate item. Set to Emerald.");
+            } else {
+                currency = currencyArray[0];
+            }
+        } catch (RuntimeException ignore) {
+        }
+        String type = NFUDataStatics.getOptionalString(from, "type").orElseGet(() ->
+            NFUDataStatics.getOptionalString(from, "action").orElse(null));
+        if (type == null) return Optional.empty();
+        boolean poisson = NFUDataStatics.getOptional(from, "poisson", JsonElement::getAsBoolean).orElse(defaultUsesPoisson);
+        double p = NFUDataStatics.getOptionalDouble(from, "p").orElse(defaultPoissonP);
+        int level = NFUDataStatics.getOptionalInt(from, "level").orElse(defaultRequiredLevel);
+        int maxUses = NFUDataStatics.getOptionalInt(from, "maxUses").orElse(12);
+        double weight = NFUDataStatics.getOptionalDouble(from, "weight").orElse(1d);
+        VanillaTradeListing res = null;
+        switch (type) {
+            case "buy": {
+                ItemStack[] buys = readItem(from.get("item"), true);
+                int[] price = readAmountRange(from.get("price"));
+                int[] amount = readAmountRange(from.get("amount"));
+                res = VanillaTradeListing.invalidWithAmounts(amount[0], amount[1], price[0], price[1])
+                    .addA(buys)
+                    .addResult(currency);
+                break;
+            }
+            case "sell": {
+                ItemStack[] sells = readItem(from.get("item"), true);
+                int[] price = readAmountRange(from.get("price"));
+                int[] amount = readAmountRange(from.get("amount"));
+                res = VanillaTradeListing.invalidWithAmounts(price[0], price[1], amount[0], amount[1])
+                    .addA(currency)
+                    .addResult(sells);
+                break;
+            }
+            case "convert": {
+                ItemStack[] convFrom = readItem(from.get("item"), false);
+                ItemStack[] to = readItem(from.get("result"), false);
+                int[] price = readAmountRange(from.get("price"));
+                int[] amount = readAmountRange(from.get("amount"));
+                res = VanillaTradeListing.converts(currency, price[0], price[1], convFrom[0], to[0],
+                    amount[0], amount[1]);
+                break;
+            }
+            case "enchantmentBook": {
+                int[] price = readAmountRange(from.get("price"));
+                var enchantment = readEnchantment(from.get("enchantment"));
+                if (enchantment != null) {
+                    res = new VanillaTradeListingEnchanted(enchantment.getA(), enchantment.getB())
+                        .setEnchantsBook()
+                        .addA(currency)
+                        .setACountRange(price[0], price[1]);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        // Finalize and reset the helper params
+        if (res == null) return Optional.empty();
+        res.setMaxUses(maxUses);
+        res.setSelectionWeight(weight);
+        res.setDefaultRequiredLevel(level);
+        if (poisson)
+            res.setAllPoisson(p);
+        return Optional.of(res);
+    }
+
 
     @Nonnull
     private static ItemStack getNonnullInstance(@Nullable Item item)
