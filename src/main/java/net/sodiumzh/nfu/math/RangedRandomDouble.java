@@ -78,6 +78,10 @@ public class RangedRandomDouble implements Supplier<Double> {
         return new RangedRandomDouble(min, max, 1, RangedRandomDouble.RandomizationType.UNIFORM);
     }
 
+    public RangedRandomDouble copy() {
+        return new RangedRandomDouble(this.minValue, this.maxValue, this.concFactor, this.rndType);
+    }
+
     public RangedRandomDouble setUniform()
     {
         return new RangedRandomDouble(this.minValue, this.maxValue, this.concFactor, RangedRandomDouble.RandomizationType.UNIFORM);

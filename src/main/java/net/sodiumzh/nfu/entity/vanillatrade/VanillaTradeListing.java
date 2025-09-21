@@ -29,14 +29,34 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	protected int maxUses = 12;
 	protected float priceMultiplier = 0f;
 	protected int demand = 0;
-	protected int requiredLevel = 1;
 	protected double selectionWeight = 1.0d;	// Higher meaning higher probability of being picked in a set of listings.
 	protected boolean mapBToResult = false;	// If true, a given B will always get the corresponding result with the same array index.
 	protected boolean linkBCountToResult = false;	// If true, the count of B is always same to the result.
 	protected boolean hasB = false;		// To indicate whether this listing is expected to have B. If it's true but the B is missing, it will be counted as invalid.
-	
+	protected int defaultRequiredLevel = 1;
+
 	protected VanillaTradeListing() {}
-	
+
+	public VanillaTradeListing copy() {
+		VanillaTradeListing res = new VanillaTradeListing();
+		res.baseCostA = new ArrayList<>(this.baseCostA);
+		res.aCount = this.aCount.copy();
+		res.costB = new ArrayList<>(this.costB);
+		res.bCount = this.bCount.copy();
+		res.result = new ArrayList<>(this.result);
+		res.resCount = this.resCount.copy();
+		res.xpReward = this.xpReward;
+		res.maxUses = this.maxUses;
+		res.priceMultiplier = this.priceMultiplier;
+		res.demand = this.demand;
+		res.selectionWeight = this.selectionWeight;
+		res.mapBToResult = this.mapBToResult;
+		res.linkBCountToResult = this.linkBCountToResult;
+		res.hasB = this.hasB;
+		res.defaultRequiredLevel = this.defaultRequiredLevel;
+		return res;
+	}
+
 	/**
 	 * Create an invalid instance. You must add costA and result manually.
 	 */
@@ -326,13 +346,13 @@ public class VanillaTradeListing implements IVanillaTradeListing
 		this.xpReward = val;
 		return this;
 	}
-	
+
 	/**
 	 * Set the required Merchant level to enable the offer.
 	 */
-	public VanillaTradeListing setRequiredLevel(int val)
+	public VanillaTradeListing setDefaultRequiredLevel(int val)
 	{
-		this.requiredLevel = Math.max(1, val);
+		this.defaultRequiredLevel = Math.max(1, val);
 		return this;
 	}
 	
@@ -478,7 +498,7 @@ public class VanillaTradeListing implements IVanillaTradeListing
 	{
 		return VanillaTradeListing.createInvalid().setACountRange(costAMin, costAMax).setResultCountRange(resultMin, resultMax);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -505,8 +525,8 @@ public class VanillaTradeListing implements IVanillaTradeListing
 			res = res + this.result.get(0).getItem().toString();
 		else res = res +  this.result.stream().map(ItemStack::getItem).toList().toString();
 		res = res + ", countResult = " + this.resCount.toString();
-		
-		res = res + String.format(", requiredLevel = %d, maxUses = %d", this.requiredLevel, this.maxUses);
+
+		res = res + String.format(", defaultRequiredLevel = %d, maxUses = %d", this.defaultRequiredLevel, this.maxUses);
 		if (this.mapBToResult) res = res + ", mapBToResult";
 		if (this.linkBCountToResult) res = res + ", linkBCountToResult";
 		if (this.xpReward != 0) res = res + String.format(", xpReward = %d", this.xpReward);
@@ -561,8 +581,8 @@ public class VanillaTradeListing implements IVanillaTradeListing
 		return maxUses;
 	}
 
-	public int getRequiredLevel() {
-		return requiredLevel;
+	public int getDefaultRequiredLevel() {
+		return defaultRequiredLevel;
 	}
 
 	public boolean shouldMapBToResult() {

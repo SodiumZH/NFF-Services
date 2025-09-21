@@ -75,6 +75,10 @@ public class RangedRandomInt implements Supplier<Integer>
         return new RangedRandomInt(min, max, 0.5, RandomizationType.UNIFORM);
     }
 
+    public RangedRandomInt copy() {
+        return new RangedRandomInt(this.minValue, this.maxValue, this.p, this.rndType);
+    }
+
     public RangedRandomInt setUniform()
     {
         return new RangedRandomInt(this.minValue, this.maxValue, this.p, RandomizationType.UNIFORM);
