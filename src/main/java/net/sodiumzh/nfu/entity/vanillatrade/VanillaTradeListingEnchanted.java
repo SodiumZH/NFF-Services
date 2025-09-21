@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.sodiumzh.nfu.container.Tuple2;
+import net.sodiumzh.nfu.math.RangedRandomInt;
 
 import java.util.List;
 
@@ -42,8 +43,10 @@ public class VanillaTradeListingEnchanted extends VanillaTradeListing
 		this.hasB = true;
 		this.costB.clear();
 		this.costB.add(new ItemStack(Items.BOOK, 1));
+		this.bCount = RangedRandomInt.fixed(1);
 		this.result.clear();
 		this.result.add(new ItemStack(Items.ENCHANTED_BOOK, 1));
+		this.resCount = RangedRandomInt.fixed(1);
 		return this;
 	}
 

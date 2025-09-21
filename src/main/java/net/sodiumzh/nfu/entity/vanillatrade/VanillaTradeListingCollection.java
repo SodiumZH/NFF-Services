@@ -63,14 +63,23 @@ public class VanillaTradeListingCollection<T extends IVanillaTradeListing> imple
 			table.put(merchantLevel, t);
 		return this;
 	}
-	
+
+	public VanillaTradeListingCollection<T> add(T t) {
+		return add(t.getDefaultRequiredLevel(), t);
+	}
+
 	public VanillaTradeListingCollection<T> addAll(Multimap<Integer, T> c)
 	{
         c.entries().stream().filter(entry -> entry.getValue().isValid())
 				.forEach(entry -> table.put(entry.getKey(), entry.getValue()));
 		return this;
 	}
-	
+
+	public VanillaTradeListingCollection<T> addAll(Collection<? extends T> c) {
+		c.forEach(entry -> table.put(entry.getDefaultRequiredLevel(), entry));
+		return this;
+	}
+
 	public VanillaTradeListingCollection<T> attach(Multimap<Integer, T> other)
 	{
 		table.attach(other);
