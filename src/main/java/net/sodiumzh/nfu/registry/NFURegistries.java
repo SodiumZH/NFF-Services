@@ -50,7 +50,7 @@ public class NFURegistries {
         new NFURegistry<>(new ResourceLocation(NFULibrary.MOD_ID, "predicates"));
 
     /**
-     * Registry for trade listing  (from vanilla trade system). A trade listing is a generator for providing random trade offers
+     * Registry for trade listing (from vanilla trade system). A trade listing is a generator for providing random trade offers
      * for mobs.
      */
     public static final NFURegistry<VanillaTradeListing> VANILLA_TRADE_LISTINGS =
@@ -61,10 +61,10 @@ public class NFURegistries {
 
     public static final NFURegistry<VanillaTradeListingCollection<?>> VANILLA_TRADE_LISTING_COLLECTIONS =
             new NFURegistry<VanillaTradeListingCollection<?>>(new ResourceLocation(NFULibrary.MOD_ID, "vanilla_trade_listing_collections"))
-                    .setShouldGenerateOnServerSetup()
-                    .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
-                    .setSide(NFURegistry.AvailableSide.SERVER)
-                    .setLoadAfter(VANILLA_TRADE_LISTINGS);
+                .setShouldGenerateOnServerSetup()
+                .setUnavailableBefore(NFURegistry.SetupPhase.SERVER_SETUP)
+                .setSide(NFURegistry.AvailableSide.SERVER)
+                .setLoadAfter(VANILLA_TRADE_LISTINGS);
 
     /**
      * Registry for trade registries (from vanilla trade system). A trade registry is a set of trade collections.

@@ -42,7 +42,10 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
     private int generateOnSetupPhase = 0;   // 0 = common setup: 1 = server setup; 2 = client setup
     private SetupPhase[] unavailableBefore = new SetupPhase[]{};
     private AvailableSide availableSide = AvailableSide.BOTH;
-    private final List<NFURegistry<?>> shouldLoadAfter = new ArrayList<>();
+    /**
+     * Indicates this registry should be loaded before the listed registries.
+     */
+    private final List<NFURegistry<?>> shouldLoadBefore = new ArrayList<>();
 
     /**
      * @param registryKey Key of this registry in the table of all registries.
@@ -281,13 +284,16 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
         return this;
     }
 
-    public NFURegistry<T> setLoadAfter(NFURegistry<?>... registries) {
+    /**
+     * Set that this registry should be loaded before the following registries.
+     */
+    public NFURegistry<T> setLoadBefore(NFURegistry<?>... registries) {
         for (NFURegistry<?> reg: registries) {
-            this.shouldLoadAfter.add(reg);
+            this.shouldLoadBefore.add(reg);
             // Detect cycle
             List<NFURegistry<?>> cycle = this.getCycle();
             if (cycle != null) {
-                this.shouldLoadAfter.remove(reg);
+                this.shouldLoadBefore.remove(reg);
                 StringBuilder cycleInfo = new StringBuilder(cycle.get(0).getKeyOfRegistry().toString());
                 for (int i = 1; i < cycle.size(); ++i)
                     cycleInfo.append(" -> ").append(cycle.get(i).getKeyOfRegistry().toString());
@@ -298,13 +304,30 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
         return this;
     }
 
-    public boolean shouldLoadAfter(NFURegistry<?> other) {
-        return this.shouldLoadAfter.contains(other) && !other.shouldLoadAfter.contains(this);
+    /**
+     * Set that this registry should be loaded after the following registries.
+     */
+    public NFURegistry<T> setLoadAfter(NFURegistry<?>... registries) {
+        for (NFURegistry<?> reg: registries) {
+            reg.setLoadBefore(this);
+        }
+        return this;
     }
 
+    public boolean shouldLoadBefore(NFURegistry<?> other) {
+        return this.shouldLoadBefore.contains(other) && !other.shouldLoadBefore.contains(this);
+    }
+
+    public boolean shouldLoadAfter(NFURegistry<?> other) {
+        return !this.shouldLoadBefore.contains(other) && other.shouldLoadBefore.contains(this);
+    }
+
+    /**
+     * @return Registries that should be loaded after this registry.
+     */
     @Override
     public Set<NFURegistry<?>> children() {
-        return REGISTRIES.values().stream().filter(reg -> reg.shouldLoadAfter(this)).collect(Collectors.toSet());
+        return Set.copyOf(this.shouldLoadBefore);
     }
 
     static class Entry<T>
@@ -397,27 +420,12 @@ public class NFURegistry<T> implements DirectedGraphNode<NFURegistry<?>>
         SERVER, CLIENT, BOTH
     }
 
-    // This sorting is slow, but it's ok as it will be only called once on generating values
     public static List<NFURegistry<?>> sortByLoadingOrder(Collection<NFURegistry<?>> raw) {
-        List<NFURegistry<?>> sort = new ArrayList<>(raw);
-        start:
-        while (true) {
-            for (int i = 0; i < sort.size(); ++i) {
-                for (int j = i + 1; j < sort.size(); ++j) {
-                    if (sort.get(i).shouldLoadAfter(sort.get(j)))
-                    {
-                        NFURegistry<?> temp = sort.get(i);
-                        sort.set(i, sort.get(j));
-                        sort.set(j, temp);
-                        continue start;
-                    }
-                }
-            }
-            return sort;
-        }
+        return DirectedGraphNode.sortByOccurrenceOrder(raw);
     }
 
     /**
+     * NYI
      * Indicates how it should handle sync. This record should exist on both sides no matter on which side
      * the registry is available.
      * @param shouldSync If true, it will sync the data to another side.
