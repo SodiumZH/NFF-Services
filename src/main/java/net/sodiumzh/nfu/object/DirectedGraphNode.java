@@ -1,13 +1,12 @@
 package net.sodiumzh.nfu.object;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Indicates the class is a node of some directed graph, i.e. keeping a set of other instances of the same class ("children nodes").
+ * Indicates the class is a node of some directed graph,
+ * i.e. keeping a set of other instances of the same class ("children nodes").
  */
 public interface DirectedGraphNode<T extends DirectedGraphNode<T>> {
 
@@ -59,13 +58,14 @@ public interface DirectedGraphNode<T extends DirectedGraphNode<T>> {
     }
 
     /**
-     * Check if the input node is in the downstream of this node, i.e. there's a path from this node to the test node.
-     * <p>Note: this node is NOT regarded as in the downstream.
+     * Check if this node is in the upstream of the input node, i.e. there's a path from this node to the test node.
+     * <p>Note: this node is NOT regarded as in the upstream.
      */
-    public default boolean isDownstreamNode(T test) {
+    public default boolean isUpstreamNodeOf(T test) {
+        if (test == self()) return false;
         Set<T> scannedNodes = new HashSet<>();
         scannedNodes.add(self());
-        Set<T> next = this.children();
+        Set<T> next = new HashSet<>(this.children());
         while (!next.isEmpty()) {
             if (next.contains(test)) return true;
             next.removeIf(scannedNodes::contains);  // Break cycle
@@ -78,11 +78,46 @@ public interface DirectedGraphNode<T extends DirectedGraphNode<T>> {
     }
 
     /**
-     * Check if the input node is in the upstream of this node, i.e. there's a path from the test node to this node.
+     * Check if this node is in the downstream of the test node, i.e. there's a path from the test node to this node.
      * <p>Note: this node is NOT regarded as in the upstream.
      */
+    public default boolean isDownstreamNodeOf(T test) {
+        return test.isUpstreamNodeOf(self());
+    }
+
+    /**
+     * Check if the input node is in the downstream of this node, i.e. there's a path from this node to the test node.
+     * <p>Note: this node is NOT regarded as in the downstream.
+     * @Deprecated The method name is confusing. Use {@code isUpstreamNodeOf} instead.
+     */
+    @Deprecated
+    public default boolean isDownstreamNode(T test) {
+        return this.isUpstreamNodeOf(test);
+    }
+
+    /**
+     * Check if the input node is in the upstream of this node, i.e. there's a path from the test node to this node.
+     * <p>Note: this node is NOT regarded as in the upstream.
+     * @Deprecated The method name is confusing. Use {@code isDownstreamNodeOf} instead.
+     */
+    @Deprecated
     public default boolean isUpstreamNode(T test) {
         return test.isDownstreamNode(self());
     }
+
+    /**
+     * Sort an unordered node collection to ensure that any node will appear before all its downstream nodes,
+     * and after all its upstream nodes. For nodes not having upstream/downstream relationships, the order is
+     * not specified.
+     */
+    public static <T extends DirectedGraphNode<T>> List<T> sortByOccurrenceOrder(Collection<T> nodes)
+    {
+        return nodes.stream().sorted(Comparator.comparing(n -> n, (n1, n2) -> {
+            if (n1.isUpstreamNodeOf(n2.self())) return -1;
+            else if (n2.isDownstreamNodeOf(n1.self())) return 1;
+            else return 0;
+        })).collect(Collectors.toList());
+    }
+
 
 }
