@@ -538,14 +538,16 @@ public class VanillaTradeListingCollectionHelper {
                             break;
                         }
                         // Trade entry definitions
-                        case "registered": {    // Add an entry from predefined listing in registry
+                        case "registered": case "registry": case "entry": {    // Add an entry from predefined listing in registry
                             String key = jo.get("key").getAsString();
                             Optional<Integer> level = NFUDataStatics.getOptionalInt(jo, "level");
+                            Optional<Double> weight = NFUDataStatics.getOptionalDouble(jo, "weight");
                             if (NFURegistries.VANILLA_TRADE_LISTINGS.containsKey(new ResourceLocation(key))) {
                                 level.ifPresentOrElse(
                                     lvl -> this.addListing(lvl, NFURegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key))),
                                     () -> this.addListing(NFURegistries.VANILLA_TRADE_LISTINGS.getValue(new ResourceLocation(key)))
                                 );
+                                weight.ifPresent(this::weight);
                             }
                             break;
                         }
