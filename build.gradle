@@ -184,9 +184,6 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 	implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.1"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
-        jarJar.ranged(it, "[${mixinextras_min_version},)")
-    }
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
