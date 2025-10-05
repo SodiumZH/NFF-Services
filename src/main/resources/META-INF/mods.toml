@@ -11,7 +11,7 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services"
 #logoFile="examplemod.png" #optional
 #credits="SodiumZH" #optional
 authors="${nff_authors}" #optional
-description="${nfu_description}"
+description="${nff_description}"
 
 [[dependencies.${nff_mod_id}]] #optional
     modId="forge" #mandatory
@@ -28,7 +28,7 @@ description="${nfu_description}"
     side="BOTH"
 
 [[dependencies.${nff_mod_id}]]
-    modId="${nfu_mod_id}"
+    modId="nfulib"
     mandatory=true
     versionRange="${nfu_version_range}"
     ordering="NONE"
