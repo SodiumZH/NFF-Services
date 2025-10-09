@@ -580,10 +580,10 @@ public interface INFFTamed extends ContainerListener, OwnableEntity  {
 		{
 			return InteractionResult.PASS;
 		}
-		MobApplicableItemTable.Output output = table.getOutput(this.asMob(), stack);
+		MobApplicableItemTable.Outcome output = table.getOutcome(this.asMob(), stack).orElse(null);
 		if (output != null)
 		{
-			return applyHealingItem(stack, output.amount().floatValue(), !output.noConsume(), output.cooldown(), player) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+			return applyHealingItem(stack, (float)(output.amount()), !output.noConsume(), output.cooldown(), player) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 		}
 		return InteractionResult.PASS;
 	}
