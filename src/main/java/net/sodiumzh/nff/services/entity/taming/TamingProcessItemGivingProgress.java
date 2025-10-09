@@ -149,7 +149,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	private boolean isItemAcceptableInternal(ItemStack item, Player player, Mob mob)
 	{
 		return Optional.ofNullable(this.getItemGivingTableOverride())
-				.map(table -> (table.get().getOutput(mob, item) != null))
+				.map(table -> (table.get().getOutcome(mob, item).isPresent()))
 				.orElseGet(() -> this.isItemAcceptable(item));
 	}
 
@@ -157,7 +157,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 		var table = this.getItemGivingTableOverride();
 		if (table != null)
 		{
-			var output = table.get().getOutput(mob, item);
+			var output = table.get().getOutcome(mob, item).orElse(null);
 			return output != null ? output.amount() : 0d;
 		}
 		else return this.getProgressToAdd(item, player, mob, oldProc);
@@ -304,7 +304,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (this.getItemGivingTableOverride() != null && this.getItemGivingTableOverride().get() != null)
 		{
-			var output = this.getItemGivingTableOverride().get().getOutputGetter(mob, itemstack);
+			var output = this.getItemGivingTableOverride().get().getOutcomeProvider(mob, itemstack).orElse(null);
 			if (output != null)
 				return !output.isNoConsume();
 			else return true;
