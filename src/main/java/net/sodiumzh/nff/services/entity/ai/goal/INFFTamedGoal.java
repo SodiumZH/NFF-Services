@@ -1,22 +1,66 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.annotation.DontOverride;
 
+import javax.annotation.Nullable;
+import java.util.function.Predicate;
+
 public interface INFFTamedGoal
 {
+	/**
+	 * Check if an AI state is allowed for this goal.
+	 */
 	public boolean isStateAllowed();
+
+	/**
+	 * Set this goal is allowed for the given AI state.
+	 */
 	public INFFTamedGoal allowState(NFFTamedMobAIState state);
+
+	/**
+	 * Set this goal is disabled for the given AI state.
+	 */
 	public INFFTamedGoal excludeState(NFFTamedMobAIState state);
+
+	/**
+	 * Set this goal is allowed for all AI states.
+	 */
 	public INFFTamedGoal allowAllStates();
+
+	/**
+	 * Set this goal is allowed for all AI states except {@link NFFTamedMobAIState#WAIT}.
+	 */
 	public INFFTamedGoal allowAllStatesExceptWait();
+
+	/**
+	 * Remove all allowed AI states.
+	 */
 	public void disallowAllStates();
-	public INFFTamedGoal block();	
-	public INFFTamedGoal unblock();	
+
+	/**
+	 * Temporarily disable this goal.
+	 */
+	public INFFTamedGoal block();
+
+	/**
+	 * Resume this goal from temporary disabling.
+	 */
+	public INFFTamedGoal unblock();
+
+	/**
+	 * Get the corresponding mob this goal is controlling.
+	 */
 	public INFFTamed getMob();
+
+	/**
+	 * Check if this goal is disabled by any way, either AI state restriction or temporary disabling.
+	 */
 	public boolean isDisabled();
+
 	/**
 	 * @return this cast to Goal.
 	 */

@@ -83,22 +83,19 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 
 	@Override
 	public INFFTamedGoal allowState(NFFTamedMobAIState state) {
-		if (!allowedStates.contains(state))
-			allowedStates.add(state);
+		allowedStates.add(state);
 		return this;
 	}
 
 	@Override
 	public INFFTamedGoal excludeState(NFFTamedMobAIState state) {
-		if (allowedStates.contains(state))
-			allowedStates.remove(state);
+		allowedStates.remove(state);
 		return this;
 	}
 
 	@Override
 	public INFFTamedGoal allowAllStates() {
-		for (NFFTamedMobAIState state : NFFTamedMobAIState.getAllStates())
-			allowedStates.add(state);
+		allowedStates.addAll(NFFTamedMobAIState.getAllStates());
 		return this;
 	}
 
@@ -159,10 +156,9 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 	public final boolean canUse() 
 	{
 		// Detect if checkCanUse() calling canUse() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanUse"))
-			throw new RuntimeException("Illegal method call: checkCanUse() method cannot call canUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanUse().");
-		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("checkCanUse"))))
+			throw new RuntimeException("Illegal method call: checkCanUse() method cannot call canUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanUse().");		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
 		if (startCondition != null && !startCondition.test(this))
 			return false;
@@ -185,8 +181,8 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 	public final boolean canContinueToUse()
 	{
 		// Detect if checkCanContinueToUse() calling canContinueToUse() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanContinueToUse"))
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("checkCanContinueToUse"))))
 			throw new RuntimeException("Illegal method call: checkCanContinueToUse() method cannot call canContinueToUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanContinueToUse().");
 		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
 			return false;
@@ -213,10 +209,10 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 	@Override
 	public final void start()
 	{
-		// Detect if onStart() calling super.start() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStart"))
-			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStart().");
+		// Detect if onStart() calling start() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onStart"))))
+			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' check, call onStart().");
 		this.expireTimer = 0;
 		this.onStart();
 	}
@@ -228,10 +224,10 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 	@Override
 	public final void tick()
 	{
-		// Detect if onTick() calling super.tick() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onTick"))
-			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' tick, call onTick().");
+		// Detect if onTick() calling tick() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onTick"))))
+			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' check, call onTick().");
 		if (this.expireTicks > 0)
 		{
 			if (this.noExpireCondition.get())
@@ -249,10 +245,10 @@ public abstract class NFFTargetGoal extends TargetGoal implements INFFTamedGoal
 	@Override
 	public final void stop()
 	{
-		// Detect if onStart() calling super.start() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStop"))
-			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStop().");
+		// Detect if onStop() calling stop() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onStop"))))
+			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' check, call onStop().");
 		if (this.expireTicks > 0)
 		{
 			if (this.noExpireCondition.get())

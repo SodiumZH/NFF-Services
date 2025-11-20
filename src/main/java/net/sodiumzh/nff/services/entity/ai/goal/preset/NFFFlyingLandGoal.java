@@ -2,22 +2,29 @@ package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.sodiumzh.nfu.util.NFULevelStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.util.NFULevelStatics;
+
+import java.util.EnumSet;
 
 public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 {
 
+	protected double heightOffset = 0d;
+
 	public NFFFlyingLandGoal(INFFTamed mob, double speed)
 	{
 		super(mob, speed);
+		this.setFlags(EnumSet.of(Flag.MOVE));
 		this.disallowAllStates();
 		this.allowState(WAIT);
 	}
 
 	public NFFFlyingLandGoal(INFFTamed mob)
 	{
-		this(mob, 0.25d);
+		this(mob, 1.0d);
 	}
 	
 	@Override
@@ -37,7 +44,7 @@ public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 	@Override
 	public void onTick()
 	{
-		if (!mob.isOwnerPresent())
+		if (!mob.isOwnerInDimension())
 			return;	// Prevent potential nullptr crash
 		if (mob.asMob().getMoveControl().hasWanted())
 			return;
@@ -47,7 +54,15 @@ public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 		while (mob.asMob().level.getBlockState(pos).isAir() && pos.getY() >= mob.asMob().level.getMinBuildHeight())
 			pos = pos.below();
 		pos = pos.above();
-		mob.asMob().getMoveControl().setWantedPosition(pos.getX(), pos.getY(), pos.getZ(), speed);
+		this.flyTo(pos.getCenter().add(0d, heightOffset, 0d), this.getSpeedModifier());
 	}
-	
+
+	public double getHeightOffset() {
+		return heightOffset;
+	}
+
+	public NFFFlyingLandGoal setHeightOffset(double heightOffset) {
+		this.heightOffset = heightOffset;
+		return this;
+	}
 }

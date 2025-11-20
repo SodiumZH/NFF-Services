@@ -24,13 +24,17 @@ import java.util.Random;
 
 public abstract class NFFAmphibiousGoals {
 
-	public static class GoToWaterGoal extends NFFGoal {
+	public static class GoToWaterGoal extends NFFGoal implements INFFPathfindingGoal {
 		private double wantedX;
 		private double wantedY;
 		private double wantedZ;
 		private final double speedModifier;
 		private final Level level;
 
+		@Override
+		public PathfinderMob getPathfinder() {
+			return (PathfinderMob) (this.mob.asMob());
+		}
 
 		public GoToWaterGoal(INFFTamed pMob, double pSpeedModifier) {
 			super(pMob);
@@ -98,7 +102,7 @@ public abstract class NFFAmphibiousGoals {
 		}
 	}
 
-	public static class GoToBeachGoal extends NFFMoveToBlockGoal {
+	public static class GoToBeachGoal extends NFFMoveToBlockGoal implements INFFPathfindingGoal {
 		protected final INFFTamedAmphibious amph;
 		protected final PathfinderMob pathfinder;
 
@@ -106,6 +110,11 @@ public abstract class NFFAmphibiousGoals {
 			super(mob, pSpeedModifier, 8, 2);
 			this.amph = (INFFTamedAmphibious) mob;
 			this.pathfinder = (PathfinderMob) mob;
+		}
+
+		@Override
+		public PathfinderMob getPathfinder() {
+			return (PathfinderMob) (this.mob.asMob());
 		}
 
 		/**
@@ -134,9 +143,9 @@ public abstract class NFFAmphibiousGoals {
 		@Override
 		protected boolean isValidTarget(LevelReader pLevel, BlockPos pPos) {
 			BlockPos blockpos = pPos.above();
-			return pLevel.isEmptyBlock(blockpos) && pLevel.isEmptyBlock(blockpos.above())
-					? pLevel.getBlockState(pPos).entityCanStandOn(pLevel, pPos, pathfinder)
-					: false;
+			return pLevel.isEmptyBlock(blockpos)
+				&& pLevel.isEmptyBlock(blockpos.above())
+				&& pLevel.getBlockState(pPos).entityCanStandOn(pLevel, pPos, pathfinder);
 		}
 
 
@@ -161,7 +170,7 @@ public abstract class NFFAmphibiousGoals {
 		}
 	}
 
-	public static class SwimUpGoal extends NFFGoal {
+	public static class SwimUpGoal extends NFFGoal implements INFFPathfindingGoal {
 		protected final INFFTamedAmphibious amph;
 		protected final double speedModifier;
 		protected final int seaLevel;
@@ -172,6 +181,11 @@ public abstract class NFFAmphibiousGoals {
 			this.amph = (INFFTamedAmphibious)mob;
 			this.speedModifier = speedModifier;
 			this.seaLevel = seaLevel;
+		}
+
+		@Override
+		public PathfinderMob getPathfinder() {
+			return (PathfinderMob) (this.mob.asMob());
 		}
 
 		/**
