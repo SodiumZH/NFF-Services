@@ -20,23 +20,22 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 	
 	public NFFFlyingRandomMoveGoal(INFFTamed mob)
 	{
-		this(mob, 0.25D);
+		this(mob, 1.0D);
 	}
 
-	public NFFFlyingRandomMoveGoal(INFFTamed mob, double moveSpeed)
+	public NFFFlyingRandomMoveGoal(INFFTamed mob, double speedModifier)
 	{
-		this(mob, moveSpeed, 6);
+		this(mob, speedModifier, 6);
 	}
 
-	public NFFFlyingRandomMoveGoal(INFFTamed mob, double moveSpeed, int chance)
+	public NFFFlyingRandomMoveGoal(INFFTamed mob, double speedModifier, int chance)
 	{
-		this(mob, moveSpeed, chance, 3, 2);
+		this(mob, speedModifier, chance, 3, 2);
 	}
 	
-	public NFFFlyingRandomMoveGoal(INFFTamed mob, double moveSpeed, int chance, int width, int height)
+	public NFFFlyingRandomMoveGoal(INFFTamed mob, double speedModifier, int chance, int width, int height)
 	{
-		super(mob);
-		this.speed = moveSpeed;
+		super(mob, speedModifier);
 		this.chance = chance;
 		this.width = width;
 		this.height = height;
@@ -141,7 +140,7 @@ public class NFFFlyingRandomMoveGoal extends NFFFlyingMoveGoal
 			
 			if (mob.asMob().level.isEmptyBlock(blockpos1))
 			{
-				mob.asMob().getMoveControl().setWantedPosition(blockpos1.getX() + 0.5D, blockpos1.getY() + 0.5D, blockpos1.getZ() + 0.5D, getActualSpeed());
+				this.flyTo(blockpos1.getX() + 0.5D, blockpos1.getY() + 0.5D, blockpos1.getZ() + 0.5D, this.getSpeedModifier());
 
 				if (mob.asMob().getTarget() == null)
 				{

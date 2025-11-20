@@ -2,6 +2,12 @@ package net.sodiumzh.nff.services.entity.ai.goal;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
+import java.util.function.Predicate;
+
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.level.block.Blocks;
+import net.sodiumzh.nff.services.entity.ai.goal.preset.INFFPathfindingGoal;
+import net.sodiumzh.nfu.util.NFUMathStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
 
@@ -19,13 +25,14 @@ public abstract class NFFMoveGoal extends NFFGoal
 	public Predicate<INFFTamed> shouldAvoidSun = (mob -> false);
 	/** Only for Pathfinder. If true, the mob should have both ground and water navigation, and must implement {@link INFFTamedAmphibious} interface. */
 	public boolean isAmphibious = false;
-	public double speedModifier = 1.0d;
+	protected double speedModifier = 1.0d;
 	public boolean canFly = false;
 	public boolean canSwim = false;
 	public boolean canWalk = true;
 	public boolean canStepOntoLeaves = false;
 	protected boolean isFlying = false;
-	
+	protected boolean usesNavigation;
+
 	/* additional modules */
 	
 	public NFFMoveGoal(INFFTamed mob) {
@@ -35,6 +42,7 @@ public abstract class NFFMoveGoal extends NFFGoal
 	public NFFMoveGoal(INFFTamed mob, double speedModifier) {
 		super(mob);
 		this.speedModifier = speedModifier;
+		this.usesNavigation = (mob.asMob() instanceof PathfinderMob && this instanceof INFFPathfindingGoal);
 	}
 	
 	/* Additional modules */
@@ -59,6 +67,7 @@ public abstract class NFFMoveGoal extends NFFGoal
 	 */
 	public NFFMoveGoal amphibious()
 	{
+		usesNavigation = true;
 		canSwim = true;
 		isAmphibious = true;
 		return this;
@@ -90,14 +99,38 @@ public abstract class NFFMoveGoal extends NFFGoal
 		canFly = true;
 		return this;
 	}
-	
+
+	public double getSpeedModifier() {
+		return speedModifier;
+	}
+
+	/**
+	 * Label whether this goal should use navigation for movement. By default,
+	 * it's true if this goal is {@link INFFPathfindingGoal} and false otherwise.
+	 * <p>Non-pathfinding mobs will never use navigation despite this value, and will
+	 * not cause crash.
+	 */
+	public NFFMoveGoal setSpeedModifier(double speedModifier) {
+		this.speedModifier = speedModifier;
+		return this;
+	}
+
 	/** Only for ground pathfinding, set the mob can step onto leaves. */
 	public NFFMoveGoal canStepOntoLeaves()
 	{
 		canStepOntoLeaves = true;
 		return this;
 	}
-	
+
+	public boolean shouldUseNavigation() {
+		return usesNavigation;
+	}
+
+	public NFFMoveGoal setUsesNavigation(boolean usesNavigation) {
+		this.usesNavigation = usesNavigation;
+		return this;
+	}
+
 	@Override
 	public void onStart()
 	{

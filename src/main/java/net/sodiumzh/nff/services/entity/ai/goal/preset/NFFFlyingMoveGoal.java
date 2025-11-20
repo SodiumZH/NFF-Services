@@ -1,5 +1,6 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.phys.Vec3;
@@ -11,27 +12,33 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
  */
 public abstract class NFFFlyingMoveGoal extends NFFMoveGoal
 {
-	public double speed = 0.25d;
-	
-	
 	public NFFFlyingMoveGoal(INFFTamed mob, double speed)
 	{
-		super(mob);
-		this.speed = speed;
+		super(mob, speed);
 		flyOnly();		
 	}
 	
 	public NFFFlyingMoveGoal(INFFTamed mob)
 	{
-		this(mob, 0.25d);
+		this(mob, 1.0d);
 	}
 
 	public void flyTo(Vec3 targetPos, double speed)
 	{
-		MoveControl control = mob.asMob().getMoveControl();
-		control.setWantedPosition(targetPos.x, targetPos.y, targetPos.z, speed);
+		// Use navigation if pathfinding, otherwise use move control
+		if (mob.asMob() instanceof PathfinderMob pm && this.shouldUseNavigation()) {
+			pm.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, speed);
+		}
+		else {
+			MoveControl control = mob.asMob().getMoveControl();
+			control.setWantedPosition(targetPos.x, targetPos.y, targetPos.z, speed);
+		}
 	}
-	
+
+	public final void flyTo(double x, double y, double z, double speed) {
+		this.flyTo(new Vec3(x, y, z), speed);
+	}
+
 	/* Util */
 		
 	public Vec3 getWantedMovementVector()
@@ -46,17 +53,9 @@ public abstract class NFFFlyingMoveGoal extends NFFMoveGoal
 	
 	public double distSqrToOwner()
 	{
-		if (!mob.isOwnerPresent())
+		if (!mob.isOwnerInDimension())
 			return 0;
-		else return mob.asMob().distanceToSqr(mob.getOwner());
+		else return mob.asMob().distanceToSqr(mob.getOwnerInDimension());
 	}
-	
-	protected double getActualSpeed()
-	{
-		if (mob.asMob().getAttribute(Attributes.FLYING_SPEED) != null)
-			return speed * mob.asMob().getAttributeValue(Attributes.FLYING_SPEED) / mob.asMob().getAttributeBaseValue(Attributes.FLYING_SPEED);
-		else if (mob.asMob().getAttribute(Attributes.MOVEMENT_SPEED) != null)
-			return speed * mob.asMob().getAttributeValue(Attributes.MOVEMENT_SPEED) / mob.asMob().getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
-		else return speed;
-	}
+
 }

@@ -6,6 +6,18 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.sodiumzh.nfu.entity.IMobSpecific;
+import net.sodiumzh.nfu.object.FilteredMapper;
+import net.sodiumzh.nfu.registry.NFUCapabilities;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,7 +44,7 @@ import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUCaps;
+import net.sodiumzh.nfu.registry.NFUCapabilities;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
@@ -55,7 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public interface INFFTamed extends ContainerListener, OwnableEntity  {
+public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	public static final CyclicSwitch<NFFTamedMobAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>
 		(NFFTamedMobAIState.WAIT, NFFTamedMobAIState.FOLLOW, NFFTamedMobAIState.WANDER);

@@ -1,5 +1,12 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
+import java.util.HashSet;
+import java.util.Random;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,8 +48,12 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	 * Additional condition to start this goal. (Not checked on checking continue to use)
 	 */
 	protected Predicate<NFFGoal> startCondition = null;
-	
-	
+	/**
+	 * The goal will be interrupted when this condition is true.
+	 */
+	@Nullable
+	protected Predicate<NFFGoal> interruptCondition = null;
+
 	@Deprecated
 	public NFFGoal()
 	{
@@ -62,24 +73,21 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	@Override
 	public NFFGoal allowState(NFFTamedMobAIState state)
 	{
-		if (!allowedStates.contains(state))
-			allowedStates.add(state);
+		allowedStates.add(state);
 		return this;
 	}
 	
 	@Override
 	public NFFGoal excludeState(NFFTamedMobAIState state)
 	{
-		if (allowedStates.contains(state))
-			allowedStates.remove(state);
+		allowedStates.remove(state);
 		return this;
 	}
 	
 	@Override
 	public NFFGoal allowAllStates()
 	{
-		for (NFFTamedMobAIState state : NFFTamedMobAIState.getAllStates())
-			allowedStates.add(state);
+		allowedStates.addAll(NFFTamedMobAIState.getAllStates());
 		return this;
 	}
 	
@@ -124,16 +132,6 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	}
 	
 	/**
-	 * Get mob as PathfinderMob
-	 * @return mob cast to PathfinderMob, or null if the mob isn't a PathfinderMob
-	 */
-	@Nullable
-	public PathfinderMob getPathfinder()
-	{
-		return mob instanceof PathfinderMob ? (PathfinderMob)mob : null;
-	}
-	
-	/**
 	 * Fixed here because some common checks are needed here.
 	 * In subclasses, override {@link INFFTamedGoal#checkCanUse} instead.
 	 */
@@ -141,14 +139,16 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	public final boolean canUse() 
 	{
 		// Detect if checkCanUse() calling canUse() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanUse"))
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("checkCanUse"))))
 			throw new RuntimeException("Illegal method call: checkCanUse() method cannot call canUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanUse().");
-		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
+		if (mob == null || requireOwnerPresent && !mob.isOwnerInDimension())
 			return false;
 		if (startCondition != null && !startCondition.test(this))
 			return false;
 		if (skipChance > 0 && rnd.nextDouble() < skipChance)
+			return false;
+		if (interruptCondition != null && interruptCondition.test(this))
 			return false;
 		NFFGoalCheckCanUseEvent event = new NFFGoalCheckCanUseEvent(this, NFFGoalCheckCanUseEvent.Phase.CAN_USE);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -167,12 +167,14 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	public final boolean canContinueToUse()
 	{
 		// Detect if checkCanContinueToUse() calling canContinueToUse() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("checkCanContinueToUse"))
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("checkCanContinueToUse"))))
 			throw new RuntimeException("Illegal method call: checkCanContinueToUse() method cannot call canContinueToUse() method inside, otherwise an infinite loop will occur. To get super class' check, call checkCanContinueToUse().");
-		if (mob == null || requireOwnerPresent && !mob.isOwnerPresent())
+		if (mob == null || requireOwnerPresent && !mob.isOwnerInDimension())
 			return false;
 		// Interruption
+		if (interruptCondition != null && interruptCondition.test(this))
+			return false;
 		// Most goals tick each 2 level-ticks so tickCount is always odd or always even
 		int i = (this.requiresUpdateEveryTick() || this.mob.asMob().tickCount % 2 == 0) ? 0 : 1;
 		if (this.mob.asMob().tickCount % 20 == i && this.rnd.nextDouble() < interruptChance)
@@ -193,10 +195,10 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	@Override
 	public final void start()
 	{
-		// Detect if onStart() calling super.start() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStart"))
-			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStart().");
+		// Detect if onStart() calling start() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onStart"))))
+			throw new RuntimeException("Illegal method call: onStart() method cannot call start() method inside, otherwise an infinite loop will occur. To get super class' check, call onStart().");
 		this.onStart();
 	}
 	
@@ -207,10 +209,10 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	@Override
 	public final void tick()
 	{
-		// Detect if onTick() calling super.tick() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onTick"))
-			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' tick, call onTick().");
+		// Detect if onTick() calling tick() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onTick"))))
+			throw new RuntimeException("Illegal method call: onTick() method cannot call tick() method inside, otherwise an infinite loop will occur. To get super class' check, call onTick().");
 		this.onTick();
 	}
 
@@ -221,10 +223,10 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	@Override
 	public final void stop()
 	{
-		// Detect if onStart() calling super.start() which leads to infinite loop
-		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-		if (stacktrace.length > 2 && stacktrace[2].getMethodName().equals("onStop"))
-			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' tick, call onStop().");
+		// Detect if onStop() calling stop() which leads to infinite loop
+		if (rnd.nextInt(2000) == 0 && StackWalker.getInstance().walk(stream ->
+			stream.limit(5).anyMatch(sf -> sf.getMethodName().equals("onStop"))))
+			throw new RuntimeException("Illegal method call: onStop() method cannot call stop() method inside, otherwise an infinite loop will occur. To get super class' check, call onStop().");
 		this.onStop();
 	}
 	
@@ -263,7 +265,6 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 	/**
 	 * Set interruption chance of this goal. 
 	 * <p> If it has interruption chance > 0, it will have a chance to be interrupted <b>each second</b> when running.
-	 * <p> It's not recommended to set this value too large as it will be checked frequently.
 	 * <p> When it's interrupted, it won't post {@link NFFGoalCheckCanUseEvent}.
 	 */
 	@SuppressWarnings("unchecked")
@@ -282,5 +283,14 @@ public abstract class NFFGoal extends Goal implements INFFTamedGoal {
 		this.requireOwnerPresent = value;
 		return (T)this;
 	}
-	
+
+	@Nullable
+	public Predicate<NFFGoal> getInterruptCondition() {
+		return interruptCondition;
+	}
+
+	public NFFGoal setInterruptCondition(@Nullable Predicate<NFFGoal> interruptCondition) {
+		this.interruptCondition = interruptCondition;
+		return this;
+	}
 }

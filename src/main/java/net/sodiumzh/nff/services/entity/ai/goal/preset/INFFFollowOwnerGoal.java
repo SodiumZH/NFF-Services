@@ -42,11 +42,12 @@ public interface INFFFollowOwnerGoal
 	 */
 	public default void goToOwnerPreset(double speedModifier)
 	{
-		if (!goal().getMob().isOwnerPresent())
+		if (!goal().getMob().isOwnerInDimension())
 			return;
 		//Mob mob = asGoal().getMob().asMob();
-		teleportToOwner();	// Distance check is inside
-		moveToOwner(speedModifier);
+		this.teleportToOwner();	// Distance check is inside
+		this.moveToOwner(speedModifier);
+		goal().getMob().asMob().getLookControl().setLookAt(goal().getMob().getOwner());
 	}
 	
 	/**
@@ -56,7 +57,7 @@ public interface INFFFollowOwnerGoal
 	 */
 	public default void moveToOwner(double param, Vec3 offset)
 	{
-		if (!goal().getMob().isOwnerPresent())
+		if (!goal().getMob().isOwnerInDimension())
 			return;
 		Mob mob = goal().getMob().asMob();
 		Player owner = goal().getMob().getOwner();
@@ -123,11 +124,10 @@ public interface INFFFollowOwnerGoal
 	
 	/**
 	 * Try getting a position around owner and teleport.
-	 * @param randomRange Random position offset scale.
 	 * @return Whether succeeded.
 	 */
 	public default boolean tryTeleportToOwner() {
-		if (!goal().getMob().isOwnerPresent())
+		if (!goal().getMob().isOwnerInDimension())
 			return false;
 		Mob mob = goal().getMob().asMob();
 		Player owner = goal().getMob().getOwner();
