@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
@@ -20,7 +21,7 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 /** Adjusted from vanilla FollowOwnerGoal for TameableAnimal.
  * <p>This goal is for non-flying mobs.
  */
-public class NFFFollowOwnerGoal extends NFFMoveGoal implements INFFFollowOwnerGoal {
+public class NFFFollowOwnerGoal extends NFFMoveGoal implements INFFFollowOwnerGoal, INFFPathfindingGoal {
 
 	protected final LevelReader level;
 	protected int timeToRecalcPath;
@@ -29,6 +30,10 @@ public class NFFFollowOwnerGoal extends NFFMoveGoal implements INFFFollowOwnerGo
 	protected float oldWaterCost;
 	public float teleportDistance = 12f;
 
+	@Override
+	public PathfinderMob getPathfinder() {
+		return (PathfinderMob) (this.mob.asMob());
+	}
 
 	public NFFFollowOwnerGoal(@Nonnull INFFTamed inMob, double pSpeedModifier, float pStartDistance,
 			float pStopDistance, boolean pCanFly) {

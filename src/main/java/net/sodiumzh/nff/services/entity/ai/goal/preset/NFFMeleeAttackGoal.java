@@ -13,7 +13,7 @@ import net.sodiumzh.nfu.util.NFUMathStatics;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
-public class NFFMeleeAttackGoal extends NFFGoal
+public class NFFMeleeAttackGoal extends NFFGoal implements INFFPathfindingGoal
 {
 
 	protected final double speedModifier;
@@ -43,7 +43,12 @@ public class NFFMeleeAttackGoal extends NFFGoal
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
 		allowAllStatesExceptWait();
 	}
-	
+
+	@Override
+	public PathfinderMob getPathfinder() {
+		return (PathfinderMob) (this.mob.asMob());
+	}
+
 	/** Max time without attacking action. The action will be interrupted if this time is reached without attacking.
 	 * Set -1 to disable.
 	 */

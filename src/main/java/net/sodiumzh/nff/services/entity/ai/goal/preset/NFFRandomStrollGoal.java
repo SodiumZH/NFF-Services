@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import javax.annotation.Nullable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.phys.Vec3;
@@ -12,7 +13,7 @@ import net.sodiumzh.nfu.util.NFUMathStatics;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
-public class NFFRandomStrollGoal extends NFFMoveGoal {
+public class NFFRandomStrollGoal extends NFFMoveGoal implements INFFPathfindingGoal {
 
 	public static final int DEFAULT_INTERVAL = 120;
 	protected double wantedX;
@@ -37,6 +38,11 @@ public class NFFRandomStrollGoal extends NFFMoveGoal {
 	      this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 	      allowState(WANDER);
 	   }
+
+	@Override
+	public PathfinderMob getPathfinder() {
+		return (PathfinderMob) (this.mob.asMob());
+	}
 
 	/**
 	 * Returns whether execution should begin. You can also read and cache any state

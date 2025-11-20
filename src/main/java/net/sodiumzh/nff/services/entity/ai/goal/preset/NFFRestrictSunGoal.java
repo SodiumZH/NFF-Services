@@ -1,6 +1,7 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
@@ -9,7 +10,7 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedSunSensitiveMob;
 
 // Adjusted from vanilla RestrictSunGoal
-public class NFFRestrictSunGoal extends NFFMoveGoal {
+public class NFFRestrictSunGoal extends NFFMoveGoal implements INFFPathfindingGoal {
 
 	// If true, the mob will restrict sun although having a helmet.
 	public boolean ignoreHelmet = false;
@@ -17,6 +18,11 @@ public class NFFRestrictSunGoal extends NFFMoveGoal {
 	public NFFRestrictSunGoal(INFFTamed mob) {
 		super(mob, 1d);
 		allowAllStates();
+	}
+
+	@Override
+	public PathfinderMob getPathfinder() {
+		return (PathfinderMob) (this.mob.asMob());
 	}
 
 	@Override
