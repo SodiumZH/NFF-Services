@@ -1,21 +1,28 @@
 package net.sodiumzh.nff.services.entity.taming;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.network.ClientboundNFFGUIOpenPacket;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nfu.util.NFUNetworkStatics;
 
 import java.util.List;
@@ -23,6 +30,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.sodiumzh.nff.services.network.NFFChannels;
+
+import javax.annotation.Nullable;
 
 /**
  * A function library for befriended mobs
@@ -35,7 +45,6 @@ public class NFFTamedStatics
 
 	/**
 	 *  Default settings of the rule about what the mob can attack.
-	 *  <p>判断生物是否可以攻击对象的规则的默认预设。
 	 */
 	public static boolean wantsToAttackDefault(INFFTamed mob, LivingEntity target) {
 		if (target instanceof Creeper && !mob.canAttackCreeper())
@@ -47,18 +56,18 @@ public class NFFTamedStatics
 
 	/* Save & Load */
 
-	@Deprecated
+	/*@Deprecated
 	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String modId) {		
 		addBefriendedCommonSaveData(mob, nbt);
-	}
+	}*/
 
 	/**
 	 * @deprecated No longer used, moved to data
 	 */
-	@Deprecated
+	/*@Deprecated
 	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt)
 	{
-		/*nbt.put("bm_common", new CompoundTag());
+		nbt.put("bm_common", new CompoundTag());
 		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
 		if (mob.getOwnerUUID() != null)
 			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
@@ -77,22 +86,16 @@ public class NFFTamedStatics
 		else
 			nbt.putUUID(ownerKey, new UUID(0, 0));
 		nbt.putInt(aiStateKey, mob.getAIState().id);
-		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);*/
-	}
+		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
+	}*/
 	
-	@Deprecated	// Use version without modid input
+	/*@Deprecated	// Use version without modid input
 	public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String inModId)
 	{
 		readBefriendedCommonSaveData(mob, nbt);
-	}
-	
-	/**
-	 * Read mob's Mod Id, owner, AI state and additional inventory information.
-	 * <p>读取生物所属的Mod ID、拥有者信息、AI状态及附加道具栏
-	 * @since 0.x.25
-	 * TODO Remove in 0.x.30. Before 30 it's left to port legacy.
-	 */
-	public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt) {
+	}*/
+
+	/*public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt) {
 		
 		if (nbt.contains("bm_common", NFUNBTStatics.TAG_COMPOUND_ID))
 		{
@@ -108,18 +111,13 @@ public class NFFTamedStatics
 			else mob.setAIState(NFFTamedMobAIState.WAIT, false);
 			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
 		}
-	}
+	}*/
 
 	/**
 	 * Convert a befriended mob to other type. This action will keep its data.
 	 * @param target The mob to convert.
-	 * @param newType The type converting to, must implementing {@code INFFTamed} interface.
+	 * @param newType The type converting to, must implement {@code INFFTamed} interface.
 	 * @return The new mob reference.
-	 * <p>========
-	 * <p>将一个友好化生物转化为其他类型。这个操作会保持其数据。
-	 * @param target 转化前的生物。
-	 * @param newType 转化为的类型。其必须实现{@code INFFTamed}接口。
-	 * @return The new mob reference. 新生物的引用。
 	 */
 	public static INFFTamed convertToOtherBefriendedType(INFFTamed target, EntityType<? extends Mob> newType)
 	{
@@ -129,7 +127,7 @@ public class NFFTamedStatics
 		// Do convertion
 		
 		Mob newMob = NFUEntityStatics.replaceMob(newType, target.asMob());
-		if (!(newMob instanceof INFFTamed))
+		if (INFFTamed.get(newMob).isEmpty())
 			throw new UnsupportedOperationException("NFFTamedStatics::convertToOtherBefriendedType supports mobs implementing INFFTamed.");
 		newMob.load(mobTag);
 		// Write the inventory back
@@ -149,9 +147,7 @@ public class NFFTamedStatics
 
 	/**
 	 * Open the inventory GUI of the mob.
-	 * <p>Warning: DO NOT call this if {@link INFFTamed#makeMenu()} method returns null, otherwise it will crash the game.
-	 * <p>打开生物的道具栏GUI。
-	 * <p>警告：如果{@link INFFTamed#makeMenu()}函数返回null则不要调用这个函数，否则游戏会崩溃。
+	 * <p>Warning: DO NOT call this if {@link INFFTamed#makeMenu} method returns null, otherwise it will crash the game.
 	 */
 	public static void openBefriendedInventory(Player player, INFFTamed mob) {
 		LivingEntity living = (LivingEntity) mob;
@@ -185,13 +181,6 @@ public class NFFTamedStatics
 	@Deprecated
 	public static String getModIdFromNbt(CompoundTag nbt)
 	{
-		/*// 0.x.15+ solution
-		if (nbt.contains("bm_common", Tag.TAG_COMPOUND))
-			return nbt.getCompound("bm_common").getString("mod_id");
-		
-		// LEGACY
-		else return nbt.contains("befriended_mod_id", Tag.TAG_COMPOUND) ?
-				nbt.getString("befriended_mod_id") : null;*/
 		return CNFFTamedCommonData.getModIdFromMobTag(nbt);
 	}
 	
@@ -201,21 +190,7 @@ public class NFFTamedStatics
 	@Deprecated
 	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
 	{
-		// 0.x.15+ solution
-		/*
-		if (nbt.contains("bm_common", NFUNBTStatics.TAG_COMPOUND_ID))
-			return nbt.getCompound("bm_common").getUUID("owner");
-		
-		// LEGACY
-		else
-		{
-			String modid = getModIdFromNbt(nbt);
-			if (modid == null)
-				return null;
-			return nbt.contains(modid + ":befriended_owner", NFUNBTStatics.TAG_INT_ARRAY_ID) ? nbt.getUUID(modid + ":befriended_owner") : null;
-		}*/
 		return CNFFTamedCommonData.getOwnerUUIDFromMobTag(nbt);
-		
 	}
 	
 	/**
@@ -229,7 +204,7 @@ public class NFFTamedStatics
 	
 	/**
 	 * Get owner if the owner is closer than the given distance of the mob. Otherwise return {@link Optional#empty}.
-	 * @param mob Mob (implements {@link INFFTamed}) to test. No need to do {@INFFTamed#isOwnerPresent} check.
+	 * @param mob Mob (implements {@link INFFTamed}) to test. No need to do {@link INFFTamed#isOwnerInDimension} check.
 	 * @param radius Search area
 	 * @param sphericalArea If true, it will search in a sphere with given radius. Otherwise search in a box with given radius.
 	 * @return Owner if the owner is present and in the given area. Otherwise {@link Optional#empty}.
@@ -263,56 +238,107 @@ public class NFFTamedStatics
 	 * behavior changes on vanilla mobs. Call {@code isLivingAlliedToBM} and {@code isBMAlliedToOwnable} instead.
 	 * <p>On server only. On client always {@code false}.
 	 */
-	private static boolean isLivingAlliedToOwnable(OwnableEntity entity, LivingEntity test)
+	static boolean isLivingAlliedToOwnableUnsafe(OwnableEntity ownable, LivingEntity target)
 	{
-		if (test == null) return false;
-		if (entity instanceof LivingEntity living && entity.getOwnerUUID() != null && entity.getOwner() != null && entity.getOwner() instanceof Player)
-		{
-			if (living.level.isClientSide)
-				return false;
-			if (living == test)
-				return true;
-			boolean allowPvp = living.level.getServer().isPvpAllowed();
-			// If don't allow pvp, it don't attack any players or owned entities
-			// If allow pvp, it just don't attack its owner and owner's other entities
-			// Horse is a special case since it's virtually ownable but doesn't have OwnableEntity interface
-			if (test instanceof AbstractHorse horse)
-			{
-				return horse.getOwnerUUID() != null && (allowPvp ? horse.getOwnerUUID().equals(entity.getOwnerUUID()) : true);
+		if (ownable == null || target == null) return false;
+		Level level = target.level();
+		if (level.isClientSide) return false;
+		// Get the actual mob. In the future INFFTamed may become a capability and may not refer to the mob itself
+		// Null means impossible to get the mob reference from the argument, and only owners will be compared
+		LivingEntity ownableMob = ownable instanceof INFFTamed t ? t.asMob() : (ownable instanceof LivingEntity l ? l : null);
+		if (target.equals(ownableMob)) return true;
+		// Recursively search self and owners
+		Set<UUID> selfAndOwners = new HashSet<>();
+		LivingEntity ptr = ownableMob != null ? ownableMob : (ownable.getOwner() != null ? ownable.getOwner() : null);
+		if (ptr == null && ownable.getOwnerUUID() != null) selfAndOwners.add(ownable.getOwnerUUID());
+		while (ptr != null) {
+			selfAndOwners.add(ptr.getUUID());
+			LivingEntity ptrCopy = ptr;
+			UUID uuid = INFFTamed.get(ptrCopy).map(INFFTamed::getOwnerUUID).orElseGet(() ->
+				ptrCopy instanceof OwnableEntity o ? o.getOwnerUUID() : null);
+			LivingEntity owner = INFFTamed.get(ptrCopy).map(t -> (LivingEntity) t.getOwner()).orElseGet(() ->
+				ptrCopy instanceof OwnableEntity o ? o.getOwner() : null);
+			if (uuid != null) {
+				if (selfAndOwners.contains(uuid)) break;	// Preventing cyclic reference in getOwner()
+				selfAndOwners.add(uuid);
 			}
-			if (!allowPvp)
-			{
-				return test instanceof Player || test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null;
+			ptr = owner;	// When the owner exists but not in level, it's still possible to record this owner, but not above
+		}
+		// Recursively search target and owners
+		Set<UUID> targetAndOwners = new HashSet<>();
+		LivingEntity ptr1 = target;
+		while (ptr1 != null) {
+			targetAndOwners.add(ptr1.getUUID());
+			LivingEntity ptrCopy = ptr1;
+			UUID uuid = INFFTamed.get(ptrCopy).map(INFFTamed::getOwnerUUID).orElseGet(() ->
+				ptrCopy instanceof OwnableEntity o ? o.getOwnerUUID() : null);
+			LivingEntity owner = INFFTamed.get(ptrCopy).map(t -> (LivingEntity) t.getOwner()).orElseGet(() ->
+				ptrCopy instanceof OwnableEntity o ? o.getOwner() : null);
+			if (uuid != null) {
+				if (targetAndOwners.contains(uuid)) break;	// Preventing cyclic reference in getOwner()
+				targetAndOwners.add(uuid);
 			}
-
-			else
-			{
-				UUID ownerUUID = entity.getOwnerUUID();
-				if (test.getUUID().equals(ownerUUID))
-					return true;
-				else if (test instanceof OwnableEntity ownable && ownable.getOwnerUUID() != null && ownable.getOwnerUUID().equals(ownerUUID))
-					return true;
-				else return false;
-			}
+			ptr1 = owner;	// When the owner exists but not in level, it's still possible to record this owner, but not above
+		}
+		// Compare UUID to cover cases when owner is not present
+		// Case when the target is owned by self or self's owner
+		boolean selfIsPlayerOwned = false;
+		for (UUID uuid: selfAndOwners) {
+			if (targetAndOwners.contains(uuid)) return true;
+			if (level.getPlayerByUUID(uuid) != null) selfIsPlayerOwned = true;
+		}
+		// Case when the target is owned by someone and pvp isn't allowed
+		if (level.getServer() != null && !level.getServer().isPvpAllowed() && selfIsPlayerOwned) {
+			if (targetAndOwners.stream().anyMatch(uuid -> level.getPlayerByUUID(uuid) != null)) return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check if a BM is considered as ally by an {@code OwnableEntity}.
 	 * <p>On server only. On client always {@code false}.
+	 * @deprecated Use {@link INFFTamed#isAllyTo} instead.
 	 */
+	@Deprecated
 	public static boolean isBMAlliedToOwnable(OwnableEntity entity, INFFTamed test)
 	{
-		return isLivingAlliedToOwnable(entity, test.asMob());
+		if (entity instanceof INFFTamed i)
+			return test.isAllyTo(i.asMob());
+		else if (entity instanceof LivingEntity le)
+			return test.isAllyTo(le);
+		else return false;
 	}
 	
 	/**
 	 * Check if a {@code LivingEntity} is considered as ally by a BM.
 	 * <p>On server only. On client always {@code false}.
+	 * @deprecated Use {@link INFFTamed#isAllyTo} instead.
 	 */
+	@Deprecated
 	public static boolean isLivingAlliedToBM(INFFTamed bm, LivingEntity test)
 	{
-		return isLivingAlliedToOwnable(bm, test);
+		return bm.isAllyTo(test);
+	}
+
+	/**
+	 * Get the LivingEntity instance from {@link OwnableEntity} interface. It handles both
+	 * {@link INFFTamed} cases and Livings directly implementing {@link OwnableEntity}.
+	 * <p>Generally it shouldn't return {@link Optional#empty}, but as we cannot guarantee
+	 * other mods don't attach OwnableEntity to non-living classes, we still use optional here
+	 */
+	@Nullable
+	public static Optional<LivingEntity> livingFromOwnableInterface(OwnableEntity ownable) {
+		return Optional.ofNullable(INFFTamed.get(ownable).map(e -> (LivingEntity) e.asMob())
+			.orElseGet(() -> ownable instanceof LivingEntity l ? l : null));
+	}
+
+	/**
+	 * Get the {@link OwnableEntity} interface from LivingEntity instance. It handles both
+	 * {@link INFFTamed} cases and Livings directly implementing {@link OwnableEntity}.
+	 * <p>Empty if the mob doesn't use {@link INFFTamed} or directly implement {@link OwnableEntity}
+	 */
+	public static Optional<OwnableEntity> ownableFromLiving(LivingEntity living) {
+		return Optional.ofNullable(INFFTamed.get(living).map(i -> (OwnableEntity)i)
+			.orElseGet(() -> living instanceof OwnableEntity o ? o : null));
 	}
 }

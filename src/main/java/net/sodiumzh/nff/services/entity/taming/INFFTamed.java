@@ -408,7 +408,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	/** Get if a target mob can be attacked by this mob.
 	 * Called in target goals.
 	*/
-
 	public default boolean wantsToAttack(LivingEntity pTarget)
 	{
 		return NFFTamedStatics.wantsToAttackDefault(this, pTarget);
@@ -472,7 +471,22 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		double dz = v.z - a.z;
 		return dx * dx + dz * dz > getAnchoredStrollRadius() * getAnchoredStrollRadius();		
 	}
-	
+
+	/**
+	 * Check if another mob should be accounted as ally of self, and should not attack each other.
+	 */
+	public default boolean isAllyTo(LivingEntity other) {
+		return NFFTamedStatics.isLivingAlliedToOwnableUnsafe(this, other);
+	}
+
+	/**
+	 * Check if another mob should be accounted as ally of the tamed mob, and should not attack each other.
+	 */
+	public static boolean isAlly(INFFTamed tamed, LivingEntity other) {
+		return tamed.isAllyTo(other);
+	}
+
+
 	/**
 	 * Check if a position is further than the stroll radius to the anchor point.
 	 * Called in random stroll goals.

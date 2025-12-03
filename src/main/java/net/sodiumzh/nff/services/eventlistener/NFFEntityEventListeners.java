@@ -18,7 +18,6 @@ import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -199,51 +198,27 @@ public class NFFEntityEventListeners
 	}
 	
 	@SubscribeEvent
-	public static void onLivingSetTarget(LivingSetAttackTargetEvent event)
+	public static void onLivingSetTarget(LivingChangeTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
 		LivingEntity target = event.getTarget();		
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
-		{ 	
-	        // Handle befriended mobs //	        
-	        if (mob instanceof INFFTamed bm)
-	        {
-	        	// Befriended mob should never attack the owner
-	        	if (target == bm.getOwner())
-	        		mob.setTarget(bm.getPreviousTarget());
-	        	// Befriended mob shouldn't attack owner's other befriended mobs
-	        	else if (target instanceof INFFTamed tbef)
-	        	{
-	        		if (bm.getOwner() != null && tbef.getOwner() != null && bm.getOwner() == tbef.getOwner())
-	        		{
-	        			mob.setTarget(bm.getPreviousTarget());
-	        		}
-	        	}
-	        	// Befriended mob shouldn't attack owner's tamable animals
-	        	else if (target instanceof TamableAnimal ta)
-	        	{
-	        		if (bm.getOwner() != null && ta.getOwner() != null && bm.getOwner() == ta.getOwner())
-	        		{
-	        			bm.asMob().setTarget(bm.getPreviousTarget());
-	        		}
-	        	}
-	        	else
-	        		bm.setPreviousTarget(target);
-	        	
-	        }
+		{
+			if (INFFTamed.get(mob).isPresent()) {
+				if (INFFTamed.get(mob).filter(i -> i.isAllyTo(target)).isPresent())
+					event.setNewTarget(INFFTamed.get(mob).orElseThrow().getPreviousTarget());
+				else INFFTamed.get(mob).orElseThrow().setPreviousTarget(target);
+			}
+			else if (INFFTamed.get(target).filter(i -> i.isAllyTo(mob)).isPresent()) {
+				event.setCanceled(true);
+		}
 	        // Handle befriended mobs end //
 	        // Handle TamableAnimal //	
-	        if (mob instanceof TamableAnimal ta)
+	        if (mob instanceof OwnableEntity oe
+				&& INFFTamed.get(target).filter(i -> NFFTamedStatics.isBMAlliedToOwnable(oe, i)).isPresent())
 	        {
-	        	// Tamable animals shouldn't attack owner's befriended mobs
-	        	if (target instanceof INFFTamed tbef)
-	        	{
-	        		if (ta.getOwner() != null && tbef.getOwner() != null && ta.getOwner() == tbef.getOwner())
-	        		{
-	        			ta.setTarget(null);
-	        		}
-	        	}
+				event.setCanceled(true);
 	        }
 	        // Handle TamableAnimal end //
 
