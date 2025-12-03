@@ -24,7 +24,7 @@ import net.sodiumzh.nfu.util.NFUParticleStatics;
 import javax.annotation.Nullable;
 
 
-public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving implements INFFDefaultProgressedTamingProcess<Mob> {
+public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving implements INFFDefaultProgressedTamingProcess<Mob>, IItemTableUsingProcess<TamingProcessItemGivingProgress> {
 
 	@Deprecated
 	protected Random rnd = new Random();

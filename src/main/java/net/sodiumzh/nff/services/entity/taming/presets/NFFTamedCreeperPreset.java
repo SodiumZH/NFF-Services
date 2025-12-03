@@ -157,8 +157,6 @@ public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed
 		tag.putBoolean("ignited", this.isIgnited());
 		tag.putInt("current_ignition_cooldown", currentIgnitionCooldown);
 		tag.putInt("ignition_cooldown", ignitionCooldownTicks);
-		
-		NFFTamedStatics.addBefriendedCommonSaveData(this, tag);
 	}
 
 	/**
@@ -186,8 +184,6 @@ public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed
 			this.ignitionCooldownTicks = tag.getInt("ignition_cooldown");
 		if (tag.contains("current_ignition_cooldown"))
 			this.currentIgnitionCooldown = tag.getInt("current_ignition_cooldown");
-		
-		NFFTamedStatics.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
 	}
