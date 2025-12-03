@@ -22,7 +22,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 
-public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving implements INFFDefaultProgressedTamingProcess<Mob> {
+public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving implements INFFDefaultProgressedTamingProcess<Mob>, IItemTableUsingProcess<TamingProcessItemGivingProgress> {
 
 	@Deprecated
 	protected Random rnd = new Random();

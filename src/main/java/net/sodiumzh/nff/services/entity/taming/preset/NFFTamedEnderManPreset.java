@@ -180,7 +180,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		{
 			tag.put("carriedBlockState", NbtUtils.writeBlockState(blockstate));
 		}
-		NFFTamedStatics.addBefriendedCommonSaveData(this, tag);
 	}
 
 	/**
@@ -200,7 +199,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		}
 
 		this.setCarriedBlock(blockstate);
-		NFFTamedStatics.readBefriendedCommonSaveData(this, tag);
 		/* Add more save data... */
 		this.setInit();
 	}
