@@ -1,5 +1,13 @@
 # Change Log
 
+### 0.x.31
+
+Separated NFU Library out as a standalone mod.
+
+Refactored flying AI goals. Fixed speed modifiers not taking effect.
+
+Refactored tamed mobs' ally check.
+
 ### 0.2.30.3
 
 ##### NFU Library
