@@ -1,8 +1,5 @@
 package net.sodiumzh.nff.services.item.capability;
 
-import java.util.HashMap;
-import java.util.function.Supplier;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -11,10 +8,13 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nfu.annotation.DontOverride;
-import net.sodiumzh.nfu.capability.CEntityTickingCapability;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+
+import java.util.HashMap;
+import java.util.function.Supplier;
 
 public interface CItemStackMonitor extends CEntityTickingCapability<LivingEntity> {
 

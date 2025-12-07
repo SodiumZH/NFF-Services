@@ -1,10 +1,10 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+
+import javax.annotation.Nullable;
 
 // Adjusted from vanilla WaterAvoidingRandomStrollGoal
 public class NFFWaterAvoidingRandomStrollGoal extends NFFRandomStrollGoal {

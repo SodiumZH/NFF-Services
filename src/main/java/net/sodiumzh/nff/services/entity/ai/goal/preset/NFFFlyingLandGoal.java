@@ -2,9 +2,8 @@ package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import net.sodiumzh.nfu.util.NFULevelStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFULevelStatics;
 
 import java.util.EnumSet;
 

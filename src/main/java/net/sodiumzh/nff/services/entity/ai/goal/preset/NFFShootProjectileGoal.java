@@ -1,16 +1,15 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.function.Supplier;
 
 /** Adjusted from vanilla RangedAttackGoal.
  * <p>Base class for mobs shooting any type of projectiles.

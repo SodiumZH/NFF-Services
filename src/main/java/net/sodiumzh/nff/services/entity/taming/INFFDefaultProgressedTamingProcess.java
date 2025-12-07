@@ -2,10 +2,10 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nfu.capability.EntityTimerAccessor;
 import net.sodiumzh.nfu.entity.taming.ITamingProcessWithProgress;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 
 import javax.annotation.Nullable;
 import java.util.Objects;

@@ -1,13 +1,5 @@
 package net.sodiumzh.nff.services.entity.taming.presets;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -30,11 +22,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -69,6 +57,9 @@ import net.sodiumzh.nff.services.entity.ai.goal.preset.target.NFFHurtByTargetGoa
 import net.sodiumzh.nff.services.entity.ai.goal.preset.target.NFFNearestAttackableTargetGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
+
+import javax.annotation.Nullable;
+import java.util.*;
 
 public abstract class NFFTamedEnderManPreset extends Monster implements INFFTamed
 {

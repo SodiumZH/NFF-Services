@@ -1,11 +1,11 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.Mob;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
-import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 /**
  * This is an interface handling sun immunity for sun-sensitive mobs.
  * Put and remove entries in {@code sunImmuneConditions()} and {@sunImmuneNecessaryConditions()} to set rules.

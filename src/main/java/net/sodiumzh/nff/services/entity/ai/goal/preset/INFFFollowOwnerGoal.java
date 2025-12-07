@@ -5,11 +5,11 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.exception.UnimplementedException;
 import net.sodiumzh.nfu.util.NFULevelStatics;
 import net.sodiumzh.nfu.util.NFUMathStatics;
-import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 
 /**
  * Sound methods for all follow-owner goals.

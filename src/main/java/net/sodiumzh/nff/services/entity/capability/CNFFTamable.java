@@ -1,12 +1,5 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Tuple;
@@ -14,14 +7,20 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.capability.EntityTimerAccessor;
 import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
-import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface CNFFTamable extends CEntityTimerCapability<Mob>, CMobAngerHandler {
 

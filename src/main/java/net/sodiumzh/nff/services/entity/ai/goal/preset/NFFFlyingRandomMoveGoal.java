@@ -1,12 +1,12 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
-import java.util.EnumSet;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sodiumzh.nfu.util.NFULevelStatics;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFULevelStatics;
+
+import java.util.EnumSet;
 
 
 // Ported from HMaG

@@ -1,9 +1,6 @@
 package net.sodiumzh.nff.services.eventlistener;
 
-import java.util.UUID;
-
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
@@ -27,24 +24,14 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nff.services.event.entity.NFFTamedDeathEvent;
-import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
-import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
-import net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent;
-import org.apache.commons.lang3.mutable.MutableObject;
-import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
-import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed.DeathRespawnerGenerationType;
 import net.sodiumzh.nff.services.event.BMHooks;
+import net.sodiumzh.nff.services.event.entity.NFFTamedDeathEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
-import net.sodiumzh.nff.services.entity.taming.INFFTamedSunSensitiveMob;
-import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
@@ -52,6 +39,14 @@ import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
+import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
+import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
+import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
+import net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.UUID;
 
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

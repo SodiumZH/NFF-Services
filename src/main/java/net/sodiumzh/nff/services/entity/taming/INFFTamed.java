@@ -1,35 +1,18 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.entity.EntityTypeTest;
-import net.sodiumzh.nfu.entity.IMobSpecific;
-import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUCapabilities;
-import net.sodiumzh.nfu.util.NFUContainerStatics;
-import net.sodiumzh.nfu.util.NFUEntityStatics;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
@@ -40,16 +23,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nfu.annotation.DontCallManually;
-import net.sodiumzh.nfu.annotation.DontOverride;
-import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
-import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
@@ -57,6 +37,23 @@ import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.container.CyclicSwitch;
+import net.sodiumzh.nfu.entity.MobApplicableItemTable;
+import net.sodiumzh.nfu.object.FilteredMapper;
+import net.sodiumzh.nfu.registry.NFUCapabilities;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public interface INFFTamed extends ContainerListener, OwnableEntity {
 

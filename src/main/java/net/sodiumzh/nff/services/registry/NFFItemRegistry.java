@@ -1,13 +1,13 @@
  package net.sodiumzh.nff.services.registry;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.sodiumzh.nfu.item.NFUItem;
-import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.item.NFFInstantTamerItem;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Rarity;
+ import net.minecraftforge.registries.DeferredRegister;
+ import net.minecraftforge.registries.ForgeRegistries;
+ import net.minecraftforge.registries.RegistryObject;
+ import net.sodiumzh.nff.services.NFFServices;
+ import net.sodiumzh.nff.services.item.NFFInstantTamerItem;
+ import net.sodiumzh.nfu.item.NFUItem;
 
 public class NFFItemRegistry {
 

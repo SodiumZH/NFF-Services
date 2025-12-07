@@ -1,9 +1,6 @@
 package net.sodiumzh.nff.services.client.gui.screen;
 
-import javax.annotation.Nullable;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -12,10 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
-import net.sodiumzh.nfu.math.GuiPos;
-import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
+import net.sodiumzh.nfu.math.GuiPos;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
+
+import javax.annotation.Nullable;
 
 public abstract class NFFTamedGUI extends AbstractContainerScreen<NFFTamedInventoryMenu> {
 

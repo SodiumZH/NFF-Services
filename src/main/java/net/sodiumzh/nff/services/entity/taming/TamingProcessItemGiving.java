@@ -1,13 +1,12 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.Random;
-
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public abstract class TamingProcessItemGiving extends NFFTamingProcess
 {

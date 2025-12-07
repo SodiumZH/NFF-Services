@@ -1,27 +1,26 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Supplier;
-
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nfu.util.NFUItemStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 import net.sodiumzh.nfu.util.NFUParticleStatics;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 
 public abstract class TamingProcessItemGivingProgress extends TamingProcessItemGiving implements INFFDefaultProgressedTamingProcess<Mob>, IItemTableUsingProcess<TamingProcessItemGivingProgress> {

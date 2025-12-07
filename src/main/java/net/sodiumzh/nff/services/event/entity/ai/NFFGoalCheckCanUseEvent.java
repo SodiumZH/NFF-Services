@@ -1,11 +1,11 @@
 package net.sodiumzh.nff.services.event.entity.ai;
 
-import java.util.Optional;
-
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.eventbus.api.Event;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFGoal;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFTargetGoal;
+
+import java.util.Optional;
 
 public class NFFGoalCheckCanUseEvent extends Event
 {

@@ -1,9 +1,5 @@
 package net.sodiumzh.nff.services.level;
 
-import java.util.HashSet;
-
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -13,8 +9,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sodiumzh.nfu.util.NFUDebugStatics;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
@@ -23,6 +17,11 @@ import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.eventlistener.NFFServerEventListeners;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.HashSet;
 
 /**
  * Comprehensive serializable module for levels in BM.

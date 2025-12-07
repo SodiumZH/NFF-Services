@@ -1,7 +1,5 @@
 package net.sodiumzh.nff.services.item;
 
-import java.util.UUID;
-
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,8 +7,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.sodiumzh.nfu.item.NFUItem;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.item.NFUItem;
+
+import java.util.UUID;
 
 public class NFFMobOwnershipTransfererItem extends NFUItem
 {

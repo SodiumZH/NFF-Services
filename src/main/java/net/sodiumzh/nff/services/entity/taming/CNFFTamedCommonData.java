@@ -1,15 +1,6 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoField;
-import java.util.*;
-import java.util.function.Supplier;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,16 +24,6 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nfu.annotation.DontCallManually;
-import net.sodiumzh.nfu.capability.CEntityTickingCapability;
-import net.sodiumzh.nfu.container.Tuple2;
-import net.sodiumzh.nfu.function.MutablePredicate;
-import net.sodiumzh.nfu.network.NFUDataSerializer;
-import net.sodiumzh.nfu.network.NFUDataSerializers;
-import net.sodiumzh.nfu.object.CastableObject;
-import net.sodiumzh.nfu.util.NFUDebugStatics;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
-import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
@@ -52,6 +33,22 @@ import net.sodiumzh.nff.services.network.NFFClientGamePacketHandler;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.container.Tuple2;
+import net.sodiumzh.nfu.function.MutablePredicate;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
+import net.sodiumzh.nfu.network.NFUDataSerializers;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * A temporal module for storage of data in INFFTamed interface.

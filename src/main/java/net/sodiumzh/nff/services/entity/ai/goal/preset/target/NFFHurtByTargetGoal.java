@@ -1,15 +1,14 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
 
-import java.util.EnumSet;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFTargetGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
 
 @SuppressWarnings("unused")
 public class NFFHurtByTargetGoal extends NFFTargetGoal {

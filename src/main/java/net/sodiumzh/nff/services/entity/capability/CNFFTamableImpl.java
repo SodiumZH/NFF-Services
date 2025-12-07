@@ -1,16 +1,16 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.*;
-
-import javax.annotation.Nonnull;
-
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
+import net.sodiumzh.nff.services.entity.taming.NFFTamableAngryEvent;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import net.sodiumzh.nfu.entity.anger.MobAngerHandler;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.anger.MobForgiveResult;
@@ -18,11 +18,11 @@ import net.sodiumzh.nfu.entity.anger.MobSetAngerResult;
 import net.sodiumzh.nfu.exception.MissingRegistryException;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
-import net.sodiumzh.nff.services.entity.taming.NFFTamableAngryEvent;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class CNFFTamableImpl extends MobAngerHandler implements CNFFTamable
 {

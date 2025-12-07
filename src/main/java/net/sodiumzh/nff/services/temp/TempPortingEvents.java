@@ -2,10 +2,10 @@ package net.sodiumzh.nff.services.temp;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nfu.mixin.event.entity.EntityFinalizeLoadingEvent;
-import net.sodiumzh.nfu.mixin.event.entity.EntityLoadEvent;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.mixin.event.entity.EntityFinalizeLoadingEvent;
+import net.sodiumzh.nfu.mixin.event.entity.EntityLoadEvent;
 
 /**
  * Dedicated event handlers only for temporary solutions when API changes. Should be removed in final releases.

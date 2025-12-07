@@ -1,17 +1,17 @@
 package net.sodiumzh.nff.services.entity.capability;
 
-import java.util.HashMap;
-
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
-import net.sodiumzh.nfu.capability.CEntityTickingCapability;
-import org.apache.commons.lang3.mutable.MutableObject;
-import net.sodiumzh.nfu.annotation.DontCallManually;
-import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nfu.annotation.DontCallManually;
+import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.HashMap;
 
 // A capability which posts LivingAttributeValueChangeEvent when the given attribute value changes.
 public interface CAttributeMonitor extends CEntityTickingCapability<LivingEntity> {
