@@ -241,7 +241,7 @@ public class NFFTamedStatics
 	static boolean isLivingAlliedToOwnableUnsafe(OwnableEntity ownable, LivingEntity target)
 	{
 		if (ownable == null || target == null) return false;
-		Level level = target.level();
+		Level level = target.level;
 		if (level.isClientSide) return false;
 		// Get the actual mob. In the future INFFTamed may become a capability and may not refer to the mob itself
 		// Null means impossible to get the mob reference from the argument, and only owners will be compared
@@ -249,14 +249,14 @@ public class NFFTamedStatics
 		if (target.equals(ownableMob)) return true;
 		// Recursively search self and owners
 		Set<UUID> selfAndOwners = new HashSet<>();
-		LivingEntity ptr = ownableMob != null ? ownableMob : (ownable.getOwner() != null ? ownable.getOwner() : null);
+		Entity ptr = ownableMob != null ? ownableMob : (ownable.getOwner() != null ? ownable.getOwner() : null);
 		if (ptr == null && ownable.getOwnerUUID() != null) selfAndOwners.add(ownable.getOwnerUUID());
 		while (ptr != null) {
 			selfAndOwners.add(ptr.getUUID());
-			LivingEntity ptrCopy = ptr;
+			Entity ptrCopy = ptr;
 			UUID uuid = INFFTamed.get(ptrCopy).map(INFFTamed::getOwnerUUID).orElseGet(() ->
 				ptrCopy instanceof OwnableEntity o ? o.getOwnerUUID() : null);
-			LivingEntity owner = INFFTamed.get(ptrCopy).map(t -> (LivingEntity) t.getOwner()).orElseGet(() ->
+			Entity owner = INFFTamed.get(ptrCopy).map(t -> (Entity) t.getOwner()).orElseGet(() ->
 				ptrCopy instanceof OwnableEntity o ? o.getOwner() : null);
 			if (uuid != null) {
 				if (selfAndOwners.contains(uuid)) break;	// Preventing cyclic reference in getOwner()
@@ -266,13 +266,13 @@ public class NFFTamedStatics
 		}
 		// Recursively search target and owners
 		Set<UUID> targetAndOwners = new HashSet<>();
-		LivingEntity ptr1 = target;
+		Entity ptr1 = target;
 		while (ptr1 != null) {
 			targetAndOwners.add(ptr1.getUUID());
-			LivingEntity ptrCopy = ptr1;
+			Entity ptrCopy = ptr1;
 			UUID uuid = INFFTamed.get(ptrCopy).map(INFFTamed::getOwnerUUID).orElseGet(() ->
 				ptrCopy instanceof OwnableEntity o ? o.getOwnerUUID() : null);
-			LivingEntity owner = INFFTamed.get(ptrCopy).map(t -> (LivingEntity) t.getOwner()).orElseGet(() ->
+			Entity owner = INFFTamed.get(ptrCopy).map(t -> (Entity) t.getOwner()).orElseGet(() ->
 				ptrCopy instanceof OwnableEntity o ? o.getOwner() : null);
 			if (uuid != null) {
 				if (targetAndOwners.contains(uuid)) break;	// Preventing cyclic reference in getOwner()

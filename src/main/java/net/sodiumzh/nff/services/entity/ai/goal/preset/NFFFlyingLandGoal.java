@@ -54,7 +54,7 @@ public class NFFFlyingLandGoal extends NFFFlyingMoveGoal
 		while (mob.asMob().level.getBlockState(pos).isAir() && pos.getY() >= mob.asMob().level.getMinBuildHeight())
 			pos = pos.below();
 		pos = pos.above();
-		this.flyTo(pos.getCenter().add(0d, heightOffset, 0d), this.getSpeedModifier());
+		this.flyTo(new Vec3(pos.getX(), pos.getY(), pos.getZ()).add(0.5d, heightOffset + 0.5d, 0.5d), this.getSpeedModifier());
 	}
 
 	public double getHeightOffset() {
