@@ -820,7 +820,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void recordLocationToOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
 				c.getNBT().put("tamedMobLocations", new CompoundTag());
 			MobLocationInfo info = MobLocationInfo.fromMob(this);
@@ -834,7 +834,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void removeLocationOnOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
 		});
 	}
@@ -844,7 +844,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		if (!(player.level instanceof ServerLevel sl)) return new HashMap<>();
 		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
 				new AtomicReference<>(new HashMap<>());
-		player.getCapability(NFUCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
 			res.set(NFUNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
 					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
@@ -879,7 +879,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
 		if (!(player.level instanceof ServerLevel sl)) return;
-		player.getCapability(NFUCaps.CAP_ENTITY_DATA).ifPresent(c -> {
+		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
 			List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
 							e -> INFFTamed.get(e).filter(tamed -> Objects.equals(tamed.getOwner(), player)).isPresent())
 					.stream().map(e -> INFFTamed.get(e).orElse(null)).filter(Objects::nonNull)

@@ -104,7 +104,7 @@ public class NFFNearestUnfriendlyMobTargetGoal extends NFFTargetGoal
 	protected void findTarget() {
 	      double followDist = mob.asMob().getAttributeValue(Attributes.FOLLOW_RANGE);
 	      AABB searchArea = new AABB(mob.asMob().position().subtract(new Vec3(followDist, followDist, followDist)), mob.asMob().position().add(new Vec3(followDist, followDist, followDist)));
-	      List<Entity> candidates = mob.asMob().level().getEntities(mob.asMob(), searchArea, (Entity e) ->
+	      List<Entity> candidates = mob.asMob().level.getEntities(mob.asMob(), searchArea, (Entity e) ->
 	      {
 	    	  if (e instanceof Mob m)
 	    	  {
