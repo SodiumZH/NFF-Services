@@ -39,7 +39,6 @@ import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
-import net.sodiumzh.nfu.object.CastableObject;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nfu.util.NFUReflectionStatics;

@@ -1,11 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
 
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -19,6 +13,7 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.NFFTamedStatics;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.function.Predicate;
 

@@ -2,7 +2,6 @@ package net.sodiumzh.nff.services.inventory;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -11,9 +10,6 @@ import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -24,8 +24,8 @@ import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 
 import javax.annotation.Nonnull;
-import java.util.Random;
 import javax.annotation.Nullable;
+import java.util.Random;
 import java.util.UUID;
 
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>

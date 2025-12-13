@@ -1,11 +1,5 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset.target;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;

@@ -1,38 +1,23 @@
 package net.sodiumzh.nff.services.entity.taming;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.network.ClientboundNFFGUIOpenPacket;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNetworkStatics;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.sodiumzh.nff.services.network.NFFChannels;
-
-import javax.annotation.Nullable;
 
 /**
  * A function library for befriended mobs
