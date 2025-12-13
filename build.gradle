@@ -20,16 +20,12 @@ plugins {
 }
 
 version = filename_version
-group = "net.sodiumzh"
+group = "net.sodiumzh.nff.services"
 
 base {
     archivesName = archive_base_name
 }
 
-mixin {
-    add sourceSets.main, "nfulib.refmap.json"
-    config 'nfulib.mixins.json'
-}
 
 javadoc {
     options.encoding = 'UTF-8'
@@ -123,7 +119,6 @@ minecraft {
 
         server {
             property 'forge.enabledGameTestNamespaces', common_mod_id
-            args '--nogui'
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -152,9 +147,10 @@ repositories {
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    flatDir {
+        dir 'libs'
+        dir '../NFU-Library/build/libs'
+    }
     	
 	maven {
         url "https://www.cursemaven.com"
@@ -182,6 +178,7 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
         jarJar.ranged(it, "[${mixinextras_min_version},)")
     }
+    implementation fg.deobf("blank:nfulib-${minecraft_version}:${nfu_version}")
 
     compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
