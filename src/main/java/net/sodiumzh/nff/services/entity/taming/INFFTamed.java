@@ -63,7 +63,7 @@ import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUCaps;
+import net.sodiumzh.nfu.registry.NFUCapabilities;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;

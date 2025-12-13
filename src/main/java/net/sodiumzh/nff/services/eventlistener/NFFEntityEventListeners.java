@@ -202,7 +202,7 @@ public class NFFEntityEventListeners
 	public static void onLivingSetTarget(LivingChangeTargetEvent event)
 	{
 		@SuppressWarnings("deprecation")
-		LivingEntity target = event.getTarget();		
+		LivingEntity target = event.getNewTarget();
 		// Handle mobs //
 		if (target != null && event.getEntity() instanceof Mob mob)
 		{
@@ -217,7 +217,7 @@ public class NFFEntityEventListeners
 	        // Handle befriended mobs end //
 	        // Handle TamableAnimal //	
 	        if (mob instanceof OwnableEntity oe
-				&& INFFTamed.get(target).filter(i -> NFFTamedStatics.isBMAlliedToOwnable(oe, i)).isPresent())
+				&& INFFTamed.get(target).filter(i -> i.isAllyTo(mob)).isPresent())
 	        {
 				event.setCanceled(true);
 	        }
@@ -343,7 +343,7 @@ public class NFFEntityEventListeners
 									event.getEntity().spawnAtLocation(container.getItem(i).copy());
 								}
 								container.getItem(i).setCount(0);
-								bef.updateFromInventory();
+								bef.getAdditionalInventory().syncToMob(bef.asMob());
 							}
 						}
 					}

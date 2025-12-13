@@ -3,28 +3,6 @@ loaderVersion="${loader_version_range}"
 license="LGPL-3.0"
 issueTrackerURL="https://github.com/SodiumZH/NFF-Services"
 
-[[mods]]
-modId="${nfu_mod_id}"
-version="${nfu_version}"
-displayName="${nfu_name}"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/nff-services" 
-#credits="SodiumZH"
-authors="${nfu_authors}"
-description="${nfu_description}"
-
-[[dependencies.${nfu_mod_id}]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="${forge_version_range}" #mandatory
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.${nfu_mod_id}]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="${minecraft_version_range}"
-    side="BOTH"
-
 [[mods]] #mandatory
 modId="${nff_mod_id}" #mandatory
 version="${nff_version}"
