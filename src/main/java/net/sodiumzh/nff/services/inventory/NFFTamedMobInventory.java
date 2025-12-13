@@ -5,9 +5,9 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

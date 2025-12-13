@@ -3,9 +3,9 @@ package net.sodiumzh.nff.services.registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.AbstractGolem;
-import net.sodiumzh.nfu.util.NFUTagStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUTagStatics;
 
 public class NFFTagRegistry
 {

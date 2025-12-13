@@ -4,9 +4,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.sodiumzh.nfu.util.NFUNetworkStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
+import net.sodiumzh.nfu.util.NFUNetworkStatics;
 
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NFFChannels {

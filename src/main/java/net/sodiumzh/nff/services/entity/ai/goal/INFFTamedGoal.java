@@ -1,13 +1,9 @@
 package net.sodiumzh.nff.services.entity.ai.goal;
 
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-
-import javax.annotation.Nullable;
-import java.util.function.Predicate;
+import net.sodiumzh.nfu.annotation.DontOverride;
 
 public interface INFFTamedGoal
 {

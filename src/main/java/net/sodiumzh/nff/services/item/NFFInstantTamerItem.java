@@ -6,13 +6,13 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
+import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.exception.UnimplementedException;
 import net.sodiumzh.nfu.item.NFUItem;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
 import net.sodiumzh.nfu.util.NFUParticleStatics;
-import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 public class NFFInstantTamerItem extends NFUItem
 {

@@ -1,7 +1,6 @@
 package net.sodiumzh.nff.services.entity.ai.goal.preset;
 
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;

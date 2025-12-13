@@ -13,12 +13,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sodiumzh.nfu.util.NFUEntityStatics;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
 import net.sodiumzh.nff.services.entity.NFFMobRespawnInfo;
 import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerAfterConstructEvent;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerBeforeConstructEvent;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
+import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

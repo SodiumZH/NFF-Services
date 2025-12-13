@@ -7,9 +7,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.sodiumzh.nfu.math.GuiPos;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.item.bauble.NFUBaubleAPI;
+import net.sodiumzh.nfu.math.GuiPos;
 
 import java.util.function.Predicate;
 

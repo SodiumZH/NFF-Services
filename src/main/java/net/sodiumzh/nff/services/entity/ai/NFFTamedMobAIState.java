@@ -2,8 +2,8 @@ package net.sodiumzh.nff.services.entity.ai;
 
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.sodiumzh.nfu.util.NFUInfoStatics;
 import net.sodiumzh.nff.services.NFFServices;
+import net.sodiumzh.nfu.util.NFUInfoStatics;
 
 import javax.annotation.Nullable;
 import java.util.Collection;

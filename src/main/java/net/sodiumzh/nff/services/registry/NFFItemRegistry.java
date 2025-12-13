@@ -5,9 +5,9 @@
  import net.minecraftforge.registries.DeferredRegister;
  import net.minecraftforge.registries.ForgeRegistries;
  import net.minecraftforge.registries.RegistryObject;
- import net.sodiumzh.nfu.item.NFUItem;
  import net.sodiumzh.nff.services.NFFServices;
  import net.sodiumzh.nff.services.item.NFFInstantTamerItem;
+ import net.sodiumzh.nfu.item.NFUItem;
 
 public class NFFItemRegistry {
 

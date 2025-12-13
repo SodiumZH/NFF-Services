@@ -5,8 +5,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sodiumzh.nfu.capability.CEntityTickingCapability;
-import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandler;
 import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
@@ -15,6 +13,8 @@ import net.sodiumzh.nff.services.entity.taming.CNFFTamable;
 import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
+import net.sodiumzh.nfu.capability.CEntityTickingCapability;
+import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 
 public class NFFCapRegistry {
 

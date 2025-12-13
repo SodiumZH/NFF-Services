@@ -12,8 +12,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nfu.capability.NFUEntitySerializableCapProvider;
-import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.capability.CAttributeMonitorProvider;
 import net.sodiumzh.nff.services.entity.capability.CHealingHandlerProvider;
@@ -28,6 +26,8 @@ import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
+import net.sodiumzh.nfu.capability.NFUEntitySerializableCapProvider;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
 import java.util.Map;
 

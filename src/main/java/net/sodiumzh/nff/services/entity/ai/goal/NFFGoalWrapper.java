@@ -2,8 +2,8 @@ package net.sodiumzh.nff.services.entity.ai.goal;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
-import net.sodiumzh.nfu.util.NFUReflectionStatics;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
 import java.util.EnumSet;
 

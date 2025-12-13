@@ -7,13 +7,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.capability.EntityTimerAccessor;
 import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
-import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

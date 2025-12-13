@@ -6,11 +6,11 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.sodiumzh.nfu.mixin.event.entity.EntityTickEvent;
-import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
+import net.sodiumzh.nfu.mixin.event.entity.EntityTickEvent;
+import net.sodiumzh.nfu.util.NFUEntityStatics;
 
 // Handle Item, Item Stack and Item Entity events
 @SuppressWarnings("removal")

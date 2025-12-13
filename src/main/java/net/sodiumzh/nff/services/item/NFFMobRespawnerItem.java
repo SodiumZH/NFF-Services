@@ -10,9 +10,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nfu.item.NFUItem;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
-import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 
 public class NFFMobRespawnerItem extends NFUItem
 {
