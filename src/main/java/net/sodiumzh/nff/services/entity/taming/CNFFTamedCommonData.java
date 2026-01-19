@@ -543,9 +543,17 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 				{
 					this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, UUID.randomUUID());
 					this.sync();
+					// In a rare case, this method appears to be called twice on running NFFTamingProcess#doTaming(). Output some verbose log
+					String callingChain = StackWalker.getInstance().walk(stackFrameStream -> stackFrameStream.map(StackWalker.StackFrame::getMethodName)
+						.reduce("Stack Trace:", (str, name) -> str + " -> " + name));
+					LogUtils.getLogger().debug("NFF tamed mob identifier generated for mob \"" + this.getEntity().getName().getString()
+					+ "\": " + this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class).orElse(EMPTY_UUID));
+					LogUtils.getLogger().debug("Method calling chain: " + callingChain);
 				}
 			}
-			else throw new UnsupportedOperationException("CNFFTamedCommonData#generateIdentifier: Identifier is valid, not supported to regenerate.");
+			else {
+				LogUtils.getLogger().error("Attempting to generate NFF tamed mob identifier twice. Skipped. Mob: \"" + this.getEntity().getName() + "\"");
+			}
 		}
 		
 		// Directly set, not safe
