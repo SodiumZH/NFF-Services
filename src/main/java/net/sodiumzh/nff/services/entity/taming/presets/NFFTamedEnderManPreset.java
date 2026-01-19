@@ -345,6 +345,7 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 	}
 
 	public boolean teleportTowards(Entity pTarget) {
+		if (pTarget == null) return false;
 		Vec3 vec3 = new Vec3(this.getX() - pTarget.getX(), this.getY(0.5D) - pTarget.getEyeY(),
 				this.getZ() - pTarget.getZ());
 		vec3 = vec3.normalize();
