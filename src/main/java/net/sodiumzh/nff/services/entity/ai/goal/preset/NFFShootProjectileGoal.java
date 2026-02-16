@@ -115,6 +115,10 @@ public abstract class NFFShootProjectileGoal extends NFFGoal {
 		return this.checkCanUse() || !this.mob.asMob().getNavigation().isDone();
 	}
 
+    public void onStart() {
+        resetAttackIntervalFromGetter();
+    }
+
 	/**
 	 * Reset the task's internal state. Called when this task is interrupted by
 	 * another one
@@ -147,22 +151,6 @@ public abstract class NFFShootProjectileGoal extends NFFGoal {
 			this.mob.asMob().getNavigation().moveTo(this.target, this.speedModifier);
 		}
 
-		// Update attack interval
-		if (this.attackIntervalGetter != null)
-		{
-			int interval = this.attackIntervalGetter.get();
-			this.attackIntervalMax = interval;
-			this.attackIntervalMin = interval;
-		}
-		else
-		{
-			if (this.attackIntervalMaxGetter != null)
-				this.attackIntervalMax = attackIntervalMaxGetter.get();
-			if (this.attackIntervalMinGetter != null)
-				this.attackIntervalMin = attackIntervalMinGetter.get();
-		}
-		// Update attack interval end
-		
 		this.mob.asMob().getLookControl().setLookAt(this.target, 30.0F, 30.0F);
 		if (--this.attackTime == 0) {
 			if (!flag) {
@@ -171,9 +159,10 @@ public abstract class NFFShootProjectileGoal extends NFFGoal {
 
 			float f = (float) Math.sqrt(d0) / this.attackRadius;
 			float f1 = Mth.clamp(f, 0.1F, 1.0F);
-			this.performShooting(this.target, f1);	// Removed RangedAttackMob 
+			this.performShooting(this.target, f1);
 			this.attackTime = Mth.floor(
 					f * (this.attackIntervalMax - this.attackIntervalMin) + this.attackIntervalMin);
+            this.resetAttackIntervalFromGetter();
 		} else if (this.attackTime < 0) {
 			this.attackTime = Mth.floor(Mth.lerp(Math.sqrt(d0) / this.attackRadius,
 					this.attackIntervalMin, this.attackIntervalMax));
@@ -192,4 +181,26 @@ public abstract class NFFShootProjectileGoal extends NFFGoal {
 	 * @return New target to set.
 	 */
 	protected abstract LivingEntity updateTarget();
+
+    private void resetAttackIntervalFromGetter() {
+        if (this.attackIntervalGetter != null)
+        {
+            int interval = this.attackIntervalGetter.get();
+            this.attackIntervalMax = interval;
+            this.attackIntervalMin = interval;
+        }
+        else if (this.attackIntervalMaxGetter != null && this.attackIntervalMinGetter != null)
+        {
+            this.attackIntervalMax = attackIntervalMaxGetter.get();
+            this.attackIntervalMin = attackIntervalMinGetter.get();
+        }
+        else if (this.attackIntervalMaxGetter != null) {
+            this.attackIntervalMax = attackIntervalMaxGetter.get();
+            this.attackIntervalMin = attackIntervalMaxGetter.get();
+        }
+        else if (this.attackIntervalMinGetter != null) {
+            this.attackIntervalMax = attackIntervalMinGetter.get();
+            this.attackIntervalMin = attackIntervalMinGetter.get();
+        }
+    }
 }
