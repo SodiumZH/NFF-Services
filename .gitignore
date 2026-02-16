@@ -22,6 +22,9 @@ build
 eclipse
 libs
 run*
+gradlew
+gradlew.bat
+gradle/*
 
 !run/saves
 
