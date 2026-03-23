@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.x.32
+
+Fixed `NFFShootProjectileGoal` attack interval issue.
+
 ### 0.x.31
 
 Separated NFU Library out as a standalone mod.
