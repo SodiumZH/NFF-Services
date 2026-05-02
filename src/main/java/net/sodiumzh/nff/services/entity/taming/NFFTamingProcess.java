@@ -20,8 +20,11 @@ import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
+import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
+import net.sodiumzh.nfu.object.ICastable;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +36,8 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 	protected static final UUID EMPTY_UUID = new UUID(0L, 0L);
 	protected static final Random RND = new Random();
+	protected MobAngerRules angerRules = MobAngerRules.ATTACKER_DAMAGED.get();
+	protected MobAngerRules interruptionRules = MobAngerRules.ATTACKER_DAMAGED.get();
 
 	public NFFTamingProcess()
 	{	
@@ -136,13 +141,14 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	@Override
 	public void onAngryAt(Mob mob, Player player, MobAngerReason reason)
 	{
-		if (isInProcess(player, mob) && this.getInterruptingAngerRules().getForgivingTicks(reason, mob, player) != 0)
+		if (isInProcess(player, mob) && this.getInterruptionRules().getForgivingTicks(reason, mob, player) != 0)
 			interrupt(player, mob, false);
 	}
 
 	@Nonnull
-	public MobAngerRules getInterruptingAngerRules() {
-		return MobAngerRules.ATTACKER_DAMAGED.get();
+	@ApiStatus.NonExtendable
+	public MobAngerRules getInterruptionRules() {
+		return this.interruptionRules;
 	}
 
 	@Override
@@ -182,6 +188,73 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 	public boolean allowsToProgressOnRiding(Mob mob, @Nullable Entity mount) {
 		return mount instanceof Mob;	// Allow to tame on horse
+	}
+
+	/**
+	 * Set rules making the mob angry. Note that this rule doesn't impact whether the friending process
+	 * will be interrupted when getting angry. To set interruption rules, use {@code setInterruptingRules} or
+	 * {@code setAngerAndInterruptionRules}.
+	 */
+	@ApiStatus.NonExtendable
+	public NFFTamingProcess setAngerRules(MobAngerRules rules) {
+		this.angerRules = rules;
+		return this;
+	}
+
+	/**
+	 * Set rules that make the progress interrupted when getting angry.
+	 * <p>Note that the mob will not get angry for reasons not included in the anger rules (accessed by
+	 * {@code getAngerRules} and {@code setAngerRules}), even if it's in the interruption rules.
+	 * <p>To set anger rules, use {@code setAngerRules} or {@code setAngerAndInterruptionRules}.
+	 */
+	@ApiStatus.NonExtendable
+	public NFFTamingProcess setInterruptionRules(MobAngerRules rules) {
+		this.interruptionRules = rules;
+		return this;
+	}
+
+	/**
+	 * Set both anger rules and interruption rules. Equivalent to calling {@code setAngerRules} and {@code setInterruptionRules}
+	 * simultaneously.
+	 */
+	@ApiStatus.NonExtendable
+	public NFFTamingProcess setAngerAndInterruptionRules(MobAngerRules anger, MobAngerRules interruption) {
+		this.angerRules = anger;
+		this.interruptionRules = interruption;
+		return this;
+	}
+
+	/**
+	 * Set both anger rules and interruption rules to the given value (i.e. set that the mob will get angry for given
+	 * reasons, and always interrupt the progress when getting angry).
+	 */
+	@ApiStatus.NonExtendable
+	public NFFTamingProcess setAngerAndInterruptionRules(MobAngerRules rules) {
+		return setAngerAndInterruptionRules(rules, rules);
+	}
+
+	@Override
+	@ApiStatus.NonExtendable
+	public MobAngerRules getAngerRules() {
+		return this.angerRules;
+	}
+
+	/**
+	 * Up-cast self to a specified subclass. For registration convenience. Take care of type hierarchy.
+	 * @throws ClassCastException If class mismatches.
+	 */
+	@SuppressWarnings("unchecked")
+	public final <T extends NFFTamingProcess> T castUnsafe(Class<T> clazz) {
+		return (T)this;
+	}
+
+	/**
+	 * Up-cast self to a context-determined subclass. For registration convenience. Take care of type hierarchy.
+	 * @throws ClassCastException If class mismatches.
+	 */
+	@SuppressWarnings("unchecked")
+	public final <T extends NFFTamingProcess> T castUnsafe() {
+		return (T)this;
 	}
 
 	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
