@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -13,7 +14,8 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 
 	@Deprecated
 	protected Random rnd = new Random();
-	
+	protected int itemGivingCooldownTicks = 100;
+
 	/**
 	 * Check if the mob accepts the item.
 	 */
@@ -41,8 +43,17 @@ public abstract class TamingProcessItemGiving extends NFFTamingProcess
 		sendParticlesOnBefriended(mob);
 		return doTaming(player, mob);
 	}
-	
-	public abstract int getItemGivingCooldownTicks();
+
+    @ApiStatus.NonExtendable
+	public int getItemGivingCooldownTicks() {
+        return itemGivingCooldownTicks;
+    }
+
+    @ApiStatus.NonExtendable
+    public TamingProcessItemGiving setItemGivingCooldownTicks(int value) {
+        this.itemGivingCooldownTicks = value;
+        return this;
+    }
 
 	public void sendParticlesOnBefriended(Mob target)
 	{

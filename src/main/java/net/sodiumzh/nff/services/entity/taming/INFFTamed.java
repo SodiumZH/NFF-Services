@@ -47,6 +47,7 @@ import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -158,6 +159,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
 	 */
 	@DontCallManually
+    @ApiStatus.OverrideOnly
 	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
 
 	/**
@@ -165,6 +167,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * <p>After finishing initialization the mob will start updating from its inventory.
 	 */
 	@DontOverride
+    @ApiStatus.NonExtendable
 	public default boolean hasInit()
 	{
 		return this.getData().hasInit();
