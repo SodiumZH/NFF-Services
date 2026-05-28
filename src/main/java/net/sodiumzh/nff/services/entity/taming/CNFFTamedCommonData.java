@@ -506,6 +506,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 					+ "Attempted class: " + mob.getClass().toString());
 		}
 
+
+
 		@Override
 		public Object getTempObject(String key) {
 			return tempObjects.get(key);
