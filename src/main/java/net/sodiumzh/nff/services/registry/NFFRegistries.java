@@ -13,6 +13,6 @@ public class NFFRegistries {
     public static void init(){}
 
     public static NFURegistry<NFFTamingProcess> TAMING_PROCESSES = new NFURegistry<NFFTamingProcess>(new ResourceLocation(NFFServices.MOD_ID, "taming_processes"))
-            .setShouldGenerateOnServerSetup();
+        .setSide(NFURegistry.AvailableSide.SERVER).setLoadTiming(NFURegistry.LoadTiming.SIDE_SETUP);
 
 }

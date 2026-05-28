@@ -41,8 +41,8 @@ import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
+import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUCapabilities;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
@@ -55,6 +55,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public interface INFFTamed extends ContainerListener, OwnableEntity {
 
@@ -689,20 +691,19 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	/**
 	 * Get the capability for storage of additional data.
+	 * @deprecated Use {@code getDataAccessor} instead.
 	 */
-	public default CNFFTamedCommonData getData()
+	@Deprecated(forRemoval = true)
+	public default NFFTamedDataAccessor getData()
 	{
-		MutableObject<CNFFTamedCommonData> res = new MutableObject<CNFFTamedCommonData>(null);
-		asMob().getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
-		{
-			res.setValue(cap);
-		});
-		if (res.getValue() == null)
-			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
-			return new CNFFTamedCommonData.Values(this);	
-		return res.getValue();
+		return this.getDataAccessor();
 	}
-	
+
+	@ApiStatus.NonExtendable
+	public default NFFTamedDataAccessor getDataAccessor() {
+		return new NFFTamedDataAccessor(this);
+	}
+
 	/**
 	 * Invoked after data capability initialized (constructor done), before {@link NFFTamedCommonDataConstructEvent}.
 	 * <p>Mainly for creating additional synched data fields.
@@ -810,12 +811,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void recordLocationToOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
-				c.getNBT().put("tamedMobLocations", new CompoundTag());
-			MobLocationInfo info = MobLocationInfo.fromMob(this);
-			c.getNBT().getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
-		});
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		if (!nbt.contains("tamedMobLocations", Tag.TAG_COMPOUND))
+			nbt.put("tamedMobLocations", new CompoundTag());
+		MobLocationInfo info = MobLocationInfo.fromMob(this);
+		nbt.getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
 	}
 
 	/**
@@ -824,27 +824,23 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void removeLocationOnOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
-		});
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		nbt.getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
 	}
 
 	/** Only on server, get all NFF mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
 	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
 		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
-		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
-				new AtomicReference<>(new HashMap<>());
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
-			res.set(NFUNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
-					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
-		});
-		return NFUContainerStatics.iterableToMap(res.get().values().stream()
+
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		if (!nbt.contains("tamedMobLocations", Tag.TAG_COMPOUND)) return Map.of();
+		Map<UUID, Optional<MobLocationInfo>> res = NFUNBTStatics.mapFromCompoundTag(nbt.getCompound("tamedMobLocations"),
+			UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl)));
+		return res.values().stream()
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.filter(MobLocationInfo::isValid)
-				.toList(),
-				MobLocationInfo::identifier, info -> info);
+			.collect(Collectors.toMap(MobLocationInfo::identifier, info -> info));
 	}
 
 	/**
@@ -869,23 +865,23 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
 		if (!(player.level() instanceof ServerLevel sl)) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
-							e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
-					.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
-					.map(INFFTamed::getIdentifier).toList();
-			List<INFFTamed.MobLocationInfo> savedLocations =
-					c.getNBT().getCompound("tamedMobLocations").getAllKeys()
-							.stream().map(k -> INFFTamed.MobLocationInfo.load(c.getNBT().getCompound("tamedMobLocations").getCompound(k), sl))
-							.filter(Objects::nonNull).toList();
-			List<UUID> suspiciousIdentifiers = new ArrayList<>();
-			for (INFFTamed.MobLocationInfo loc: savedLocations) {
-				ServerLevel dim = sl.getServer().getLevel(loc.dimension());
-				if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
-					suspiciousIdentifiers.add(loc.identifier());
-			}
-			suspiciousIdentifiers.forEach(id -> c.getNBT().getCompound("tamedMobLocations").remove(id.toString()));
-		});
+
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
+				e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
+			.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
+			.map(INFFTamed::getIdentifier).toList();
+		List<INFFTamed.MobLocationInfo> savedLocations =
+			nbt.getCompound("tamedMobLocations").getAllKeys()
+				.stream().map(k -> INFFTamed.MobLocationInfo.load(nbt.getCompound("tamedMobLocations").getCompound(k), sl))
+				.filter(Objects::nonNull).toList();
+		List<UUID> suspiciousIdentifiers = new ArrayList<>();
+		for (INFFTamed.MobLocationInfo loc: savedLocations) {
+			ServerLevel dim = sl.getServer().getLevel(loc.dimension());
+			if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
+				suspiciousIdentifiers.add(loc.identifier());
+		}
+		suspiciousIdentifiers.forEach(id -> nbt.getCompound("tamedMobLocations").remove(id.toString()));
 	}
 
 	public static record MobLocationInfo(UUID identifier, Component mobName, ResourceKey<Level> dimension, BlockPos pos) {
