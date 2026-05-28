@@ -27,14 +27,16 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
 
     public NFFTamedDataComponent(Mob entity) {
         super(entity);
-        if (INFFTamed.get(entity).isEmpty())
-            throw new IllegalStateException("NFFTamedDataComponent is only for INFFTamed");
         this.putTransientVariable("sunImmunity", new MutablePredicate<Mob>());
     }
 
     private EntityType<? extends Mob> getInitialEntityTypeRaw() {
         return this.getVariable("initialType", ResourceLocation.class)
             .map(loc -> (EntityType<? extends Mob>)ForgeRegistries.ENTITY_TYPES.getValue(loc)).orElse(null);
+    }
+
+    public INFFTamed getTamed() {
+        return INFFTamed.get(this.getEntity()).orElseThrow(() -> new IllegalStateException("Missing INFFTamed interface."));
     }
 
     @SuppressWarnings("unchecked")
@@ -67,7 +69,7 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
         this.putPermanentVariable("initialType", ForgeRegistries.ENTITY_TYPES.getKey(entityType), NFUDataSerializers.RESOURCE_LOCATION);
     }
 
-
+    @SuppressWarnings("unchecked")
     public MutablePredicate<INFFTamed> getSunImmunity() {
         return this.getOrPutTransient("sunImmunity", MutablePredicate.class, MutablePredicate::new).orElseThrow();
     }
