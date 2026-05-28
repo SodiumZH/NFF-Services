@@ -39,65 +39,6 @@ public class NFFTamedStatics
 		else return !mob.isAllyTo(target);
 	}
 
-	/* Save & Load */
-
-	/*@Deprecated
-	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String modId) {		
-		addBefriendedCommonSaveData(mob, nbt);
-	}*/
-
-	/**
-	 * @deprecated No longer used, moved to data
-	 */
-	/*@Deprecated
-	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt)
-	{
-		nbt.put("bm_common", new CompoundTag());
-		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
-		if (mob.getOwnerUUID() != null)
-			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
-		nbt.getCompound("bm_common").putString("ai_state", mob.getAIState().getId().toString());
-		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");*/
-		
-		/*String modId = mob.getModId();
-		String ownerKey = modId + ":befriended_owner";
-		String aiStateKey = modId + ":befriended_ai_state";
-		String inventoryKey = modId + ":befriended_additional_inventory";
-		// Mod ID
-		nbt.putString("befriended_mod_id", modId);
-		// Owner UUID
-		if (mob.getOwnerUUID() != null)
-			nbt.putUUID(ownerKey, mob.getOwnerUUID());
-		else
-			nbt.putUUID(ownerKey, new UUID(0, 0));
-		nbt.putInt(aiStateKey, mob.getAIState().id);
-		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
-	}*/
-	
-	/*@Deprecated	// Use version without modid input
-	public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String inModId)
-	{
-		readBefriendedCommonSaveData(mob, nbt);
-	}*/
-
-	/*public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt) {
-		
-		if (nbt.contains("bm_common", NFUNBTStatics.TAG_COMPOUND_ID))
-		{
-			if (nbt.getCompound("bm_common").getUUID("owner") == null)
-			{
-				new IllegalStateException("Reading befriended mob data error: invalid owner. Was INFFTamed.init() not called?").printStackTrace();
-				return;
-			}
-			mob.setOwnerUUID(nbt.getCompound("bm_common").getUUID("owner"));
-			mob.init(mob.getOwnerUUID(), null);
-			if (nbt.getCompound("bm_common").contains("ai_state", Tag.TAG_STRING))
-				mob.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getCompound("bm_common").getString("ai_state"))), false);
-			else mob.setAIState(NFFTamedMobAIState.WAIT, false);
-			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
-		}
-	}*/
-
 	/**
 	 * Convert a befriended mob to other type. This action will keep its data.
 	 * @param target The mob to convert.

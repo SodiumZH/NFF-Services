@@ -7,6 +7,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sodiumzh.nff.services.registry.NFFCapabilityAttachments;
+import net.sodiumzh.nff.services.registry.NFFDataSerializers;
+import net.sodiumzh.nff.services.registry.NFFEntityComponents;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.savedata.redirector.SaveDataLocationRedirector;
 import org.slf4j.Logger;
@@ -35,6 +37,8 @@ public class NFFServices {
 		//modEventBus.addListener(this::commonSetup);
 		
 		NFFItemRegistry.ITEMS.register(modEventBus);
+		NFFDataSerializers.COLLECTION.merge();
+		NFFEntityComponents.COLLECTION.merge();
 		//EXAMPLE_EntityTypeRegister.EXAMPLE_ENTITY_TYPES.register(modEventBus);
 		
         MinecraftForge.EVENT_BUS.register(this);
