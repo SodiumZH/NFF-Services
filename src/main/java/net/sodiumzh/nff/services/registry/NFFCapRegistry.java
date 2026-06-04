@@ -14,12 +14,11 @@ import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
 import net.sodiumzh.nfu.capability.CEntityTickingCapability;
-import net.sodiumzh.nfu.entity.anger.CMobAngerHandler;
 
 public class NFFCapRegistry {
 
 	// Functional caps
-	public static final Capability<CNFFTamable> CAP_BEFRIENDABLE_MOB = CapabilityManager.get(new CapabilityToken<>(){});
+	//public static final Capability<CNFFTamable> CAP_BEFRIENDABLE_MOB = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<CHealingHandler> CAP_HEALING_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<CAttributeMonitor> CAP_ATTRIBUTE_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<CItemStackMonitor> CAP_ITEM_STACK_MONITOR = CapabilityManager.get(new CapabilityToken<>(){});
@@ -36,14 +35,14 @@ public class NFFCapRegistry {
 		CEntityTickingCapability.registerTicking(CAP_BEFRIENDED_MOB_DATA);
 		CEntityTickingCapability.registerTicking(CAP_ATTRIBUTE_MONITOR);
 		CEntityTickingCapability.registerTicking(CAP_ITEM_STACK_MONITOR);
-		CMobAngerHandler.register(CAP_BEFRIENDABLE_MOB);
+		//CMobAngerHandler.register(CAP_BEFRIENDABLE_MOB);
 	}
 	
 	@SubscribeEvent
 	public static void register(RegisterCapabilitiesEvent event)
 	{
 		// Entities
-		event.register(CNFFTamable.class);
+		//event.register(CNFFTamable.class);
 		event.register(CHealingHandler.class);
 		event.register(CAttributeMonitor.class);
 		//event.register(CBaubleDataCache.class);

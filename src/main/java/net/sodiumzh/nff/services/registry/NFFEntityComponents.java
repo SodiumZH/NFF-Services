@@ -5,10 +5,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.*;
-import net.sodiumzh.nfu.entity.component.EntityComponentSetupEvent;
-import net.sodiumzh.nfu.entity.component.EntityComponentType;
-import net.sodiumzh.nfu.entity.component.EntityComponentTypes;
-import net.sodiumzh.nfu.entity.component.IEntityComponent;
+import net.sodiumzh.nfu.entity.component.*;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 import net.sodiumzh.nfu.registry.NFURegistryEntryCollection;
@@ -21,6 +18,12 @@ public class NFFEntityComponents {
 
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableComponent>> TAMABLE = COLLECTION.register("tamable", () ->
         new EntityComponentType<>(Mob.class, NFFTamableComponent.class, NFFTamableComponent::new));
+    public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableDataComponent>> TAMABLE_DATA = COLLECTION.register("tamable_data", () ->
+        new EntityComponentType<>(Mob.class, NFFTamableDataComponent.class, NFFTamableDataComponent::new));
+    public static final NFURegistry.Accessor<EntityComponentType<Mob, EntityTimerComponent<Mob>>> MOB_TIMER = COLLECTION.register("mob_timer", () ->
+        new EntityComponentType<>(Mob.class, EntityTimerComponent.class, EntityTimerComponent::new));
+    public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableAngerHandlerComponent>> TAMABLE_ANGER_HANDLER = COLLECTION.register("tamable_anger_handler", () ->
+        new EntityComponentType<>(Mob.class, NFFTamableAngerHandlerComponent.class, NFFTamableAngerHandlerComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedDataComponent>> TAMED_DATA = COLLECTION.register("tamed_data", () ->
         new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, NFFTamedDataComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedSyncherComponent>> TAMED_SYNCHER = COLLECTION.register("tamed_syncher", () ->
@@ -37,9 +40,10 @@ public class NFFEntityComponents {
             event.addComponent("/nff/tamed/data", TAMED_DATA.get());
         }
         else if (event.getEntity() instanceof Mob mob && NFFTamingMapping.getAllTamableTypes().contains(event.getEntity().getType())) {
-            event.addNode("/nff/tamable");
-            event.addComponent("/nff/tamable/data", EntityComponentTypes.DATA.get());
-            event.addComponent("/nff/tamable/timer", EntityComponentTypes.TIMER.get());
+            event.addComponent("/nff/tamable", TAMABLE.get());
+            event.addComponent("/nff/tamable/data", TAMABLE_DATA.get());
+            event.addComponent("/nff/tamable/timer", MOB_TIMER.get());
+            event.addComponent("nff/tamable/anger_handler", TAMABLE_ANGER_HANDLER.get());
         }
     }
 
