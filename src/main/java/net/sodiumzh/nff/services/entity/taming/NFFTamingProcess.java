@@ -10,18 +10,14 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.BMHooks;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
-import net.sodiumzh.nfu.capability.CEntityTimerCapability;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.entity.component.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
-import net.sodiumzh.nfu.object.ICastable;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 import org.jetbrains.annotations.ApiStatus;
@@ -46,7 +42,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	 * Invoked on entity join level to initialize the tamable capability.
 	 * <p>Handled in {@link NFFEntityEventListeners#onEntityJoinWorld}.
 	 */
-	public abstract void tamableInit(CNFFTamable cap);
+	public abstract void tamableInit(NFFTamableComponent cap);
 
 	@Override
 	public Mob doTaming(Player player, Mob target)
@@ -59,8 +55,8 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 			return null;		
 
 		// Check if befriendable capability is attached
-		if(!target.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent())
-			throw new RuntimeException("Befriending: Target mob not having CNFFTamable capability attached.");
+		if(NFFTamableComponent.getOptional(target).isEmpty())
+			throw new RuntimeException("Befriending: Target mob not having NFFTamableComponent correctly attached.");
 		
 		// Get new type, and do check
 		@SuppressWarnings("unchecked")
@@ -94,13 +90,13 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	/**
 	 * Invoked on mob tick on server.
 	 * <p> For custom tick actions, override {@code serverTick} instead.
-	 * <p> Implemented through {@link CNFFTamableImpl#tick()}.
+	 * <p> Implemented through {@link NFFTamableComponent#tick()}.
 	 */
 	public final void doServerTick(Mob mob)
 	{
 		if (persistentIfInProcess())
 		{
-			mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(c -> 
+			NFFTamableComponent.getOptional(mob).ifPresent(c ->
 			{
 				if (this.isInAnyProcess(mob))
 					c.setForcePersistent(true);
@@ -131,7 +127,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 
 	/** Execute when the mob added player into hatred list
 	* Interrupt if attacked by default
-	 * <p>Implemented through {@link CNFFTamableImpl#onAngryAt}</>
+	 * <p>Implemented through {@link NFFTamableAngerHandlerComponent#onAngryAt}</>
 	* */
 	@Override
 	public void onAngryAt(Mob mob, Player player, MobAngerReason reason)
@@ -167,10 +163,10 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	public void onPlayerTimerExpire(Mob mob, UUID playerUUID, String key) {}
 
 	/**
-	 * Get the tamable capability of a mob. It's a shortcut of {@link CNFFTamable#get}.
+	 * Get the tamable component of a mob. It's a shortcut of {@link NFFTamableComponent#get}.
 	 */
-	public final CNFFTamable getTamable(Mob mob) {
-		return CNFFTamable.get(mob);
+	public final NFFTamableComponent getTamable(Mob mob) {
+		return NFFTamableComponent.get(mob);
 	}
 
 	/**
@@ -255,12 +251,16 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = NFFServices.MOD_ID)
 	public static class EventListeners {
 		@SubscribeEvent
-		public static void notifyTimerExpire(CEntityTimerCapability.ExpireEvent event) {
-			if (event.getCapability() instanceof CNFFTamable tamable) {
-				var playerInfo = CNFFTamable.parsePlayerSpecificTimerKey(event.getKey());
-				playerInfo.ifPresent(info -> tamable.getTamingProcess().onPlayerTimerExpire(tamable.getEntity(), info.getA(), info.getB()));
-				if (playerInfo.isEmpty()) {
-					tamable.getTamingProcess().onGeneralTimerExpire(tamable.getEntity(), event.getKey());
+		public static void notifyTimerExpire(EntityTimerComponent.ExpireEvent event) {
+			if (event.getComponent().equals(NFFTamableComponent.getOptional(event.getEntity()).map(NFFTamableComponent::getTimerComponent).orElse(null))
+				&& event.getEntity() instanceof Mob mob)
+			{
+				NFFTamableComponent tamableComponent = NFFTamableComponent.getOptional(event.getEntity()).orElseThrow();
+				if (event.isUUIDSpecific()) {
+					tamableComponent.getTamingProcess().onPlayerTimerExpire(mob, event.getUUID().orElseThrow(), event.getName());
+				}
+				else {
+					tamableComponent.getTamingProcess().onGeneralTimerExpire(mob, event.getName());
 				}
 			}
 		}
