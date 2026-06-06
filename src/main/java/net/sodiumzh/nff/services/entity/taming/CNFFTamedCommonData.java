@@ -53,6 +53,7 @@ import java.util.function.Supplier;
 /**
  * A temporal module for storage of data in INFFTamed interface.
  */
+@Deprecated(forRemoval = true)
 public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEntityTickingCapability<Mob> {
 	
 	// General //
