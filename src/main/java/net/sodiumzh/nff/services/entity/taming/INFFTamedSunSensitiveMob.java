@@ -6,6 +6,10 @@ import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
+import org.jetbrains.annotations.NonNls;
+
+import javax.annotation.Nonnull;
+
 /**
  * This is an interface handling sun immunity for sun-sensitive mobs.
  * Put and remove entries in {@code sunImmuneConditions()} and {@sunImmuneNecessaryConditions()} to set rules.
@@ -13,13 +17,11 @@ import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
  */
 public interface INFFTamedSunSensitiveMob
 {
-
 	@DontOverride
+	@Nonnull
 	public default INFFTamed getTamed()
 	{
-		if (this instanceof INFFTamed bm)
-			return bm;
-		else throw new UnsupportedOperationException("INFFTamedSunSensitiveMob: mob missing INFFTamed interface.");
+		return INFFTamed.get(this.getMob()).orElseThrow(() -> new UnsupportedOperationException("INFFTamedSunSensitiveMob: mob missing INFFTamed interface."));
 	}
 	
 	@DontOverride
@@ -37,7 +39,7 @@ public interface INFFTamedSunSensitiveMob
 	@DontOverride
 	public default boolean isSunImmune()
 	{
-		return getSunImmunity().test(this);
+		return getSunImmunity().test(this.getTamed());
 	}
 	
 	/**
@@ -48,7 +50,7 @@ public interface INFFTamedSunSensitiveMob
 	public void setupSunImmunityRules();
 	
 	@DontOverride
-	public default MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity()
+	public default MutablePredicate<INFFTamed> getSunImmunity()
 	{
 		return this.getTamed().getData().getSunImmunity();
 	}
