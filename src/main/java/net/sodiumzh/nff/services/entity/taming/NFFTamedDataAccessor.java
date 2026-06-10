@@ -107,6 +107,11 @@ public class NFFTamedDataAccessor {
         return this.getSyncherComponent().getIdentifier();
     }
 
+    @ApiStatus.Internal
+    public void setIdentifier(UUID identifier) {
+        return this.getSyncherComponent().setIdentifier
+    }
+
     /**
      * Generate UUID identifier of this mob. (Independent to the entity UUID.
      * This is generated on befriended for identifying a mob even if it has respawned with a new UUID.)
