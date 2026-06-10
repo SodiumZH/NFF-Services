@@ -3,7 +3,7 @@ package net.sodiumzh.nff.services.entity.taming;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.sodiumzh.nfu.entity.component.EntityDataComponent;
+import net.sodiumzh.nfu.entity.component.preset.EntityDataComponent;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nonnull;

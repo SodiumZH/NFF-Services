@@ -1,23 +1,18 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.ForgeRenderTypes;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.registry.NFFDataSerializers;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
-import net.sodiumzh.nfu.annotation.DontCallManually;
-import net.sodiumzh.nfu.entity.component.EntityDataComponent;
+import net.sodiumzh.nfu.entity.component.preset.EntityDataComponent;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
-import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
@@ -94,7 +89,7 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
     }
 
     public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getOrPutPermanent("inventory", NFFTamedMobInventory.class, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), () ->
+        return this.getOrPutPermanent(" ", NFFTamedMobInventory.class, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), () ->
             INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow())
             .orElseGet(() -> INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow());
     }

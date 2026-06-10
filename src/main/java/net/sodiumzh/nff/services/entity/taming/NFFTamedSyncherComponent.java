@@ -2,15 +2,13 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.registry.NFFTagRegistry;
-import net.sodiumzh.nfu.entity.component.EntitySyncherComponent;
+import net.sodiumzh.nfu.entity.component.preset.EntitySyncherComponent;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
+import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,6 +47,11 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         }
     }
 
+    private void setIdentifier(UUID identifier) {
+        if (identifier.equals(new UUID(0L, 0L))) throw new IllegalArgumentException();
+        this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, identifier);
+    }
+
     public void generateIdentifier()
     {
         UUID id = this.getSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class).orElse(null);
@@ -68,12 +71,6 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         else {
             LogUtils.getLogger().error("Attempting to generate NFF tamed mob identifier twice. Skipped. Mob: \"" + this.getEntity().getName() + "\"");
         }
-    }
-
-    // Directly set, not safe
-    private void setIdentifier(UUID val)
-    {
-        this.setSynchedData(IDENTIFIER_SYNCHED_KEY, UUID.class, val);
     }
 
     public String getOwnerName() {

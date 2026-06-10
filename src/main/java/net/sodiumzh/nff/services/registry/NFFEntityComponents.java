@@ -6,6 +6,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nfu.entity.component.*;
+import net.sodiumzh.nfu.entity.component.preset.*;
+import net.sodiumzh.nfu.registry.NFUEntityComponents;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 import net.sodiumzh.nfu.registry.NFURegistryEntryCollection;
@@ -30,7 +32,6 @@ public class NFFEntityComponents {
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
 
 
-
     @SubscribeEvent
     public static void attach(EntityComponentSetupEvent event) {
         event.addNode("/nff");
@@ -38,12 +39,17 @@ public class NFFEntityComponents {
             event.addNode("/nff/tamed");
             event.addComponent("/nff/tamed/syncher", TAMED_SYNCHER.get());
             event.addComponent("/nff/tamed/data", TAMED_DATA.get());
+            event.addComponent("/nff/tamed/healing_handler", NFUEntityComponents.HEALING_HANDLER.get());
         }
         else if (event.getEntity() instanceof Mob mob && NFFTamingMapping.getAllTamableTypes().contains(event.getEntity().getType())) {
             event.addComponent("/nff/tamable", TAMABLE.get());
             event.addComponent("/nff/tamable/data", TAMABLE_DATA.get());
             event.addComponent("/nff/tamable/timer", MOB_TIMER.get());
-            event.addComponent("nff/tamable/anger_handler", TAMABLE_ANGER_HANDLER.get());
+            event.addComponent("/nff/tamable/anger_handler", TAMABLE_ANGER_HANDLER.get());
+        }
+        if (event.getEntity() instanceof Mob mob) {
+            event.addComponent("/nff/attribute_monitor", NFUEntityComponents.ATTRIBUTE_MONITOR.get());
+            event.addComponent("/nff/item_stack_monitor", NFUEntityComponents.ITEM_STACK_MONITOR.get());
         }
     }
 
