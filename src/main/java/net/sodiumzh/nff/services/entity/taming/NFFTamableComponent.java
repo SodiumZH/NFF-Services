@@ -14,7 +14,7 @@ import net.sodiumzh.nfu.container.ITable2D;
 import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.entity.component.EntityComponentBase;
 import net.sodiumzh.nfu.entity.component.EntityComponentType;
-import net.sodiumzh.nfu.entity.component.EntityTimerComponent;
+import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -234,6 +234,8 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
         return this;
     }
 
+    // Static shortcuts
+
     /**
      * Get the default tamable component of a mob (path: {@code "/nff/tamable"}). If it's not present, return a new (invalid) instance to prevent errors.
      */
@@ -246,11 +248,22 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
     /**
      * Get the tamable capability of a mob if present, or empty if not.
      */
-    @Nonnull
     public static Optional<NFFTamableComponent> getOptional(Entity e) {
         if (e instanceof Mob mob)
             return EntityComponentAPI.getComponentByPath(mob, "/nff/tamable", NFFEntityComponents.TAMABLE.get());
         else return Optional.empty();
+    }
+
+    public static Optional<NFFTamableDataComponent> getDataComponent(Entity e) {
+        return getOptional(e).map(NFFTamableComponent::getDataComponent);
+    }
+
+    public static Optional<EntityTimerComponent<Mob>> getTimerComponent(Entity e) {
+        return getOptional(e).map(NFFTamableComponent::getTimerComponent);
+    }
+
+    public static Optional<NFFTamableAngerHandlerComponent> getAngerHandler(Entity e) {
+        return getOptional(e).map(NFFTamableComponent::getAngerHandler);
     }
 
     @Override

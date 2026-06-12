@@ -2,8 +2,7 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
-import net.sodiumzh.nfu.capability.EntityTimerAccessor;
+import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcessWithProgress;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 
@@ -19,7 +18,7 @@ import java.util.UUID;
  */
 public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITamingProcessWithProgress<T> {
 
-    public static final EntityTimerAccessor TIMER_KEY_ITEM_COOLDOWN = CNFFTamable.getTimerAccessor("itemCooldown");
+    public static final String TIMER_KEY_ITEM_COOLDOWN = "itemCooldown";
     // Indicates if a player is in progress and the progress. DO NOT CALL IT ANYWHERE other than getProgressValue and setProgressValue!
     public static final String NBT_KEY_PROGRESS_VALUE = "progress";
     public static final String NBT_KEY_ONGOING_PLAYER = "ongoingPlayer";
@@ -45,8 +44,8 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     @Override
     public default void setProgressValue(T mob, UUID playerUUID, double value) {
         if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(uuid, playerUUID)).orElse(false)) return;
-        CNFFTamable.get(mob).getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
-        CNFFTamable.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+        NFFTamableComponent.get(mob).getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
+        NFFTamableComponent.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
     }
 
     /**
@@ -68,8 +67,8 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     public default void removeProgressValue(T mob, UUID playerUUID) {
         if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true))
         {
-            CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-            CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
         }
     }
 
@@ -80,7 +79,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     public default Optional<Double> getProgressValue(T mob)
     {
         return this.getOngoingPlayerUUID(mob).isPresent() ? 
-                Optional.of(CNFFTamable.get(mob).getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE)) :
+                Optional.of(NFFTamableComponent.get(mob).getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE)) :
                 Optional.empty();
     }
 
@@ -92,7 +91,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      */
     public default void setProgressValue(T mob, double value) {
         if (this.getOngoingPlayerUUID(mob).isPresent())
-            CNFFTamable.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+            NFFTamableComponent.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
     }
 
     public default void setProgressValueIfPlayerAbsent(T mob, UUID playerUUID, double value) {
@@ -111,15 +110,15 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      * and works correctly even if the player is not online.
      */
     public default void removeProgressValue(T mob) {
-        CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-        CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+        NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+        NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
     }
     
     /**
      * Get the mob's ongoing player UUID. The player is not necessarily present in the world. Empty if it doesn't have one.
      */
     public default Optional<UUID> getOngoingPlayerUUID(T mob) {
-        CNFFTamable tamable = CNFFTamable.get(mob);
+        NFFTamableComponent tamable = NFFTamableComponent.get(mob);
         if (tamable.getGeneralNBT().hasUUID(NBT_KEY_ONGOING_PLAYER)) {
             return Optional.of(tamable.getGeneralNBT().getUUID(NBT_KEY_ONGOING_PLAYER));
         }
@@ -149,7 +148,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      * Set the ongoing player. Input null to remove ongoing player.
      */
     public default void setOngoingPlayer(T mob, @Nullable UUID player) {
-        CNFFTamable tamable = CNFFTamable.get(mob);
+        NFFTamableComponent tamable = NFFTamableComponent.get(mob);
         if (player != null && !Objects.equals(player, EMPTY_UUID)) {
             tamable.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, player);
         } else {
@@ -180,7 +179,8 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     }
 
     public default int getCurrentCooldown(T mob) {
-        return TIMER_KEY_ITEM_COOLDOWN.getRemainingTime(mob);
+        return NFFTamableComponent.getOptional(mob).orElseThrow().getTimerComponent().getNamedTimer(TIMER_KEY_ITEM_COOLDOWN)
+            .map(EntityTimerComponent.Timer::getTicksRemaining).orElse(0);
     }
 
     /**
@@ -190,11 +190,11 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      */
     public default void setCurrentCooldown(T mob, int ticks) {
         if (ticks <= 0) removeCurrentCooldown(mob, false);
-        TIMER_KEY_ITEM_COOLDOWN.setTimer(mob, ticks);
+        else NFFTamableComponent.getTimerComponent(mob).ifPresent(tc -> tc.addTimer(TIMER_KEY_ITEM_COOLDOWN, ticks, true));
     }
 
     public default void removeCurrentCooldown(T mob, boolean postExpireEvent) {
-        TIMER_KEY_ITEM_COOLDOWN.removeTimer(mob, postExpireEvent);
+        NFFTamableComponent.getTimerComponent(mob).ifPresent(tc -> tc.removeNamedTimer(TIMER_KEY_ITEM_COOLDOWN));
     }
 
     /**

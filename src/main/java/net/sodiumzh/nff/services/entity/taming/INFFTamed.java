@@ -28,8 +28,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
 import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
@@ -42,7 +40,9 @@ import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
+import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
 import net.sodiumzh.nfu.object.FilteredMapper;
+import net.sodiumzh.nfu.registry.NFUEntityComponents;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
@@ -508,29 +508,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * Method to create additional inventory. Invoked on befriended or loaded.
 	 */
 	public NFFTamedMobInventory createAdditionalInventory();
-	
-	/**
-	 *  Set mob data from befriendedInventory.
-	 *  <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#syncToMob} instead.
-	 * @deprecated Use {@code getAdditionalInventory().syncToMob(this.asMob())}.
-	 */
-	@Deprecated
-	@DontOverride
-	public default void updateFromInventory()
-	{
-		this.getAdditionalInventory().syncToMob(this.asMob());
-	}
-	
-	/** Set befriendedInventory from mob data, usually for initializing
-	 * <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#getFromMob} instead.
-	 * @deprecated Use {@code getAdditionalInventory().getFromMob(this.asMob())}.
-	 */
-	@DontOverride
-	@Deprecated
-	public default void setInventoryFromMob()
-	{
-		this.getAdditionalInventory().getFromMob(this.asMob());
-	}
 
 	@Nullable
 	public NFFTamedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
@@ -544,7 +521,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		if (!(pContainer instanceof NFFTamedMobInventory))
 			throw new UnsupportedOperationException("INFFTamed container only receives NFFTamedMobInventory.");
 		if (hasInit())
-			updateFromInventory();
+			this.getAdditionalInventory().syncToMob(this.asMob());
 		onInventoryChanged();
 	}
 
@@ -566,20 +543,20 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	/**
 	 * Get the implementation type of healing handler.
 	 */
-	public default Class<? extends CHealingHandlerImpl> healingHandlerClass()
+	@Deprecated
+	public default Class<? extends HealingHandlerComponent> healingHandlerClass()
 	{
-		return CHealingHandlerImplDefault.class;
+		return HealingHandlerComponent.class;
+	}
+
+	public default HealingHandlerComponent getHealingHandler() {
+		return EntityComponentAPI.getComponentByPathOrFallback(this.asMob(), "/nff/tamed/healing_handler", NFUEntityComponents.HEALING_HANDLER.get());
 	}
 
 	@DontOverride
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown, Player player)
 	{
-		MutableObject<Boolean> succeeded = new MutableObject<>(false);		
-		this.asMob().getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
-		{
-			succeeded.setValue(l.applyHealingItem(stack, value, consume, cooldown, player));
-		});		
-		return succeeded.getValue();
+		return this.getHealingHandler().applyHealingItem(stack, value, consume, cooldown, player);
 	}
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
@@ -589,7 +566,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return null;
 	}
 
-	@DontOverride
+	@ApiStatus.NonExtendable
 	public default InteractionResult tryApplyHealingItems(ItemStack stack, Player player)
 	{
 		if (stack.isEmpty())
@@ -796,7 +773,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		this.setOwner(player);
 		this.getData().setOwnerName(player.getName().getString());
 		this.init(player.getUUID(), from);
-		this.setInventoryFromMob();
+		this.getAdditionalInventory().getFromMob(this.asMob());
 		this.getData().generateIdentifier();
 		this.getData().recordEntityType();
 		this.getData().recordEncounteredDate();

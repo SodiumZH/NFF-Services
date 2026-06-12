@@ -15,7 +15,6 @@ import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
-import net.sodiumzh.nfu.entity.component.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
@@ -69,13 +68,11 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		
 		// Do conversion
 		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
-		if(!(newMob instanceof INFFTamed))
-			throw new RuntimeException("Befriending: Entity type after befriending not implementing INFFTamed interface.");
-		INFFTamed bm = (INFFTamed)newMob;
+		INFFTamed bm = INFFTamed.get(newMob).orElseThrow(() -> new RuntimeException("Befriending: Entity type after befriending is missing INFFTamed interface."));
 		bm.setOwner(player);
 		bm.getData().setOwnerName(player.getName().getString());
 		bm.init(player.getUUID(), target);
-		bm.setInventoryFromMob();
+		bm.getAdditionalInventory().getFromMob(bm.asMob());
 		bm.getData().generateIdentifier();
 		bm.getData().recordEntityType();
 		bm.getData().recordEncounteredDate();
