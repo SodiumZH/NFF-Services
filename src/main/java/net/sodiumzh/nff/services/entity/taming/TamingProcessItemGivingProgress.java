@@ -34,10 +34,9 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 
 	@Override
 	public TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand) {
-
-		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level);
-		CNFFTamable tamable = CNFFTamable.getOptional(mob).resolve().orElse(null);
-		if (tamable == null) return TamingInteractionResult.unhandled(player.level);
+		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level());
+		NFFTamableComponent tamable = NFFTamableComponent.getOptional(mob).orElse(null);
+		if (tamable == null) return TamingInteractionResult.unhandled(player.level());
 
 		if (!player.level.isClientSide)
 		{
@@ -59,9 +58,9 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 					result.setHandled();
 				}
 				// Fail if the mob is angry
-				if (tamable.isAngryAt(player) && !shouldIgnoreAnger()) {
+				if (tamable.getAngerHandler().isAngryAt(player) && !shouldIgnoreAnger()) {
 					sendParticlesOnAngry(mob);
-					this.debugPrint(player, "Anger cooldown: " + Integer.toString(tamable.getRemainingForgivingTicks(player) / 20) + " s.");
+					this.debugPrint(player, "Anger cooldown: " + Integer.toString(tamable.getAngerHandler().getRemainingForgivingTicks(player) / 20) + " s.");
 					result.setHandled();
 				}
 				// Fail if in cooldown
