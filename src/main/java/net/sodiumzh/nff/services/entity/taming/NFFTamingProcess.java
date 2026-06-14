@@ -15,6 +15,7 @@ import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
+import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
@@ -25,7 +26,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public abstract class NFFTamingProcess implements ITamingProcess<Mob>
+public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastable<NFFTamingProcess>
 {
 
 	protected static final UUID EMPTY_UUID = new UUID(0L, 0L);
@@ -70,12 +71,13 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>
 		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
 		INFFTamed bm = INFFTamed.get(newMob).orElseThrow(() -> new RuntimeException("Befriending: Entity type after befriending is missing INFFTamed interface."));
 		bm.setOwner(player);
-		bm.getData().setOwnerName(player.getName().getString());
+        NFFTamedDataAccessor accessor = bm.getDataAccessor();
+        accessor.setOwnerName(player.getName().getString());
 		bm.init(player.getUUID(), target);
 		bm.getAdditionalInventory().getFromMob(bm.asMob());
-		bm.getData().generateIdentifier();
-		bm.getData().recordEntityType();
-		bm.getData().recordEncounteredDate();
+        accessor.generateIdentifier();
+        accessor.recordEntityType();
+        accessor.recordEncounteredDate();
 		//NaUtilsDebugStatics.debugPrintToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
 		BMHooks.Befriending.onMobBefriended(target, bm);
 		bm.setInit();

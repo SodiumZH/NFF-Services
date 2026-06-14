@@ -538,33 +538,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 
 	// Interaction end
 
-	// Inventory related
-	// Generally no need to modify unless noted
-
-	@Override
-	public void updateFromInventory() {
-		if (!this.level().isClientSide)
-		{
-			/*
-			 * If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory,
-			 * set here
-			 */
-		}
-	}
-
-	@Override
-	public void setInventoryFromMob() {
-		if (!this.level().isClientSide)
-		{
-			/*
-			 * If inventory needs to be set from mob's properties on initialization, set
-			 * here
-			 */
-		}
-	}
-
-
-	// Inventory end
 	public static class LeaveBlockGoal extends NFFGoal
 	{
 		protected final NFFTamedEnderManPreset enderman;

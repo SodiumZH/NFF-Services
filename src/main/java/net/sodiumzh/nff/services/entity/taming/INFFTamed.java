@@ -41,6 +41,8 @@ import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
+import net.sodiumzh.nfu.function.MutablePredicate;
+import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
 import net.sodiumzh.nfu.object.FilteredMapper;
 import net.sodiumzh.nfu.registry.NFUEntityComponents;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
@@ -48,6 +50,7 @@ import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -685,7 +688,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * Invoked after data capability initialized (constructor done), before {@link NFFTamedCommonDataConstructEvent}.
 	 * <p>Mainly for creating additional synched data fields.
 	 */
-	public default void onDataInit(CNFFTamedCommonData dataCap) {}
+	public default void onDataInit(NFFTamedDataComponent dataCap) {}
 	
 	/**
 	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID).
@@ -761,7 +764,40 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return false;
 	}
 
-	// Static
+    /**
+     * Return if the mob should use sun-sensitivity features. Override this to true
+     * for mobs that should react to sun.
+     */
+    @ApiStatus.OverrideOnly
+    public default boolean enableSunSensitivity() {return false;}
+
+    /**
+     * Check if the mob is immune to sun from rules.
+     * Implemented in {@link NFFEntityEventListeners#onMobSunBurnTick} via {@link net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent}
+     */
+    @DontOverride
+    @ApiStatus.NonExtendable
+    public default boolean isSunImmune()
+    {
+        return getSunImmunity().test(this);
+    }
+
+    /**
+     * Setup rules for sun immunity. Use {@code getSunImmunity()} to access rules.
+     * Called in EntityJoinWorldEvent only
+     */
+    @DontCallManually
+    @ApiStatus.OverrideOnly
+    public default void setupSunImmunityRules() {};
+
+    @DontOverride
+    @ApiStatus.NonExtendable
+    public default MutablePredicate<INFFTamed> getSunImmunity()
+    {
+        return this.getDataAccessor().getSunImmunity();
+    }
+
+    // Static
 
 	/**
 	 * Common initialization when a new tamed mob is created but not loaded from NBT, either from taming or other ways.

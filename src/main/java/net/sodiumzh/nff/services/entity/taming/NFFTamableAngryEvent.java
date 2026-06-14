@@ -2,7 +2,6 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.event.NFULivingEvent;
 
@@ -27,8 +26,8 @@ public class NFFTamableAngryEvent extends NFULivingEvent<Mob> {
         return reason;
     }
 
-    public CNFFTamable getTamable() {
-        return CNFFTamable.get(this.getEntity());
+    public NFFTamableComponent getTamable() {
+        return NFFTamableComponent.get(this.getEntity());
     }
 
     @Nonnull

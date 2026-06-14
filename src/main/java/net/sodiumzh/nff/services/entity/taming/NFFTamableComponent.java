@@ -293,9 +293,10 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
 
     @Deprecated
     public final Map<String, Integer> getTimerMap() {
-        return this.getTimerComponent().getAllTimerNames().stream()
-            .map(k -> new AbstractMap.SimpleEntry<>(k, this.getTimerComponent().getNamedTimer(k).map(EntityTimerComponent.Timer::getTicksRemaining).orElse(0)))
-            .filter(entry -> entry.getValue() != 0).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return this.getTimerComponent().getAllGeneralTimerNames().stream()
+                .map(key -> new AbstractMap.SimpleEntry<>(key, this.getTimerComponent().getGeneralTimer(key).map(EntityTimerComponent.Timer::getTicksRemaining).orElse(0)))
+                .filter(entry -> entry.getValue() != 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 

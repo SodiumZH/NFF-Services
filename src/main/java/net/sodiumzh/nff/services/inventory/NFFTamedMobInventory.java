@@ -27,7 +27,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 	protected void updateOwner()
 	{
 		if (owner != null && owner.hasInit())
-			owner.updateFromInventory();
+            this.syncToMob(owner.asMob());
 	}
 	
 	public INFFTamed getOwner()

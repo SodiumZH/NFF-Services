@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
-import net.sodiumzh.nfu.mixin.event.entity.EntityTickEvent;
+import net.sodiumzh.nfu.mixin.event.entity.EntityStartTickEvent;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 
 // Handle Item, Item Stack and Item Entity events
@@ -34,7 +34,7 @@ public class NFFItemEventListeners
 	
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
-	public static void onServerItemEntityPreWorldTick(EntityTickEvent event)
+	public static void onServerItemEntityPreWorldTick(EntityStartTickEvent event)
 	{
 		if (event.getEntity() instanceof ItemEntity itementity)
 		{

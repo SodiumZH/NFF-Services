@@ -6,15 +6,16 @@ import net.sodiumzh.nff.services.level.CNFFLevelModule;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 
+import javax.annotation.Nullable;
+
 public class NFFLevelModuleTickEndEvent extends Event
 {
 	public final ServerLevel level;
-	public final CNFFLevelModule levelModule;
+	@Nullable public final CNFFLevelModule levelModule;
 	
 	public NFFLevelModuleTickEndEvent(ServerLevel level)
 	{
 		this.level = level;
-		var cap = NFUMiscStatics.getValue(level.getCapability(NFFCapRegistry.CAP_BM_LEVEL));
-		this.levelModule = cap != null ? cap : null;
+		this.levelModule = level.getCapability(NFFCapRegistry.CAP_LEVEL).orElse(null);
 	}
 }
