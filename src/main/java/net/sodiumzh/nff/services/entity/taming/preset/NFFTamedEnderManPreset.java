@@ -533,8 +533,8 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		}
 	}
 
-	// Inventory end
-	
+	// Interaction end
+
 	public static class LeaveBlockGoal extends NFFGoal
 	{
 		protected final NFFTamedEnderManPreset enderman;

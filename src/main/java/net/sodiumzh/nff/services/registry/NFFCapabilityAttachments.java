@@ -3,30 +3,13 @@ package net.sodiumzh.nff.services.registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.capability.CAttributeMonitorProvider;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerProvider;
-import net.sodiumzh.nff.services.entity.capability.CLivingEntityDelayedActionHandler;
-import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
-import net.sodiumzh.nff.services.entity.capability.wrapper.IAttributeMonitor;
-import net.sodiumzh.nff.services.entity.capability.wrapper.ILivingDelayedActions;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamableImpl;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
-import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
-import net.sodiumzh.nff.services.item.capability.wrapper.IItemStackMonitor;
 import net.sodiumzh.nff.services.level.CNFFLevelModule;
-import net.sodiumzh.nfu.capability.NFUEntitySerializableCapProvider;
 import net.sodiumzh.nfu.util.NFUReflectionStatics;
 
 import java.util.Map;
@@ -56,82 +39,16 @@ public class NFFCapabilityAttachments {
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public static void attachLivingEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-	
-		if (event.getObject() instanceof LivingEntity living)
-		{
-			// Attribute change monitor
-			if (living instanceof IAttributeMonitor)
-			{
-				CAttributeMonitorProvider prvd = new CAttributeMonitorProvider(living);
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_ATTRIBUTE_MONOTOR)
-						, prvd);
-			}
-			// Item Stack monitor
-			if (living instanceof IItemStackMonitor)
-			{
-				CItemStackMonitor.Prvd prvd1 = new CItemStackMonitor.Prvd(living);
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_ITEM_STACK_MONITOR), prvd1);
-			}
-			// Delay action handler
-			if (living instanceof ILivingDelayedActions)
-			{
-				CLivingEntityDelayedActionHandler.Prvd prvd = new CLivingEntityDelayedActionHandler.Prvd(living);
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_DELAYED_ACTION_HANDLER), prvd);
-			}
-		}			
-		
-		
+
 		// CNFFTamable
-		if (event.getObject() instanceof Mob mob) {
-			if (NFFTamingMapping.contains((EntityType<? extends Mob>) mob.getType())
-					&& !(mob instanceof INFFTamed)) 
-			{
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_TAMABLE),
-						new NFUEntitySerializableCapProvider<>(event.getObject(), NFFCapRegistry.CAP_BEFRIENDABLE_MOB,
-								() -> new CNFFTamableImpl(mob, NFFTamingMapping.getProcess(mob).getAngerRules())));
-			}
-
-
+		/*if (event.getObject() instanceof Mob mob) {
 			if (NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
 					&& mob instanceof INFFTamed bm)
 			{
 				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_MOB_COMMON_DATA),
-						new CNFFTamedCommonData.Prvd(bm));
-
-
-				// CHealingHandler
-				if (bm.healingHandlerClass() != null)
-				{
-					try
-					{
-						event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_HEALING_HANDLER),
-							new CHealingHandlerProvider(
-								// Implementation class defined in INFFTamed implementation
-								bm.healingHandlerClass().getDeclaredConstructor(LivingEntity.class).newInstance(bm.asMob()),
-								bm.asMob()));
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
+					new CNFFTamedCommonData.Prvd(bm));
 			}
-		}
-		
-		// CBaubleDataCache
-		/*if (event.getObject() instanceof IBaubleEquipable b)
-		{
-			event.addCapability(new ResourceLocation(NFFServices.MOD_ID, "cap_bauble_data_cache"), 
-					new CBaubleDataCache.Prvd(b));
 		}*/
-		
-		// CNFFPlayerModule
-		if (event.getObject() instanceof Player p)
-		{
-			event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_PLAYER), 
-					new CNFFPlayerModule.Prvd(p));
-		}
-		
 	}
 
 	@SubscribeEvent

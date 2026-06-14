@@ -7,7 +7,6 @@ import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.entity.taming.INFFTamedAmphibious;
-import net.sodiumzh.nff.services.entity.taming.INFFTamedSunSensitiveMob;
 
 // Adjusted from vanilla RestrictSunGoal
 public class NFFRestrictSunGoal extends NFFMoveGoal implements INFFPathfindingGoal {
@@ -33,7 +32,7 @@ public class NFFRestrictSunGoal extends NFFMoveGoal implements INFFPathfindingGo
 			return false;
 		else if (!ignoreHelmet && !getPathfinder().getItemBySlot(EquipmentSlot.HEAD).isEmpty())
 			return false;
-		else if (mob instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		else if (mob.enableSunSensitivity() && mob.isSunImmune())
 			return false;
 		else if (this.mob.asMob().isInWater())
 			return false;

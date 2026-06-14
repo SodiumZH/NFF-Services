@@ -28,8 +28,8 @@ public class TempPortingEvents
 	@SubscribeEvent
 	public static void afterLoad(EntityFinalizeLoadingEvent event)
 	{
-		INFFTamed.ifTamed(event.getEntity(), bm -> {
-			bm.updateFromInventory();
+		INFFTamed.get(event.getEntity()).ifPresent(bm -> {
+            bm.getAdditionalInventory().syncToMob(bm.asMob());
 			bm.init(bm.getOwnerUUID(), null);
 			bm.setInit();
 		});

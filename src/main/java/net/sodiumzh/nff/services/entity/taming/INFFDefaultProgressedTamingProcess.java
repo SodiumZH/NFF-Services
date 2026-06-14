@@ -179,7 +179,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     }
 
     public default int getCurrentCooldown(T mob) {
-        return NFFTamableComponent.getOptional(mob).orElseThrow().getTimerComponent().getNamedTimer(TIMER_KEY_ITEM_COOLDOWN)
+        return NFFTamableComponent.getOptional(mob).orElseThrow().getTimerComponent().getGeneralTimer(TIMER_KEY_ITEM_COOLDOWN)
             .map(EntityTimerComponent.Timer::getTicksRemaining).orElse(0);
     }
 
@@ -194,7 +194,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     }
 
     public default void removeCurrentCooldown(T mob, boolean postExpireEvent) {
-        NFFTamableComponent.getTimerComponent(mob).ifPresent(tc -> tc.removeNamedTimer(TIMER_KEY_ITEM_COOLDOWN));
+        NFFTamableComponent.getTimerComponent(mob).ifPresent(tc -> tc.removeGeneralTimer(TIMER_KEY_ITEM_COOLDOWN));
     }
 
     /**

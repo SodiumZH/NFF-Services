@@ -5,10 +5,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nfu.entity.anger.MobAngerHandlerComponent;
-import net.sodiumzh.nfu.entity.anger.MobForgiveResult;
 import net.sodiumzh.nfu.entity.anger.MobSetAngerResult;
-
-import java.util.UUID;
 
 public class NFFTamableAngerHandlerComponent extends MobAngerHandlerComponent {
 

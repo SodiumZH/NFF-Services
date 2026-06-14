@@ -2,6 +2,7 @@ package net.sodiumzh.nff.services.level;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -11,7 +12,6 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.capability.CNFFPlayerModule;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickEndEvent;
 import net.sodiumzh.nff.services.event.level.NFFLevelModuleTickStartEvent;
@@ -46,7 +46,6 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 	 * So it will be temporarily saved in the level, and once the owner enters the level, the respawner will be given and removed from the suspended list.
 	 * <p> Suspended respawners are added only when {@link INFFTamed#getDeathRespawnerGenerationType} returns {@code DeathRespawnerGenerationType.GIVE}, but can be given back any time.
 	 * <p> The adding action will be handled in {@link NFFEntityEventListeners#onLivingDeath}.
-	 * @param owner UUID of the owner.
 	 */
 	public void addSuspendedRespawner(NFFMobRespawnerInstance respawner);
 	
@@ -125,7 +124,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 		@Override
 		public boolean tryReturnSuspendedRespawner(String key) {
 			CompoundTag container = this.getNbt().getCompound("suspended_respawners");
-			if (!container.contains(key, NFUNBTStatics.TAG_COMPOUND_ID))
+			if (!container.contains(key, Tag.TAG_COMPOUND))
 				return false;	// No such entry
 			ItemStack stack = ItemStack.of(container.getCompound(key));
 			if (stack == null)
@@ -195,7 +194,7 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (cap == NFFCapRegistry.CAP_BM_LEVEL)
+			if (cap == NFFCapRegistry.CAP_LEVEL)
 				return LazyOptional.of(() -> {return this.impl;}).cast();
 			else return LazyOptional.empty();
 		}
@@ -210,16 +209,6 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 			impl.deserializeNBT(nbt);
 		}
 		
-	}
-	
-	public static CNFFPlayerModule get(Player player)
-	{
-		MutableObject<CNFFPlayerModule> wrp = new MutableObject<>(null);
-		player.getCapability(NFFCapRegistry.CAP_BM_PLAYER).ifPresent(c -> 
-		{
-			wrp.setValue(c);
-		});
-		return wrp.getValue();
 	}
 	
 }

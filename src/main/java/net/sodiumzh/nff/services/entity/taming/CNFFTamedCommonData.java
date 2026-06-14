@@ -68,7 +68,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public CompoundTag getAdditionalNBT();
 	
 	/** Get sun immunity. It only works when the mob is an {@link INFFTamedSunSensitiveMob}, otherwise throws exception. */
-	public MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity();
+	public MutablePredicate<INFFTamed> getSunImmunity();
 	
 	/** Get temporary object from a key from table. Temporary object table is a non-serialized object table to store any objects, 
 	 * not directly accessible but only with {@code getTempObject}, {@code addTempObject} and {@code removeTempObject}.
@@ -339,7 +339,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private Map<String, SynchedGetter> synchedGetters = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
-		private MutablePredicate<INFFTamedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
+		private MutablePredicate<INFFTamed> sunImmunity = new MutablePredicate<>();
 		// Temp
 		private Map<String, Object> tempObjects = new HashMap<>();
 		
@@ -358,7 +358,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 					() -> Optional.ofNullable(this.getEntity().getTarget())
 							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
-			this.getBM().onDataInit(this);
+			//this.getBM().onDataInit(this);
 			MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
 			this.sync();
 		}
@@ -500,11 +500,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 		
 		@Override
-		public MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity() {
-			if (mob instanceof INFFTamedSunSensitiveMob)
+		public MutablePredicate<INFFTamed> getSunImmunity() {
 				return sunImmunity;
-			else throw new UnsupportedOperationException("CNFFTamedCommonData sun immunity field only supports INFFTamedSunSensitiveMob. "
-					+ "Attempted class: " + mob.getClass().toString());
 		}
 
 

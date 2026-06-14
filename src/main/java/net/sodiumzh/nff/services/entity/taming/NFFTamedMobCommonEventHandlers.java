@@ -40,7 +40,7 @@ public class NFFTamedMobCommonEventHandlers
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
 	{
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		if (INFFTamed.get(event.getEntity()).map(t -> t.enableSunSensitivity() && t.isSunImmune()).orElse(false))
 			event.setCanceled(true);
 	}
 }

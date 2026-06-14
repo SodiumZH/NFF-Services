@@ -73,7 +73,7 @@ public class NFFMobRespawnerItem extends NFUItem
 					{
 						if (!bef.getAdditionalInventory().isEmpty())
 							bef.getAdditionalInventory().clearContent();
-						bef.updateFromInventory();
+						bef.getAdditionalInventory().syncToMob(bef.asMob());
 						NFUEntityStatics.removeAllEquipment(bef.asMob());
 					}
 					bef.setInit();
