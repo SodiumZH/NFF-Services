@@ -26,7 +26,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
 import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed.DeathRespawnerGenerationType;
 import net.sodiumzh.nff.services.event.entity.NFFTamedDeathEvent;
@@ -35,7 +34,6 @@ import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
-import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
@@ -128,7 +126,6 @@ public class NFFEntityEventListeners
 					});    // Then turn to the always-hostile target
 			}
 		}
-	}*/
 	}
 
 	@SubscribeEvent
@@ -325,7 +322,7 @@ public class NFFEntityEventListeners
 									event.getEntity().spawnAtLocation(container.getItem(i).copy());
 								}
 								container.getItem(i).setCount(0);
-								bef.getAdditionalInventory().syncToMob(bef.asMob());
+                                bef.getAdditionalInventory().syncToMob(bef.asMob());
 							}
 						}
 					}
@@ -338,11 +335,11 @@ public class NFFEntityEventListeners
 								{}
 								else
 								{
-									if (!bef.asMob().level.getCapability(NFFCapRegistry.CAP_BM_LEVEL).isPresent()) {
+									if (!bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().level.getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap ->
+									bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -473,10 +470,11 @@ public class NFFEntityEventListeners
 					});
 				}*/
 				// update healing handler cooldown
-				mob.getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
+                // Handled in component
+				/*mob.getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
 				{
 					l.updateCooldown();
-				});
+				});*/
 				// IBaubleEquipable tick
 				/*if (mob instanceof IBaubleEquipable holder)
 				{
@@ -553,7 +551,7 @@ public class NFFEntityEventListeners
 	public static void onEntityJoinWorld(EntityJoinWorldEvent event)
 	{
 		if (event.getEntity() instanceof LivingEntity living)
-		{
+		{/*
 			// Setup attribute monitor cap
 			event.getEntity().getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
@@ -563,14 +561,13 @@ public class NFFEntityEventListeners
 			event.getEntity().getCapability(NFFCapRegistry.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
-			});
+			});*/
 			NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
 		}
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob um)
-		{
-			// Setup befriended undead sun-immunity rules
-			um.setupSunImmunityRules();
-		}
+		INFFTamed.get(event.getEntity())
+                .filter(INFFTamed::enableSunSensitivity)
+                .ifPresent(INFFTamed::setupSunImmunityRules);
+
 	}
 
 	/*@SubscribeEvent
@@ -585,7 +582,7 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
 	{
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		if (INFFTamed.get(event.getEntity()).filter(t -> t.enableSunSensitivity() && t.isSunImmune()).isPresent())
 			event.setCanceled(true);
 	}
 

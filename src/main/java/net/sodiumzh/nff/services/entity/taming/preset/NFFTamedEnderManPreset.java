@@ -558,7 +558,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 	        return (NFFTamedEnderManPreset) super.getEntity();
 	    }
 	}
-	
 
 	public static class LeaveBlockGoal extends NFFGoal
 	{

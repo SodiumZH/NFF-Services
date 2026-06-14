@@ -1,5 +1,7 @@
 package net.sodiumzh.nff.services.registry;
 
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -35,7 +37,11 @@ public class NFFEntityComponents {
     @SubscribeEvent
     public static void attach(EntityComponentSetupEvent event) {
         event.addNode("/nff");
-        if (INFFTamed.get(event.getEntity()).isPresent()) {
+        // TODO this logic is still not reliable. Find a more robust way to determine if a mob is NFF-tamed before
+        // components are attached
+        if (event.getEntity() instanceof Mob mob
+            && NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
+            || event.getEntity() instanceof INFFTamed) {
             event.addNode("/nff/tamed");
             event.addComponent("/nff/tamed/syncher", TAMED_SYNCHER.get());
             event.addComponent("/nff/tamed/data", TAMED_DATA.get());
@@ -47,11 +53,18 @@ public class NFFEntityComponents {
             event.addComponent("/nff/tamable/timer", MOB_TIMER.get());
             event.addComponent("/nff/tamable/anger_handler", TAMABLE_ANGER_HANDLER.get());
         }
-        if (event.getEntity() instanceof Mob mob) {
+        if (event.getEntity() instanceof LivingEntity mob) {
             event.addComponent("/nff/attribute_monitor", NFUEntityComponents.ATTRIBUTE_MONITOR.get());
             event.addComponent("/nff/item_stack_monitor", NFUEntityComponents.ITEM_STACK_MONITOR.get());
         }
     }
 
+    public static EntityAttributeMonitorComponent getAttributeMonitor(LivingEntity living) {
+        return EntityComponentAPI.getComponentByPathOrFallback(living, "/nff/attribute_monitor", NFUEntityComponents.ATTRIBUTE_MONITOR.get());
+    }
+
+    public static EntityItemStackMonitorComponent getItemStackMonitor(LivingEntity living) {
+        return EntityComponentAPI.getComponentByPathOrFallback(living, "/nff/item_stack_monitor", NFUEntityComponents.ITEM_STACK_MONITOR.get());
+    }
 
 }

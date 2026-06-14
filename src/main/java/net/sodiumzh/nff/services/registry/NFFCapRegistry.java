@@ -14,7 +14,8 @@ public class NFFCapRegistry {
 	// Caps for data storage only
 	@Deprecated
 	public static final Capability<CNFFTamedCommonData> CAP_BEFRIENDED_MOB_DATA = CapabilityManager.get(new CapabilityToken<>(){});
-	
+    public static final Capability<CNFFLevelModule> CAP_LEVEL = CapabilityManager.get(new CapabilityToken<>(){});
+
 	static {
 		CEntityTickingCapability.registerTicking(CAP_BEFRIENDED_MOB_DATA);
 	}

@@ -27,8 +27,8 @@ public class NFFTamableAngryEvent extends NFULivingEvent<Mob> {
         return reason;
     }
 
-    public CNFFTamable getTamable() {
-        return CNFFTamable.get(this.getEntity());
+    public NFFTamableComponent getTamable() {
+        return NFFTamableComponent.get(this.getEntity());
     }
 
     @Nonnull

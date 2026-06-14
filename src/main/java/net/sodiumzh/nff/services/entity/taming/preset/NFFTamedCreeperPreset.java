@@ -451,23 +451,6 @@ public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed
 
 	// Interaction end
 
-	// Inventory related
-	// Generally no need to modify unless noted
-
-	@Override
-	public void updateFromInventory() {
-		if (!this.level.isClientSide) {
-			/* If mob's properties (e.g. equipment, HP, etc.) needs to sync with inventory, set here */
-		}
-	}
-
-	@Override
-	public void setInventoryFromMob() {
-		if (!this.level.isClientSide) {
-			/* If inventory needs to be set from mob's properties on initialization, set here */
-		}
-	}
-
 	@Override
 	public NFFTamedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container) {
 		return null; /* return new YourMenuClass(containerId, playerInventory, container, this) */
