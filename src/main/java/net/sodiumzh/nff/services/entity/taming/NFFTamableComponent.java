@@ -15,6 +15,7 @@ import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.entity.component.EntityComponentBase;
 import net.sodiumzh.nfu.entity.component.EntityComponentType;
 import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
+import net.sodiumzh.nfu.object.HierarchyPath;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,15 +38,16 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
     protected boolean forcePersistent = false;
 
     @Override
-    public Map<String, EntityComponentType<?, ?>> getRequiredSubcomponents() {
-        return Map.of("/data", NFFEntityComponents.TAMABLE_DATA.get(),
-            "/timer", NFFEntityComponents.MOB_TIMER.get(),
-            "/anger_handler", NFFEntityComponents.TAMABLE_ANGER_HANDLER.get());
+    public Map<HierarchyPath, EntityComponentType<?, ?>> getRequiredSubcomponents() {
+        return Map.of(
+            HierarchyPath.byNameArray("data"), NFFEntityComponents.TAMABLE_DATA.get(),
+            HierarchyPath.byNameArray("timer"), NFFEntityComponents.MOB_TIMER.get(),
+            HierarchyPath.byNameArray("anger_handler"), NFFEntityComponents.TAMABLE_ANGER_HANDLER.get());
     }
 
     @Override
-    public List<String> getRequiredPaths() {
-        return List.of("/nff/tamable");
+    public List<HierarchyPath> getRequiredPaths() {
+        return List.of(HierarchyPath.byNameArray("nff", "tamable"));
     }
 
     public NFFTamableDataComponent getDataComponent() {

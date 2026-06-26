@@ -22,6 +22,7 @@ import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * Comprehensive serializable module for levels in BM.
@@ -130,11 +131,14 @@ public interface CNFFLevelModule extends INBTSerializable<CompoundTag>
 			NFFMobRespawnerInstance resp = NFFMobRespawnerInstance.createIfValid(stack);
 			if (resp == null)
 				return false;	// Not a valid respawner
-			if (this.getLevel().getPlayerByUUID(resp.getOwnerUUID()) == null)
+			UUID ownerUUID = resp.getOwnerUUID().orElse(null);
+			if (ownerUUID == null) return false;
+			Player owner = this.getLevel().getPlayerByUUID(ownerUUID);
+			if (owner == null)
 				return false;	// Player isn't present
-			if (this.getLevel().getPlayerByUUID(resp.getOwnerUUID()).getInventory().getFreeSlot() == -1)
+			if (owner.getInventory().getFreeSlot() == -1)
 				return false;	// Player's inventory is full
-			if (!this.getLevel().getPlayerByUUID(resp.getOwnerUUID()).addItem(resp.get()))
+			if (!owner.addItem(resp.get()))
 				return false;	// Adding failed for possible other reason
 			else return true;	// Successfully added
 		}

@@ -37,12 +37,12 @@ public class NFFTamedDataAccessor {
 
     public NFFTamedDataComponent getDataComponent() {
         return EntityComponentAPI.getComponentManager(this.tamed.asMob())
-            .getSubComponentByPath("/nff/tamed/data", NFFEntityComponents.TAMED_DATA.get()).orElse(NFFEntityComponents.TAMED_DATA.get().create(this.tamed.asMob()));
+            .getSubComponentByPath(NFFEntityComponents.PATH_TAMED_DATA, NFFEntityComponents.TAMED_DATA.get()).orElse(NFFEntityComponents.TAMED_DATA.get().create(this.tamed.asMob()));
     }
 
     public NFFTamedSyncherComponent getSyncherComponent() {
         return EntityComponentAPI.getComponentManager(this.tamed.asMob())
-            .getSubComponentByPath("/nff/tamed/syncher", NFFEntityComponents.TAMED_SYNCHER.get()).orElse(NFFEntityComponents.TAMED_SYNCHER.get().create(this.tamed.asMob()));
+            .getSubComponentByPath(NFFEntityComponents.PATH_TAMED_SYNCHER, NFFEntityComponents.TAMED_SYNCHER.get()).orElse(NFFEntityComponents.TAMED_SYNCHER.get().create(this.tamed.asMob()));
     }
 
     // General //

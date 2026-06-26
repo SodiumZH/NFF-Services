@@ -4,7 +4,9 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
+import net.sodiumzh.nff.services.event.entity.NFFTamedSyncherConstructEvent;
 import net.sodiumzh.nfu.entity.component.preset.EntitySyncherComponent;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,6 +35,7 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         this.createSynchedData(AI_STATE_SYNCHED_KEY, NFUDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString(), true);
         this.createSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, NFUDataSerializers.INT, -1,
             mob -> Optional.ofNullable(mob.getTarget()).map(LivingEntity::getId).orElse(-1));	// -1 means no target
+        MinecraftForge.EVENT_BUS.post(new NFFTamedSyncherConstructEvent(entity, this));
     }
 
     public UUID getIdentifier()

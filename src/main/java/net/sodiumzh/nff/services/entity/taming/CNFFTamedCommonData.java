@@ -26,7 +26,6 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nff.services.network.NFFClientGamePacketHandler;
@@ -51,7 +50,8 @@ import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * A temporal module for storage of data in INFFTamed interface.
+ * No longer used, left only for porting old data
+ * TODO remove in 0.x.34
  */
 @Deprecated(forRemoval = true)
 public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEntityTickingCapability<Mob> {
@@ -358,8 +358,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
 			//this.getBM().onDataInit(this);
-			MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
-			this.sync();
+			//MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
+			//this.sync();
 		}
 	
 		private Level getLevel()
@@ -869,16 +869,15 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		public CNFFTamedCommonData values;
 		
-		public Prvd(INFFTamed mob)
+		private Prvd(INFFTamed mob)
 		{
 			values = new Values(mob);
+			throw new RuntimeException("No longer used as a capability.");
 		}
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (cap == NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA)
-				return LazyOptional.of(() -> {return this.values;}).cast();
-			else return LazyOptional.empty();
+			throw new RuntimeException("No longer used as a capability.");
 		}
 
 		@Override
@@ -977,7 +976,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public void handle(ClientGamePacketListener pHandler) {
-			NFFClientGamePacketHandler.handleBefriendedDataSync(this, pHandler);
+			throw new RuntimeException();
+			//NFFClientGamePacketHandler.handleBefriendedDataSync(this, pHandler);
 		}
 	}
 
