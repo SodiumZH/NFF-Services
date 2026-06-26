@@ -6,8 +6,7 @@ import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nff.services.client.gui.screen.NFFGuiConstructorRegistry;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
+import net.sodiumzh.nff.services.client.gui.screen.NFFGUIConstructorRegistry;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
@@ -48,20 +47,5 @@ public class NFFClientGamePacketHandlers
 			mob.setYHeadRot(packet.yHeadRot);
 		}
 	}
-	
-	public static void handleBefriendedDataSync(CNFFTamedCommonData.ClientboundDataSyncPacket packet, ClientGamePacketListener listener)
-	{
-		@SuppressWarnings("resource")
-		Minecraft mc = Minecraft.getInstance();
-		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
-		Entity e = mc.level.getEntity(packet.entityId);
-		if (e == null) return;
-		e.getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent(c -> {
-			for (var entry: packet.objects.entrySet())
-				c.setSynchedDataClient(entry.getKey(), entry.getValue().getA(), entry.getValue().getB());
-			for (var entry: packet.getters.entrySet())
-				c.setSynchedGetterClient(entry.getKey(), entry. getValue());
-			c.getAdditionalInventory().fromList(packet.inventory);
-		});
-	}
+
 }

@@ -100,35 +100,6 @@ public class NFFTamedStatics
 	}
 
 	/**
-	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
-	 * <p>使用一个用于读档的NBT标签，在未实际生成生物前获取生物所属的MOD ID
-	 * @deprecated Use {@link CNFFTamedCommonData#getModIdFromMobTag} instead
-	 */
-	@Deprecated
-	public static String getModIdFromNbt(CompoundTag nbt)
-	{
-		return CNFFTamedCommonData.getModIdFromMobTag(nbt);
-	}
-	
-	/**
-	 * @deprecated Use {@link CNFFTamedCommonData#getOwnerUUIDFromMobTag} instead
-	 */
-	@Deprecated
-	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
-	{
-		return CNFFTamedCommonData.getOwnerUUIDFromMobTag(nbt);
-	}
-	
-	/**
-	 * @deprecated Use {@link NFUEntityStatics#getNameFromNbt} instead
-	 */
-	@Deprecated
-	public static Component getNameFromNbt(CompoundTag nbt, EntityType<?> type)
-	{
-		return NFUEntityStatics.getNameFromNbt(nbt, type);
-	}
-	
-	/**
 	 * Get owner if the owner is closer than the given distance of the mob. Otherwise return {@link Optional#empty}.
 	 * @param mob Mob (implements {@link INFFTamed}) to test. No need to do {@link INFFTamed#isOwnerInDimension} check.
 	 * @param radius Search area

@@ -28,7 +28,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
@@ -40,6 +39,7 @@ import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
+import net.sodiumzh.nfu.entity.component.EntityComponentTypes;
 import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
 import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
@@ -553,7 +553,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 
 	public default HealingHandlerComponent getHealingHandler() {
-		return EntityComponentAPI.getComponentByPathOrFallback(this.asMob(), "/nff/tamed/healing_handler", NFUEntityComponents.HEALING_HANDLER.get());
+		return EntityComponentAPI.getComponentByPathOrFallback(this.asMob(), "/nff/tamed/healing_handler", EntityComponentTypes.HEALING_HANDLER.get());
 	}
 
 	@DontOverride
@@ -686,12 +686,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 
 	/**
-	 * Invoked after data capability initialized (constructor done), before {@link NFFTamedCommonDataConstructEvent}.
-	 * <p>Mainly for creating additional synched data fields.
-	 */
-	public default void onDataInit(NFFTamedDataComponent dataCap) {}
-	
-	/**
 	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID).
 	 * Returns empty uuid (0, 0) if the data cap is lost (may occasionally happen).
 	 */
@@ -769,7 +763,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
      * Return if the mob should use sun-sensitivity features. Override this to true
      * for mobs that should react to sun.
      */
-    @ApiStatus.OverrideOnly
     public default boolean enableSunSensitivity() {return false;}
 
     /**

@@ -5,7 +5,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nfu.util.NFUNetworkStatics;
 
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -19,12 +18,11 @@ public class NFFChannels {
     }
 
     public static void registerMessage() {
-    	
-    	CHANNEL = NFUNetworkStatics.newChannel(NFFServices.MOD_ID, "nff_channel", VERSION);
-    	NFUNetworkStatics.registerDefaultClientGamePacket(nextID(), CHANNEL, ClientboundNFFGuiOpenPacket.class);
-    	NFUNetworkStatics.registerDefaultClientGamePacket(nextID(), CHANNEL, ClientboundNFFTamedInitPacket.class);
-    	NFUNetworkStatics.registerDefaultClientGamePacket(nextID(), CHANNEL, CNFFTamedCommonData.ClientboundDataSyncPacket.class);
-    	/*CHANNEL = NetworkRegistry.newSimpleChannel(
+
+    	BM_CHANNEL = NFUNetworkStatics.newChannel(NFFServices.MOD_ID, "bm_channel", VERSION);
+    	NFUNetworkStatics.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundNFFGUIOpenPacket.class);
+    	NFUNetworkStatics.registerDefaultClientGamePacket(nextID(), BM_CHANNEL, ClientboundTamedInitPacket.class);
+    	/*BM_CHANNEL = NetworkRegistry.newSimpleChannel(
                 new ResourceLocation(NFFServices.MOD_ID, "bm_channel"),
                 () -> {
                     return VERSION;
