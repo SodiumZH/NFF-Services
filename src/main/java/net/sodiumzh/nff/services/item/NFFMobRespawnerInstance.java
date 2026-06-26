@@ -14,7 +14,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.entity.NFFMobRespawnInfo;
-import net.sodiumzh.nff.services.entity.taming.CNFFTamedCommonData;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerAfterConstructEvent;
 import net.sodiumzh.nff.services.item.event.NFFMobRespawnerBeforeConstructEvent;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
@@ -157,16 +156,6 @@ public class NFFMobRespawnerInstance extends NFFMobRespawnInfo
 		MinecraftForge.EVENT_BUS.post(new NFFMobRespawnerAfterConstructEvent(fromMob, this, original));
 	}
 
-	public UUID getOwnerUUID()
-	{
-		return CNFFTamedCommonData.getOwnerUUIDFromMobTag(getMobNbt());
-	}
-	
-	public String getModId()
-	{
-		return CNFFTamedCommonData.getModIdFromMobTag(getMobNbt());
-	}
-	
 	public Component getName()
 	{
 		return NFUEntityStatics.getNameFromNbt(getMobNbt(), getType());

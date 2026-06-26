@@ -9,10 +9,12 @@ import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nfu.entity.component.*;
 import net.sodiumzh.nfu.entity.component.preset.*;
+import net.sodiumzh.nfu.object.HierarchyPath;
 import net.sodiumzh.nfu.registry.NFUEntityComponents;
 import net.sodiumzh.nfu.registry.NFURegistries;
 import net.sodiumzh.nfu.registry.NFURegistry;
 import net.sodiumzh.nfu.registry.NFURegistryEntryCollection;
+import org.antlr.v4.codegen.model.SrcOp;
 
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class NFFEntityComponents {
@@ -34,37 +36,46 @@ public class NFFEntityComponents {
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
 
 
+
+    public static final HierarchyPath PATH_NFF = HierarchyPath.byLiteral("/nff");
+    public static final HierarchyPath PATH_TAMABLE = HierarchyPath.byLiteral("/nff/tamable");
+    public static final HierarchyPath PATH_TAMABLE_DATA = HierarchyPath.byLiteral("/nff/tamable/data");
+    public static final HierarchyPath PATH_TAMABLE_TIMER = HierarchyPath.byLiteral("/nff/tamable/timer");
+    public static final HierarchyPath PATH_TAMABLE_ANGER_HANDLER = HierarchyPath.byLiteral("/nff/tamable/anger_handler");
+    public static final HierarchyPath PATH_TAMED = HierarchyPath.byLiteral("/nff/tamed");
+    public static final HierarchyPath PATH_TAMED_SYNCHER = HierarchyPath.byLiteral("/nff/tamed/syncher");
+    public static final HierarchyPath PATH_TAMED_DATA = HierarchyPath.byLiteral("/nff/tamed/data");
+    public static final HierarchyPath PATH_TAMED_HEALING_HANDLER = HierarchyPath.byLiteral("/nff/tamed/healing_handler");
+    public static final HierarchyPath PATH_ITEM_STACK_MONITOR = HierarchyPath.byLiteral("/nff/item_stack_monitor");
+
+
     @SubscribeEvent
     public static void attach(EntityComponentSetupEvent event) {
-        event.addNode("/nff");
+        event.addNode(PATH_NFF);
         // TODO this logic is still not reliable. Find a more robust way to determine if a mob is NFF-tamed before
         // components are attached
         if (event.getEntity() instanceof Mob mob
             && NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
             || event.getEntity() instanceof INFFTamed) {
-            event.addNode("/nff/tamed");
-            event.addComponent("/nff/tamed/syncher", TAMED_SYNCHER.get());
-            event.addComponent("/nff/tamed/data", TAMED_DATA.get());
-            event.addComponent("/nff/tamed/healing_handler", NFUEntityComponents.HEALING_HANDLER.get());
+            event.addNode(PATH_TAMED);
+            event.addComponent(PATH_TAMED_SYNCHER, TAMED_SYNCHER.get());
+            event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get());
+            event.addComponent(PATH_TAMED_HEALING_HANDLER, EntityComponentTypes.HEALING_HANDLER.get());
         }
         else if (event.getEntity() instanceof Mob mob && NFFTamingMapping.getAllTamableTypes().contains(event.getEntity().getType())) {
-            event.addComponent("/nff/tamable", TAMABLE.get());
-            event.addComponent("/nff/tamable/data", TAMABLE_DATA.get());
-            event.addComponent("/nff/tamable/timer", MOB_TIMER.get());
-            event.addComponent("/nff/tamable/anger_handler", TAMABLE_ANGER_HANDLER.get());
+            event.addComponent(PATH_TAMABLE, TAMABLE.get());
+            event.addComponent(PATH_TAMABLE_DATA, TAMABLE_DATA.get());
+            event.addComponent(PATH_TAMABLE_TIMER, MOB_TIMER.get());
+            event.addComponent(PATH_TAMABLE_ANGER_HANDLER, TAMABLE_ANGER_HANDLER.get());
         }
-        if (event.getEntity() instanceof LivingEntity mob) {
-            event.addComponent("/nff/attribute_monitor", NFUEntityComponents.ATTRIBUTE_MONITOR.get());
-            event.addComponent("/nff/item_stack_monitor", NFUEntityComponents.ITEM_STACK_MONITOR.get());
+        if (event.getEntity() instanceof Mob mob) {
+            event.addComponent(PATH_ITEM_STACK_MONITOR, EntityComponentTypes.ITEM_STACK_MONITOR.get());
         }
-    }
-
-    public static EntityAttributeMonitorComponent getAttributeMonitor(LivingEntity living) {
-        return EntityComponentAPI.getComponentByPathOrFallback(living, "/nff/attribute_monitor", NFUEntityComponents.ATTRIBUTE_MONITOR.get());
     }
 
     public static EntityItemStackMonitorComponent getItemStackMonitor(LivingEntity living) {
-        return EntityComponentAPI.getComponentByPathOrFallback(living, "/nff/item_stack_monitor", NFUEntityComponents.ITEM_STACK_MONITOR.get());
+        return EntityComponentAPI.getComponentByPathOrFallback(living, PATH_ITEM_STACK_MONITOR, EntityComponentTypes.ITEM_STACK_MONITOR.get());
     }
+
 
 }

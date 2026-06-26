@@ -3,6 +3,8 @@ package net.sodiumzh.nff.services.entity.taming;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
+import net.sodiumzh.nff.services.event.entity.NFFTamedDataConstructEvent;
 import net.sodiumzh.nfu.entity.component.preset.EntityDataComponent;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
@@ -16,6 +18,7 @@ public class NFFTamableDataComponent extends EntityDataComponent<Mob> {
 
     public NFFTamableDataComponent(Mob entity) {
         super(entity);
+        MinecraftForge.EVENT_BUS.post(new NFFTamedDataConstructEvent(entity, this));
     }
 
     @Nonnull

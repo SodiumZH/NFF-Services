@@ -20,6 +20,7 @@ import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
+import net.sodiumzh.nfu.object.Upcastable;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
 import org.jetbrains.annotations.ApiStatus;
