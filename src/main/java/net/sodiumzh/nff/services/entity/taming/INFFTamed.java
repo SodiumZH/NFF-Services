@@ -772,7 +772,8 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
     @ApiStatus.NonExtendable
     public default boolean isSunImmune()
     {
-        return getSunImmunity().test(this);
+		// Mobs not using sun sensitivity should always be accounted as sun-immune (i.e. not sun-sensitive)
+        return !this.enableSunSensitivity() || getSunImmunity().test(this);
     }
 
     /**
