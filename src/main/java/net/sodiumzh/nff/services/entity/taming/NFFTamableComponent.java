@@ -28,14 +28,14 @@ import java.util.stream.Collectors;
  */
 public class NFFTamableComponent extends EntityComponentBase<Mob> {
 
-    public NFFTamableComponent(Mob entity) {
-        super(entity);
-        this.tamingProcess = Optional.ofNullable(NFFTamingMapping.getProcess(this.getEntity())).orElseThrow(() -> new IllegalStateException("Missing taming process."));
-    }
-
     protected @Nonnull NFFTamingProcess tamingProcess;
     protected @Nullable UUID alwaysHostileTo = null;
     protected boolean forcePersistent = false;
+
+    public NFFTamableComponent(Mob entity) {
+        super(entity);
+        this.tamingProcess = Optional.ofNullable(NFFTamingMapping.getProcess(entity)).orElseThrow(() -> new IllegalStateException("Missing taming process."));
+    }
 
     @Override
     public Map<HierarchyPath, EntityComponentType<?, ?>> getRequiredSubcomponents() {
@@ -239,12 +239,11 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
     // Static shortcuts
 
     /**
-     * Get the default tamable component of a mob (path: {@code "/nff/tamable"}). If it's not present, return a new (invalid) instance to prevent errors.
+     * Get the tamable component, or create a transient instance if absent (to prevent nullity).
+     * <p>Not recommended, use {@code getOptional} if possible.
      */
-    @Nonnull
-    public static NFFTamableComponent get(Mob mob) {
-        return EntityComponentAPI.getComponentByPath(mob, "/nff/tamable", NFFEntityComponents.TAMABLE.get())
-            .orElseGet(() -> NFFEntityComponents.TAMABLE.get().create(mob));
+    public static NFFTamableComponent getOrDefault(Mob m) {
+        return getOptional(m).orElse(NFFEntityComponents.TAMABLE.get().create(m));
     }
 
     /**

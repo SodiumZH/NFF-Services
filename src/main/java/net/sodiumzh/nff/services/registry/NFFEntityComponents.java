@@ -9,6 +9,7 @@ import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nfu.entity.component.*;
 import net.sodiumzh.nfu.entity.component.preset.*;
+import net.sodiumzh.nfu.network.AvailableSide;
 import net.sodiumzh.nfu.object.HierarchyPath;
 import net.sodiumzh.nfu.registry.NFUEntityComponents;
 import net.sodiumzh.nfu.registry.NFURegistries;
@@ -23,15 +24,15 @@ public class NFFEntityComponents {
         NFURegistries.ENTITY_COMPONENT_TYPES, NFFServices.MOD_ID);
 
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableComponent>> TAMABLE = COLLECTION.register("tamable", () ->
-        new EntityComponentType<>(Mob.class, NFFTamableComponent.class, NFFTamableComponent::new));
+        new EntityComponentType<>(Mob.class, NFFTamableComponent.class, AvailableSide.SERVER, NFFTamableComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableDataComponent>> TAMABLE_DATA = COLLECTION.register("tamable_data", () ->
-        new EntityComponentType<>(Mob.class, NFFTamableDataComponent.class, NFFTamableDataComponent::new));
+        new EntityComponentType<>(Mob.class, NFFTamableDataComponent.class, AvailableSide.SERVER, NFFTamableDataComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, EntityTimerComponent<Mob>>> MOB_TIMER = COLLECTION.register("mob_timer", () ->
         new EntityComponentType<>(Mob.class, EntityTimerComponent.class, EntityTimerComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableAngerHandlerComponent>> TAMABLE_ANGER_HANDLER = COLLECTION.register("tamable_anger_handler", () ->
-        new EntityComponentType<>(Mob.class, NFFTamableAngerHandlerComponent.class, NFFTamableAngerHandlerComponent::new));
+        new EntityComponentType<>(Mob.class, NFFTamableAngerHandlerComponent.class, AvailableSide.SERVER, NFFTamableAngerHandlerComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedDataComponent>> TAMED_DATA = COLLECTION.register("tamed_data", () ->
-        new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, NFFTamedDataComponent::new));
+        new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, AvailableSide.SERVER, NFFTamedDataComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedSyncherComponent>> TAMED_SYNCHER = COLLECTION.register("tamed_syncher", () ->
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
 
@@ -59,14 +60,14 @@ public class NFFEntityComponents {
             || event.getEntity() instanceof INFFTamed) {
             event.addNode(PATH_TAMED);
             event.addComponent(PATH_TAMED_SYNCHER, TAMED_SYNCHER.get());
-            event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get());
+            event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get(), AvailableSide.SERVER);
             event.addComponent(PATH_TAMED_HEALING_HANDLER, EntityComponentTypes.HEALING_HANDLER.get());
         }
         else if (event.getEntity() instanceof Mob mob && NFFTamingMapping.getAllTamableTypes().contains(event.getEntity().getType())) {
-            event.addComponent(PATH_TAMABLE, TAMABLE.get());
-            event.addComponent(PATH_TAMABLE_DATA, TAMABLE_DATA.get());
-            event.addComponent(PATH_TAMABLE_TIMER, MOB_TIMER.get());
-            event.addComponent(PATH_TAMABLE_ANGER_HANDLER, TAMABLE_ANGER_HANDLER.get());
+            event.addComponent(PATH_TAMABLE, TAMABLE.get(), AvailableSide.SERVER);
+            event.addComponent(PATH_TAMABLE_DATA, TAMABLE_DATA.get(), AvailableSide.SERVER);
+            event.addComponent(PATH_TAMABLE_TIMER, MOB_TIMER.get(), AvailableSide.SERVER);
+            event.addComponent(PATH_TAMABLE_ANGER_HANDLER, TAMABLE_ANGER_HANDLER.get(), AvailableSide.SERVER);
         }
         if (event.getEntity() instanceof Mob mob) {
             event.addComponent(PATH_ITEM_STACK_MONITOR, EntityComponentTypes.ITEM_STACK_MONITOR.get());

@@ -227,7 +227,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(playerUUID, uuid)).orElse(true))
 			return Optional.empty();
-		return Optional.of(NFFTamableComponent.get(mob).getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE));
+		return NFFTamableComponent.getOptional(mob).map(c -> c.getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE));
 	}
 
 	/**
@@ -237,8 +237,10 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	@Override
 	public void setProgressValue(Mob mob, UUID playerUUID, double value) {
 		if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(uuid, playerUUID)).orElse(false)) return;
-        NFFTamableComponent.get(mob).getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
-        NFFTamableComponent.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+        NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+			c.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
+			c.getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+		});
 	}
 
 	/**
@@ -247,10 +249,11 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	 */
 	@Override
 	public void removeProgressValue(Mob mob, UUID playerUUID) {
-		if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true))
-		{
-            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+		if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true)) {
+            NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+				c.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+				c.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+			});
 		}
 	}
 

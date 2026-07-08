@@ -35,12 +35,17 @@ import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
+import net.sodiumzh.nff.services.registry.NFFEntityComponents;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
+import net.sodiumzh.nfu.entity.component.CEntityComponentManager;
+import net.sodiumzh.nfu.entity.component.EntityComponentFinalizeSetupEvent;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
 import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
 import net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
+import net.sodiumzh.nfu.network.NFUDataSerializers;
 import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -540,7 +545,7 @@ public class NFFEntityEventListeners
 			event.setResult(Result.DENY);
 	}
 
-	// MIXIN EVENTS
+	// NFU MIXIN EVENTS
 
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)

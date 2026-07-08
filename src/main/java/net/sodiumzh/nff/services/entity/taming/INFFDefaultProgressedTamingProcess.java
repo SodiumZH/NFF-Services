@@ -44,8 +44,10 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     @Override
     public default void setProgressValue(T mob, UUID playerUUID, double value) {
         if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(uuid, playerUUID)).orElse(false)) return;
-        NFFTamableComponent.get(mob).getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
-        NFFTamableComponent.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+        NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+            c.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
+            c.getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+        });
     }
 
     /**
@@ -67,8 +69,10 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     public default void removeProgressValue(T mob, UUID playerUUID) {
         if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true))
         {
-            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-            NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+            NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+                c.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+                c.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+            });
         }
     }
 
@@ -79,7 +83,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
     public default Optional<Double> getProgressValue(T mob)
     {
         return this.getOngoingPlayerUUID(mob).isPresent() ? 
-                Optional.of(NFFTamableComponent.get(mob).getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE)) :
+                Optional.of(NFFTamableComponent.getOptional(mob).map(c -> c.getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE)).orElseThrow()) :
                 Optional.empty();
     }
 
@@ -91,7 +95,7 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      */
     public default void setProgressValue(T mob, double value) {
         if (this.getOngoingPlayerUUID(mob).isPresent())
-            NFFTamableComponent.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+            NFFTamableComponent.getOptional(mob).ifPresent(c -> c.getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value));
     }
 
     public default void setProgressValueIfPlayerAbsent(T mob, UUID playerUUID, double value) {
@@ -110,19 +114,19 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      * and works correctly even if the player is not online.
      */
     public default void removeProgressValue(T mob) {
-        NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-        NFFTamableComponent.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+        NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+            c.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+            c.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+        });
     }
     
     /**
      * Get the mob's ongoing player UUID. The player is not necessarily present in the world. Empty if it doesn't have one.
      */
     public default Optional<UUID> getOngoingPlayerUUID(T mob) {
-        NFFTamableComponent tamable = NFFTamableComponent.get(mob);
-        if (tamable.getGeneralNBT().hasUUID(NBT_KEY_ONGOING_PLAYER)) {
-            return Optional.of(tamable.getGeneralNBT().getUUID(NBT_KEY_ONGOING_PLAYER));
-        }
-        else return Optional.empty();
+        return NFFTamableComponent.getOptional(mob)
+            .filter(tamable -> tamable.getGeneralNBT().hasUUID(NBT_KEY_ONGOING_PLAYER))
+            .map(tamable -> tamable.getGeneralNBT().getUUID(NBT_KEY_ONGOING_PLAYER));
     }
 
     /**
@@ -148,13 +152,14 @@ public interface INFFDefaultProgressedTamingProcess<T extends Mob> extends ITami
      * Set the ongoing player. Input null to remove ongoing player.
      */
     public default void setOngoingPlayer(T mob, @Nullable UUID player) {
-        NFFTamableComponent tamable = NFFTamableComponent.get(mob);
-        if (player != null && !Objects.equals(player, EMPTY_UUID)) {
-            tamable.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, player);
-        } else {
-            tamable.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-            tamable.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
-        }
+        NFFTamableComponent.getOptional(mob).ifPresent(tamable -> {
+            if (player != null && !Objects.equals(player, EMPTY_UUID)) {
+                tamable.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, player);
+            } else {
+                tamable.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+                tamable.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+            }
+        });
     }
 
     /**

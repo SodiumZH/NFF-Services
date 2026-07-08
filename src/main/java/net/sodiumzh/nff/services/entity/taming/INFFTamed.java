@@ -33,7 +33,6 @@ import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
 import net.sodiumzh.nfu.container.CyclicSwitch;
@@ -42,23 +41,16 @@ import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.entity.component.EntityComponentTypes;
 import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
 import net.sodiumzh.nfu.function.MutablePredicate;
-import net.sodiumzh.nfu.mixin.mixin.NFUMixinMob;
 import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUEntityComponents;
-import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public interface INFFTamed extends ContainerListener, OwnableEntity {
@@ -175,7 +167,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
     @ApiStatus.NonExtendable
 	public default boolean hasInit()
 	{
-		return this.getData().hasInit();
+		return this.getDataAccessor().hasInit();
 	}
 	
 	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
@@ -190,7 +182,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontOverride
 	public default void setInit()
 	{
-		this.getData().setInitState(true);
+		this.getDataAccessor().setInitState(true);
 	}
 
 	/** Label a mob not finished initialization.
@@ -203,7 +195,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontOverride
 	public default void setNotInit()
 	{
-		this.getData().setInitState(false);
+		this.getDataAccessor().setInitState(false);
 	}
 	
 	/* Ownership */
@@ -276,7 +268,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nullable
 	public default UUID getOwnerUUID()
 	{
-		return this.getData().getOwnerUUID();
+		return this.getDataAccessor().getOwnerUUID();
 	}
 	
 	/** Set owner from player entity.
@@ -294,7 +286,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
 		if (!this.asMob().level().isClientSide)
-			this.getData().setOwnerUUID(ownerUUID);
+			this.getDataAccessor().setOwnerUUID(ownerUUID);
 	}
 
 	/**
@@ -349,7 +341,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontOverride
 	public default NFFTamedMobAIState getAIState()
 	{
-		return this.getData().getAIState();
+		return this.getDataAccessor().getAIState();
 	}
 	
 	/** A preset action when switching AI e.g. on right click.
@@ -389,7 +381,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 			return;
 		if (postEvent && MinecraftForge.EVENT_BUS.post(new NFFTamedChangeAiStateEvent(this, getAIState(), state)))
 			return;
-		this.getData().setAIState(state);
+		this.getDataAccessor().setAIState(state);
 	}
 	
 	/** Get if a target mob can be attacked by this mob.
@@ -409,7 +401,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontCallManually
 	public default LivingEntity getPreviousTarget()
 	{
-		return this.getData().getPreviousTarget();
+		return this.getDataAccessor().getPreviousTarget();
 	}
 	
 	/** 
@@ -421,7 +413,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontCallManually
 	public default void setPreviousTarget(LivingEntity target)
 	{
-		this.getData().setPreviousTarget(target);
+		this.getDataAccessor().setPreviousTarget(target);
 	}
 	
 	/** Get the anchor pos that the mob won't stroll too far from it
@@ -430,13 +422,13 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nullable
 	public default Vec3 getAnchorPos() 
 	{
-		return this.getData().getAnchor();
+		return this.getDataAccessor().getAnchor();
 	}
 	
 	@DontOverride
 	public default void setAnchorPos(Vec3 pos) 
 	{
-		this.getData().setAnchor(pos);
+		this.getDataAccessor().setAnchor(pos);
 	}
 	
 	public default double getAnchoredStrollRadius()  
@@ -499,7 +491,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	
 	/* Inventory */
 	
-	public default NFFTamedMobInventory getAdditionalInventory() {return this.getData().getAdditionalInventory();}
+	public default NFFTamedMobInventory getAdditionalInventory() {return this.getDataAccessor().getAdditionalInventory();}
 	
 	/**
 	 * @deprecated Use {@code createAdditionalInventory} to override inventory.
@@ -670,16 +662,9 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 
 	/**
-	 * Get the capability for storage of additional data.
-	 * @deprecated Use {@code getDataAccessor} instead.
+	 * Get a utility accessor for tamed data.
+	 * <p>If your sub-interface have its own data, override this to your data accessor utility extending {@link NFFTamedDataAccessor}.
 	 */
-	@Deprecated(forRemoval = true)
-	public default NFFTamedDataAccessor getData()
-	{
-		return this.getDataAccessor();
-	}
-
-	@ApiStatus.NonExtendable
 	public default NFFTamedDataAccessor getDataAccessor() {
 		return new NFFTamedDataAccessor(this);
 	}
@@ -692,7 +677,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nonnull
 	public default UUID getIdentifier()
 	{
-		return this.getData().getIdentifier();
+		return this.getDataAccessor().getIdentifier();
 	}
 	
 	/* Behaviors */
@@ -801,12 +786,12 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void commonInit(@Nonnull Player player, @Nullable Mob from)
 	{
 		this.setOwner(player);
-		this.getData().setOwnerName(player.getName().getString());
+		this.getDataAccessor().setOwnerName(player.getName().getString());
 		this.init(player.getUUID(), from);
 		this.getAdditionalInventory().getFromMob(this.asMob());
-		this.getData().generateIdentifier();
-		this.getData().recordEntityType();
-		this.getData().recordEncounteredDate();
+		this.getDataAccessor().generateIdentifier();
+		this.getDataAccessor().recordEntityType();
+		this.getDataAccessor().recordEncounteredDate();
 	}
 
 	// ===== Mob Search ===
