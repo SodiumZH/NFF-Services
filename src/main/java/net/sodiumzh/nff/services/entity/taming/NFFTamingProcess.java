@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.registry.NFFEntityComponents;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
@@ -171,7 +172,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 	 * Get the tamable component of a mob. It's a shortcut of {@link NFFTamableComponent#get}.
 	 */
 	public final NFFTamableComponent getTamable(Mob mob) {
-		return NFFTamableComponent.get(mob);
+		return NFFTamableComponent.getOptional(mob).orElse(NFFEntityComponents.TAMABLE.get().create(mob));
 	}
 
 	/**

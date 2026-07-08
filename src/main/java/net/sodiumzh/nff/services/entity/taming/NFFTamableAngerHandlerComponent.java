@@ -25,7 +25,7 @@ public class NFFTamableAngerHandlerComponent extends MobAngerHandlerComponent {
         super.onAngryAt(target, forgivingTicks, setResult);
         if (target instanceof Player player) {
             if (setResult.isHandled()) {
-                MinecraftForge.EVENT_BUS.post(new NFFTamableAngryEvent(this.getEntity(), target, setResult.reason().orElse(null)));
+                MinecraftForge.EVENT_BUS.post(new NFFTamableAngryEvent(this, target, setResult.reason().orElse(null)));
                 this.getTamable().getTamingProcess().onAngryAt(this.getEntity(), player, setResult.reason().orElse(null));
             }
         }

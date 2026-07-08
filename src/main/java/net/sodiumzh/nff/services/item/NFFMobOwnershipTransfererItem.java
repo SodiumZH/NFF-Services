@@ -99,9 +99,9 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 		if (stack.getOrCreateTag().getBoolean("mot_locked"))
 			return InteractionResult.PASS;
 		mob.setOwnerUUID(player.getUUID());
-		mob.getData().setOwnerName(player.getName().getString());
-		mob.getData().recordEncounteredDate();
-		return InteractionResult.sidedSuccess(player.level.isClientSide);
+		mob.getDataAccessor().setOwnerName(player.getName().getString());
+		mob.getDataAccessor().recordEncounteredDate();
+		return InteractionResult.sidedSuccess(player.level().isClientSide);
 	}
 	
 	@Override

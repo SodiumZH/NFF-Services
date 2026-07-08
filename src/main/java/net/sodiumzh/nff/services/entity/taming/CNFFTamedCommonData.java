@@ -36,6 +36,7 @@ import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.capability.CEntityTickingCapability;
 import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.function.MutablePredicate;
+import net.sodiumzh.nfu.network.AvailableSide;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
@@ -833,9 +834,9 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
-		public TickingSide getTickingSide()
+		public AvailableSide getTickingSide()
 		{
-			return TickingSide.BOTH;
+			return AvailableSide.BOTH;
 		}
 
 		@Override
