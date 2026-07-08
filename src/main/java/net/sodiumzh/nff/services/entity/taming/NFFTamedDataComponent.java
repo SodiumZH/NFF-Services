@@ -46,7 +46,7 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
             !(initialType.equals(EntityType.PIG) && !this.getEntity().getType().is(NFFTagRegistry.COULD_BE_FROM_PIG)))
             return initialType;
         else {
-            LogUtils.getLogger().error(String.format("CNFFTamedCommonData: mob %s missing initial type. Reset to current type.", this.getEntity().getName().getString()));
+            LogUtils.getLogger().error(String.format("NFF Tamed Data: mob %s missing initial type. Reset to current type.", this.getEntity().getName().getString()));
             this.recordEntityType();
             return this.getInitialEntityTypeRaw();
         }
@@ -88,10 +88,10 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
         this.putTransientVariable("previousTarget", l);
     }
 
+    @Nullable
     public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getOrPutPermanent(" ", NFFTamedMobInventory.class, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), () ->
-            INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow())
-            .orElseGet(() -> INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow());
+        return this.getOrPutPermanent("inventory", NFFTamedMobInventory.class, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), () ->
+            INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow()).orElse(null);
     }
 
     @ApiStatus.Internal
