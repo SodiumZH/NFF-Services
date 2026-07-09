@@ -437,7 +437,7 @@ public class NFFEntityEventListeners
 				}*/
 				
 
-				INFFTamed.ifBM(mob, bm -> {
+				INFFTamed.get(mob).ifPresent(bm -> {
 					// update befriended mob anchor position
 					if (bm.getAnchorPos() != null)
 					{

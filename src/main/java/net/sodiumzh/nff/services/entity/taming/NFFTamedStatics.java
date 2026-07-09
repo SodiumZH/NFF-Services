@@ -226,8 +226,10 @@ public class NFFTamedStatics
 	 */
 	@Nullable
 	public static Optional<LivingEntity> livingFromOwnableInterface(OwnableEntity ownable) {
-		return Optional.ofNullable(INFFTamed.get(ownable).map(e -> (LivingEntity) e.asMob())
-			.orElseGet(() -> ownable instanceof LivingEntity l ? l : null));
+		if (ownable instanceof LivingEntity l) return Optional.of(l);
+		else if (ownable instanceof INFFTamed t)	// Check if the ownable interface is bound with INFFTamed interface impl, so cast here is intentional
+			return Optional.ofNullable(t.asMob());
+		else return Optional.empty();
 	}
 
 	/**

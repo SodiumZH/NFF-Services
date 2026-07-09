@@ -53,75 +53,25 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Central interface for NFF tamed mobs.
+ * <p>Any mob using NFF tamed mob features should be bound an implementation of this interface. The access of this interface
+ * from the mob is defined in {@link NFFTamedTypeRegistry}.
+ * <p><b>WARNING: </b> DO NOT perform {@code instanceof} check or cast to this interface directly from the mob reference!!!
+ * Always use {@link INFFTamed#get} or {@link NFFTamedTypeRegistry#asTamed} instead.
+ */
 public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	public static final CyclicSwitch<NFFTamedMobAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>
 		(NFFTamedMobAIState.WAIT, NFFTamedMobAIState.FOLLOW, NFFTamedMobAIState.WANDER);
 
 	/**
-	 * Mapper to test if a mob is {@code INFFTamed}, and cast it to {@code INFFTamed}.
+	 * Get the corresponding INFFTamed interface
 	 */
-	public static final FilteredMapper<Object, INFFTamed> IS_TAMED_MAPPER =
-			FilteredMapper.unconditionalNoVararg(Object.class, INFFTamed.class, obj -> {
-				if (obj instanceof INFFTamed tamed) return tamed;
-				else return null;
-	});
-
-	public static Optional<INFFTamed> get(Object o) {
-		return IS_TAMED_MAPPER.apply(o);
+	public static Optional<INFFTamed> get(Entity o) {
+		return o instanceof Mob m ? NFFTamedTypeRegistry.asTamed(m) : Optional.empty();
 	}
 
-	/* Common */
-	/**
-	 * Check if an object has a BM interface.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this instead of {@code instanceof} check.
-	 */
-	@Deprecated
-	public static boolean isBM(Object o)
-	{
-		return IS_TAMED_MAPPER.apply(o).isPresent();
-	}
-	
-	/**
-	 * Cast an object to the BM interface. Null if failed.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this to cast a mob to BM.
-	 */
-	@Deprecated
-	@Nullable
-	public static INFFTamed getBM(Object o)
-	{
-		return IS_TAMED_MAPPER.apply(o).orElse(null);
-	}
-	
-	/**
-	 * Do an action if an object has a BM interface.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * you can use this to safely cast and do things to BM.
-	 * @return Whether the action is invoked.
-	 */
-	@Deprecated
-	public static boolean ifBM(Object o, Consumer<INFFTamed> action)
-	{
-		return IS_TAMED_MAPPER.apply(o).filter(tamed -> {action.accept(tamed); return true;}).isPresent();
-	}
-	
-	/**
-	 * Check if a mob has a BM interface and satisfied the given condition.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this instead of {@code instanceof} check and followed checks of the cast BM.
-	 */
-	@Deprecated
-	public static boolean isBMAnd(Object o, Predicate<INFFTamed> cond)
-	{
-		return get(o).filter(cond).isPresent();
-	}	
-	
 	/* Initialization */
 	
 	/** Initialize a mob.
@@ -175,9 +125,6 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * <p>After spawning and deserializing, call this.
 	 * <p>Don't worry about if the presets in NFFServices API has already labeled init, 
 	 * as labeling again will not do anything if so.
-	 * <p>标记一个生物为已初始化，在进行读取NBT、从其他对象复制等操作之后。
-	 * <p>在生成和读档之后调用此函数。
-	 * <p>无需考虑BefriendMobs API的预设中是否已经标记了已初始化。重复标记不会做任何事情。
 	 */
 	@DontOverride
 	public default void setInit()
@@ -837,6 +784,9 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	/**
 	 * Find tamed mob by its tamed mob identifier (not entity uuid). Will search in all loaded dimensions.
+	 * <p>WARNING: this method is now very costly because there is no direct map from the identifier to the mob references, and
+	 * it have to search on all mobs loaded on the server.</p>
+	 * TODO Make a direct map and fix the issue above.
 	 * @param identifier Tamed mob identifier. (Not the entity UUID!)
 	 * @param context Any server level that can provide a context to the server.
 	 * @return Find result.
@@ -844,7 +794,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public static Optional<Mob> byIdentifier(UUID identifier, ServerLevel context) {
 		for (ServerLevel sl: context.getServer().getAllLevels()) {
 			var list = sl.getEntities(EntityTypeTest.forClass(Mob.class), mob ->
-					INFFTamed.isBM(mob) && INFFTamed.getBM(mob).getIdentifier().equals(identifier));
+					INFFTamed.get(mob).filter(t -> t.getIdentifier().equals(identifier)).isPresent());
 			if (!list.isEmpty()) return Optional.of(list.get(0));
 		}
 		return Optional.empty();
@@ -860,8 +810,8 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
 		List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
-				e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
-			.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
+				e -> INFFTamed.get(e).filter(tamed -> Objects.equals(tamed.getOwner(), player)).isPresent())
+			.stream().map(e -> INFFTamed.get(e).orElse(null)).filter(Objects::nonNull)
 			.map(INFFTamed::getIdentifier).toList();
 		List<INFFTamed.MobLocationInfo> savedLocations =
 			nbt.getCompound("tamedMobLocations").getAllKeys()
