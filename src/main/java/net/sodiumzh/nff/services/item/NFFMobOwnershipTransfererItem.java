@@ -125,8 +125,9 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 	public InteractionResult interactLivingEntity(Player player, LivingEntity living, InteractionHand usedHand)
 	{
 		ItemStack stack = player.getItemInHand(usedHand);
-		if (!player.level.isClientSide && living instanceof INFFTamed bm)
+		if (!player.level().isClientSide && INFFTamed.get(living).isPresent())
 		{
+			INFFTamed bm = INFFTamed.get(living).get();
 			if (isWritten(stack))
 			{
 				if (tryTransfer(stack, player, bm) == InteractionResult.PASS)

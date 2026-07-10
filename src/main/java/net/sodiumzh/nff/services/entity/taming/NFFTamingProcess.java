@@ -60,7 +60,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 		if (target.level.isClientSide())
 			return null;
 		// Don't execute on mobs already befriended
-		if (target instanceof INFFTamed)
+		if (INFFTamed.get(target).filter(t -> t.getOwnerUUID() != null).isPresent())
 			return null;		
 
 		// Check if befriendable capability is attached

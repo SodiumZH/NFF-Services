@@ -33,11 +33,10 @@ public class NFFMobRespawnInfo extends MobRespawnInfo {
 
     @Override
     protected void afterRespawn(Mob mob, Level level, @Nullable Player player) {
-        if (mob instanceof INFFTamed b)
-        {
+        INFFTamed.get(mob).ifPresent(b -> {
             b.updateAnchor();
             b.setInit();
-        }
+        });
     }
 
     public Optional<UUID> getOwnerUUID() {
