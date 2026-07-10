@@ -124,7 +124,7 @@ public class NFFTamedStatics
 	public static List<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
 		Stream<Entity> stream = player.level().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
-				e -> (e.getType() == type && e instanceof INFFTamed bm && bm.getOwner() == player)).stream();
+				e -> (e.getType() == type && INFFTamed.get(e).filter(bm -> bm.getOwner() == player).isPresent())).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
 		return stream.map(e -> (Mob)e).collect(Collectors.toList());
@@ -143,6 +143,7 @@ public class NFFTamedStatics
 		if (level.isClientSide) return false;
 		// Get the actual mob. In the future INFFTamed may become a capability and may not refer to the mob itself
 		// Null means impossible to get the mob reference from the argument, and only owners will be compared
+
 		LivingEntity ownableMob = ownable instanceof INFFTamed t ? t.asMob() : (ownable instanceof LivingEntity l ? l : null);
 		if (target.equals(ownableMob)) return true;
 		// Recursively search self and owners
@@ -206,7 +207,7 @@ public class NFFTamedStatics
 			return test.isAllyTo(le);
 		else return false;
 	}
-	
+
 	/**
 	 * Check if a {@code LivingEntity} is considered as ally by a BM.
 	 * <p>On server only. On client always {@code false}.
@@ -227,7 +228,7 @@ public class NFFTamedStatics
 	@Nullable
 	public static Optional<LivingEntity> livingFromOwnableInterface(OwnableEntity ownable) {
 		if (ownable instanceof LivingEntity l) return Optional.of(l);
-		else if (ownable instanceof INFFTamed t)	// Check if the ownable interface is bound with INFFTamed interface impl, so cast here is intentional
+		else if (ownable instanceof INFFTamed t)
 			return Optional.ofNullable(t.asMob());
 		else return Optional.empty();
 	}

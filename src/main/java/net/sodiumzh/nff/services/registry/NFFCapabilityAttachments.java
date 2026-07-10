@@ -36,20 +36,6 @@ public class NFFCapabilityAttachments {
 	public static final String KEY_NFF_LEVEL_LEGACY = "cap_bm_level";
 	
 	// Attach capabilities
-	@SuppressWarnings("unchecked")
-	@SubscribeEvent
-	public static void attachLivingEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-
-		// CNFFTamable
-		/*if (event.getObject() instanceof Mob mob) {
-			if (NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
-					&& mob instanceof INFFTamed bm)
-			{
-				event.addCapability(new ResourceLocation(NFFServices.MOD_ID, KEY_NFF_MOB_COMMON_DATA),
-					new CNFFTamedCommonData.Prvd(bm));
-			}
-		}*/
-	}
 
 	@SubscribeEvent
 	public static void attachLevelCapabilities(AttachCapabilitiesEvent<Level> event)
