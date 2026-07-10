@@ -57,7 +57,7 @@ public class NFFEntityComponents {
         // components are attached
         if (event.getEntity() instanceof Mob mob
             && NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
-            || event.getEntity() instanceof INFFTamed) {
+            || INFFTamed.get(event.getEntity()).isPresent()) {
             event.addNode(PATH_TAMED);
             event.addComponent(PATH_TAMED_SYNCHER, TAMED_SYNCHER.get());
             event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get(), AvailableSide.SERVER);

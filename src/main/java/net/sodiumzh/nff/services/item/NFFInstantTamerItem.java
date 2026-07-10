@@ -29,13 +29,10 @@ public class NFFInstantTamerItem extends NFUItem
 	{
 		if (player.isCreative() && !player.level.isClientSide)
 		{
-			if (target instanceof INFFTamed bef)
-			{
-				bef.init(player.getUUID(), null);
+			INFFTamed.get(target).ifPresentOrElse(t -> {
+				t.init(player.getUUID(), null);
 				NFUDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " initialized", player);
-			}
-			else 
-			{
+			}, () -> {
 				NFFTamableComponent.getOptional(target).ifPresent((l) ->
 				{
 					Mob bef = NFFTamingMapping.getProcess((EntityType<Mob>)target.getType()).doTaming(player, l.getEntity());
@@ -47,10 +44,10 @@ public class NFFInstantTamerItem extends NFUItem
 						throw new UnimplementedException(
 								"Entity type befriend method unimplemented: " + target.getType().toShortString()
 								+ ", handler class: " + NFFTamingMapping.getHandler((EntityType<Mob>)target.getType()).toString());
-	
+
 				});
-			}
-			return InteractionResult.sidedSuccess(player.level.isClientSide);
+			});
+			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		else return InteractionResult.PASS;
 	}

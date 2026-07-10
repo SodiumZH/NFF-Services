@@ -21,7 +21,7 @@ public class NFFClientGamePacketHandlers
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
 		Entity entity = mc.level.getEntity(packet.getEntityId());
-		if (entity instanceof INFFTamed bef) {
+		INFFTamed.get(entity).ifPresent(bef -> {
 			LocalPlayer localplayer = mc.player;
 			NFFTamedMobInventory inv = new NFFTamedMobInventory(packet.getSize());
 			NFFTamedInventoryMenu menu =
@@ -29,8 +29,8 @@ public class NFFClientGamePacketHandlers
 			if (menu == null)
 				return;
 			localplayer.containerMenu = menu;
-			mc.setScreen(NFFGuiConstructorRegistry.createGuiFromMenu(menu));
-		}
+			mc.setScreen(NFFGUIConstructorRegistry.make(menu));
+		});
 	}
 	
 	public static void handleBefriendingInit(ClientboundNFFTamedInitPacket packet, ClientGamePacketListener listener)

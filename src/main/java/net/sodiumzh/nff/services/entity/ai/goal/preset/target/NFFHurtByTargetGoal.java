@@ -102,8 +102,8 @@ public class NFFHurtByTargetGoal extends NFFTargetGoal {
 					dontAlert = true;
 			}
 			// For befriended, the same
-			else if (other instanceof INFFTamed bef) {
-				if (mob.getOwner() != bef.getOwner())
+			else if (INFFTamed.get(other).isPresent) {
+				if (mob.getOwner() != INFFTamed.get(other).getOwner())
 					dontAlert = true;
 			}
 			// Other isn't allied to the target
