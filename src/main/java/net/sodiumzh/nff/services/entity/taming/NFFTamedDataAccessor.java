@@ -29,9 +29,25 @@ import java.util.function.Supplier;
  */
 public class NFFTamedDataAccessor {
 
-    private final INFFTamed tamed;
+    protected static NFFTamedDataAccessor INSTANCE = null;
 
-    public NFFTamedDataAccessor(INFFTamed tamed) {
+    protected INFFTamed tamed;
+
+    protected NFFTamedDataAccessor(INFFTamed tamed) {
+        this.tamed = tamed;
+    }
+
+    public static NFFTamedDataAccessor get(INFFTamed tamed) {
+        if (INSTANCE == null) INSTANCE = new NFFTamedDataAccessor(tamed);
+        INSTANCE.tamed = tamed;
+        return INSTANCE;
+    }
+
+    public INFFTamed getOwner() {
+        return this.tamed;
+    }
+
+    protected void setOwner(INFFTamed tamed) {
         this.tamed = tamed;
     }
 
@@ -221,6 +237,7 @@ public class NFFTamedDataAccessor {
      * <b> Don't call manually! </b> This method is only called in {@link INFFTamed#getPreviousTarget}.
      */
     @ApiStatus.Internal
+    @ApiStatus.NonExtendable
     @Nullable
     public LivingEntity getPreviousTarget() {
         return this.getDataComponent().getPreviousTarget();
@@ -230,8 +247,8 @@ public class NFFTamedDataAccessor {
      * <b> Don't call manually! </b> This method is only called in {@link INFFTamed#setPreviousTarget}.
      */
     @ApiStatus.Internal
-    @Nullable
-    public void setPreviousTarget(LivingEntity target) {
+    @ApiStatus.NonExtendable
+    public void setPreviousTarget(@Nullable LivingEntity target) {
         this.getDataComponent().setPreviousTarget(target);
     }
 

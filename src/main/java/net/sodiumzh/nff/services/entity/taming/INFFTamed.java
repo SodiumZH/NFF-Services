@@ -613,7 +613,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * <p>If your sub-interface have its own data, override this to your data accessor utility extending {@link NFFTamedDataAccessor}.
 	 */
 	public default NFFTamedDataAccessor getDataAccessor() {
-		return new NFFTamedDataAccessor(this);
+		return NFFTamedDataAccessor.get(this);
 	}
 
 	/**

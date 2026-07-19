@@ -1,5 +1,6 @@
 package net.sodiumzh.nff.services.registry;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -36,8 +37,6 @@ public class NFFEntityComponents {
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedSyncherComponent>> TAMED_SYNCHER = COLLECTION.register("tamed_syncher", () ->
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
 
-
-
     public static final HierarchyPath PATH_NFF = HierarchyPath.byLiteral("/nff");
     public static final HierarchyPath PATH_TAMABLE = HierarchyPath.byLiteral("/nff/tamable");
     public static final HierarchyPath PATH_TAMABLE_DATA = HierarchyPath.byLiteral("/nff/tamable/data");
@@ -49,15 +48,28 @@ public class NFFEntityComponents {
     public static final HierarchyPath PATH_TAMED_HEALING_HANDLER = HierarchyPath.byLiteral("/nff/tamed/healing_handler");
     public static final HierarchyPath PATH_ITEM_STACK_MONITOR = HierarchyPath.byLiteral("/nff/item_stack_monitor");
 
+    public static final SubComponentAccessor<Mob, NFFTamableComponent> ACCESSOR_TAMABLE =
+        new SubComponentAccessor<>(PATH_TAMABLE, TAMABLE);
+    public static final SubComponentAccessor<Mob, NFFTamableDataComponent> ACCESSOR_TAMABLE_DATA =
+        new SubComponentAccessor<>(PATH_TAMABLE_DATA, TAMABLE_DATA);
+    public static final SubComponentAccessor<Mob, EntityTimerComponent<Mob>> ACCESSOR_TAMABLE_TIMER=
+        new SubComponentAccessor<>(PATH_TAMABLE_TIMER, MOB_TIMER);
+    public static final SubComponentAccessor<Mob, NFFTamableAngerHandlerComponent> ACCESSOR_TAMABLE_ANGER_HANDLER=
+        new SubComponentAccessor<>(PATH_TAMABLE_ANGER_HANDLER, TAMABLE_ANGER_HANDLER);
+    public static final SubComponentAccessor<Mob, NFFTamedSyncherComponent> ACCESSOR_TAMED_SYNCHER =
+        new SubComponentAccessor<>(PATH_TAMED_SYNCHER, TAMED_SYNCHER);
+    public static final SubComponentAccessor<Mob, NFFTamedDataComponent> ACCESSOR_TAMED_DATA =
+        new SubComponentAccessor<>(PATH_TAMED_DATA, TAMED_DATA);
+    public static final SubComponentAccessor<LivingEntity, HealingHandlerComponent> ACCESSOR_TAMED_HEALING_HANDLER =
+        new SubComponentAccessor<>(PATH_TAMED_HEALING_HANDLER, EntityComponentTypes.HEALING_HANDLER);
+    public static final SubComponentAccessor<Entity, EntityItemStackMonitorComponent> ACCESSOR_ITEM_STACK_MONITOR =
+        new SubComponentAccessor<>(PATH_ITEM_STACK_MONITOR, EntityComponentTypes.ITEM_STACK_MONITOR);
 
     @SubscribeEvent
     public static void attach(EntityComponentSetupEvent event) {
         event.addNode(PATH_NFF);
-        // TODO this logic is still not reliable. Find a more robust way to determine if a mob is NFF-tamed before
-        // components are attached
         if (event.getEntity() instanceof Mob mob
-            && NFFTamingMapping.containsAfter((EntityType<? extends Mob>) mob.getType())
-            || INFFTamed.get(event.getEntity()).isPresent()) {
+            && NFFTamedTypeRegistry.contains(mob.getType())) {
             event.addNode(PATH_TAMED);
             event.addComponent(PATH_TAMED_SYNCHER, TAMED_SYNCHER.get());
             event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get(), AvailableSide.SERVER);

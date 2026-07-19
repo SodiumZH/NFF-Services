@@ -46,7 +46,7 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
     }
 
     @Override
-    public List<HierarchyPath> getRequiredPaths() {
+    public List<HierarchyPath> getAllowedPaths() {
         return List.of(HierarchyPath.byNameArray("nff", "tamable"));
     }
 
