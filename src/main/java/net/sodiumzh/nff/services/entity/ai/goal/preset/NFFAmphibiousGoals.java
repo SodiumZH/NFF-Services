@@ -260,7 +260,7 @@ public abstract class NFFAmphibiousGoals {
 
 		public FollowOwnerGoal(@NotNull INFFTamed inMob, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly, int walkBelowDepth) {
 			super(inMob, pSpeedModifier, pStartDistance, pStopDistance, pCanFly);
-			this.amph = (INFFTamedAmphibious)(mob.asMob());
+			this.amph = (INFFTamedAmphibious)mob;
 			this.walkBelowDepth = walkBelowDepth;
 		}
 

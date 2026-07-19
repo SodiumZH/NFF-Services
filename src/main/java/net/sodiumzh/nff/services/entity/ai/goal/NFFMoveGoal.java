@@ -58,13 +58,15 @@ public abstract class NFFMoveGoal extends NFFGoal
 	
 	/** (Must be pathfinding)
 	 * <p>Set this goal should support amphibious mobs (having both water and ground navigations).
-	* If amphibious, the mob must implement INFFTamedAmphibious interface.
+	* If amphibious, the mob's {@link INFFTamed} implementation must implement {@link INFFTamedAmphibious} interface.
 	 */
 	public NFFMoveGoal amphibious()
 	{
 		usesNavigation = true;
 		canSwim = true;
 		isAmphibious = true;
+		if (!(this.getMob() instanceof INFFTamedAmphibious))
+			throw new IllegalStateException("NFF Services: Amphibious move goal requires implementation of INFFTamedAmphibious.");
 		return this;
 	}
 	
