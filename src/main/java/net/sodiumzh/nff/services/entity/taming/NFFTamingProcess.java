@@ -14,6 +14,7 @@ import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
+import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.registry.NFFEntityComponents;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Random;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastable<NFFTamingProcess>
@@ -74,25 +75,34 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 			throw new RuntimeException("Befriending: Entity type after befriending is not valid. Check if the befriendable mob has been registered to NFFTamingMapping.");
 		
 		// Record the old mob's some properties for initializing new mob on client UNIMPLEMENTED
-		//ClientboundTamedInitPacket packet = new ClientboundTamedInitPacket(target);
-		
+
 		// Do conversion
 		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
-		INFFTamed bm = INFFTamed.get(newMob).orElseThrow(() -> new RuntimeException("Befriending: Entity type after befriending is missing INFFTamed interface."));
-		bm.setOwner(player);
-        NFFTamedDataAccessor accessor = bm.getDataAccessor();
-        accessor.setOwnerName(player.getName().getString());
-		bm.init(player.getUUID(), target);
-		bm.getAdditionalInventory().getFromMob(bm.asMob());
-        accessor.generateIdentifier();
-        accessor.recordEntityType();
-        accessor.recordEncounteredDate();
-		//NaUtilsDebugStatics.debugPrintToScreen("Mob \""+target.getDisplayName().getString()+"\" befriended", player);
-		BMHooks.Befriending.onMobBefriended(target, bm);
-		bm.setInit();
+		INFFTamed tamed = INFFTamed.get(newMob).orElseThrow(() -> new RuntimeException("Taming Process: Tamed mob is missing INFFTamed interface."));
+		this.initOnTaming(tamed, target, player);
+		tamed.onTamed(player, target);
+		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, tamed.asMob()));
+
 		// Sync the recorded properties UNIMPLEMENTED
-		//NFUNetworkStatics.sendToAllPlayers(newBefMob.asMob().level, NFFChannels.BM_CHANNEL, packet);
-		return bm.asMob();
+
+		return tamed.asMob();
+	}
+
+	/**
+	 * Initialize the new tamed mob from the source mob and tamer player.
+	 */
+	public void initOnTaming(INFFTamed newTamed, Mob tamedFrom, Player player) {
+		newTamed.setOwner(player);
+		newTamed.asMob().setHealth(Math.max(tamedFrom.getHealth(), 0.1f));
+		newTamed.asMob().setPersistenceRequired();
+		NFFTamedDataAccessor accessor = newTamed.getDataAccessor();
+		accessor.setOwnerName(player.getName().getString());
+		newTamed.setOwnerUUID(player.getUUID());
+		newTamed.getAdditionalInventory().getFromMob(newTamed.asMob());
+		accessor.generateIdentifier();
+		accessor.recordEntityType();
+		accessor.recordEncounteredDate();
+		// No need to initialize inventory here because it's done in NFFEntityEventListeners#onEntityFinishConstruction
 	}
 
 	/**

@@ -198,8 +198,6 @@ public abstract class NFFTamedEnderManPreset extends Monster implements INFFTame
 		}
 
 		this.setCarriedBlock(blockstate);
-		/* Add more save data... */
-		this.setInit();
 	}
 
 	public HashSet<Item> getMaskTypes()

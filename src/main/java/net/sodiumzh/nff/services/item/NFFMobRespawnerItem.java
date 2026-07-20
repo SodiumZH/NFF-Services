@@ -68,7 +68,6 @@ public class NFFMobRespawnerItem extends NFUItem
 				context.getPlayer().getItemInHand(context.getHand()).shrink(1);
 				INFFTamed.get(mob).ifPresent(t ->
 				{
-					t.init(t.getOwnerUUID(), null);
 					if (!retainBefriendedMobInventory)
 					{
 						if (!t.getAdditionalInventory().isEmpty())
@@ -76,7 +75,6 @@ public class NFFMobRespawnerItem extends NFUItem
 						t.getAdditionalInventory().syncToMob(t.asMob());
 						NFUEntityStatics.removeAllEquipment(t.asMob());
 					}
-					t.setInit();
 				});
 				return InteractionResult.CONSUME;
 			}
