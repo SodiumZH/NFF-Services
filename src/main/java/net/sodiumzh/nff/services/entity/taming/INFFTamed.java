@@ -35,13 +35,13 @@ import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.annotation.NotYetImplemented;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
 import net.sodiumzh.nfu.entity.component.EntityComponentTypes;
 import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
 import net.sodiumzh.nfu.function.MutablePredicate;
-import net.sodiumzh.nfu.object.FilteredMapper;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 import org.jetbrains.annotations.ApiStatus;
@@ -49,8 +49,6 @@ import org.jetbrains.annotations.ApiStatus;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -72,91 +70,31 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return o instanceof Mob m ? NFFTamedTypeRegistry.asTamed(m) : Optional.empty();
 	}
 
-	/* Initialization */
-	
-	/** Initialize a mob.
-	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
-	 * @param playerUUID Player UUID who owns this mob.
-	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
+	/**
+	 * Invoked on this mob's construction.
+	 * <p>Called by {@link NFFEntityEventListeners#onEntityFinishConstruction}.
 	 */
-	@DontOverride
-	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
-	{
-		if (!this.asMob().level.isClientSide)
-		{
-			this.setOwnerUUID(playerUUID);
-			if (from != null)
-			{
-				this.asMob().setHealth(from.getHealth());
-			}
-			//this.setInventoryFromMob();
-		/*	if (this.getAnchorPos() != null)
-			{
-				this.setAnchorPos(this.asMob().position());
-			}*/
-			this.asMob().setPersistenceRequired();
-			this.onInit(playerUUID, from);
-		}
-	}
+	public default void onInitialize() {}
 
 	/**
-	 * Custom actions invoked after {@link INFFTamed#init(UUID, Mob)}.
-	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
-	 * @param playerUUID Player UUID who owns this mob.
-	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
+	 * Invoked on this mob is tamed.
+	 * <p>Called by {@link NFFTamingProcess#doTaming}.
+	 * @param player Tamer player.
+	 * @param tamedFrom The "wild" mob it's tamed from. If it's an in-place taming i.e.
+	 *                  using the "wild" mob entity for tamed mob implementation, it's null.
 	 */
-	@DontCallManually
-    @ApiStatus.OverrideOnly
-	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
+	@ApiStatus.OverrideOnly
+	public default void onTamed(@Nonnull Player player, @Nullable Mob tamedFrom) {}
 
-	/**
-	 * Get whether this mob has finished initialization.
-	 * <p>After finishing initialization the mob will start updating from its inventory.
-	 */
-	@DontOverride
-    @ApiStatus.NonExtendable
-	public default boolean hasInit()
-	{
-		return this.getDataAccessor().hasInit();
-	}
-	
-	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
-	 * <p>Only after labeled init, the mob will update from inventory.
-	 * <p>After spawning and deserializing, call this.
-	 * <p>Don't worry about if the presets in NFFServices API has already labeled init, 
-	 * as labeling again will not do anything if so.
-	 */
-	@DontOverride
-	public default void setInit()
-	{
-		this.getDataAccessor().setInitState(true);
-	}
-
-	/** Label a mob not finished initialization.
-	 * <p>Call this only when the presets has labeled init but you need some extra actions that needs to keep it not init.
-	 * <p>Currently the init label affects only inventory updating.
-	 * <p>标记一个生物为未完成初始化。
-	 * <p>当预设已经标记为了已初始化，但需要进行的额外操作要求保持未初始化时，调用此函数。
-	 * <p>目前已初始化标记仅用于附加道具栏更新。
-	 */
-	@DontOverride
-	public default void setNotInit()
-	{
-		this.getDataAccessor().setInitState(false);
-	}
-	
-	/* Ownership */
+	// Ownership //
 	
 	/** 
 	 * Get owner as player entity.
-	 * @return Owner as entity, or null if the owner is absent in the level.
-	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
-	* <p>获取拥有者的玩家实体。
-	* <p>拥有者实体，若拥有者不在世界中时返回null。
-	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
-	*/
+	 * @deprecated Only for {@link OwnableEntity} implementation.
+	 */
+	@Deprecated
+	@ApiStatus.Internal
 	@Override
-	@DontOverride
 	@Nullable
 	public default Player getOwner() 
 	{
@@ -437,8 +375,10 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 	
 	/* Inventory */
-	
-	public default NFFTamedMobInventory getAdditionalInventory() {return this.getDataAccessor().getAdditionalInventory();}
+
+	public default NFFTamedMobInventory getAdditionalInventory() {
+		return this.getDataAccessor().getAdditionalInventory();
+	}
 	
 	/**
 	 * @deprecated Use {@code createAdditionalInventory} to override inventory.
@@ -449,24 +389,32 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	/**
 	 * Method to create additional inventory. Invoked on befriended or loaded.
 	 */
+	@Nullable
 	public NFFTamedMobInventory createAdditionalInventory();
 
 	@Nullable
 	public NFFTamedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
 
 	/* ContainerListener interface */
-	/** DO NOT override this. Override onInventoryChanged instead. */
-	@DontOverride
+
+	/** Actions on additional inventory changed.
+	 * <p>DO NOT override this. Override onInventoryChanged instead.
+	 */
+	@ApiStatus.NonExtendable
 	@Override
 	public default void containerChanged(Container pContainer) 
 	{
 		if (!(pContainer instanceof NFFTamedMobInventory))
 			throw new UnsupportedOperationException("INFFTamed container only receives NFFTamedMobInventory.");
-		if (hasInit())
+		if (!this.asMob().level().isClientSide())
 			this.getAdditionalInventory().syncToMob(this.asMob());
-		onInventoryChanged();
+		this.onInventoryChanged();
 	}
 
+	/**
+	 * Additional actions on inventory changed.
+	 */
+	@ApiStatus.OverrideOnly
 	public default void onInventoryChanged() 
 	{
 	}
@@ -475,6 +423,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * @deprecated Not implemented
 	 */
 	@Deprecated
+	@NotYetImplemented
 	public default boolean dropInventoryOnDeath()
 	{
 		return true;
@@ -724,25 +673,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
         return this.getDataAccessor().getSunImmunity();
     }
 
-    // Static
-
-	/**
-	 * Common initialization when a new tamed mob is created but not loaded from NBT, either from taming or other ways.
-	 * @param player owner.
-	 * @param from The "wild" mob from which this mob is tamed. Null if it's not created by taming.
-	 */
-	public default void commonInit(@Nonnull Player player, @Nullable Mob from)
-	{
-		this.setOwner(player);
-		this.getDataAccessor().setOwnerName(player.getName().getString());
-		this.init(player.getUUID(), from);
-		this.getAdditionalInventory().getFromMob(this.asMob());
-		this.getDataAccessor().generateIdentifier();
-		this.getDataAccessor().recordEntityType();
-		this.getDataAccessor().recordEncounteredDate();
-	}
-
-	// ===== Mob Search ===
+	// ===== Mob Search === //
 
 	/**
 	 *  Only on server, record the current location to the owner's data.

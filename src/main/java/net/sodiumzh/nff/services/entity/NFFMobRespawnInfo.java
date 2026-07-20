@@ -35,7 +35,6 @@ public class NFFMobRespawnInfo extends MobRespawnInfo {
     protected void afterRespawn(Mob mob, Level level, @Nullable Player player) {
         INFFTamed.get(mob).ifPresent(b -> {
             b.updateAnchor();
-            b.setInit();
         });
     }
 

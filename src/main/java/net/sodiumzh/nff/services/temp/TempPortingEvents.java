@@ -30,8 +30,6 @@ public class TempPortingEvents
 	{
 		INFFTamed.get(event.getEntity()).ifPresent(bm -> {
             bm.getAdditionalInventory().syncToMob(bm.asMob());
-			bm.init(bm.getOwnerUUID(), null);
-			bm.setInit();
 		});
 	}
 }

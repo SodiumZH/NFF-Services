@@ -255,7 +255,7 @@ public class NFFTamedDataAccessor {
     // Inventory related //
 
     public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getDataComponent().getAdditionalInventory();
+        return this.getSyncherComponent().getInventory();
     }
 
     // Synched Data related //
@@ -332,8 +332,8 @@ public class NFFTamedDataAccessor {
 
     /**
      * Get a synched getter as a raw {@link Object}.
-     * <p>Safe to call on both sides. On server, it will be directly accessed by the supplier,
-     * and on client it will be read from the cached field which is updated on synching.
+     * <p>Safe to call on both sides. On the main side, it will be directly accessed by the supplier,
+     * and on the synched side it will be read from the cached field which is updated on synching.
      * <p> Null if the key doesn't exist.
      */
     @Nullable
@@ -341,15 +341,6 @@ public class NFFTamedDataAccessor {
         return this.getSyncherComponent().getSynchedGetter(key).orElse(null);
     }
 
-    /**
-     * Set the key-value pair in the synched getter cache on client.
-     * <p>This is only used in synching process and should not be called elsewhere.
-     * Safe to call on server as the cache on server will not be read.
-     */
-    @DontCallManually
-    public void setSynchedGetterClient(String key, @Nonnull Object o) {
-        this.setSynchedGetterClient(key, o);
-    }
 
     /**
      * Set how many ticks to do a sync
@@ -357,28 +348,5 @@ public class NFFTamedDataAccessor {
     public void setSyncInterval(int ticks) {
         this.getSyncherComponent().setSyncInterval(ticks);
     }
-
-
-    // Misc //
-
-    /**
-     * <b> Don't call manually! </b> Use {@link INFFTamed#hasInit()} instead.
-     * Get whether this mob has finished initialization.
-     * <p>After finishing initialization the mob will start updating from its inventory.
-     */
-    @DontCallManually
-    public boolean hasInit() {
-        return this.getDataComponent().hasInit();
-    }
-
-    /**
-     * <b> Don't call manually! </b> Use {@link INFFTamed#setInit()} or {@link INFFTamed#setNotInit()} instead.
-     * Set the label for if this mob has finished initialization.
-     */
-    @DontCallManually
-    public void setInitState(boolean value) {
-        this.getDataComponent().hasInit();
-    }
-
 
 }
