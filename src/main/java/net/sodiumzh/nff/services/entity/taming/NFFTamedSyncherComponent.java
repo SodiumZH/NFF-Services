@@ -7,7 +7,10 @@ import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.MinecraftForge;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
 import net.sodiumzh.nff.services.event.entity.NFFTamedSyncherConstructEvent;
+import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
+import net.sodiumzh.nff.services.registry.NFFDataSerializers;
 import net.sodiumzh.nfu.entity.component.preset.EntitySyncherComponent;
+import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -24,6 +27,7 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
     private static final String ENCOUNTERED_DATE_SYNCHED_KEY = "encounteredDate";
     private static final String ATTACK_TARGET_SYNCHED_KEY = "attackTarget";
     private static final String AI_STATE_SYNCHED_KEY = "aiState";
+    private static final String ADDITIONAL_INVENTORY_KEY = "additionalInventory";
     private static final UUID EMPTY_UUID = new UUID(0L, 0L);
 
     public NFFTamedSyncherComponent(Mob entity) {
@@ -33,6 +37,7 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         this.createSynchedData(OWNER_NAME_SYNCHED_KEY, NFUDataSerializers.STRING, "", true);
         this.createSynchedData(ENCOUNTERED_DATE_SYNCHED_KEY, NFUDataSerializers.INT_ARRAY, new int[] {2023, 1, 1}, true);
         this.createSynchedData(AI_STATE_SYNCHED_KEY, NFUDataSerializers.STRING, NFFTamedMobAIState.WAIT.getId().toString(), true);
+        this.createSynchedData(ADDITIONAL_INVENTORY_KEY, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), NFFTamedMobInventory.createEmpty(null), true);
         this.createSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, NFUDataSerializers.INT, -1,
             mob -> Optional.ofNullable(mob.getTarget()).map(LivingEntity::getId).orElse(-1));	// -1 means no target
         MinecraftForge.EVENT_BUS.post(new NFFTamedSyncherConstructEvent(entity, this));
@@ -121,6 +126,14 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
     public void setAIState(NFFTamedMobAIState state)
     {
         this.setSynchedData(AI_STATE_SYNCHED_KEY, String.class, state.getId().toString());
+    }
+
+    public NFFTamedMobInventory getInventory() {
+        return this.getSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class).orElseGet(() -> NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity()).orElseThrow()));
+    }
+
+    public void setInventory(NFFTamedMobInventory inventory) {
+        this.setSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class, inventory);
     }
 
     @Nullable

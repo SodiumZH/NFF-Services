@@ -17,6 +17,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
 
@@ -86,22 +87,6 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
     @ApiStatus.Internal
     public void setPreviousTarget(@Nullable LivingEntity l) {
         this.putTransientVariable("previousTarget", l);
-    }
-
-    @Nullable
-    public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getOrPutPermanent("inventory", NFFTamedMobInventory.class, NFFDataSerializers.TAMED_MOB_INVENTORY.get(), () ->
-            INFFTamed.get(this.getEntity()).map(INFFTamed::createAdditionalInventory).orElseThrow()).orElse(null);
-    }
-
-    @ApiStatus.Internal
-    public boolean hasInit() {
-        return this.getOrPutTransient("hasInit", Boolean.class, () -> false).orElse(false);
-    }
-
-    @ApiStatus.Internal
-    public void setInitState(boolean value) {
-        this.putTransientVariable("hasInit", Boolean.class);
     }
 
 }

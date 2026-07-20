@@ -177,8 +177,6 @@ public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed
 			this.ignitionCooldownTicks = tag.getInt("ignition_cooldown");
 		if (tag.contains("current_ignition_cooldown"))
 			this.currentIgnitionCooldown = tag.getInt("current_ignition_cooldown");
-		/* Add more save data... */
-		this.setInit();
 	}
 
 	/**
@@ -469,20 +467,6 @@ public abstract class NFFTamedCreeperPreset extends Monster implements INFFTamed
 	// Generally these can be copy-pasted to other INFFTamed classes //
 
 	// ------------------ INFFTamed interface ------------------ //
-
-	protected boolean initialized = false;
-
-	@Override
-	public boolean hasInit()
-	{
-		return initialized;
-	}
-
-	@Override
-	public void setInit()
-	{
-		initialized = true;
-	}
 
 	// AI related
 

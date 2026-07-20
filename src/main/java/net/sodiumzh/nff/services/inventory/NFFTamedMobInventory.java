@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.extensions.IForgeItemStack;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nff.services.entity.taming.NFFTamedDataComponent;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nullable;
@@ -26,7 +27,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 	
 	protected void updateOwner()
 	{
-		if (owner != null && owner.hasInit())
+		if (owner != null)
             this.syncToMob(owner.asMob());
 	}
 	
@@ -313,6 +314,10 @@ public class NFFTamedMobInventory extends SimpleContainer
 		for (int i = 0; i < list.size(); ++i) {
 			if (i < this.getContainerSize()) this.setItem(i, list.get(i));
 		}
+	}
+
+	public static NFFTamedMobInventory createEmpty(@Nullable INFFTamed owner) {
+		return new NFFTamedMobInventory(0, owner);
 	}
 
 }

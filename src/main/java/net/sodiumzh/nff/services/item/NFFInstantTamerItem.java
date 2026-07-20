@@ -30,7 +30,6 @@ public class NFFInstantTamerItem extends NFUItem
 		if (player.isCreative() && !player.level().isClientSide)
 		{
 			INFFTamed.get(target).ifPresentOrElse(t -> {
-				t.init(player.getUUID(), null);
 				NFUDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " initialized", player);
 			}, () -> {
 				NFFTamableComponent.getOptional(target).ifPresent((l) ->
