@@ -31,7 +31,7 @@ public class NFFTamedMobInventoryWithEquipment extends NFFTamedMobInventory
 		this.setItem(3, mob.getItemBySlot(EquipmentSlot.FEET));
 		this.setItem(4, mob.getItemBySlot(EquipmentSlot.MAINHAND));
 		this.setItem(5, mob.getItemBySlot(EquipmentSlot.OFFHAND));
-		updateOwner();		
+		syncToOwner();
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class NFFTamedMobInventoryWithEquipment extends NFFTamedMobInventory
 	
 	public ItemStack getItemFromSlot(EquipmentSlot slot)
 	{
-		updateOwner();
+		syncToOwner();
 		switch (slot)
 		{
 		case HEAD:
