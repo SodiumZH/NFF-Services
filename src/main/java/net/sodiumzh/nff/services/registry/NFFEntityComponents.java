@@ -36,6 +36,8 @@ public class NFFEntityComponents {
         new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, AvailableSide.SERVER, NFFTamedDataComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedSyncherComponent>> TAMED_SYNCHER = COLLECTION.register("tamed_syncher", () ->
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
+    public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedInventoryComponent>> TAMED_INVENTORY = COLLECTION.register("tamed_inventory", () ->
+        new EntityComponentType<>(Mob.class, NFFTamedInventoryComponent.class, NFFTamedInventoryComponent::new));
 
     public static final HierarchyPath PATH_NFF = HierarchyPath.byLiteral("/nff");
     public static final HierarchyPath PATH_TAMABLE = HierarchyPath.byLiteral("/nff/tamable");
@@ -45,6 +47,7 @@ public class NFFEntityComponents {
     public static final HierarchyPath PATH_TAMED = HierarchyPath.byLiteral("/nff/tamed");
     public static final HierarchyPath PATH_TAMED_SYNCHER = HierarchyPath.byLiteral("/nff/tamed/syncher");
     public static final HierarchyPath PATH_TAMED_DATA = HierarchyPath.byLiteral("/nff/tamed/data");
+    public static final HierarchyPath PATH_TAMED_INVENTORY = HierarchyPath.byLiteral("/nff/tamed/inventory");
     public static final HierarchyPath PATH_TAMED_HEALING_HANDLER = HierarchyPath.byLiteral("/nff/tamed/healing_handler");
     public static final HierarchyPath PATH_ITEM_STACK_MONITOR = HierarchyPath.byLiteral("/nff/item_stack_monitor");
 
@@ -60,6 +63,8 @@ public class NFFEntityComponents {
         new SubComponentAccessor<>(PATH_TAMED_SYNCHER, TAMED_SYNCHER);
     public static final SubComponentAccessor<Mob, NFFTamedDataComponent> ACCESSOR_TAMED_DATA =
         new SubComponentAccessor<>(PATH_TAMED_DATA, TAMED_DATA);
+    public static final SubComponentAccessor<Mob, NFFTamedInventoryComponent> ACCESSOR_TAMED_INVENTORY =
+        new SubComponentAccessor<>(PATH_TAMED_INVENTORY, TAMED_INVENTORY);
     public static final SubComponentAccessor<LivingEntity, HealingHandlerComponent> ACCESSOR_TAMED_HEALING_HANDLER =
         new SubComponentAccessor<>(PATH_TAMED_HEALING_HANDLER, EntityComponentTypes.HEALING_HANDLER);
     public static final SubComponentAccessor<Entity, EntityItemStackMonitorComponent> ACCESSOR_ITEM_STACK_MONITOR =
@@ -73,6 +78,7 @@ public class NFFEntityComponents {
             event.addNode(PATH_TAMED);
             event.addComponent(PATH_TAMED_SYNCHER, TAMED_SYNCHER.get());
             event.addComponent(PATH_TAMED_DATA, TAMED_DATA.get(), AvailableSide.SERVER);
+            event.addComponent(PATH_TAMED_INVENTORY, TAMED_INVENTORY.get());
             event.addComponent(PATH_TAMED_HEALING_HANDLER, EntityComponentTypes.HEALING_HANDLER.get());
         }
         else if (event.getEntity() instanceof Mob mob && NFFTamingMapping.getAllTamableTypes().contains(event.getEntity().getType())) {
