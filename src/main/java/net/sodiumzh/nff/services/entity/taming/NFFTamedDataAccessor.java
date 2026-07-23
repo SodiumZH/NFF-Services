@@ -260,7 +260,7 @@ public class NFFTamedDataAccessor {
     // Inventory related //
 
     public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getInventoryComponent().get();
+        return this.getInventoryComponent().getInventory();
     }
 
     // Synched Data related //

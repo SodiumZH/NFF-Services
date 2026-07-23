@@ -546,7 +546,7 @@ public class NFFEntityEventListeners
 	public static void onEntityFinishConstruction(EntityFinishConstructionEvent event) {
 		INFFTamed.get(event.getEntity()).ifPresent(t -> {
 			// Initialize inventory here.
-			t.getDataAccessor().getSyncherComponent().setInventory(Optional.ofNullable(t.createAdditionalInventory()).orElseGet(() -> NFFTamedMobInventory.createEmpty(t)));
+			//t.getDataAccessor().getSyncherComponent().setInventory(Optional.ofNullable(t.createAdditionalInventory()).orElseGet(() -> NFFTamedMobInventory.createEmpty(t)));
 			t.onInitialize();
 		});
 	}
