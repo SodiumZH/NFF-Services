@@ -128,12 +128,15 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         this.setSynchedData(AI_STATE_SYNCHED_KEY, String.class, state.getId().toString());
     }
 
-    public NFFTamedMobInventory getInventory() {
-        return this.getSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class).orElseGet(() -> NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity()).orElseThrow()));
-    }
-
-    public void setInventory(NFFTamedMobInventory inventory) {
-        this.setSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class, inventory);
+    @Override
+    public void tick() {
+        super.tick();
+        // Sync inventory to mob
+        if (!this.isClientSide()) {
+            NFFTamedMobInventory inv = this.getSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class).orElse(null);
+            if (inv != null && inv.getContainerSize() > 0 && inv.getOwner() != null)
+                inv.syncToMob(inv.getOwner().asMob());
+        }
     }
 
     @Nullable
