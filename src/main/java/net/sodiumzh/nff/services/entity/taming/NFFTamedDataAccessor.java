@@ -61,6 +61,11 @@ public class NFFTamedDataAccessor {
             .getSubComponentByPath(NFFEntityComponents.PATH_TAMED_SYNCHER, NFFEntityComponents.TAMED_SYNCHER.get()).orElse(NFFEntityComponents.TAMED_SYNCHER.get().create(this.tamed.asMob()));
     }
 
+    public NFFTamedInventoryComponent getInventoryComponent() {
+        return EntityComponentAPI.getComponentManager(this.tamed.asMob())
+            .getSubComponentByPath(NFFEntityComponents.PATH_TAMED_INVENTORY, NFFEntityComponents.TAMED_INVENTORY.get()).orElse(NFFEntityComponents.TAMED_INVENTORY.get().create(this.tamed.asMob()));
+    }
+
     // General //
 
     /** Get the befriended mob owning this data. */
@@ -255,7 +260,7 @@ public class NFFTamedDataAccessor {
     // Inventory related //
 
     public NFFTamedMobInventory getAdditionalInventory() {
-        return this.getSyncherComponent().getInventory();
+        return this.getInventoryComponent().get();
     }
 
     // Synched Data related //
