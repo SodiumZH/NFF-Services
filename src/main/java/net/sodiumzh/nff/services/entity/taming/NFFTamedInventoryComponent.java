@@ -6,6 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Mob;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nfu.entity.component.EntityComponentBase;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
 import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,9 +57,11 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
         }
     }
 
-    public void getInventory() {
-        Optional.of(inventory).orElseGet(() ->
-            NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity())
-                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob."))));
+    public NFFTamedMobInventory getInventory() {
+        return Optional.of(inventory).orElseGet(() -> {
+            NFUDebugStatics.errorOnce("Missing inventory. Not initialized?");
+            return NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity())
+                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob.")));
+        });
     }
 }
