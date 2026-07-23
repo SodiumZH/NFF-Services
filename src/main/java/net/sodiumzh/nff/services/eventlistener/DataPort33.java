@@ -33,7 +33,7 @@ public class DataPort33 {
             CompoundTag caps = event.getNBT().getCompound("ForgeCaps");
             CompoundTag legacyCommonData = caps.getCompound("nffservices:nff_mob_common_data");
             if (!legacyCommonData.isEmpty()) {
-                CNFFTamedCommonData.Values temp = new CNFFTamedCommonData.Values(tamed);
+                    CNFFTamedCommonData.Values temp = new CNFFTamedCommonData.Values(tamed);
                 temp.deserializeNBT(legacyCommonData);
                 NFFTamedSyncherComponent syncher = EntityComponentAPI.getComponentByPath(event.getEntity(), "/nff/tamed/syncher", NFFEntityComponents.TAMED_SYNCHER.get()).orElseThrow();
                 NFFTamedDataComponent data = EntityComponentAPI.getComponentByPath(event.getEntity(), "/nff/tamed/data", NFFEntityComponents.TAMED_DATA.get()).orElseThrow();

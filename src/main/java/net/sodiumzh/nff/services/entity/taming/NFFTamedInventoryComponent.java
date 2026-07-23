@@ -7,7 +7,6 @@ import net.minecraft.world.entity.Mob;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nfu.entity.component.EntityComponentBase;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -31,10 +30,7 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
 
     @Override
     public void joinLevel() {
-        if (inventory == null)
-            inventory = INFFTamed.get(this.getEntity())
-                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob."))
-                .createAdditionalInventory();
+        this.createInventoryIfAbsent();
     }
 
     @Override
@@ -47,10 +43,7 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        if (inventory == null)
-            inventory = INFFTamed.get(this.getEntity())
-                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob."))
-                .createAdditionalInventory();
+        this.createInventoryIfAbsent();
         ListTag listTag = nbt.getList("inventory", Tag.TAG_COMPOUND);
         if (!listTag.isEmpty()) {
             inventory.fromTag(listTag);
@@ -63,5 +56,12 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
             return NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity())
                 .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob.")));
         });
+    }
+
+    public void createInventoryIfAbsent() {
+        if (inventory == null)
+            inventory = INFFTamed.get(this.getEntity())
+                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob."))
+                .createAdditionalInventory();
     }
 }
