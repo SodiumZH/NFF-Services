@@ -8,10 +8,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.extensions.IForgeItemStack;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.entity.taming.NFFTamedDataComponent;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nullable;
@@ -24,13 +22,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 	// For BefriendedMob only, owner ref
 	@Nullable
 	protected INFFTamed owner = null;
-	
-	protected void updateOwner()
-	{
-		if (owner != null)
-            this.syncToMob(owner.asMob());
-	}
-	
+
 	public INFFTamed getOwner()
 	{
 		return owner;
@@ -41,7 +33,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 		this.removeListener(owner);
 		owner = newOwner;
 		this.addListener(newOwner);
-		updateOwner();
+		syncToOwner();
 	}
 	
 	public NFFTamedMobInventory(int size)
@@ -137,7 +129,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 				else this.setItem(i, ItemStack.EMPTY);
 			}
 		}
-		updateOwner();
+		if (this.owner != null) this.syncToMob(this.owner.asMob());
 	}
 	
 	public void writeBuf(FriendlyByteBuf buf) {
@@ -172,7 +164,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 		else if (tag instanceof ListTag list)
 			inv = new NFFTamedMobInventory(list.size(), owner);
 		inv.readFromTag(tag);
-		inv.updateOwner();
+		inv.syncToOwner();
 		return inv;
 	}
 	
@@ -204,7 +196,7 @@ public class NFFTamedMobInventory extends SimpleContainer
 		{
 			this.setItem(i, from.getItem(i));
 		}
-		updateOwner();
+		syncToOwner();
 	}
 	
 	@Deprecated
@@ -277,14 +269,22 @@ public class NFFTamedMobInventory extends SimpleContainer
 	public void syncToMob(Mob mob)
 	{
 	}
-	
-	/**
+
+    public final void syncToOwner() {
+        if (owner != null) this.syncToMob(owner.asMob());
+    }
+
+    /**
 	 * Use mob state to update this inventory. Usually used only on initialization.
 	 */
 	public void getFromMob(Mob mob)
 	{
 	}
-	
+
+    public final void getFromOwner() {
+        if (this.owner != null) this.getFromMob(this.owner.asMob());
+    }
+
 	/**
 	 * Cast this to given subclass. 
 	 * <p>WARNING: This method wraps an unchecked cast. Make sure the class matches.

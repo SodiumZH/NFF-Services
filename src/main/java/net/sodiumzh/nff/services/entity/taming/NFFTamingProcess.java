@@ -2,8 +2,10 @@ package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -29,8 +31,11 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastable<NFFTamingProcess>
 {
@@ -77,12 +82,18 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 		// Record the old mob's some properties for initializing new mob on client UNIMPLEMENTED
 
 		// Do conversion
+        // Record equipment slots first, as entity conversion will clear them
+        Map<EquipmentSlot, ItemStack> slotItems = Arrays.stream(EquipmentSlot.values()).collect(Collectors.toMap(
+            es -> es, es -> target.getItemBySlot(es).copy()
+        ));
 		Mob newMob = NFUEntityStatics.replaceMob(newType, target);
+        slotItems.forEach(target::setItemSlot);
 		INFFTamed tamed = INFFTamed.get(newMob).orElseThrow(() -> new RuntimeException("Taming Process: Tamed mob is missing INFFTamed interface."));
-		this.initOnTaming(tamed, target, player);
+        // Do initialization on taming
+        this.initOnTaming(tamed, target, player);
 		tamed.onTamed(player, target);
 		MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(target, tamed.asMob()));
-
+        NFUEntityStatics.syncLivingEquipment(newMob);
 		// Sync the recorded properties UNIMPLEMENTED
 
 		return tamed.asMob();
@@ -98,7 +109,9 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 		NFFTamedDataAccessor accessor = newTamed.getDataAccessor();
 		accessor.setOwnerName(player.getName().getString());
 		newTamed.setOwnerUUID(player.getUUID());
-		newTamed.getAdditionalInventory().getFromMob(newTamed.asMob());
+        accessor.getInventoryComponent().createInventoryIfAbsent();
+		accessor.getAdditionalInventory().getFromMob(tamedFrom);
+        accessor.getAdditionalInventory().syncToMob(newTamed.asMob());
 		accessor.generateIdentifier();
 		accessor.recordEntityType();
 		accessor.recordEncounteredDate();
