@@ -3,6 +3,10 @@
 > Purpose of this file: a concise, high-level map of the NFF Services framework
 > for AI agents to quickly understand what the mod does and how it is organized.
 > It describes the architecture and functionalities, not implementation details.
+>
+> Reflects the `0.2.33` "de-legacy" architecture: as of 0.2.33 the framework was
+> refactored off Forge **Capabilities** onto the NFU library's **Entity Component
+> System (ECS)**. See the "Entity Component System" section below.
 
 ## What this mod is
 
@@ -27,7 +31,7 @@ Taming uses a **"replacement" mechanic** rather than mutating the wild mob:
 
 1. A wild mob type is registered as *tamable* and mapped to a distinct *tamed* mob
    type via **`NFFTamingMapping.register(from, convertTo, processSupplier)`**.
-   Registered wild types automatically receive the `CNFFTamable` capability.
+   Registered wild types automatically receive their tamable components.
 2. Each mapping references an **`NFFTamingProcess`** — a single‑instance handler
    (like `Item`/`Block`, with registry `NFFRegistries.TAMING_PROCESSES`) that
    defines *how* the mob is tamed (e.g. giving items, instant tool, progress‑based).
@@ -36,32 +40,66 @@ Taming uses a **"replacement" mechanic** rather than mutating the wild mob:
    The tamed type is a separate `EntityType` that looks identical but no longer has a
    "wild" state — it must always have an owner.
 
+Which mobs are treated as "tamed" is decided by **`NFFTamedTypeRegistry`**: it maps a
+mob `EntityType` to an accessor `Function<Mob, INFFTamed>` (the built‑in `SELF`
+accessor casts mobs that directly implement `INFFTamed`). This registry replaces the
+old `instanceof INFFTamed` checks and lets the ECS attach the right components to
+tamed vs. tamable mobs.
+
 ## Key components
 
 - **`INFFTamed`** — central interface for tamed/companion mobs. Extends
   `OwnableEntity`; provides owner handling, AI‑state switching, inventory access,
   GUI opening, common‑data access, and helper queries. Implemented on dedicated
-  "tamed" mob classes (or via mixin in special cases).
+  "tamed" mob classes (or via mixin in special cases). Data/behavior are delegated
+  to entity components, reached through a facade **`NFFTamedDataAccessor`**
+  (`getDataAccessor()`). Lifecycle hooks `onInitialize()` and `onTamed(...)` replace
+  the old explicit init calls.
 - **`NFFTamingProcess`** — abstract taming handler. Notable subclasses include
   item‑giving processes (`TamingProcessItemGiving`, progress‑based
   `TamingProcessItemGivingProgress`). Handles interaction results and anger checks.
 - **`NFFTamingMapping`** — registry of wild→tamed type mappings and their processes.
+- **`NFFTamedTypeRegistry`** — maps mob `EntityType`s to their `INFFTamed` accessor;
+  drives component attachment and replaces `instanceof` checks.
 - **Presets** (`entity/taming/presets/`) — reference tamed implementations
   (e.g. `NFFTamedCreeperPreset`, `NFFTamedEnderManPreset`).
 
-## Capabilities (persistent per‑entity/level/player data)
+## Entity Component System (ECS)
 
-Registered in `NFFCapRegistry`; several tick each game tick.
+As of 0.2.33 ("de‑legacy"), per‑mob state and behavior are no longer stored in Forge
+**Capabilities**; they live in **NFU entity components**
+(`net.sodiumzh.nfu.entity.component.*`). Each entity carries a tree of components
+addressed by **`HierarchyPath`** strings (e.g. `/nff/tamable/...`, `/nff/tamed/...`).
+Component classes extend `EntityComponentBase`; each has an `EntityComponentType`
+registered in NFU's `ENTITY_COMPONENT_TYPES` registry. A component can declare
+required sub‑components and allowed paths, exposes lifecycle hooks (`tick`,
+`joinLevel`, NBT serialize/deserialize), and is bound to a side via `AvailableSide`
+(SERVER / CLIENT / BOTH).
 
-- **`CNFFTamable`** — attached to wild tamable mobs; also handles mob **anger**
-  (can get angry at players, interrupting taming). Stores general and
-  per‑player NBT.
-- **`CNFFTamedCommonData`** — common data on every `INFFTamed` mob: a stable
-  identifier (survives death/respawn), initial entity type, additional serialized
-  NBT, non‑serialized temp objects, and periodically **synched** data. Owner info.
-- Support capabilities: `CHealingHandler`, `CAttributeMonitor`, `CItemStackMonitor`,
-  `CLivingEntityDelayedActionHandler`, plus player‑scope `CNFFPlayerModule` and
-  level‑scope `CNFFLevelModule` (server‑side serializable per‑level state).
+NFF registers its component types and hierarchy paths in **`NFFEntityComponents`**,
+which also holds typed `SubComponentAccessor`s and, on an `EntityComponentSetupEvent`
+listener, attaches the correct components depending on whether a mob is tamable,
+tamed, or neither.
+
+**Tamable‑side components** (server‑only, under `/nff/tamable`):
+- `NFFTamableComponent` — main handler (holds the taming process, hostility, etc.).
+- `NFFTamableDataComponent` — general + per‑player serialized NBT.
+- `NFFTamableTimerComponent` / `EntityTimerComponent` — timers.
+- `NFFTamableAngerHandlerComponent` — mob anger toward players (can interrupt taming).
+
+**Tamed‑side components** (under `/nff/tamed`):
+- `NFFTamedDataComponent` — persistent data (e.g. initial `EntityType`, sun immunity).
+- `NFFTamedSyncherComponent` — client‑**synched** data: stable identifier, owner
+  UUID/name, encounter date, AI state, attack target, additional inventory.
+- `NFFTamedInventoryComponent` — the mob's inventory, synced back to the mob on tick.
+- shared `HealingHandlerComponent` and (all mobs) `EntityItemStackMonitorComponent`.
+
+Custom synched types are registered via **`NFFDataSerializers`** (NFU
+`NFUDataSerializer`s, e.g. the tamed‑mob inventory serializer).
+
+Legacy Forge capabilities are essentially gone (`NFFCapRegistry` retains only a
+deprecated level cap). Old 0.x.32 save data is migrated into the new components by
+**`DataPort33`** (a temporary porting listener, slated for removal in 0.x.34).
 
 ## AI system
 
@@ -104,28 +142,40 @@ Registered in `NFFItemRegistry` (framework ships mainly debug/utility items):
 ## Event system
 
 Custom Forge‑bus events let content mods hook the lifecycle, e.g.
-`NFFMobTamedEvent`, `NFFTamedCommonDataConstructEvent`, `NFFTamedDeathEvent`,
-`NFFTamedDropRespawnerOnDyingEvent`, AI events (`NFFTamedChangeAiStateEvent`,
-`NFFGoalCheckCanUseEvent`), respawner lifecycle events, level‑module tick events,
-and the setup event `NFFTamingMappingRegisterEvent`. `BMHooks` centralizes common
-hook calls; listeners live under `eventlistener/`.
+`NFFMobTamedEvent`, `NFFTamedDataConstructEvent`, `NFFTamedSyncherConstructEvent`,
+`NFFTamedDeathEvent`, `NFFTamedDropRespawnerOnDyingEvent`, AI events
+(`NFFTamedChangeAiStateEvent`, `NFFGoalCheckCanUseEvent`), respawner lifecycle
+events, level‑module tick events, and the setup event
+`NFFTamingMappingRegisterEvent`. `BMHooks` centralizes common hook calls; listeners
+live under `eventlistener/`.
 
 ## Package map (`net.sodiumzh.nff.services`)
 
-- `entity/taming` — taming mappings, processes, `INFFTamed`, common data, presets.
-- `entity/capability` — entity capabilities (tamable, healing, attribute/item monitors).
+- `entity/taming` — taming mappings, processes, `INFFTamed`, entity components
+  (`NFF*Component`), `NFFTamedDataAccessor`, `NFFTamedTypeRegistry`, presets, and the
+  legacy `CNFFTamedCommonData` (kept for data porting).
 - `entity/ai` + `entity/ai/goal` (+ `preset`, `preset/target`) — AI states and goals.
-- `item` (+ `capability`, `event`) — catcher, respawner, tamer, ownership items.
+- `item` (+ `event`) — catcher, respawner, tamer, ownership items.
 - `inventory` — mob containers and menu.
-- `level`, `network`, `registry`, `event`, `eventlistener`, `client/gui` — supporting
-  systems (level module, packets, registries, events/listeners, client screens).
+- `registry` — `NFFEntityComponents` (ECS types/paths), `NFFDataSerializers`,
+  `NFFItemRegistry`, `NFFRegistries`, `NFFTagRegistry`, `NFFCapabilityAttachments`,
+  and the now‑minimal `NFFCapRegistry`.
+- `level`, `network`, `event`, `eventlistener`, `client/gui` — supporting systems
+  (level module, packets, events/listeners incl. `DataPort33`, client screens).
 
 ## Notes for future sessions
 
+- **0.2.33 refactor:** the biggest change is the move from Forge Capabilities to the
+  NFU **Entity Component System**. When reasoning about per‑mob data, look at the
+  `NFF*Component` classes and `NFFEntityComponents`, not old `CNFF*` capabilities.
+- `NFFTamedDataAccessor` is the convenient facade `INFFTamed` uses to read/write the
+  underlying tamed components; `NFFTamedTypeRegistry` decides which mobs are tamed.
 - Legacy namespace `befriendmobs` is redirected to `nffservices` at load time
-  (`SaveDataLocationRedirector`), so old class/capability/save keys still resolve.
+  (`SaveDataLocationRedirector`); `DataPort33` migrates 0.x.32 save data into the new
+  components and is temporary (removal planned in 0.x.34).
 - This is a framework: most gameplay content (actual tamed mobs, taming items) is
   expected to be provided by downstream mods that register types, processes and
   mappings against these APIs.
 - A developer‑facing tutorial exists at `wiki/docs_en.md`; the changelog at
-  `wiki/changelog.md`.
+  `wiki/changelog.md`. It also depends on the sibling **NFU‑Library**
+  (`net.sodiumzh.nfu`) for the ECS and shared utilities.
