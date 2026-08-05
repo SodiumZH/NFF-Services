@@ -4,72 +4,45 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sodiumzh.nfu.container.ITable2D;
+import net.sodiumzh.nfu.container.Table2D;
+import net.sodiumzh.nfu.container.Tuple2;
+import net.sodiumzh.nfu.exception.MissingRegistryEntryException;
+import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /** Defines entity types before and after taming. Mobs which are registered to be a tamable type (type before
- * taming) will be automatically attached a {@link CNFFTamable} capability.
+ * taming) will be automatically attached a {@link NFFTamableComponent}.
  */
 public class NFFTamingMapping {
 
-	private NFFTamingMapping()
-	{
-	};
-	
-	protected static final NFFTamingMapping REGISTRY = new NFFTamingMapping(); 
-	
-	protected static class Entry
-	{
-		public ResourceLocation fromType = null;
-		public ResourceLocation convertToType = null;
-		public Supplier<NFFTamingProcess> process = null;
-		
-		public Entry(ResourceLocation before, ResourceLocation after, Supplier<NFFTamingProcess> process)
-		{
-			this.fromType = before;
-			this.convertToType = after;
-			this.process = process;
-		}
-
-		@SuppressWarnings("unchecked")
-		public EntityType<? extends Mob> getTypeBefore() {
-			return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(fromType);
-		}
-
-		@SuppressWarnings("unchecked")
-		public EntityType<? extends Mob> getTypeAfter() {
-			return (EntityType<? extends Mob>) ForgeRegistries.ENTITY_TYPES.getValue(convertToType);
-		}
-	}
-		
-	private final ArrayList<Entry> map = new ArrayList<>();
+	private static final ITable2D<EntityType<?>, EntityType<?>, Tuple2<Supplier<NFFTamingProcess>, NFFTamingProcess>> TABLE = new Table2D<>();
 
 	/* Register */
 	
 	public static void register(@Nonnull ResourceLocation from, @Nonnull ResourceLocation convertTo, @Nonnull Supplier<NFFTamingProcess> process, boolean override)
 	{
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.fromType.equals(from))
-			{
-				if (override)
-				{
-					REGISTRY.map.remove(entry);
-					break;
-				}
-				else
-				{
-					return;
-				}
+		if (!ForgeRegistries.ENTITY_TYPES.containsKey(from))
+			throw new MissingRegistryEntryException("NFFTamingMapping registering illegal key " + from);
+		if (!ForgeRegistries.ENTITY_TYPES.containsKey(convertTo))
+			throw new MissingRegistryEntryException("NFFTamingMapping registering illegal key " + convertTo);
+		EntityType<?> fromType = ForgeRegistries.ENTITY_TYPES.getValue(from);
+		EntityType<?> toType = ForgeRegistries.ENTITY_TYPES.getValue(convertTo);
+		if (TABLE.containsRow(ForgeRegistries.ENTITY_TYPES.getValue(from))) {
+			if (override) {
+				TABLE.removeRow(fromType);
+			} else {
+				return;
 			}
 		}
-		Entry newEntry = new Entry(from, convertTo, process);
-		REGISTRY.map.add(newEntry);
+		TABLE.put(fromType, toType, new Tuple2<>(process, null));
 	}
 	
 	public static void register(@Nonnull ResourceLocation fromType, @Nonnull ResourceLocation convertToType, @Nonnull Supplier<NFFTamingProcess> process)
@@ -78,55 +51,19 @@ public class NFFTamingMapping {
 	}
 
 	/* Search */
-	
-	private static Entry getEntryFromType(EntityType<? extends Mob> fromType)
-	{
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.getTypeBefore().equals(fromType))
-			{
-				return entry;
-			}
-		}
-		return null;
-	}
-	
+
 	// Get which type this mob should convert to (from type)
-	public static EntityType<? extends Mob> getConvertTo(EntityType<? extends Mob> fromType)
-	{
-		Entry entry = getEntryFromType(fromType);
-		if (entry != null)
-			return entry.getTypeAfter();
-		else return null;
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static EntityType<? extends Mob> getConvertTo(EntityType<?> fromType) {
+		return (EntityType<? extends Mob>) TABLE.getRow(fromType).keySet().stream().findAny().orElse(null);
 	}
 	
 	// Get which type this mob should convert to (from mob)
-	@SuppressWarnings("unchecked")
+	@Nullable
 	public static EntityType<? extends Mob> getConvertTo(Mob fromMob)
 	{
-		return getConvertTo((EntityType<? extends Mob>) fromMob.getType());
-	}
-
-	/**
-	 * @deprecated use {@code getProcessSupplier} or {@code getProcess} instead.
-	 */
-	@Deprecated
-	public static NFFTamingProcess getHandler(EntityType<? extends Mob> fromType)
-	{
-		return getProcess(fromType);
-	}
-
-	/**
-	 * // Get which taming process this mob should use (from type) as supplier.
-	 * @param fromType Type of the "wild" mob.
-	 * @return Process.
-	 */
-	public static Supplier<NFFTamingProcess> getProcessSupplier(EntityType<? extends Mob> fromType)
-	{
-		Entry entry = getEntryFromType(fromType);
-		if (entry != null)
-			return entry.process;
-		else return null;
+		return getConvertTo(fromMob.getType());
 	}
 
 	/**
@@ -134,21 +71,15 @@ public class NFFTamingMapping {
 	 * @param fromType Type of the "wild" mob.
 	 * @return Process.
 	 */
-	public static NFFTamingProcess getProcess(EntityType<? extends Mob> fromType)
-	{
-		Supplier<NFFTamingProcess> supplier = getProcessSupplier(fromType);
-		return supplier != null ? supplier.get() : null;
-	}
-
-	/**
-	 * // Get which taming process this mob ("wild") should use as supplier.
-	 * @param fromMob The "wild" mob.
-	 * @return Process.
-	 */
-	@SuppressWarnings("unchecked")
-	public static Supplier<NFFTamingProcess> getProcessSupplier(Mob fromMob)
-	{
-		return getProcessSupplier((EntityType<? extends Mob>) fromMob.getType());
+	@Nullable
+	public static NFFTamingProcess getProcess(EntityType<?> fromType) {
+		EntityType<? extends Mob> after = getConvertTo(fromType);
+		if (after == null) return null;
+		Tuple2<Supplier<NFFTamingProcess>, NFFTamingProcess> value = TABLE.get(fromType, after).orElse(null);
+		if (value == null) return null;
+		if (value.getB() == null)
+			TABLE.put(fromType, after, new Tuple2<>(value.getA(), value.getA().get()));
+		return TABLE.get(fromType, after).map(Tuple2::getB).orElse(null);
 	}
 
 	/**
@@ -159,94 +90,53 @@ public class NFFTamingMapping {
 	@SuppressWarnings("unchecked")
 	public static NFFTamingProcess getProcess(Mob fromMob)
 	{
-		return getProcess((EntityType<? extends Mob>) fromMob.getType());
+		return getProcess(fromMob.getType());
 	}
 	
 	/** Get if the type ("wild" type) is tamable. */
-	public static boolean contains(EntityType<? extends Mob> fromType)
-	{
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.getTypeBefore().equals(fromType))
-			{
-				return true;
-			}
-		}
-		return false;
+	public static boolean contains(EntityType<?> fromType) {
+		return !TABLE.getRow(fromType).isEmpty();
 	}
 	
 	/** Get if the mob is tamable. */
 	@SuppressWarnings("unchecked")
 	public static boolean contains(Mob fromMob)
 	{
-		return contains((EntityType<? extends Mob>) fromMob.getType());
+		return contains(fromMob.getType());
 	}
 
 	/** Get if the type could be (not necessarily) a tamed mob. */
-	public static boolean containsAfter(EntityType<? extends Mob> fromType)
+	public static boolean containsAfter(EntityType<?> toType)
 	{
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.getTypeAfter().equals(fromType))
-			{
-				return true;
-			}
-		}
-		return false;
+		return !TABLE.getColumn(toType).isEmpty();
 	}
 
 	/** Get if the mob could be (not necessarily) a tamed mob. */
-	@SuppressWarnings("unchecked")
-	public static boolean containsAfter(Mob fromMob)
-	{
-		return containsAfter((EntityType<? extends Mob>) fromMob.getType());
+	public static boolean containsAfter(Mob fromMob) {
+		return containsAfter(fromMob.getType());
 	}
 
-	public static EntityType<? extends Mob> getTypeBefore(EntityType<? extends Mob> befriendedType)
-	{
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.getTypeAfter().equals(befriendedType))
-			{
-				return entry.getTypeBefore();
-			}
-		}
-		throw new IllegalArgumentException("Type " + befriendedType.getDescriptionId() + "is not a nff-tamed mob.");
+	@Nullable
+	public static EntityType<? extends Mob> getTypeBefore(EntityType<?> afterType) {
+		return (EntityType<? extends Mob>) TABLE.getColumn(afterType).keySet().stream().findAny().orElse(null);
 	}
 	
 	@Nullable
-	@SuppressWarnings("unchecked")
 	public static EntityType<? extends Mob> getTypeBefore(Mob tamed)
 	{
-		EntityType<? extends Mob> tamedType = (EntityType<? extends Mob>) tamed.getType();
-		
-		for (Entry entry: REGISTRY.map)
-		{
-			if (entry.getTypeAfter().equals(tamedType))
-			{
-				return entry.getTypeBefore();
-			}
-		}
-		return null;
+		return getTypeBefore(tamed.getType());
 	}	
 	
-	public static Set<EntityType<?>> getAllTamableTypes()
-	{
-		Set<EntityType<?>> types = new HashSet<EntityType<?>>();
-		for (Entry entry: REGISTRY.map)
-		{
-			types.add(entry.getTypeBefore());
-		}
-		return types;
+	public static Set<EntityType<? extends Mob>> getAllTamableTypes() {
+		return TABLE.keyPairs().stream().map(ITable2D.KeyPair::row)
+			.map(et -> (EntityType<? extends Mob>)et)
+			.collect(Collectors.toSet());
 	}
 	
-	public static Set<EntityType<?>> getAllTamedTypes()
+	public static Set<EntityType<? extends Mob>> getAllTamedTypes()
 	{
-		Set<EntityType<?>> types = new HashSet<EntityType<?>>();
-		for (Entry entry: REGISTRY.map)
-		{
-			types.add(entry.getTypeAfter());
-		}
-		return types;
+		return TABLE.keyPairs().stream().map(ITable2D.KeyPair::column)
+			.map(et -> (EntityType<? extends Mob>)et)
+			.collect(Collectors.toSet());
 	}
 }
