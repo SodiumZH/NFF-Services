@@ -405,60 +405,18 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public void deserializeNBT(CompoundTag nbt) {
-			// 0.x.25+: normal reading
-			if (nbt.getBoolean("25+"))
-			{
-				this.nbt = nbt.getCompound("additionalNBT").copy();
-				this.readSynchedData(nbt.getCompound("synchedData"));
-				//this.setIdentifier(nbt.getUUID("identifier"));
-				this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
-				//this.setOwnerName(nbt.getString("ownerName"));
-				//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
-				//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
-				this.setAnchor(NFUNBTStatics.getVec3(nbt, "randomStrollAnchor"));
-				//this.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
-				this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
-			}
-			// Port legacy
-			else 
-			{
-				CompoundTag nbtCpy = nbt.copy();
-				nbtCpy.remove("mod_id");
-				
-				UUID identifier = nbtCpy.getUUID("identifier");
-				if (identifier == null || identifier.equals(EMPTY_UUID)) this.generateIdentifier();
-				else this.setIdentifier(identifier);
-				nbtCpy.remove("identifier");
-				
-				String entityTypeKey = nbtCpy.getString("initial_entity_type");
-				if (entityTypeKey != null && ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)) != null)
-					this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)));
-				else this.recordEntityType();
-				nbtCpy.remove("initial_entity_type");
-				
-				String ownerName = nbtCpy.getString("owner_name");
-				if (ownerName != null) this.setOwnerName(ownerName);
-				else this.setOwnerName("");
-				nbtCpy.remove("owner_name");
-				
-				// owner uuid is set in NFFTamedStatics
-				int[] encounteredDate = nbtCpy.getIntArray("encountered_date");
-				if (encounteredDate != null && encounteredDate.length >= 3) 
-					this.setEncounteredDate(new int[] {encounteredDate[0], encounteredDate[1], encounteredDate[2]});
-				else this.setEncounteredDate(new int[] {0, 0, 0});
-				nbtCpy.remove("encountered_date");
-				
-				this.anchor = this.getEntity().position();
-				this.nbt = nbtCpy;
-				// AI state, owner uuid and inventory are loaded from NFFTamedStatics
-			}
+			this.nbt = nbt.getCompound("additionalNBT").copy();
+			this.readSynchedData(nbt.getCompound("synchedData"));
+			//this.setIdentifier(nbt.getUUID("identifier"));
+			this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
+			//this.setOwnerName(nbt.getString("ownerName"));
+			//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
+			//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
+			this.setAnchor(NFUNBTStatics.getVec3(nbt, "randomStrollAnchor"));
+			//this.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
+			this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
 			if (this.getEncounteredDate()[0] == 0)
 				this.recordEncounteredDate();
-			// TODO Remove from TempPortingEvent and restore this
-			/*
-			this.getBM().updateFromInventory();
-			this.getBM().init(this.getOwnerUUID(), null);
-			this.getBM().setInit();*/
 		}
 
 		private CompoundTag saveSynchedData()

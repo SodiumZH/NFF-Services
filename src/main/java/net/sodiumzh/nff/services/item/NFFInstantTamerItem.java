@@ -42,7 +42,7 @@ public class NFFInstantTamerItem extends NFUItem
 					} else
 						throw new UnimplementedException(
 								"Entity type befriend method unimplemented: " + target.getType().toShortString()
-								+ ", handler class: " + NFFTamingMapping.getHandler((EntityType<Mob>)target.getType()).toString());
+								+ ", handler class: " + NFFTamingMapping.getProcess(target.getType()).toString());
 
 				});
 			});

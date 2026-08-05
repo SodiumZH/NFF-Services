@@ -30,7 +30,8 @@ public class NFFTamedMobInventory extends SimpleContainer
 	
 	public void changeOwner(INFFTamed newOwner)
 	{
-		this.removeListener(owner);
+		if (owner != null)
+			this.removeListener(owner);
 		owner = newOwner;
 		this.addListener(newOwner);
 		syncToOwner();
