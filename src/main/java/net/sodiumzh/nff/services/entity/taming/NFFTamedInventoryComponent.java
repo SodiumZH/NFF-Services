@@ -46,7 +46,7 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
         this.createInventoryIfAbsent();
         ListTag listTag = nbt.getList("inventory", Tag.TAG_COMPOUND);
         if (!listTag.isEmpty()) {
-            inventory.fromTag(listTag);
+            inventory.readFromTag(listTag);
         }
     }
 

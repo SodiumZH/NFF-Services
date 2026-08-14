@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nfu.util.NFUDebugStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
 
 import javax.annotation.Nullable;
@@ -155,6 +156,15 @@ public class NFFTamedMobInventory extends SimpleContainer
 			inventory.setItem(i, list.get(i));
 		}
 		return inventory;
+	}
+
+	/**
+	 * Vanilla {@code fromTag} is wrong for this class. Use {@code readFromTag} instead.
+	 */
+	@Override
+	@Deprecated
+	public void fromTag(ListTag pContainerNbt) {
+		this.readFromTag(pContainerNbt);
 	}
 
 	public static NFFTamedMobInventory makeFromTag(Tag tag, INFFTamed owner)
