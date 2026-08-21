@@ -1,7 +1,6 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Creeper;
@@ -9,7 +8,7 @@ import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.sodiumzh.nff.services.network.ClientboundNFFGuiOpenPacket;
+import net.sodiumzh.nff.services.network.ClientboundNFFGUIOpenPacket;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNetworkStatics;
@@ -87,7 +86,7 @@ public class NFFTamedStatics
 			}
 
 			sp.nextContainerCounter();
-			ClientboundNFFGuiOpenPacket packet = new ClientboundNFFGuiOpenPacket(sp.containerCounter,
+			ClientboundNFFGUIOpenPacket packet = new ClientboundNFFGUIOpenPacket(sp.containerCounter,
 					mob.getAdditionalInventory().getContainerSize(), living.getId());
 			NFUNetworkStatics.sendToPlayer(NFFChannels.CHANNEL, packet, sp);
 			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
@@ -122,7 +121,7 @@ public class NFFTamedStatics
 
 	public static List<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
-		Stream<Entity> stream = player.level().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
+		Stream<Entity> stream = player.getLevel().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
 				e -> (e.getType() == type && INFFTamed.get(e).filter(bm -> bm.getOwner() == player).isPresent())).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);

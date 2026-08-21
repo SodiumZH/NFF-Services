@@ -51,7 +51,7 @@ public class DataPort33 {
                     NFFTamedDataComponent data = EntityComponentAPI.getComponentByPath(event.getEntity(), "/nff/tamed/data", NFFEntityComponents.TAMED_DATA.get()).orElseThrow();
                     NFFTamedDataAccessor accessor = tamed.getDataAccessor();
                     // Setup debug output
-                    Player player = Optional.of(event.getEntity().level().players())
+                    Player player = Optional.of(event.getEntity().getLevel().players())
                         .map(p -> p.isEmpty() ? null : p.get(0))
                         .orElse(null);
                     BiConsumer<String, String> msgPrinter = (fieldName, msg) ->

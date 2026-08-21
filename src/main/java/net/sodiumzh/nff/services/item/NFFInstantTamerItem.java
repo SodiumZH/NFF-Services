@@ -46,7 +46,7 @@ public class NFFInstantTamerItem extends NFUItem
 
 				});
 			});
-			return InteractionResult.sidedSuccess(player.level().isClientSide);
+			return InteractionResult.sidedSuccess(player.getLevel().isClientSide);
 		}
 		else return InteractionResult.PASS;
 	}

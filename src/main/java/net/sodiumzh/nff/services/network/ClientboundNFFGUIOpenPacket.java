@@ -4,19 +4,19 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public class ClientboundNFFGuiOpenPacket implements Packet<ClientGamePacketListener> {
+public class ClientboundNFFGUIOpenPacket implements Packet<ClientGamePacketListener> {
 
 	protected final int containerId;
 	protected final int size;
 	protected final int entityId;
 
-	public ClientboundNFFGuiOpenPacket(int containerId, int size, int entityId) {
+	public ClientboundNFFGUIOpenPacket(int containerId, int size, int entityId) {
 		this.containerId = containerId;
 		this.size = size;
 		this.entityId = entityId;
 	}
 
-	public ClientboundNFFGuiOpenPacket(FriendlyByteBuf pBuffer) {
+	public ClientboundNFFGUIOpenPacket(FriendlyByteBuf pBuffer) {
 		this.containerId = pBuffer.readUnsignedByte();
 		this.size = pBuffer.readVarInt();
 		this.entityId = pBuffer.readInt();

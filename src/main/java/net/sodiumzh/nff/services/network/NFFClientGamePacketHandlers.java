@@ -6,17 +6,16 @@ import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nff.services.client.gui.screen.NFFGUIConstructorRegistry;
+import net.sodiumzh.nff.services.client.gui.screen.NFFGuiConstructorRegistry;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 public class NFFClientGamePacketHandlers
 {
 	
 	@SuppressWarnings("resource")
-	public static void handleBefriendedGuiOpen(ClientboundNFFGuiOpenPacket packet, ClientGamePacketListener listener)
+	public static void handleBefriendedGuiOpen(ClientboundNFFGUIOpenPacket packet, ClientGamePacketListener listener)
 	{
 		Minecraft mc = Minecraft.getInstance();
 		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
@@ -29,23 +28,8 @@ public class NFFClientGamePacketHandlers
 			if (menu == null)
 				return;
 			localplayer.containerMenu = menu;
-			mc.setScreen(NFFGUIConstructorRegistry.make(menu));
+			mc.setScreen(NFFGuiConstructorRegistry.createGuiFromMenu(menu));
 		});
-	}
-	
-	public static void handleBefriendingInit(ClientboundNFFTamedInitPacket packet, ClientGamePacketListener listener)
-	{
-		@SuppressWarnings("resource")
-		Minecraft mc = Minecraft.getInstance();
-		PacketUtils.ensureRunningOnSameThread(packet, listener, mc);
-		Entity entity = mc.level.getEntity(packet.entityId);
-		entity.setXRot(packet.xRot);
-		entity.setYRot(packet.yRot);
-		if (entity instanceof Mob mob)
-		{
-			mob.setYBodyRot(packet.yBodyRot);
-			mob.setYHeadRot(packet.yHeadRot);
-		}
 	}
 
 }
