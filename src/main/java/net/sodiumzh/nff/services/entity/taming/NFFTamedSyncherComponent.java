@@ -143,7 +143,7 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
     public LivingEntity getAttackTarget() {
         int id = this.getSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);
         if (id == -1) return null;
-        return Stream.of(this.getEntity().level().getEntity(id)).filter(e -> e instanceof LivingEntity)
+        return Stream.of(this.getEntity().getLevel().getEntity(id)).filter(e -> e instanceof LivingEntity)
             .map(e -> (LivingEntity)e).findAny().orElse(null);
     }
 

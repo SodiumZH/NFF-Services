@@ -49,10 +49,6 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 	{	
 	}
 
-	public void initCap(CNFFTamable cap)
-	{
-	}	
-
 	/**
 	 * Invoked on entity join level to initialize the tamable capability.
 	 * <p>Handled in {@link NFFEntityEventListeners#onEntityJoinWorld}.

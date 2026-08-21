@@ -196,12 +196,12 @@ public class NFFTamableComponent extends EntityComponentBase<Mob> {
 
     public Optional<LivingEntity> getAlwaysHostileToLiving() {
         if (this.alwaysHostileTo == null) return Optional.empty();
-        Player player = this.getEntity().level().getPlayerByUUID(this.alwaysHostileTo);
+        Player player = this.getEntity().getLevel().getPlayerByUUID(this.alwaysHostileTo);
         if (player != null) return Optional.of(player);
-        if (this.getEntity().level() instanceof ServerLevel sl)
+        if (this.getEntity().getLevel() instanceof ServerLevel sl)
             return Optional.ofNullable(sl.getEntities().get(this.alwaysHostileTo))
                 .filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e);
-        else return this.getEntity().level()
+        else return this.getEntity().getLevel()
             .getEntitiesOfClass(LivingEntity.class, this.getEntity().getBoundingBox().inflate(16d))
             .stream().filter(e -> e.getUUID().equals(this.alwaysHostileTo)).findAny();
     }

@@ -1,7 +1,6 @@
 package net.sodiumzh.nff.services.entity.taming;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Creeper;
@@ -123,7 +122,7 @@ public class NFFTamedStatics
 
 	public static List<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
-		Stream<Entity> stream = player.level().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
+		Stream<Entity> stream = player.getLevel().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
 				e -> (e.getType() == type && INFFTamed.get(e).filter(bm -> bm.getOwner() == player).isPresent())).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);

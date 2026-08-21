@@ -172,7 +172,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontOverride
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
-		if (!this.asMob().level().isClientSide)
+		if (!this.asMob().getLevel().isClientSide)
 			this.getDataAccessor().setOwnerUUID(ownerUUID);
 	}
 
@@ -408,7 +408,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	{
 		if (!(pContainer instanceof NFFTamedMobInventory))
 			throw new UnsupportedOperationException("INFFTamed container only receives NFFTamedMobInventory.");
-		if (!this.asMob().level().isClientSide())
+		if (!this.asMob().getLevel().isClientSide())
 			this.getAdditionalInventory().syncToMob(this.asMob());
 		this.onInventoryChanged();
 	}
@@ -703,7 +703,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	/** Only on server, get all NFF mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
 	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
-		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
+		if (!(player.getLevel() instanceof ServerLevel sl)) return new HashMap<>();
 
 		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
 		if (!nbt.contains("tamedMobLocations", Tag.TAG_COMPOUND)) return Map.of();
@@ -740,7 +740,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * but the mob isn't found in level。
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
-		if (!(player.level() instanceof ServerLevel sl)) return;
+		if (!(player.getLevel() instanceof ServerLevel sl)) return;
 
 		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
 		List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),

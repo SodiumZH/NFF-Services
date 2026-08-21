@@ -101,7 +101,7 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 		mob.setOwnerUUID(player.getUUID());
 		mob.getDataAccessor().setOwnerName(player.getName().getString());
 		mob.getDataAccessor().recordEncounteredDate();
-		return InteractionResult.sidedSuccess(player.level().isClientSide);
+		return InteractionResult.sidedSuccess(player.getLevel().isClientSide);
 	}
 	
 	@Override
@@ -125,7 +125,7 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 	public InteractionResult interactLivingEntity(Player player, LivingEntity living, InteractionHand usedHand)
 	{
 		ItemStack stack = player.getItemInHand(usedHand);
-		if (!player.level().isClientSide && INFFTamed.get(living).isPresent())
+		if (!player.getLevel().isClientSide && INFFTamed.get(living).isPresent())
 		{
 			INFFTamed bm = INFFTamed.get(living).get();
 			if (isWritten(stack))

@@ -13,10 +13,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -120,9 +118,9 @@ public class NFFEntityEventListeners
 
 	public static void onLivingChangeTarget_Low(LivingChangeTargetEvent event)
 	{
-		if (!event.getEntity().level().isClientSide) {
+		if (!event.getEntity().getLevel().isClientSide) {
 			// Handle tamable always-hostile
-			if (!event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob) {
+			if (!event.getEntity().getLevel().isClientSide && event.getEntity() instanceof Mob mob) {
 				NFFTamableComponent.getOptional(mob)
 					.flatMap(c -> c.getAlwaysHostileToLiving()        // when has an always-hostile target
 						.filter(e -> !e.equals(event.getNewTarget()))    // and trying to set to another target (or remove target)
@@ -266,16 +264,13 @@ public class NFFEntityEventListeners
 		if (!event.getEntity().getLevel().isClientSide)
 		{
 			// Handle tamable always-hostile
-			if (!event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob)
+			if (!event.getEntity().getLevel().isClientSide && event.getEntity() instanceof Mob mob)
 			{
 				NFFTamableComponent.getOptional(mob)
 					.flatMap(c -> c.getAlwaysHostileToLiving()		// when has an always-hostile target
-						.filter(e -> !e.equals(event.getNewTarget()))	// and trying to set to another target (or remove target)
+						.filter(e -> !e.equals(event.getTarget()))	// and trying to set to another target (or remove target)
 						.filter(mob::hasLineOfSight))	// and can see the target
-					.ifPresent(e -> {
-						event.setNewTarget(e);
-						event.setCanceled(false);
-					});	// Then turn to the always-hostile target
+					.ifPresent(mob::setTarget);	// Then turn to the always-hostile target
 			}
 		}
 		
@@ -285,7 +280,7 @@ public class NFFEntityEventListeners
 	public static void onLivingDeath(LivingDeathEvent event) {
 		if (event.isCanceled())
 			return;
-		if (!event.getEntity().level().isClientSide) {
+		if (!event.getEntity().getLevel().isClientSide) {
 			INFFTamed.get(event.getEntity()).ifPresent(bef -> {
 				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
@@ -374,7 +369,7 @@ public class NFFEntityEventListeners
 						}
 					});
 				}
-				else if (event.getEntity() instanceof Player player && player.level() instanceof ServerLevel sl) {
+				else if (event.getEntity() instanceof Player player && player.getLevel() instanceof ServerLevel sl) {
 					// Notify taming interruption on player death
 					NFUContainerStatics.iterableToList(sl.getServer().getAllLevels()).stream()	// Get all levels
 						.flatMap(sl1 -> NFUContainerStatics.iterableToList(sl1.getEntities().getAll()).stream())	// Get all entities of all levels
@@ -521,20 +516,9 @@ public class NFFEntityEventListeners
                 .ifPresent(INFFTamed::setupSunImmunityRules);
 
 	}
-	
+
 	@SubscribeEvent
-	public static void onMobFall(LivingFallEvent event)
-	{
-		// Keep fall damage immunity after befriended
-		INFFTamed.get(event.getEntity()).ifPresent(bm -> {
-			EntityType<? extends Mob> before = NFFTamingMapping.getTypeBefore(bm.asMob());
-			if (before != null && before.is(EntityTypeTags.FALL_DAMAGE_IMMUNE))
-				event.setCanceled(true);
-		});
-	}
-	
-	@SubscribeEvent
-	public static void onDespawn(MobSpawnEvent.AllowDespawn event)
+	public static void onDespawn(LivingSpawnEvent.AllowDespawn event)
 	{
 		if (NFFTamableComponent.getOptional(event.getEntity()).filter(NFFTamableComponent::isForcePersistent).isPresent())
 			event.setResult(Result.DENY);
