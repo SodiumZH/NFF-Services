@@ -70,6 +70,8 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return o instanceof Mob m ? NFFTamedTypeRegistry.asTamed(m) : Optional.empty();
 	}
 
+	// Initialization //
+
 	/**
 	 * Invoked on this mob's construction.
 	 * <p>Called by {@link NFFEntityEventListeners#onEntityFinishConstruction}.
