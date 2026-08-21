@@ -14,7 +14,6 @@ public class NFFLevelModuleTickStartEvent extends Event
 	public NFFLevelModuleTickStartEvent(ServerLevel level)
 	{
 		this.level = level;
-		var cap = NFUMiscStatics.getValue(level.getCapability(NFFCapRegistry.CAP_BM_LEVEL));
-		this.levelModule = cap != null ? cap : null;
+		this.levelModule = level.getCapability(NFFCapRegistry.CAP_LEVEL).orElse(null);
 	}
 }

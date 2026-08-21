@@ -7,8 +7,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
+import net.sodiumzh.nff.services.entity.taming.NFFTamableComponent;
+import net.sodiumzh.nff.services.entity.taming.NFFTamableDataComponent;
 import net.sodiumzh.nff.services.entity.taming.NFFTamingMapping;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.exception.UnimplementedException;
 import net.sodiumzh.nfu.item.NFUItem;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
@@ -28,14 +29,10 @@ public class NFFInstantTamerItem extends NFUItem
 	{
 		if (player.isCreative() && !player.level().isClientSide)
 		{
-			if (target instanceof INFFTamed bef)
-			{
-				bef.init(player.getUUID(), null);
+			INFFTamed.get(target).ifPresentOrElse(t -> {
 				NFUDebugStatics.debugPrintToScreen("Mob " + target.getName().getString() + " initialized", player);
-			}
-			else 
-			{
-				target.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
+			}, () -> {
+				NFFTamableComponent.getOptional(target).ifPresent((l) ->
 				{
 					Mob bef = NFFTamingMapping.getProcess((EntityType<Mob>)target.getType()).doTaming(player, l.getEntity());
 					if (bef != null)
@@ -45,10 +42,10 @@ public class NFFInstantTamerItem extends NFUItem
 					} else
 						throw new UnimplementedException(
 								"Entity type befriend method unimplemented: " + target.getType().toShortString()
-								+ ", handler class: " + NFFTamingMapping.getHandler((EntityType<Mob>)target.getType()).toString());
-	
+								+ ", handler class: " + NFFTamingMapping.getProcess(target.getType()).toString());
+
 				});
-			}
+			});
 			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		else return InteractionResult.PASS;

@@ -6,7 +6,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
@@ -36,7 +35,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	public TamingInteractionResult handleInteract(Player player, Mob mob, InteractionHand hand) {
 
 		TamingInteractionResult result = TamingInteractionResult.unhandled(player.level());
-		CNFFTamable tamable = CNFFTamable.getOptional(mob).resolve().orElse(null);
+		NFFTamableComponent tamable = NFFTamableComponent.getOptional(mob).orElse(null);
 		if (tamable == null) return TamingInteractionResult.unhandled(player.level());
 
 		if (!player.level().isClientSide)
@@ -59,13 +58,13 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 					result.setHandled();
 				}
 				// Fail if the mob is angry
-				if (tamable.isAngryAt(player) && !shouldIgnoreAnger()) {
+				if (tamable.getAngerHandler().isAngryAt(player) && !shouldIgnoreAnger()) {
 					sendParticlesOnAngry(mob);
-					this.debugPrint(player, "Anger cooldown: " + Integer.toString(tamable.getRemainingForgivingTicks(player) / 20) + " s.");
+					this.debugPrint(player, "Anger cooldown: " + Integer.toString(tamable.getAngerHandler().getRemainingForgivingTicks(player) / 20) + " s.");
 					result.setHandled();
 				}
 				// Fail if in cooldown
-				else if (TIMER_KEY_ITEM_COOLDOWN.getRemainingTime(mob) != 0) {
+				else if (this.getCurrentCooldown(mob) != 0) {
 					this.debugPrint(player,"Action cooldown " + Integer.toString(this.getCurrentCooldown(mob) / 20) + " s.");
 					sendParticlesOnActionCooldown(mob);
 					result.setHandled();
@@ -109,7 +108,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 					} else {
 						// Not satisfied, put data
 						this.setOngoingPlayer(mob, player.getUUID());
-						TIMER_KEY_ITEM_COOLDOWN.setTimer(mob, this.getItemGivingCooldownTicks());
+                        this.getTamable(mob).getTimerComponent().addTimer(TIMER_KEY_ITEM_COOLDOWN, this.getItemGivingCooldownTicks(), true);
 						this.afterItemGiven(player, mob, givenCopy);
 						this.onItemGiven(player, mob, givenCopy, oldProgress, currentProgress);
 						sendParticlesOnItemReceived(mob);
@@ -197,7 +196,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	
 	@Override
 	public void interrupt(Player player, Mob mob, boolean isQuiet) {
-		CNFFTamable.getOptional(mob).ifPresent((l) ->
+		NFFTamableComponent.getOptional(mob).ifPresent((l) ->
 		{
 			if (isInProcess(player, mob) && !isQuiet)
 			{
@@ -228,7 +227,7 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	{
 		if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(playerUUID, uuid)).orElse(true))
 			return Optional.empty();
-		return Optional.of(CNFFTamable.get(mob).getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE));
+		return NFFTamableComponent.getOptional(mob).map(c -> c.getGeneralNBT().getDouble(NBT_KEY_PROGRESS_VALUE));
 	}
 
 	/**
@@ -238,8 +237,10 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	@Override
 	public void setProgressValue(Mob mob, UUID playerUUID, double value) {
 		if (this.getOngoingPlayerUUID(mob).map(uuid -> !Objects.equals(uuid, playerUUID)).orElse(false)) return;
-		CNFFTamable.get(mob).getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
-		CNFFTamable.get(mob).getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+        NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+			c.getGeneralNBT().putUUID(NBT_KEY_ONGOING_PLAYER, playerUUID);
+			c.getGeneralNBT().putDouble(NBT_KEY_PROGRESS_VALUE, value);
+		});
 	}
 
 	/**
@@ -248,10 +249,11 @@ public abstract class TamingProcessItemGivingProgress extends TamingProcessItemG
 	 */
 	@Override
 	public void removeProgressValue(Mob mob, UUID playerUUID) {
-		if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true))
-		{
-			CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
-			CNFFTamable.get(mob).getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+		if (this.getOngoingPlayerUUID(mob).map(uuid -> Objects.equals(uuid, playerUUID)).orElse(true)) {
+            NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+				c.getGeneralNBT().remove(NBT_KEY_ONGOING_PLAYER);
+				c.getGeneralNBT().remove(NBT_KEY_PROGRESS_VALUE);
+			});
 		}
 	}
 

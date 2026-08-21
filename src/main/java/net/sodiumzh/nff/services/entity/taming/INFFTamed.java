@@ -28,191 +28,75 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImpl;
-import net.sodiumzh.nff.services.entity.capability.CHealingHandlerImplDefault;
-import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
-import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.annotation.DontOverride;
+import net.sodiumzh.nfu.annotation.NotYetImplemented;
 import net.sodiumzh.nfu.container.CyclicSwitch;
 import net.sodiumzh.nfu.entity.MobApplicableItemTable;
-import net.sodiumzh.nfu.object.FilteredMapper;
-import net.sodiumzh.nfu.registry.NFUCapabilities;
-import net.sodiumzh.nfu.util.NFUContainerStatics;
+import net.sodiumzh.nfu.entity.component.EntityComponentAPI;
+import net.sodiumzh.nfu.entity.component.EntityComponentTypes;
+import net.sodiumzh.nfu.entity.component.preset.HealingHandlerComponent;
+import net.sodiumzh.nfu.function.MutablePredicate;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUNBTStatics;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+/**
+ * Central interface for NFF tamed mobs.
+ * <p>Any mob using NFF tamed mob features should be bound an implementation of this interface. The access of this interface
+ * from the mob is defined in {@link NFFTamedTypeRegistry}.
+ * <p><b>WARNING: </b> DO NOT perform {@code instanceof} check or cast to this interface directly from the mob reference!!!
+ * Always use {@link INFFTamed#get} or {@link NFFTamedTypeRegistry#asTamed} instead.
+ */
 public interface INFFTamed extends ContainerListener, OwnableEntity {
 
 	public static final CyclicSwitch<NFFTamedMobAIState> DEFAULT_AI_SWITCH = new CyclicSwitch<>
 		(NFFTamedMobAIState.WAIT, NFFTamedMobAIState.FOLLOW, NFFTamedMobAIState.WANDER);
 
 	/**
-	 * Mapper to test if a mob is {@code INFFTamed}, and cast it to {@code INFFTamed}.
+	 * Get the corresponding INFFTamed interface
 	 */
-	public static final FilteredMapper<Object, INFFTamed> IS_TAMED_MAPPER =
-			FilteredMapper.unconditionalNoVararg(Object.class, INFFTamed.class, obj -> {
-				if (obj instanceof INFFTamed tamed) return tamed;
-				else return null;
-	});
-
-	public static Optional<INFFTamed> get(Object o) {
-		return IS_TAMED_MAPPER.apply(o);
+	public static Optional<INFFTamed> get(Entity o) {
+		return o instanceof Mob m ? NFFTamedTypeRegistry.asTamed(m) : Optional.empty();
 	}
 
-	/* Common */
-	/**
-	 * Check if an object has a BM interface.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this instead of {@code instanceof} check.
-	 */
-	@Deprecated
-	public static boolean isBM(Object o)
-	{
-		return IS_TAMED_MAPPER.apply(o).isPresent();
-	}
-	
-	/**
-	 * Cast an object to the BM interface. Null if failed.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this to cast a mob to BM.
-	 */
-	@Deprecated
-	@Nullable
-	public static INFFTamed getBM(Object o)
-	{
-		return IS_TAMED_MAPPER.apply(o).orElse(null);
-	}
-	
-	/**
-	 * Do an action if an object has a BM interface.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * you can use this to safely cast and do things to BM.
-	 * @return Whether the action is invoked.
-	 */
-	@Deprecated
-	public static boolean ifBM(Object o, Consumer<INFFTamed> action)
-	{
-		return IS_TAMED_MAPPER.apply(o).filter(tamed -> {action.accept(tamed); return true;}).isPresent();
-	}
-	
-	/**
-	 * Check if a mob has a BM interface and satisfied the given condition.
-	 * <p>
-	 * As INFFTamed could also be implemented in capabilities instead of the mob class in the future,
-	 * always use this instead of {@code instanceof} check and followed checks of the cast BM.
-	 */
-	@Deprecated
-	public static boolean isBMAnd(Object o, Predicate<INFFTamed> cond)
-	{
-		return get(o).filter(cond).isPresent();
-	}	
-	
-	/* Initialization */
-	
-	/** Initialize a mob.
-	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
-	 * @param playerUUID Player UUID who owns this mob.
-	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
-	 */
-	@DontOverride
-	public default void init(@Nonnull UUID playerUUID, @Nullable Mob from)
-	{
-		if (!this.asMob().level().isClientSide)
-		{
-			this.setOwnerUUID(playerUUID);
-			if (from != null)
-			{
-				this.asMob().setHealth(from.getHealth());
-			}
-			//this.setInventoryFromMob();
-		/*	if (this.getAnchorPos() != null)
-			{
-				this.setAnchorPos(this.asMob().position());
-			}*/
-			this.asMob().setPersistenceRequired();
-			this.onInit(playerUUID, from);
-		}
-	}
+	// Initialization //
 
 	/**
-	 * Custom actions invoked after {@link INFFTamed#init(UUID, Mob)}.
-	 * On reading from NBT, the befriendedFrom mob is null, so implementation must handle null cases.
-	 * @param playerUUID Player UUID who owns this mob.
-	 * @param from The source mob from which this mob was befriended or converted. NULLABLE!
+	 * Invoked on this mob's construction.
+	 * <p>Called by {@link NFFEntityEventListeners#onEntityFinishConstruction}.
 	 */
-	@DontCallManually
-    @ApiStatus.OverrideOnly
-	public default void onInit(@Nonnull UUID playerUUID, @Nullable Mob from) {}
+	public default void onInitialize() {}
 
 	/**
-	 * Get whether this mob has finished initialization.
-	 * <p>After finishing initialization the mob will start updating from its inventory.
+	 * Invoked on this mob is tamed.
+	 * <p>Called by {@link NFFTamingProcess#doTaming}.
+	 * @param player Tamer player.
+	 * @param tamedFrom The "wild" mob it's tamed from. If it's an in-place taming i.e.
+	 *                  using the "wild" mob entity for tamed mob implementation, it's null.
 	 */
-	@DontOverride
-    @ApiStatus.NonExtendable
-	public default boolean hasInit()
-	{
-		return this.getData().hasInit();
-	}
-	
-	/** Label a mob as finished initialization after reading nbt, copying from other, etc.
-	 * <p>Only after labeled init, the mob will update from inventory.
-	 * <p>After spawning and deserializing, call this.
-	 * <p>Don't worry about if the presets in NFFServices API has already labeled init, 
-	 * as labeling again will not do anything if so.
-	 * <p>标记一个生物为已初始化，在进行读取NBT、从其他对象复制等操作之后。
-	 * <p>在生成和读档之后调用此函数。
-	 * <p>无需考虑BefriendMobs API的预设中是否已经标记了已初始化。重复标记不会做任何事情。
-	 */
-	@DontOverride
-	public default void setInit()
-	{
-		this.getData().setInitState(true);
-	}
+	@ApiStatus.OverrideOnly
+	public default void onTamed(@Nonnull Player player, @Nullable Mob tamedFrom) {}
 
-	/** Label a mob not finished initialization.
-	 * <p>Call this only when the presets has labeled init but you need some extra actions that needs to keep it not init.
-	 * <p>Currently the init label affects only inventory updating.
-	 * <p>标记一个生物为未完成初始化。
-	 * <p>当预设已经标记为了已初始化，但需要进行的额外操作要求保持未初始化时，调用此函数。
-	 * <p>目前已初始化标记仅用于附加道具栏更新。
-	 */
-	@DontOverride
-	public default void setNotInit()
-	{
-		this.getData().setInitState(false);
-	}
-	
-	/* Ownership */
+	// Ownership //
 	
 	/** 
 	 * Get owner as player entity.
-	 * @return Owner as entity, or null if the owner is absent in the level.
-	* <p>Warning: be careful calling this on initialization! If the owner hasn't been initialized it will return null.
-	* <p>获取拥有者的玩家实体。
-	* <p>拥有者实体，若拥有者不在世界中时返回null。
-	* <p>警告：在初始化时调用此函数请谨慎！如果拥有者尚未初始化，此函数会返回null。
-	*/
+	 * @deprecated Only for {@link OwnableEntity} implementation.
+	 */
+	@Deprecated
+	@ApiStatus.Internal
 	@Override
-	@DontOverride
 	@Nullable
 	public default Player getOwner() 
 	{
@@ -271,7 +155,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nullable
 	public default UUID getOwnerUUID()
 	{
-		return this.getData().getOwnerUUID();
+		return this.getDataAccessor().getOwnerUUID();
 	}
 	
 	/** Set owner from player entity.
@@ -289,7 +173,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void setOwnerUUID(@Nonnull UUID ownerUUID)
 	{
 		if (!this.asMob().level().isClientSide)
-			this.getData().setOwnerUUID(ownerUUID);
+			this.getDataAccessor().setOwnerUUID(ownerUUID);
 	}
 
 	/**
@@ -344,7 +228,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontOverride
 	public default NFFTamedMobAIState getAIState()
 	{
-		return this.getData().getAIState();
+		return this.getDataAccessor().getAIState();
 	}
 	
 	/** A preset action when switching AI e.g. on right click.
@@ -384,7 +268,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 			return;
 		if (postEvent && MinecraftForge.EVENT_BUS.post(new NFFTamedChangeAiStateEvent(this, getAIState(), state)))
 			return;
-		this.getData().setAIState(state);
+		this.getDataAccessor().setAIState(state);
 	}
 	
 	/** Get if a target mob can be attacked by this mob.
@@ -404,7 +288,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontCallManually
 	public default LivingEntity getPreviousTarget()
 	{
-		return this.getData().getPreviousTarget();
+		return this.getDataAccessor().getPreviousTarget();
 	}
 	
 	/** 
@@ -416,7 +300,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@DontCallManually
 	public default void setPreviousTarget(LivingEntity target)
 	{
-		this.getData().setPreviousTarget(target);
+		this.getDataAccessor().setPreviousTarget(target);
 	}
 	
 	/** Get the anchor pos that the mob won't stroll too far from it
@@ -425,13 +309,13 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nullable
 	public default Vec3 getAnchorPos() 
 	{
-		return this.getData().getAnchor();
+		return this.getDataAccessor().getAnchor();
 	}
 	
 	@DontOverride
 	public default void setAnchorPos(Vec3 pos) 
 	{
-		this.getData().setAnchor(pos);
+		this.getDataAccessor().setAnchor(pos);
 	}
 	
 	public default double getAnchoredStrollRadius()  
@@ -493,8 +377,10 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 	
 	/* Inventory */
-	
-	public default NFFTamedMobInventory getAdditionalInventory() {return this.getData().getAdditionalInventory();}
+
+	public default NFFTamedMobInventory getAdditionalInventory() {
+		return this.getDataAccessor().getAdditionalInventory();
+	}
 	
 	/**
 	 * @deprecated Use {@code createAdditionalInventory} to override inventory.
@@ -505,47 +391,32 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	/**
 	 * Method to create additional inventory. Invoked on befriended or loaded.
 	 */
+	@Nullable
 	public NFFTamedMobInventory createAdditionalInventory();
-	
-	/**
-	 *  Set mob data from befriendedInventory.
-	 *  <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#syncToMob} instead.
-	 * @deprecated Use {@code getAdditionalInventory().syncToMob(this.asMob())}.
-	 */
-	@Deprecated
-	@DontOverride
-	public default void updateFromInventory()
-	{
-		this.getAdditionalInventory().syncToMob(this.asMob());
-	}
-	
-	/** Set befriendedInventory from mob data, usually for initializing
-	 * <p><u>DO NOT override this.</u> Create subclasses of {@link NFFTamedMobInventory} and override {@link NFFTamedMobInventory#getFromMob} instead.
-	 * @deprecated Use {@code getAdditionalInventory().getFromMob(this.asMob())}.
-	 */
-	@DontOverride
-	@Deprecated
-	public default void setInventoryFromMob()
-	{
-		this.getAdditionalInventory().getFromMob(this.asMob());
-	}
 
 	@Nullable
 	public NFFTamedInventoryMenu makeMenu(int containerId, Inventory playerInventory, Container container);
 
 	/* ContainerListener interface */
-	/** DO NOT override this. Override onInventoryChanged instead. */
-	@DontOverride
+
+	/** Actions on additional inventory changed.
+	 * <p>DO NOT override this. Override onInventoryChanged instead.
+	 */
+	@ApiStatus.NonExtendable
 	@Override
 	public default void containerChanged(Container pContainer) 
 	{
 		if (!(pContainer instanceof NFFTamedMobInventory))
 			throw new UnsupportedOperationException("INFFTamed container only receives NFFTamedMobInventory.");
-		if (hasInit())
-			updateFromInventory();
-		onInventoryChanged();
+		if (!this.asMob().level().isClientSide())
+			this.getAdditionalInventory().syncToMob(this.asMob());
+		this.onInventoryChanged();
 	}
 
+	/**
+	 * Additional actions on inventory changed.
+	 */
+	@ApiStatus.OverrideOnly
 	public default void onInventoryChanged() 
 	{
 	}
@@ -554,6 +425,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * @deprecated Not implemented
 	 */
 	@Deprecated
+	@NotYetImplemented
 	public default boolean dropInventoryOnDeath()
 	{
 		return true;
@@ -564,20 +436,20 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	/**
 	 * Get the implementation type of healing handler.
 	 */
-	public default Class<? extends CHealingHandlerImpl> healingHandlerClass()
+	@Deprecated
+	public default Class<? extends HealingHandlerComponent> healingHandlerClass()
 	{
-		return CHealingHandlerImplDefault.class;
+		return HealingHandlerComponent.class;
+	}
+
+	public default HealingHandlerComponent getHealingHandler() {
+		return EntityComponentAPI.getComponentByPathOrFallback(this.asMob(), "/nff/tamed/healing_handler", EntityComponentTypes.HEALING_HANDLER.get());
 	}
 
 	@DontOverride
 	public default boolean applyHealingItem(ItemStack stack, float value, boolean consume, int cooldown, Player player)
 	{
-		MutableObject<Boolean> succeeded = new MutableObject<>(false);		
-		this.asMob().getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
-		{
-			succeeded.setValue(l.applyHealingItem(stack, value, consume, cooldown, player));
-		});		
-		return succeeded.getValue();
+		return this.getHealingHandler().applyHealingItem(stack, value, consume, cooldown, player);
 	}
 	
 	/** Add all usable items here, including non-consuming items. Value is HP it can heal. */
@@ -587,7 +459,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return null;
 	}
 
-	@DontOverride
+	@ApiStatus.NonExtendable
 	public default InteractionResult tryApplyHealingItems(ItemStack stack, Player player)
 	{
 		if (stack.isEmpty())
@@ -688,27 +560,13 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	}
 
 	/**
-	 * Get the capability for storage of additional data.
+	 * Get a utility accessor for tamed data.
+	 * <p>If your sub-interface have its own data, override this to your data accessor utility extending {@link NFFTamedDataAccessor}.
 	 */
-	public default CNFFTamedCommonData getData()
-	{
-		MutableObject<CNFFTamedCommonData> res = new MutableObject<CNFFTamedCommonData>(null);
-		asMob().getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent((cap) ->
-		{
-			res.setValue(cap);
-		});
-		if (res.getValue() == null)
-			// Sometimes it's called after the capability is detached, so return a temporal dummy cap
-			return new CNFFTamedCommonData.Values(this);	
-		return res.getValue();
+	public default NFFTamedDataAccessor getDataAccessor() {
+		return NFFTamedDataAccessor.get(this);
 	}
-	
-	/**
-	 * Invoked after data capability initialized (constructor done), before {@link NFFTamedCommonDataConstructEvent}.
-	 * <p>Mainly for creating additional synched data fields.
-	 */
-	public default void onDataInit(CNFFTamedCommonData dataCap) {}
-	
+
 	/**
 	 * Get the UUID identifier of this mob. (Not the entity UUID. This is for identifying a mob even if it respawned with a new UUID).
 	 * Returns empty uuid (0, 0) if the data cap is lost (may occasionally happen).
@@ -717,7 +575,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	@Nonnull
 	public default UUID getIdentifier()
 	{
-		return this.getData().getIdentifier();
+		return this.getDataAccessor().getIdentifier();
 	}
 	
 	/* Behaviors */
@@ -783,25 +641,40 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		return false;
 	}
 
-	// Static
+    /**
+     * Return if the mob should use sun-sensitivity features. Override this to true
+     * for mobs that should react to sun.
+     */
+    public default boolean enableSunSensitivity() {return false;}
 
-	/**
-	 * Common initialization when a new tamed mob is created but not loaded from NBT, either from taming or other ways.
-	 * @param player owner.
-	 * @param from The "wild" mob from which this mob is tamed. Null if it's not created by taming.
-	 */
-	public default void commonInit(@Nonnull Player player, @Nullable Mob from)
-	{
-		this.setOwner(player);
-		this.getData().setOwnerName(player.getName().getString());
-		this.init(player.getUUID(), from);
-		this.setInventoryFromMob();
-		this.getData().generateIdentifier();
-		this.getData().recordEntityType();
-		this.getData().recordEncounteredDate();
-	}
+    /**
+     * Check if the mob is immune to sun from rules.
+     * Implemented in {@link NFFEntityEventListeners#onMobSunBurnTick} via {@link net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent}
+     */
+    @DontOverride
+    @ApiStatus.NonExtendable
+    public default boolean isSunImmune()
+    {
+		// Mobs not using sun sensitivity should always be accounted as sun-immune (i.e. not sun-sensitive)
+        return !this.enableSunSensitivity() || getSunImmunity().test(this);
+    }
 
-	// ===== Mob Search ===
+    /**
+     * Setup rules for sun immunity. Use {@code getSunImmunity()} to access rules.
+     * Called in EntityJoinWorldEvent only
+     */
+    @DontCallManually
+    @ApiStatus.OverrideOnly
+    public default void setupSunImmunityRules() {};
+
+    @DontOverride
+    @ApiStatus.NonExtendable
+    public default MutablePredicate<INFFTamed> getSunImmunity()
+    {
+        return this.getDataAccessor().getSunImmunity();
+    }
+
+	// ===== Mob Search === //
 
 	/**
 	 *  Only on server, record the current location to the owner's data.
@@ -810,12 +683,11 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void recordLocationToOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND))
-				c.getNBT().put("tamedMobLocations", new CompoundTag());
-			MobLocationInfo info = MobLocationInfo.fromMob(this);
-			c.getNBT().getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
-		});
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		if (!nbt.contains("tamedMobLocations", Tag.TAG_COMPOUND))
+			nbt.put("tamedMobLocations", new CompoundTag());
+		MobLocationInfo info = MobLocationInfo.fromMob(this);
+		nbt.getCompound("tamedMobLocations").put(info.identifier().toString(), info.save());
 	}
 
 	/**
@@ -824,31 +696,30 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public default void removeLocationOnOwner() {
 		Player player = this.getOwnerInWorld();
 		if (player == null) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			c.getNBT().getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
-		});
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		nbt.getCompound("tamedMobLocations").remove(this.getIdentifier().toString());
 	}
 
 	/** Only on server, get all NFF mob's locations. The keys are Tamed Identifiers, not mob uuid!! */
 	public static Map<UUID, MobLocationInfo> getAllMobLocations(Player player) {
 		if (!(player.level() instanceof ServerLevel sl)) return new HashMap<>();
-		AtomicReference<Map<UUID, Optional<MobLocationInfo>>> res =
-				new AtomicReference<>(new HashMap<>());
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			if (!c.getNBT().contains("tamedMobLocations", Tag.TAG_COMPOUND)) return;
-			res.set(NFUNBTStatics.mapFromCompoundTag(c.getNBT().getCompound("tamedMobLocations"),
-					UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl))));
-		});
-		return NFUContainerStatics.iterableToMap(res.get().values().stream()
+
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		if (!nbt.contains("tamedMobLocations", Tag.TAG_COMPOUND)) return Map.of();
+		Map<UUID, Optional<MobLocationInfo>> res = NFUNBTStatics.mapFromCompoundTag(nbt.getCompound("tamedMobLocations"),
+			UUID::fromString, tag -> Optional.ofNullable(MobLocationInfo.load((CompoundTag) tag, sl)));
+		return res.values().stream()
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.filter(MobLocationInfo::isValid)
-				.toList(),
-				MobLocationInfo::identifier, info -> info);
+			.collect(Collectors.toMap(MobLocationInfo::identifier, info -> info));
 	}
 
 	/**
 	 * Find tamed mob by its tamed mob identifier (not entity uuid). Will search in all loaded dimensions.
+	 * <p>WARNING: this method is now very costly because there is no direct map from the identifier to the mob references, and
+	 * it have to search on all mobs loaded on the server.</p>
+	 * TODO Make a direct map and fix the issue above.
 	 * @param identifier Tamed mob identifier. (Not the entity UUID!)
 	 * @param context Any server level that can provide a context to the server.
 	 * @return Find result.
@@ -856,7 +727,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	public static Optional<Mob> byIdentifier(UUID identifier, ServerLevel context) {
 		for (ServerLevel sl: context.getServer().getAllLevels()) {
 			var list = sl.getEntities(EntityTypeTest.forClass(Mob.class), mob ->
-					INFFTamed.isBM(mob) && INFFTamed.getBM(mob).getIdentifier().equals(identifier));
+					INFFTamed.get(mob).filter(t -> t.getIdentifier().equals(identifier)).isPresent());
 			if (!list.isEmpty()) return Optional.of(list.get(0));
 		}
 		return Optional.empty();
@@ -869,23 +740,23 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	 * */
 	public static void removeSuspiciousMobLocations(Player player) {
 		if (!(player.level() instanceof ServerLevel sl)) return;
-		player.getCapability(NFUCapabilities.CAP_ENTITY_DATA).ifPresent(c -> {
-			List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
-							e -> INFFTamed.isBMAnd(e, tamed -> Objects.equals(tamed.getOwner(), player)))
-					.stream().map(INFFTamed::getBM).filter(Objects::nonNull)
-					.map(INFFTamed::getIdentifier).toList();
-			List<INFFTamed.MobLocationInfo> savedLocations =
-					c.getNBT().getCompound("tamedMobLocations").getAllKeys()
-							.stream().map(k -> INFFTamed.MobLocationInfo.load(c.getNBT().getCompound("tamedMobLocations").getCompound(k), sl))
-							.filter(Objects::nonNull).toList();
-			List<UUID> suspiciousIdentifiers = new ArrayList<>();
-			for (INFFTamed.MobLocationInfo loc: savedLocations) {
-				ServerLevel dim = sl.getServer().getLevel(loc.dimension());
-				if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
-					suspiciousIdentifiers.add(loc.identifier());
-			}
-			suspiciousIdentifiers.forEach(id -> c.getNBT().getCompound("tamedMobLocations").remove(id.toString()));
-		});
+
+		CompoundTag nbt = EntityComponentAPI.getDataComponent(player).getNBT();
+		List<UUID> levelLoadedIdentifiers = NFUEntityStatics.getEntitiesOnServer(sl, EntityTypeTest.forClass(Mob.class),
+				e -> INFFTamed.get(e).filter(tamed -> Objects.equals(tamed.getOwner(), player)).isPresent())
+			.stream().map(e -> INFFTamed.get(e).orElse(null)).filter(Objects::nonNull)
+			.map(INFFTamed::getIdentifier).toList();
+		List<INFFTamed.MobLocationInfo> savedLocations =
+			nbt.getCompound("tamedMobLocations").getAllKeys()
+				.stream().map(k -> INFFTamed.MobLocationInfo.load(nbt.getCompound("tamedMobLocations").getCompound(k), sl))
+				.filter(Objects::nonNull).toList();
+		List<UUID> suspiciousIdentifiers = new ArrayList<>();
+		for (INFFTamed.MobLocationInfo loc: savedLocations) {
+			ServerLevel dim = sl.getServer().getLevel(loc.dimension());
+			if (dim == null || dim.isLoaded(loc.pos()) && !levelLoadedIdentifiers.contains(loc.identifier()))
+				suspiciousIdentifiers.add(loc.identifier());
+		}
+		suspiciousIdentifiers.forEach(id -> nbt.getCompound("tamedMobLocations").remove(id.toString()));
 	}
 
 	public static record MobLocationInfo(UUID identifier, Component mobName, ResourceKey<Level> dimension, BlockPos pos) {

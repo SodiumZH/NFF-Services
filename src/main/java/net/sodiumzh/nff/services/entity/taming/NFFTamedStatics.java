@@ -39,65 +39,6 @@ public class NFFTamedStatics
 		else return !isLivingAlliedToBM(mob, target);
 	}
 
-	/* Save & Load */
-
-	/*@Deprecated
-	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String modId) {		
-		addBefriendedCommonSaveData(mob, nbt);
-	}*/
-
-	/**
-	 * @deprecated No longer used, moved to data
-	 */
-	/*@Deprecated
-	public static void addBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt)
-	{
-		nbt.put("bm_common", new CompoundTag());
-		nbt.getCompound("bm_common").putString("mod_id", mob.getModId());
-		if (mob.getOwnerUUID() != null)
-			nbt.getCompound("bm_common").putUUID("owner", mob.getOwnerUUID());
-		nbt.getCompound("bm_common").putString("ai_state", mob.getAIState().getId().toString());
-		mob.getAdditionalInventory().saveToTag(nbt.getCompound("bm_common"), "inventory");*/
-		
-		/*String modId = mob.getModId();
-		String ownerKey = modId + ":befriended_owner";
-		String aiStateKey = modId + ":befriended_ai_state";
-		String inventoryKey = modId + ":befriended_additional_inventory";
-		// Mod ID
-		nbt.putString("befriended_mod_id", modId);
-		// Owner UUID
-		if (mob.getOwnerUUID() != null)
-			nbt.putUUID(ownerKey, mob.getOwnerUUID());
-		else
-			nbt.putUUID(ownerKey, new UUID(0, 0));
-		nbt.putInt(aiStateKey, mob.getAIState().id);
-		mob.getAdditionalInventory().saveToTag(nbt, inventoryKey);
-	}*/
-	
-	/*@Deprecated	// Use version without modid input
-	public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt, String inModId)
-	{
-		readBefriendedCommonSaveData(mob, nbt);
-	}*/
-
-	/*public static void readBefriendedCommonSaveData(INFFTamed mob, CompoundTag nbt) {
-		
-		if (nbt.contains("bm_common", NFUNBTStatics.TAG_COMPOUND_ID))
-		{
-			if (nbt.getCompound("bm_common").getUUID("owner") == null)
-			{
-				new IllegalStateException("Reading befriended mob data error: invalid owner. Was INFFTamed.init() not called?").printStackTrace();
-				return;
-			}
-			mob.setOwnerUUID(nbt.getCompound("bm_common").getUUID("owner"));
-			mob.init(mob.getOwnerUUID(), null);
-			if (nbt.getCompound("bm_common").contains("ai_state", Tag.TAG_STRING))
-				mob.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getCompound("bm_common").getString("ai_state"))), false);
-			else mob.setAIState(NFFTamedMobAIState.WAIT, false);
-			mob.getAdditionalInventory().readFromTag(nbt.getCompound("bm_common").getCompound("inventory"));
-		}
-	}*/
-
 	/**
 	 * Convert a befriended mob to other type. This action will keep its data.
 	 * @param target The mob to convert.
@@ -160,35 +101,6 @@ public class NFFTamedStatics
 	}
 
 	/**
-	 * Get the Mod Id which the mob belongs to, with an nbt for deserialization before the mob spawns
-	 * <p>使用一个用于读档的NBT标签，在未实际生成生物前获取生物所属的MOD ID
-	 * @deprecated Use {@link CNFFTamedCommonData#getModIdFromMobTag} instead
-	 */
-	@Deprecated
-	public static String getModIdFromNbt(CompoundTag nbt)
-	{
-		return CNFFTamedCommonData.getModIdFromMobTag(nbt);
-	}
-	
-	/**
-	 * @deprecated Use {@link CNFFTamedCommonData#getOwnerUUIDFromMobTag} instead
-	 */
-	@Deprecated
-	public static UUID getOwnerUUIDFromNbt(CompoundTag nbt)
-	{
-		return CNFFTamedCommonData.getOwnerUUIDFromMobTag(nbt);
-	}
-	
-	/**
-	 * @deprecated Use {@link NFUEntityStatics#getNameFromNbt} instead
-	 */
-	@Deprecated
-	public static Component getNameFromNbt(CompoundTag nbt, EntityType<?> type)
-	{
-		return NFUEntityStatics.getNameFromNbt(nbt, type);
-	}
-	
-	/**
 	 * Get owner if the owner is closer than the given distance of the mob. Otherwise return {@link Optional#empty}.
 	 * @param mob Mob (implements {@link INFFTamed}) to test. No need to do {@link INFFTamed#isOwnerInDimension} check.
 	 * @param radius Search area
@@ -212,7 +124,7 @@ public class NFFTamedStatics
 	public static List<Mob> getOwningMobsInArea(Player player, EntityType<? extends Mob> type, double radius, boolean sphericalArea)
 	{
 		Stream<Entity> stream = player.level().getEntities(player, player.getBoundingBox().inflate(radius, radius, radius),
-				e -> (e.getType() == type && e instanceof INFFTamed bm && bm.getOwner() == player)).stream();
+				e -> (e.getType() == type && INFFTamed.get(e).filter(bm -> bm.getOwner() == player).isPresent())).stream();
 		if (sphericalArea)
 			stream = stream.filter(e -> e.distanceToSqr(player) <= radius * radius);
 		return stream.map(e -> (Mob)e).collect(Collectors.toList());
@@ -231,6 +143,7 @@ public class NFFTamedStatics
 		if (level.isClientSide) return false;
 		// Get the actual mob. In the future INFFTamed may become a capability and may not refer to the mob itself
 		// Null means impossible to get the mob reference from the argument, and only owners will be compared
+
 		LivingEntity ownableMob = ownable instanceof INFFTamed t ? t.asMob() : (ownable instanceof LivingEntity l ? l : null);
 		if (target.equals(ownableMob)) return true;
 		// Recursively search self and owners
@@ -294,7 +207,7 @@ public class NFFTamedStatics
 			return test.isAllyTo(le);
 		else return false;
 	}
-	
+
 	/**
 	 * Check if a {@code LivingEntity} is considered as ally by a BM.
 	 * <p>On server only. On client always {@code false}.
@@ -314,8 +227,10 @@ public class NFFTamedStatics
 	 */
 	@Nullable
 	public static Optional<LivingEntity> livingFromOwnableInterface(OwnableEntity ownable) {
-		return Optional.ofNullable(INFFTamed.get(ownable).map(e -> (LivingEntity) e.asMob())
-			.orElseGet(() -> ownable instanceof LivingEntity l ? l : null));
+		if (ownable instanceof LivingEntity l) return Optional.of(l);
+		else if (ownable instanceof INFFTamed t)
+			return Optional.ofNullable(t.asMob());
+		else return Optional.empty();
 	}
 
 	/**

@@ -26,7 +26,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.entity.capability.CAttributeMonitor;
 import net.sodiumzh.nff.services.entity.taming.*;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed.DeathRespawnerGenerationType;
 import net.sodiumzh.nff.services.event.BMHooks;
@@ -35,18 +34,20 @@ import net.sodiumzh.nff.services.event.entity.ai.NFFTamedChangeAiStateEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 import net.sodiumzh.nff.services.item.NFFMobRespawnerItem;
-import net.sodiumzh.nff.services.item.capability.CItemStackMonitor;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nff.services.registry.NFFTagRegistry;
 import net.sodiumzh.nfu.entity.taming.TamingInteractionResult;
 import net.sodiumzh.nfu.mixin.event.entity.EntityDiscardEvent;
+import net.sodiumzh.nfu.mixin.event.entity.EntityFinishConstructionEvent;
 import net.sodiumzh.nfu.mixin.event.entity.LivingStartDeathEvent;
 import net.sodiumzh.nfu.mixin.event.entity.MobSunBurnTickEvent;
+import net.sodiumzh.nfu.util.NFUContainerStatics;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import org.apache.commons.lang3.mutable.MutableObject;
 
-import java.util.UUID;
+import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings("removal")
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -72,21 +73,8 @@ public class NFFEntityEventListeners
 			@SuppressWarnings("unchecked")
 			EntityType<Mob> type = (EntityType<Mob>) mob.getType();
 
-			
-			// Do debug actions and skip when holding debug items
-			/*if (NaUtilsTagStatics.hasTag(player.getMainHandItem().getItem(), "befriendmobs", "debug_tools"))
-			{
-				if (!isClientSide && isMainHand)
-					BMDebugItemHandler.onDebugItemUsed(player, (Mob)target, player.getMainHandItem().getItem());
-				event.setCanceled(true);
-				event.setCancellationResult(InteractionResult.sidedSuccess(isClientSide));			
-				return;		
-			}
-			
 			// Handle befriendable mob start //
-			else*/ if (mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent()
-					&& !(mob instanceof INFFTamed)) {
-				mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) -> 
+			NFFTamableComponent.getOptional(mob).ifPresent((l) ->
 				{
 					TamingInteractionResult res = NFFTamingMapping.getProcess(type)
 							.handleInteract(player, mob, event.getHand());
@@ -101,20 +89,16 @@ public class NFFEntityEventListeners
 						result.setValue(InteractionResult.sidedSuccess(isClientSide));
 						shouldPostInteractEvent.setValue(true);
 					}
-					
+
 				});
-			}
+
 			// Handle befriendable mob end //
 			// Handle befriended mob start //
-			else if (mob instanceof INFFTamed bef) 
-			{
-				// if (!isClientSide && isMainHand)
-
+			INFFTamed.get(mob).ifPresent(t -> {
 				if (player.isShiftKeyDown() && player.getMainHandItem().getItem() == NFFItemRegistry.DEBUG_BEFRIENDER.get()) {
-					bef.init(player.getUUID(), null);
 					result.setValue(InteractionResult.sidedSuccess(isClientSide));
 				}
-			}
+			});
 			// Handle befriended mob end //
 		}
 		// Mob interaction end //
@@ -132,18 +116,18 @@ public class NFFEntityEventListeners
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public static void onLivingChangeTarget_Low(LivingChangeTargetEvent event)
 	{
-		// Handle {@link CNFFTamable} AlwaysHostile feature
-		if (!event.getEntity().level().isClientSide)
-		{
-			event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
-			{
-				Mob mob = cap.getEntity();
-				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
-				Entity target = NFUEntityStatics.getIfCanSee(alwaysHostileUUID, mob).orElse(null);
-				if (target instanceof LivingEntity targetLiving
-						&& event.getNewTarget() != target)
-					event.setCanceled(true);
-			});
+		if (!event.getEntity().level().isClientSide) {
+			// Handle tamable always-hostile
+			if (!event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob) {
+				NFFTamableComponent.getOptional(mob)
+					.flatMap(c -> c.getAlwaysHostileToLiving()        // when has an always-hostile target
+						.filter(e -> !e.equals(event.getNewTarget()))    // and trying to set to another target (or remove target)
+						.filter(mob::hasLineOfSight))    // and can see the target
+					.ifPresent(e -> {
+						event.setNewTarget(e);
+						event.setCanceled(false);
+					});    // Then turn to the always-hostile target
+			}
 		}
 	}
 	
@@ -165,7 +149,7 @@ public class NFFEntityEventListeners
 	        // Handle befriended mobs end //
 	        // Handle TamableAnimal //	
 	        if (mob instanceof OwnableEntity oe
-				&& INFFTamed.get(target).filter(i -> NFFTamedStatics.isBMAlliedToOwnable(oe, i)).isPresent())
+				&& INFFTamed.get(target).filter(i -> i.isAllyTo(NFFTamedStatics.livingFromOwnableInterface(oe).orElse(null))).isPresent())
 	        {
 				event.setCanceled(true);
 	        }
@@ -173,18 +157,13 @@ public class NFFEntityEventListeners
 	        // Handle Golems //
 	        if (mob instanceof AbstractGolem g && !mob.getType().is(NFFTagRegistry.IGNORES_GOLEM_ATTITUDE))
 	        {
-	        	if (target instanceof INFFTamed bm)
-	        	{
-	        		
-	        		switch (bm.golemAttitude())
-	        		{
-	        		case DEFAULT:
-	        		{
+				INFFTamed.get(target).ifPresent(bm -> {
+	        		switch (bm.golemAttitude()) {
+	        		case DEFAULT: {
 	        			// No change
 	        			break;
 	        		}
-	        		case NEUTRAL:
-	        		{
+	        		case NEUTRAL: {
 	        			// Golems keep neutral to befriended mobs, but if it's attacked it will still attack back
 		        		if (g.getLastHurtByMob() == null || !g.getLastHurtByMob().equals(target))
 		        		{
@@ -192,14 +171,12 @@ public class NFFEntityEventListeners
 		        		}
 		        		break;
 	        		}
-	        		case PASSIVE:
-	        		{
+	        		case PASSIVE: {
 	        			// Always cancel
 	        			event.setCanceled(true);
 	        			break;
 	        		}
-	        		case CUSTOM:
-	        		{
+	        		case CUSTOM: {
 	        			// Use custom config
 	        			if (!bm.shouldGolemAttack(g))
 	        			{
@@ -207,12 +184,11 @@ public class NFFEntityEventListeners
 	        			}
 	        			break;
 	        		}
-	        		default:
-	        		{
+	        		default: {
 	        			throw new RuntimeException();
 	        		}
 	        		}
-	        	}
+	        	});
 	        }
 	        // Handle Golems End
 	        // Handle hostility tags
@@ -228,22 +204,20 @@ public class NFFEntityEventListeners
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingSetAttackTarget_Lowest(LivingChangeTargetEvent event)
 	{
-		
 		if (!event.getEntity().level().isClientSide)
 		{
-			// Handle befriendable mobs //
-			event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> 
+			// Handle tamable always-hostile
+			if (!event.getEntity().level().isClientSide && event.getEntity() instanceof Mob mob)
 			{
-				/** Handle {@link CNFFTamable} AlwaysHostile feature */
-				Mob mob = cap.getEntity();
-				UUID alwaysHostileUUID = cap.getAlwaysHostileTo();
-				Entity target = NFUEntityStatics.getIfCanSee(alwaysHostileUUID, mob).orElse(null);
-				if (target != null && target instanceof LivingEntity targetLiving)
-				{
-					event.setNewTarget(targetLiving);
-					event.setCanceled(false);
-				}
-			});
+				NFFTamableComponent.getOptional(mob)
+					.flatMap(c -> c.getAlwaysHostileToLiving()		// when has an always-hostile target
+						.filter(e -> !e.equals(event.getNewTarget()))	// and trying to set to another target (or remove target)
+						.filter(mob::hasLineOfSight))	// and can see the target
+					.ifPresent(e -> {
+						event.setNewTarget(e);
+						event.setCanceled(false);
+					});	// Then turn to the always-hostile target
+			}
 		}
 		
 	}
@@ -253,7 +227,7 @@ public class NFFEntityEventListeners
 		if (event.isCanceled())
 			return;
 		if (!event.getEntity().level().isClientSide) {
-			if (event.getEntity() instanceof INFFTamed bef) {
+			INFFTamed.get(event.getEntity()).ifPresent(bef -> {
 				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(bef, event.getSource()))) {
 					event.setCanceled(true);
 					if (event.getEntity().getHealth() < 0.00001f)
@@ -262,7 +236,8 @@ public class NFFEntityEventListeners
 				}
 				// Befriended mobs should not kill each other with same owner, or get killed by
 				// owner-tamed animals
-				else if (event.getSource().getEntity() instanceof INFFTamed srcBef) {
+				else if (INFFTamed.get(event.getSource().getEntity()).isPresent()) {
+					INFFTamed srcBef = INFFTamed.get(event.getSource().getEntity()).get();
 					if (srcBef.getOwner() != null && bef.getOwner() != null && srcBef.getOwner() == bef.getOwner()) {
 						bef.asMob().setHealth(1.0f);
 						bef.asMob().invulnerableTime += 20;
@@ -288,7 +263,7 @@ public class NFFEntityEventListeners
 									event.getEntity().spawnAtLocation(container.getItem(i).copy());
 								}
 								container.getItem(i).setCount(0);
-								bef.updateFromInventory();
+                                bef.getAdditionalInventory().syncToMob(bef.asMob());
 							}
 						}
 					}
@@ -301,11 +276,11 @@ public class NFFEntityEventListeners
 								{}
 								else
 								{
-									if (!bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).isPresent()) {
+									if (!bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().level().getCapability(NFFCapRegistry.CAP_BM_LEVEL).ifPresent(cap ->
+									bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -331,31 +306,27 @@ public class NFFEntityEventListeners
 
 				else if (event.getEntity() instanceof TamableAnimal ta) 
 				{
-					if (event.getSource().getEntity() instanceof INFFTamed srcBef) 
-					{
+					INFFTamed.get(event.getSource().getEntity()).ifPresent(srcBef -> {
 						if (srcBef.getOwner() != null && ta.getOwner() != null && srcBef.getOwner() == ta.getOwner()) {
 							ta.setHealth(1.0f);
 							ta.invulnerableTime += 20;
 							event.setCanceled(true);
 							return;
 						}
-					}
+					});
 				}
 
-				else if (event.getEntity() instanceof Player player) {
+				else if (event.getEntity() instanceof Player player && player.level() instanceof ServerLevel sl) {
 					// Notify taming interruption on player death
-					for (Entity en : ((ServerLevel) (player.level())).getAllEntities()) {
-						if (en instanceof Mob mob && mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent()) 
-						{
-							if (!NFFTamingMapping.getProcess(mob).dontInterruptOnPlayerDie()
-									&& NFFTamingMapping.getProcess(mob).isInProcess(player, mob))
-							{
-								NFFTamingMapping.getProcess(mob).interrupt(player, mob, true);
-							}
-						}
-					}
+					NFUContainerStatics.iterableToList(sl.getServer().getAllLevels()).stream()	// Get all levels
+						.flatMap(sl1 -> NFUContainerStatics.iterableToList(sl1.getEntities().getAll()).stream())	// Get all entities of all levels
+						.filter(e -> e instanceof Mob)	// Cast to mobs
+						.map(e -> NFFTamableComponent.getOptional(e).orElse(null))	// Try getting tamable component
+						.filter(Objects::nonNull)	// Clear non-tamable
+						.filter(c -> !c.getTamingProcess().dontInterruptOnPlayerDie() && c.getTamingProcess().isInProcess(player, c.getEntity()))	// When should interrupt on player death, and player is in process
+						.forEach(c -> c.getTamingProcess().interrupt(player, c.getEntity(), true));		// Interrupt player's process
 				}
-			}
+			});
 		}
 	}
 	
@@ -363,10 +334,7 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onZombieSummon(SummonAidEvent event)
 	{
-		if (event.getEntity() instanceof INFFTamed)
-		{
-			event.setResult(Result.DENY);
-		}
+		INFFTamed.get(event.getEntity()).ifPresent(t -> event.setResult(Result.DENY));
 	}
 
 	@SubscribeEvent
@@ -382,32 +350,24 @@ public class NFFEntityEventListeners
 			// Handle befriending process events on mob attacked
 			// The events are handled in handler classes, not a forge event
 			// On befriendable mob attacked by player
-			if (living instanceof Mob 
-				&& living.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent()
-				&& source != null
-				&& source instanceof Player)
+			if (living instanceof Mob mob
+				&& source instanceof Player player)
 			{
-				Mob mob = (Mob)living;
-				Player player = (Player)source;
-				NFFTamingProcess handler = NFFTamingMapping.getProcess(mob);
-				if (handler.isInProcess(player, mob))
-				{
-					handler.onAttackedByProcessingPlayer(mob, player, event.getAmount());
-				}
+				NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+					if (c.getTamingProcess().isInProcess(player, mob)) {
+						c.getTamingProcess().onAttackedByProcessingPlayer(mob, player, event.getAmount());
+					}
+				});
 			}
 			// On player attacked by befriendable mob
-			else if (living instanceof Player 
-				&& source != null 
-				&& (source instanceof Mob)
-				&& source.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).isPresent())
+			else if (living instanceof Player player
+				&& source instanceof Mob mob)
 			{
-				Player player = (Player)living;
-				Mob mob = (Mob)source;
-				NFFTamingProcess handler = NFFTamingMapping.getProcess(mob);
-				if (handler.isInProcess(player, mob))
-				{
-					handler.onAttackProcessingPlayer(mob, player, event.getAmount());
-				}
+				NFFTamableComponent.getOptional(mob).ifPresent(c -> {
+					if (c.getTamingProcess().isInProcess(player, mob)) {
+						c.getTamingProcess().onAttackProcessingPlayer(mob, player, event.getAmount());
+					}
+				});
 			}
 		}
 	}
@@ -419,46 +379,9 @@ public class NFFEntityEventListeners
 	{
 		if (!event.getEntity().level().isClientSide)
 		{
-			/*// Tick attribute monitor
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent(CAttributeMonitor::tick);
-			// Tick item stack monitor
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ITEM_STACK_MONITOR).ifPresent(CItemStackMonitor::tick);
-			// Tick delay action handler
-			event.getEntity().getCapability(NFFCapRegistry.CAP_DELAYED_ACTION_HANDLER).ifPresent(CLivingEntityDelayedActionHandler::tick);
-			// Tick data
-			// event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA).ifPresent(CNFFTamedCommonData::tick);*/
 			if (event.getEntity() instanceof Mob mob)
 			{
-				// update befriendable mobs
-				if (!(mob instanceof INFFTamed))
-				{
-					mob.getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent((l) ->
-					{
-						// AlwaysHostile feature
-						if (l.getAlwaysHostileTo() != null)
-						{
-							Entity target = NFUEntityStatics.getIfCanSee(l.getAlwaysHostileTo(), mob).orElse(null);
-							if (target != null && target instanceof LivingEntity targetLiving)
-								mob.setTarget(targetLiving);
-						}
-						// Befriending handler tick
-						// Now ticked on CNFFTamableImpl
-						//NFFTamingMapping.getProcess((EntityType<Mob>) (mob.getType())).serverTickInternal(mob);
-					});
-				}
-				// update healing handler cooldown
-				mob.getCapability(NFFCapRegistry.CAP_HEALING_HANDLER).ifPresent((l) ->
-				{
-					l.updateCooldown();
-				});
-				// IBaubleEquipable tick
-				/*if (mob instanceof IBaubleEquipable holder)
-				{
-					holder.updateBaubleEffects();
-				}*/
-				
-
-				INFFTamed.ifBM(mob, bm -> {
+				INFFTamed.get(mob).ifPresent(bm -> {
 					// update befriended mob anchor position
 					if (bm.getAnchorPos() != null)
 					{
@@ -470,7 +393,7 @@ public class NFFEntityEventListeners
 		        	// Generally the code below shouldn't be invoked, so print an error to log
 		        	if (NFFTamedStatics.isLivingAlliedToBM(bm, bm.asMob().getTarget()))
 		        	{
-		        		LogUtils.getLogger().error("BefriendedMobs Framework: Befriended mob [" 
+		        		LogUtils.getLogger().error("NFF Services: NFF tamed mob ["
 		        				+ bm.asMob().getName().getString() + "] attempting to attack ally ["
 		        				+ bm.asMob().getTarget().getName().getString() + "]. Target reset.");
 		        		bm.asMob().setTarget(null);
@@ -528,7 +451,7 @@ public class NFFEntityEventListeners
 	public static void onEntityJoinWorld(EntityJoinLevelEvent event)
 	{
 		if (event.getEntity() instanceof LivingEntity living)
-		{
+		{/*
 			// Setup attribute monitor cap
 			event.getEntity().getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
 			{
@@ -538,57 +461,59 @@ public class NFFEntityEventListeners
 			event.getEntity().getCapability(NFFCapRegistry.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
 			{
 				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
-			});
-			event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(cap -> {
-				cap.getTamingProcess().tamableInit(cap);
-			});
+			});*/
+			NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
 		}
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob um)
-		{
-			// Setup befriended undead sun-immunity rules
-			um.setupSunImmunityRules();
-		}
+		INFFTamed.get(event.getEntity())
+                .filter(INFFTamed::enableSunSensitivity)
+                .ifPresent(INFFTamed::setupSunImmunityRules);
+
 	}
 	
 	@SubscribeEvent
 	public static void onMobFall(LivingFallEvent event)
 	{
 		// Keep fall damage immunity after befriended
-		if (event.getEntity() instanceof INFFTamed bm)
-		{
+		INFFTamed.get(event.getEntity()).ifPresent(bm -> {
 			EntityType<? extends Mob> before = NFFTamingMapping.getTypeBefore(bm.asMob());
 			if (before != null && before.is(EntityTypeTags.FALL_DAMAGE_IMMUNE))
 				event.setCanceled(true);
-		}
+		});
 	}
 	
 	@SubscribeEvent
 	public static void onDespawn(MobSpawnEvent.AllowDespawn event)
 	{
-		event.getEntity().getCapability(NFFCapRegistry.CAP_BEFRIENDABLE_MOB).ifPresent(cap ->
-		{
-			if (cap.isForcePersistent())
-				event.setResult(Result.DENY);
-		});
+		if (NFFTamableComponent.getOptional(event.getEntity()).filter(NFFTamableComponent::isForcePersistent).isPresent())
+			event.setResult(Result.DENY);
 	}
 
-	// MIXIN EVENTS
+	// NFU MIXIN EVENTS
+
+	@SubscribeEvent
+	public static void onEntityFinishConstruction(EntityFinishConstructionEvent event) {
+		INFFTamed.get(event.getEntity()).ifPresent(t -> {
+			// Initialize inventory here.
+			//t.getDataAccessor().getSyncherComponent().setInventory(Optional.ofNullable(t.createAdditionalInventory()).orElseGet(() -> NFFTamedMobInventory.createEmpty(t)));
+			t.onInitialize();
+		});
+	}
 
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
 	{
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		if (INFFTamed.get(event.getEntity()).filter(t -> t.enableSunSensitivity() && t.isSunImmune()).isPresent())
 			event.setCanceled(true);
 	}
 
 	@SubscribeEvent
 	public static void onDiscard(EntityDiscardEvent event) {
-		INFFTamed.ifBM(event.getEntity(), INFFTamed::removeLocationOnOwner);
+		INFFTamed.get(event.getEntity()).ifPresent(INFFTamed::removeLocationOnOwner);
 	}
 
 	@SubscribeEvent
 	public static void onStartDeath(LivingStartDeathEvent event) {
-		INFFTamed.ifBM(event.getEntity(), INFFTamed::removeLocationOnOwner);
+		INFFTamed.get(event.getEntity()).ifPresent(INFFTamed::removeLocationOnOwner);
 	}
 
 }

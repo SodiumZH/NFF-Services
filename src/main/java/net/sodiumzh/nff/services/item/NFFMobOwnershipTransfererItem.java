@@ -99,8 +99,8 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 		if (stack.getOrCreateTag().getBoolean("mot_locked"))
 			return InteractionResult.PASS;
 		mob.setOwnerUUID(player.getUUID());
-		mob.getData().setOwnerName(player.getName().getString());
-		mob.getData().recordEncounteredDate();
+		mob.getDataAccessor().setOwnerName(player.getName().getString());
+		mob.getDataAccessor().recordEncounteredDate();
 		return InteractionResult.sidedSuccess(player.level().isClientSide);
 	}
 	
@@ -125,8 +125,9 @@ public class NFFMobOwnershipTransfererItem extends NFUItem
 	public InteractionResult interactLivingEntity(Player player, LivingEntity living, InteractionHand usedHand)
 	{
 		ItemStack stack = player.getItemInHand(usedHand);
-		if (!player.level().isClientSide && living instanceof INFFTamed bm)
+		if (!player.level().isClientSide && INFFTamed.get(living).isPresent())
 		{
+			INFFTamed bm = INFFTamed.get(living).get();
 			if (isWritten(stack))
 			{
 				if (tryTransfer(stack, player, bm) == InteractionResult.PASS)

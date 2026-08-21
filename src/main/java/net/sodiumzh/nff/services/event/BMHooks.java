@@ -12,18 +12,6 @@ import net.sodiumzh.nff.services.item.NFFMobRespawnerInstance;
 
 public class BMHooks
 {
-
-	/**
-	 * Hooks related to befriending processes
-	 */
-	public static class Befriending
-	{
-		public static void onMobBefriended(Mob mobBefore, INFFTamed befriended)
-		{
-			MinecraftForge.EVENT_BUS.post(new NFFMobTamedEvent(mobBefore, befriended.asMob()));
-		}
-	}
-	
 	public static class Befriended
 	{
 		public static boolean onBefriendedGenerateRespawnerOnDying(INFFTamed mob, NFFMobRespawnerInstance respawner)

@@ -9,7 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.sodiumzh.nff.services.entity.ai.goal.NFFMoveGoal;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
-import net.sodiumzh.nff.services.entity.taming.INFFTamedSunSensitiveMob;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -48,7 +47,7 @@ public class NFFFleeSunGoal extends NFFMoveGoal implements INFFPathfindingGoal {
 			return false;
 		else if (!ignoreHelmet && !getPathfinder().getItemBySlot(EquipmentSlot.HEAD).isEmpty())
 			return false;
-		else if (mob instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		else if (mob.enableSunSensitivity() && mob.isSunImmune())
 			return false;
 		else if	(!this.setWantedPos())
 			return false;

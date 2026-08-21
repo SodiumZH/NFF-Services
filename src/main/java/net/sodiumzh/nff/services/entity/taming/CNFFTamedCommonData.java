@@ -26,7 +26,6 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sodiumzh.nff.services.NFFServices;
 import net.sodiumzh.nff.services.entity.ai.NFFTamedMobAIState;
-import net.sodiumzh.nff.services.event.entity.NFFTamedCommonDataConstructEvent;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.network.NFFChannels;
 import net.sodiumzh.nff.services.network.NFFClientGamePacketHandler;
@@ -37,6 +36,7 @@ import net.sodiumzh.nfu.annotation.DontCallManually;
 import net.sodiumzh.nfu.capability.CEntityTickingCapability;
 import net.sodiumzh.nfu.container.Tuple2;
 import net.sodiumzh.nfu.function.MutablePredicate;
+import net.sodiumzh.nfu.network.AvailableSide;
 import net.sodiumzh.nfu.network.NFUDataSerializer;
 import net.sodiumzh.nfu.network.NFUDataSerializers;
 import net.sodiumzh.nfu.util.NFUDebugStatics;
@@ -51,8 +51,10 @@ import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * A temporal module for storage of data in INFFTamed interface.
+ * No longer used, left only for porting old data
+ * TODO remove in 0.x.34
  */
+@Deprecated(forRemoval = true)
 public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEntityTickingCapability<Mob> {
 	
 	// General //
@@ -66,7 +68,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 	public CompoundTag getAdditionalNBT();
 	
 	/** Get sun immunity. It only works when the mob is an {@link INFFTamedSunSensitiveMob}, otherwise throws exception. */
-	public MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity();
+	public MutablePredicate<INFFTamed> getSunImmunity();
 	
 	/** Get temporary object from a key from table. Temporary object table is a non-serialized object table to store any objects, 
 	 * not directly accessible but only with {@code getTempObject}, {@code addTempObject} and {@code removeTempObject}.
@@ -337,7 +339,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		private Map<String, SynchedGetter> synchedGetters = new HashMap<>();
 		private int syncInterval = 1;
 		// BefriendedUndeadMob data
-		private MutablePredicate<INFFTamedSunSensitiveMob> sunImmunity = new MutablePredicate<>();
+		private MutablePredicate<INFFTamed> sunImmunity = new MutablePredicate<>();
 		// Temp
 		private Map<String, Object> tempObjects = new HashMap<>();
 		
@@ -356,9 +358,9 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 					() -> Optional.ofNullable(this.getEntity().getTarget())
 							.flatMap(living -> Optional.of(living.getId())).orElse(-1));	// -1 means no target
 			
-			this.getBM().onDataInit(this);
-			MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
-			this.sync();
+			//this.getBM().onDataInit(this);
+			//MinecraftForge.EVENT_BUS.post(new NFFTamedCommonDataConstructEvent(this));
+			//this.sync();
 		}
 	
 		private Level getLevel()
@@ -402,60 +404,18 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public void deserializeNBT(CompoundTag nbt) {
-			// 0.x.25+: normal reading
-			if (nbt.getBoolean("25+"))
-			{
-				this.nbt = nbt.getCompound("additionalNBT").copy();
-				this.readSynchedData(nbt.getCompound("synchedData"));
-				//this.setIdentifier(nbt.getUUID("identifier"));
-				this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
-				//this.setOwnerName(nbt.getString("ownerName"));
-				//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
-				//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
-				this.setAnchor(NFUNBTStatics.getVec3(nbt, "randomStrollAnchor"));
-				//this.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
-				this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
-			}
-			// Port legacy
-			else 
-			{
-				CompoundTag nbtCpy = nbt.copy();
-				nbtCpy.remove("mod_id");
-				
-				UUID identifier = nbtCpy.getUUID("identifier");
-				if (identifier == null || identifier.equals(EMPTY_UUID)) this.generateIdentifier();
-				else this.setIdentifier(identifier);
-				nbtCpy.remove("identifier");
-				
-				String entityTypeKey = nbtCpy.getString("initial_entity_type");
-				if (entityTypeKey != null && ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)) != null)
-					this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entityTypeKey)));
-				else this.recordEntityType();
-				nbtCpy.remove("initial_entity_type");
-				
-				String ownerName = nbtCpy.getString("owner_name");
-				if (ownerName != null) this.setOwnerName(ownerName);
-				else this.setOwnerName("");
-				nbtCpy.remove("owner_name");
-				
-				// owner uuid is set in NFFTamedStatics
-				int[] encounteredDate = nbtCpy.getIntArray("encountered_date");
-				if (encounteredDate != null && encounteredDate.length >= 3) 
-					this.setEncounteredDate(new int[] {encounteredDate[0], encounteredDate[1], encounteredDate[2]});
-				else this.setEncounteredDate(new int[] {0, 0, 0});
-				nbtCpy.remove("encountered_date");
-				
-				this.anchor = this.getEntity().position();
-				this.nbt = nbtCpy;
-				// AI state, owner uuid and inventory are loaded from NFFTamedStatics
-			}
+			this.nbt = nbt.getCompound("additionalNBT").copy();
+			this.readSynchedData(nbt.getCompound("synchedData"));
+			//this.setIdentifier(nbt.getUUID("identifier"));
+			this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
+			//this.setOwnerName(nbt.getString("ownerName"));
+			//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
+			//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
+			this.setAnchor(NFUNBTStatics.getVec3(nbt, "randomStrollAnchor"));
+			//this.setAIState(NFFTamedMobAIState.fromID(new ResourceLocation(nbt.getString("aiState"))));
+			this.inventory.readFromTag(nbt.getCompound("additionalInventory"));
 			if (this.getEncounteredDate()[0] == 0)
 				this.recordEncounteredDate();
-			// TODO Remove from TempPortingEvent and restore this
-			/*
-			this.getBM().updateFromInventory();
-			this.getBM().init(this.getOwnerUUID(), null);
-			this.getBM().setInit();*/
 		}
 
 		private CompoundTag saveSynchedData()
@@ -498,12 +458,11 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 		
 		@Override
-		public MutablePredicate<INFFTamedSunSensitiveMob> getSunImmunity() {
-			if (mob instanceof INFFTamedSunSensitiveMob)
+		public MutablePredicate<INFFTamed> getSunImmunity() {
 				return sunImmunity;
-			else throw new UnsupportedOperationException("CNFFTamedCommonData sun immunity field only supports INFFTamedSunSensitiveMob. "
-					+ "Attempted class: " + mob.getClass().toString());
 		}
+
+
 
 		@Override
 		public Object getTempObject(String key) {
@@ -840,9 +799,9 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		}
 
 		@Override
-		public TickingSide getTickingSide()
+		public AvailableSide getTickingSide()
 		{
-			return TickingSide.BOTH;
+			return AvailableSide.BOTH;
 		}
 
 		@Override
@@ -869,16 +828,15 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 		
 		public CNFFTamedCommonData values;
 		
-		public Prvd(INFFTamed mob)
+		private Prvd(INFFTamed mob)
 		{
 			values = new Values(mob);
+			throw new RuntimeException("No longer used as a capability.");
 		}
 		
 		@Override
 		public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-			if (cap == NFFCapRegistry.CAP_BEFRIENDED_MOB_DATA)
-				return LazyOptional.of(() -> {return this.values;}).cast();
-			else return LazyOptional.empty();
+			throw new RuntimeException("No longer used as a capability.");
 		}
 
 		@Override
@@ -977,7 +935,8 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 
 		@Override
 		public void handle(ClientGamePacketListener pHandler) {
-			NFFClientGamePacketHandler.handleBefriendedDataSync(this, pHandler);
+			throw new RuntimeException();
+			//NFFClientGamePacketHandler.handleBefriendedDataSync(this, pHandler);
 		}
 	}
 

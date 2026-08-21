@@ -19,7 +19,7 @@ public class NFFTamedMobCommonEventListeners
 	@SubscribeEvent
 	public static void preventSleep(MonsterPreventSleepEvent event)
 	{
-		INFFTamed.ifBM(event.getEntity(), bm -> {
+		INFFTamed.get(event.getEntity()).ifPresent(bm -> {
 			if (bm.getOwnerUUID().equals(event.getPlayer().getUUID()) || bm.canPreventOtherPlayersSleep(event.getPlayer()))
 				event.setCanceled(true);
 		});
@@ -31,7 +31,7 @@ public class NFFTamedMobCommonEventListeners
 	@SubscribeEvent
 	public static void checkDespawn(MobCheckDespawnEvent event)
 	{
-		INFFTamed.ifBM(event.getEntity(), bm -> event.setCanceled(true));
+		INFFTamed.get(event.getEntity()).ifPresent(bm -> event.setCanceled(true));
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class NFFTamedMobCommonEventListeners
 	@SubscribeEvent
 	public static void onMobSunBurnTick(MobSunBurnTickEvent event)
 	{
-		if (event.getEntity() instanceof INFFTamedSunSensitiveMob bssm && bssm.isSunImmune())
+		if (INFFTamed.get(event.getEntity()).map(t -> t.enableSunSensitivity() && t.isSunImmune()).orElse(false))
 			event.setCanceled(true);
 	}
 }
