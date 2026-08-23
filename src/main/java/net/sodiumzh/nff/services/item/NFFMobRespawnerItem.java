@@ -70,9 +70,10 @@ public class NFFMobRespawnerItem extends NFUItem
 				{
 					if (!retainBefriendedMobInventory)
 					{
-						if (!t.getAdditionalInventory().isEmpty())
-							t.getAdditionalInventory().clearContent();
-						t.getAdditionalInventory().syncToMob(t.asMob());
+						t.getAdditionalInventory().ifPresent(i -> {
+							i.clearContent();
+							i.syncToMob(t.asMob());
+						});
 						NFUEntityStatics.removeAllEquipment(t.asMob());
 					}
 				});

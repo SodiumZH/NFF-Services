@@ -79,10 +79,8 @@ public class DataPort33 {
                     ListTag inventoryNBT = Optional.ofNullable(temp.getAdditionalInventory()).map(NFFTamedMobInventory::toTag)
                             .orElseGet(ListTag::new);
                     accessor.getInventoryComponent().createInventoryIfAbsent();
-                    NFFTamedMobInventory inventory = accessor.getAdditionalInventory();
-                    if (inventory != null) {
-                        inventory.readFromTag(inventoryNBT);
-                    }
+                    accessor.getAdditionalInventory()
+                        .ifPresent(inventory -> inventory.readFromTag(inventoryNBT));
                     msgPrinter.accept("inventory", accessor.getAdditionalInventory().toString());
                     NFUDebugStatics.debugPrintToScreen("Mob \"" + event.getEntity().getName().getString() + "\" porting finished.", player);
                 } catch (RuntimeException e) {
