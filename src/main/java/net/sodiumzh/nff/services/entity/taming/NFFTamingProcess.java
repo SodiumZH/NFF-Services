@@ -106,8 +106,10 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 		accessor.setOwnerName(player.getName().getString());
 		newTamed.setOwnerUUID(player.getUUID());
         accessor.getInventoryComponent().createInventoryIfAbsent();
-		accessor.getAdditionalInventory().getFromMob(tamedFrom);
-        accessor.getAdditionalInventory().syncToMob(newTamed.asMob());
+		accessor.getAdditionalInventory().ifPresent(i -> {
+			i.getFromMob(tamedFrom);
+			i.syncToMob(newTamed.asMob());
+		});
 		accessor.generateIdentifier();
 		accessor.recordEntityType();
 		accessor.recordEncounteredDate();

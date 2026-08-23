@@ -378,15 +378,17 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 	
 	/* Inventory */
 
-	public default NFFTamedMobInventory getAdditionalInventory() {
+	public default Optional<NFFTamedMobInventory> getAdditionalInventory() {
 		return this.getDataAccessor().getAdditionalInventory();
 	}
 	
 	/**
-	 * @deprecated Use {@code createAdditionalInventory} to override inventory.
+	 * @deprecated Use {@code getDataAccessor.getInventorySize()} instead.
 	 */
 	@Deprecated
-	public default int getInventorySize() {return getAdditionalInventory().getContainerSize();}
+	public default int getInventorySize() {
+		return this.getDataAccessor().getInventorySize();
+	}
 	
 	/**
 	 * Method to create additional inventory. Invoked on befriended or loaded.
@@ -409,7 +411,7 @@ public interface INFFTamed extends ContainerListener, OwnableEntity {
 		if (!(pContainer instanceof NFFTamedMobInventory))
 			throw new UnsupportedOperationException("INFFTamed container only receives NFFTamedMobInventory.");
 		if (!this.asMob().level().isClientSide())
-			this.getAdditionalInventory().syncToMob(this.asMob());
+			this.getAdditionalInventory().ifPresent(i -> i.syncToMob(this.asMob()));
 		this.onInventoryChanged();
 	}
 

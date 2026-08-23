@@ -128,17 +128,6 @@ public class NFFTamedSyncherComponent extends EntitySyncherComponent<Mob> {
         this.setSynchedData(AI_STATE_SYNCHED_KEY, String.class, state.getId().toString());
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        // Sync inventory to mob
-        if (!this.isClientSide()) {
-            NFFTamedMobInventory inv = this.getSynchedData(ADDITIONAL_INVENTORY_KEY, NFFTamedMobInventory.class).orElse(null);
-            if (inv != null && inv.getContainerSize() > 0 && inv.getOwner() != null)
-                inv.syncToMob(inv.getOwner().asMob());
-        }
-    }
-
     @Nullable
     public LivingEntity getAttackTarget() {
         int id = this.getSynchedGetter(ATTACK_TARGET_SYNCHED_KEY, Integer.class).orElse(-1);

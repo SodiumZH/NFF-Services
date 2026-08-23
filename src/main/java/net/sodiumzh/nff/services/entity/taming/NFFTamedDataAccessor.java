@@ -259,8 +259,12 @@ public class NFFTamedDataAccessor {
 
     // Inventory related //
 
-    public NFFTamedMobInventory getAdditionalInventory() {
+    public Optional<NFFTamedMobInventory> getAdditionalInventory() {
         return this.getInventoryComponent().getInventory();
+    }
+
+    public int getInventorySize() {
+        return getAdditionalInventory().map(NFFTamedMobInventory::getContainerSize).orElse(0);
     }
 
     // Synched Data related //
