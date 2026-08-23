@@ -15,6 +15,8 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
 
     @Nullable
     private NFFTamedMobInventory inventory = null;
+    // Labels this mob doesn't have an inventory, so that we don't need to try generating on each getting operation.
+    private boolean noInventory = false;
 
     public NFFTamedInventoryComponent(Mob entity) {
         super(entity);
@@ -50,18 +52,20 @@ public class NFFTamedInventoryComponent extends EntityComponentBase<Mob> {
         }
     }
 
-    public NFFTamedMobInventory getInventory() {
-        return Optional.of(inventory).orElseGet(() -> {
-            NFUDebugStatics.errorOnce("Missing inventory. Not initialized?");
-            return NFFTamedMobInventory.createEmpty(INFFTamed.get(this.getEntity())
-                .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob.")));
-        });
+    public Optional<NFFTamedMobInventory> getInventory() {
+        createInventoryIfAbsent();
+        return Optional.ofNullable(inventory);
     }
 
     public void createInventoryIfAbsent() {
-        if (inventory == null)
-            inventory = INFFTamed.get(this.getEntity())
+        if (this.noInventory)
+            return;
+        if (this.inventory == null)
+            this.inventory = INFFTamed.get(this.getEntity())
                 .orElseThrow(() -> new IllegalCallerException("NFF Tamed Mob Inventory access on non-NFF mob."))
                 .createAdditionalInventory();
+        // Tried generated but returned null, label this mob as not having an inventory
+        if (this.inventory == null)
+            this.noInventory = true;
     }
 }

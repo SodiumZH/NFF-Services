@@ -33,7 +33,7 @@ public class NFFEntityComponents {
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamableAngerHandlerComponent>> TAMABLE_ANGER_HANDLER = COLLECTION.register("tamable_anger_handler", () ->
         new EntityComponentType<>(Mob.class, NFFTamableAngerHandlerComponent.class, AvailableSide.SERVER, NFFTamableAngerHandlerComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedDataComponent>> TAMED_DATA = COLLECTION.register("tamed_data", () ->
-        new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, AvailableSide.SERVER, NFFTamedDataComponent::new));
+        new EntityComponentType<>(Mob.class, NFFTamedDataComponent.class, NFFTamedDataComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedSyncherComponent>> TAMED_SYNCHER = COLLECTION.register("tamed_syncher", () ->
         new EntityComponentType<>(Mob.class, NFFTamedSyncherComponent.class, NFFTamedSyncherComponent::new));
     public static final NFURegistry.Accessor<EntityComponentType<Mob, NFFTamedInventoryComponent>> TAMED_INVENTORY = COLLECTION.register("tamed_inventory", () ->

@@ -10,6 +10,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -228,8 +229,8 @@ public class NFFEntityEventListeners
 		if (event.isCanceled())
 			return;
 		if (!event.getEntity().getLevel().isClientSide) {
-			INFFTamed.get(event.getEntity()).ifPresent(bef -> {
-				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(bef, event.getSource()))) {
+			INFFTamed.get(event.getEntity()).ifPresent(t -> {
+				if (MinecraftForge.EVENT_BUS.post(new NFFTamedDeathEvent(t, event.getSource()))) {
 					event.setCanceled(true);
 					if (event.getEntity().getHealth() < 0.00001f)
 						event.getEntity().setHealth(1f);
@@ -239,16 +240,16 @@ public class NFFEntityEventListeners
 				// owner-tamed animals
 				else if (INFFTamed.get(event.getSource().getEntity()).isPresent()) {
 					INFFTamed srcBef = INFFTamed.get(event.getSource().getEntity()).get();
-					if (srcBef.getOwner() != null && bef.getOwner() != null && srcBef.getOwner() == bef.getOwner()) {
-						bef.asMob().setHealth(1.0f);
-						bef.asMob().invulnerableTime += 20;
+					if (srcBef.getOwner() != null && t.getOwner() != null && srcBef.getOwner() == t.getOwner()) {
+						t.asMob().setHealth(1.0f);
+						t.asMob().invulnerableTime += 20;
 						event.setCanceled(true);
 						return;
 					}
 				} else if (event.getSource().getEntity() instanceof TamableAnimal ta) {
-					if (ta.getOwner() != null && bef.getOwner() != null && ta.getOwner() == bef.getOwner()) {
-						bef.asMob().setHealth(1.0f);
-						bef.asMob().invulnerableTime += 20;
+					if (ta.getOwner() != null && t.getOwner() != null && ta.getOwner() == t.getOwner()) {
+						t.asMob().setHealth(1.0f);
+						t.asMob().invulnerableTime += 20;
 						event.setCanceled(true);
 						return;
 					}
@@ -256,43 +257,49 @@ public class NFFEntityEventListeners
 				if (!event.getEntity().level.isClientSide) {
 					// Drop all items in inventory if no vanishing curse
 					if (/*bef.dropInventoryOnDeath()*//**TODO: Fix item loss if not dropping */true) {
-						NFFTamedMobInventory container = bef.getAdditionalInventory();
-						for (int i = 0; i < container.getContainerSize(); ++i) {
-							if (container.getItem(i) != ItemStack.EMPTY) {
-								if (!EnchantmentHelper.hasVanishingCurse(container.getItem(i)))
-								{
-									event.getEntity().spawnAtLocation(container.getItem(i).copy());
+						t.getAdditionalInventory().ifPresent(container -> {
+							;
+							for (int i = 0; i < container.getContainerSize(); ++i) {
+								if (container.getItem(i) != ItemStack.EMPTY) {
+									if (!EnchantmentHelper.hasVanishingCurse(container.getItem(i))) {
+										event.getEntity().spawnAtLocation(container.getItem(i).copy());
+									}
+									container.getItem(i).setCount(0);
+									t.getAdditionalInventory().ifPresent(inv -> inv.syncToMob(t.asMob()));
 								}
-								container.getItem(i).setCount(0);
-                                bef.getAdditionalInventory().syncToMob(bef.asMob());
 							}
-						}
+						});
 					}
 					// If drop respawner, drop and initialize
-					if (bef.getRespawnerType() != null) {
-						NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createAndInitItem(NFFMobRespawnerItem.fromMob(bef.getRespawnerType(), bef.asMob()));
+					if (t.getRespawnerType() != null) {
+						// Set necessary properties to default before creating the respawner
+						t.asMob().setDeltaMovement(Vec3.ZERO);
+						t.asMob().getActiveEffects().stream().toList().forEach(ei -> t.asMob().removeEffect(ei.getEffect()));
+						t.asMob().setRemainingFireTicks(0);
+						// Create the respawner
+						NFFMobRespawnerInstance ins = NFFMobRespawnerInstance.createAndInitItem(NFFMobRespawnerItem.fromMob(t.getRespawnerType(), t.asMob()));
 						if (ins.isNFFRespawnerItem()) {
-							if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE) {
-								if (bef.isOwnerInDimension() && bef.getOwner().getInventory().getFreeSlot() != -1 && bef.getOwner().addItem(ins.get()))
+							if (t.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.GIVE) {
+								if (t.isOwnerInDimension() && t.getOwner().getInventory().getFreeSlot() != -1 && t.getOwner().addItem(ins.get()))
 								{}
 								else
 								{
-									if (!bef.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
+									if (!t.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
 										throw new IllegalStateException(
-												"BefriendedMobs: Server level missing CNFFLevelModule capability");
+												"NFF: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
+									t.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
 								}
 							}
 
-							else if (bef.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.DROP)
+							else if (t.getDeathRespawnerGenerationType() == DeathRespawnerGenerationType.DROP)
 							{
 								ItemEntity resp = new ItemEntity(event.getEntity().level, event.getEntity().getX(),
 										event.getEntity().getY(), event.getEntity().getZ(), ins.get());
-								if (bef.isRespawnerInvulnerable()) {
+								if (t.isRespawnerInvulnerable()) {
 									ins.setInvulnerable(true);
 									resp.setInvulnerable(true);
 								}
@@ -450,23 +457,14 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onEntityJoinWorld(EntityJoinLevelEvent event)
 	{
-		if (event.getEntity() instanceof LivingEntity living)
-		{/*
-			// Setup attribute monitor cap
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
-			{
-				MinecraftForge.EVENT_BUS.post(new CAttributeMonitor.SetupEvent(living, cap));
-			});
-			// Setup item stack monitor cap
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
-			{
-				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
-			});*/
-			NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
+		if (!event.getEntity().level().isClientSide()) {
+			if (event.getEntity() instanceof LivingEntity living) {
+				NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
+			}
+			INFFTamed.get(event.getEntity())
+				.filter(INFFTamed::enableSunSensitivity)
+				.ifPresent(INFFTamed::setupSunImmunityRules);
 		}
-		INFFTamed.get(event.getEntity())
-                .filter(INFFTamed::enableSunSensitivity)
-                .ifPresent(INFFTamed::setupSunImmunityRules);
 
 	}
 
