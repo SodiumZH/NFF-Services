@@ -284,11 +284,11 @@ public class NFFEntityEventListeners
 								{}
 								else
 								{
-									if (!t.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
+									if (!t.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"NFF: Server level missing CNFFLevelModule capability");
 									}
-									t.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
+									t.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -303,9 +303,9 @@ public class NFFEntityEventListeners
 									ins.setInvulnerable(true);
 									resp.setInvulnerable(true);
 								}
-								ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
-								ins.setNoExpire(bef.respawnerNoExpire());
-								if (!MinecraftForge.EVENT_BUS.post(new NFFTamedDropRespawnerOnDyingEvent(bef, ins)))
+								ins.setRecoverInVoid(t.shouldRespawnerRecoverOnDropInVoid());
+								ins.setNoExpire(t.respawnerNoExpire());
+								if (!MinecraftForge.EVENT_BUS.post(new NFFTamedDropRespawnerOnDyingEvent(t, ins)))
 									event.getEntity().level.addFreshEntity(resp);
 							}
 						}
@@ -457,7 +457,7 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onEntityJoinWorld(EntityJoinLevelEvent event)
 	{
-		if (!event.getEntity().level().isClientSide()) {
+		if (!event.getEntity().getLevel().isClientSide()) {
 			if (event.getEntity() instanceof LivingEntity living) {
 				NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
 			}

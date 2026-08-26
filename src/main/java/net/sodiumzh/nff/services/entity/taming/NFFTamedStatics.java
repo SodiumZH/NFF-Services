@@ -92,7 +92,7 @@ public class NFFTamedStatics
 			sp.nextContainerCounter();
 			ClientboundNFFGUIOpenPacket packet = new ClientboundNFFGUIOpenPacket(sp.containerCounter,
 			mob.getDataAccessor().getInventorySize(), living.getId());
-			NFUNetworkStatics.sendToPlayer(NFFChannels.BM_CHANNEL, packet, sp);
+			NFUNetworkStatics.sendToPlayer(NFFChannels.CHANNEL, packet, sp);
 			var menu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory()
 				.orElseGet(() -> new NFFTamedMobInventory(0, mob)));
 			if (menu == null) return;
