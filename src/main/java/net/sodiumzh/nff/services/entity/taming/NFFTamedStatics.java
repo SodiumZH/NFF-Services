@@ -88,11 +88,12 @@ public class NFFTamedStatics
 
 			sp.nextContainerCounter();
 			ClientboundNFFGUIOpenPacket packet = new ClientboundNFFGUIOpenPacket(sp.containerCounter,
-					mob.getAdditionalInventory().getContainerSize(), living.getId());
-			NFUNetworkStatics.sendToPlayer(NFFChannels.BM_CHANNEL, packet, sp);
-			sp.containerMenu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory());
-			if (sp.containerMenu == null)
-				return;
+			mob.getDataAccessor().getInventorySize(), living.getId());
+			NFUNetworkStatics.sendToPlayer(NFFChannels.CHANNEL, packet, sp);
+			var menu = mob.makeMenu(sp.containerCounter, sp.getInventory(), mob.getAdditionalInventory()
+				.orElseGet(() -> new NFFTamedMobInventory(0, mob)));
+			if (menu == null) return;
+			sp.containerMenu = menu;
 			sp.initMenu(sp.containerMenu);
 			MinecraftForge.EVENT_BUS.post(
 					new net.minecraftforge.event.entity.player.PlayerContainerEvent.Open(player, player.containerMenu));

@@ -335,11 +335,11 @@ public class NFFEntityEventListeners
 								{}
 								else
 								{
-									if (!bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
+									if (!t.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).isPresent()) {
 										throw new IllegalStateException(
 												"BefriendedMobs: Server level missing CNFFLevelModule capability");
 									}
-									bef.asMob().level().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
+									t.asMob().getLevel().getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap ->
 									{
 										cap.addSuspendedRespawner(ins);
 									});
@@ -354,9 +354,9 @@ public class NFFEntityEventListeners
 									ins.setInvulnerable(true);
 									resp.setInvulnerable(true);
 								}
-								ins.setRecoverInVoid(bef.shouldRespawnerRecoverOnDropInVoid());
-								ins.setNoExpire(bef.respawnerNoExpire());
-								if (!MinecraftForge.EVENT_BUS.post(new NFFTamedDropRespawnerOnDyingEvent(bef, ins)))
+								ins.setRecoverInVoid(t.shouldRespawnerRecoverOnDropInVoid());
+								ins.setNoExpire(t.respawnerNoExpire());
+								if (!MinecraftForge.EVENT_BUS.post(new NFFTamedDropRespawnerOnDyingEvent(t, ins)))
 									event.getEntity().level.addFreshEntity(resp);
 							}
 						}
@@ -550,19 +550,13 @@ public class NFFEntityEventListeners
 	@SubscribeEvent
 	public static void onEntityJoinWorld(EntityJoinWorldEvent event)
 	{
-		if (event.getEntity() instanceof LivingEntity living)
-		{/*
-			// Setup attribute monitor cap
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ATTRIBUTE_MONITOR).ifPresent((cap) -> 
-			{
-				MinecraftForge.EVENT_BUS.post(new CAttributeMonitor.SetupEvent(living, cap));
-			});
-			// Setup item stack monitor cap
-			event.getEntity().getCapability(NFFCapRegistry.CAP_ITEM_STACK_MONITOR).ifPresent((cap) -> 
-			{
-				MinecraftForge.EVENT_BUS.post(new CItemStackMonitor.SetupEvent(living, cap));
-			});*/
-			NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
+		if (!event.getEntity().getLevel().isClientSide()) {
+			if (event.getEntity() instanceof LivingEntity living) {
+				NFFTamableComponent.getOptional(living).ifPresent(c -> c.getTamingProcess().tamableInit(c));
+			}
+			INFFTamed.get(event.getEntity())
+				.filter(INFFTamed::enableSunSensitivity)
+				.ifPresent(INFFTamed::setupSunImmunityRules);
 		}
 		INFFTamed.get(event.getEntity())
                 .filter(INFFTamed::enableSunSensitivity)
