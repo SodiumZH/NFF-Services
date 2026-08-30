@@ -12,18 +12,14 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamable;
-import net.sodiumzh.nff.services.entity.capability.CNFFTamableImpl;
 import net.sodiumzh.nff.services.event.entity.NFFMobTamedEvent;
 import net.sodiumzh.nff.services.eventlistener.NFFEntityEventListeners;
-import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
 import net.sodiumzh.nff.services.registry.NFFEntityComponents;
 import net.sodiumzh.nff.services.registry.NFFItemRegistry;
 import net.sodiumzh.nfu.entity.anger.MobAngerReason;
 import net.sodiumzh.nfu.entity.anger.MobAngerRules;
 import net.sodiumzh.nfu.entity.component.preset.EntityTimerComponent;
 import net.sodiumzh.nfu.entity.taming.ITamingProcess;
-import net.sodiumzh.nfu.math.ThreadSafeRandomSource;
 import net.sodiumzh.nfu.object.Upcastable;
 import net.sodiumzh.nfu.util.NFUEntityStatics;
 import net.sodiumzh.nfu.util.NFUMiscStatics;
@@ -33,7 +29,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -192,7 +188,7 @@ public abstract class NFFTamingProcess implements ITamingProcess<Mob>, Upcastabl
 	public void onPlayerTimerExpire(Mob mob, UUID playerUUID, String key) {}
 
 	/**
-	 * Get the tamable component of a mob. It's a shortcut of {@link NFFTamableComponent#get}.
+	 * Get the tamable component of a mob. It's a shortcut of {@link NFFTamableComponent#getOptional}.
 	 */
 	public final NFFTamableComponent getTamable(Mob mob) {
 		return NFFTamableComponent.getOptional(mob).orElse(NFFEntityComponents.TAMABLE.get().create(mob));

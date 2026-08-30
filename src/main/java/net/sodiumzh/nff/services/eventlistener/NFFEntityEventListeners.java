@@ -13,9 +13,9 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.living.ZombieEvent.SummonAidEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -205,7 +205,7 @@ public class NFFEntityEventListeners
 	        // Handle befriended mobs end //
 	        // Handle TamableAnimal //	
 	        if (mob instanceof OwnableEntity oe
-				&& INFFTamed.get(target).filter(i -> i.isAllyTo(NFFTamedStatics.livingFromOwnableInterface(oe).orElse(null))).isPresent()).orElseThrow()
+				&& INFFTamed.get(target).filter(i -> i.isAllyTo(NFFTamedStatics.livingFromOwnableInterface(oe).orElse(null))).isPresent())
 	        {
 				event.setCanceled(true);
 	        }
@@ -435,7 +435,7 @@ public class NFFEntityEventListeners
 
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
-	public static void onLivingUpdate(LivingUpdateEvent event)
+	public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event)
 	{
 		if (!event.getEntity().level.isClientSide)
 		{

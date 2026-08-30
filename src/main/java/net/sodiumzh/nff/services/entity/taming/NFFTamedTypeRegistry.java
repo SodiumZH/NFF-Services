@@ -46,7 +46,7 @@ public class NFFTamedTypeRegistry {
      * but not in other methods.
      */
     public static void add(EntityType<? extends Mob> type, Function<Mob, INFFTamed> accessor) {
-        add(ForgeRegistries.ENTITY_TYPES.getKey(type), accessor);
+        add(ForgeRegistries.ENTITIES.getKey(type), accessor);
     }
 
     /**
@@ -61,7 +61,7 @@ public class NFFTamedTypeRegistry {
     }
 
     public static void addIfAbsent(EntityType<? extends Mob> type, Function<Mob, INFFTamed> accessor) {
-        addIfAbsent(ForgeRegistries.ENTITY_TYPES.getKey(type), accessor);
+        addIfAbsent(ForgeRegistries.ENTITIES.getKey(type), accessor);
     }
     
     public static boolean contains(ResourceLocation typeID) {
@@ -69,7 +69,7 @@ public class NFFTamedTypeRegistry {
     }
     
     public static boolean contains(EntityType<?> type) {
-        return contains(ForgeRegistries.ENTITY_TYPES.getKey(type));
+        return contains(ForgeRegistries.ENTITIES.getKey(type));
     }
 
     public static Optional<Function<Mob, INFFTamed>> getAccessor(ResourceLocation typeID) {
@@ -77,7 +77,7 @@ public class NFFTamedTypeRegistry {
     }
 
     public static Optional<Function<Mob, INFFTamed>> getAccessor(EntityType<?> type) {
-        return Optional.ofNullable(ForgeRegistries.ENTITY_TYPES.getKey(type)).map(TABLE::get);
+        return Optional.ofNullable(ForgeRegistries.ENTITIES.getKey(type)).map(TABLE::get);
     }
 
     public static Optional<Function<Mob, INFFTamed>> getAccessor(Entity entity) {

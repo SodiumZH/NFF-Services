@@ -71,7 +71,7 @@ public class DataPort33 {
                     accessor.setAIState(temp.getAIState());
                     msgPrinter.accept("aiState", accessor.getAIState().toString());
                     // Port other values
-                    data.putPermanentVariable("initialType", ForgeRegistries.ENTITY_TYPES.getKey(temp.getInitialEntityType()), NFUDataSerializers.RESOURCE_LOCATION);
+                    data.putPermanentVariable("initialType", ForgeRegistries.ENTITIES.getKey(temp.getInitialEntityType()), NFUDataSerializers.RESOURCE_LOCATION);
                     msgPrinter.accept("initialType", accessor.getInitialEntityType().getDescriptionId());
                     data.putPermanentVariable("randomStrollAnchor", temp.getAnchor(), NFUDataSerializers.VEC3);
                     msgPrinter.accept("randomStrollAnchor", accessor.getAnchor().toString());

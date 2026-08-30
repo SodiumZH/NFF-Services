@@ -8,6 +8,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.sodiumzh.nff.services.NFFServices;
+import net.sodiumzh.nff.services.level.CNFFLevelModule;
 import net.sodiumzh.nff.services.registry.NFFCapRegistry;
 
 @Mod.EventBusSubscriber(modid = NFFServices.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -15,10 +16,10 @@ public class NFFServerEventListeners
 {
 
 	@SubscribeEvent
-	public static void onLevelTick(TickEvent.LevelTickEvent event) {
-		if (event.level instanceof ServerLevel serverlevel && event.phase.equals(TickEvent.Phase.END))
+	public static void onLevelTick(TickEvent.WorldTickEvent event) {
+		if (event.world instanceof ServerLevel serverlevel && event.phase.equals(TickEvent.Phase.END))
 		{
-            serverlevel.getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(cap -> {cap.tick();});
+            serverlevel.getCapability(NFFCapRegistry.CAP_LEVEL).ifPresent(CNFFLevelModule::tick);
 		}
 	}
 	

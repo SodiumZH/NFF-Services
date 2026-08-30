@@ -30,13 +30,13 @@ public class NFFTamingMapping {
 	
 	public static void register(@Nonnull ResourceLocation from, @Nonnull ResourceLocation convertTo, @Nonnull Supplier<NFFTamingProcess> process, boolean override)
 	{
-		if (!ForgeRegistries.ENTITY_TYPES.containsKey(from))
+		if (!ForgeRegistries.ENTITIES.containsKey(from))
 			throw new MissingRegistryEntryException("NFFTamingMapping registering illegal key " + from);
-		if (!ForgeRegistries.ENTITY_TYPES.containsKey(convertTo))
+		if (!ForgeRegistries.ENTITIES.containsKey(convertTo))
 			throw new MissingRegistryEntryException("NFFTamingMapping registering illegal key " + convertTo);
-		EntityType<?> fromType = ForgeRegistries.ENTITY_TYPES.getValue(from);
-		EntityType<?> toType = ForgeRegistries.ENTITY_TYPES.getValue(convertTo);
-		if (TABLE.containsRow(ForgeRegistries.ENTITY_TYPES.getValue(from))) {
+		EntityType<?> fromType = ForgeRegistries.ENTITIES.getValue(from);
+		EntityType<?> toType = ForgeRegistries.ENTITIES.getValue(convertTo);
+		if (TABLE.containsRow(ForgeRegistries.ENTITIES.getValue(from))) {
 			if (override) {
 				TABLE.removeRow(fromType);
 			} else {

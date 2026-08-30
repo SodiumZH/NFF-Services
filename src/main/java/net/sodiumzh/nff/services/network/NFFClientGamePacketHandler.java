@@ -6,7 +6,7 @@ import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.sodiumzh.nff.services.client.gui.screen.NFFGuiConstructorRegistry;
+import net.sodiumzh.nff.services.client.gui.screen.NFFGUIConstructorRegistry;
 import net.sodiumzh.nff.services.entity.taming.INFFTamed;
 import net.sodiumzh.nff.services.inventory.NFFTamedInventoryMenu;
 import net.sodiumzh.nff.services.inventory.NFFTamedMobInventory;
@@ -28,7 +28,7 @@ public class NFFClientGamePacketHandler
 			if (menu == null)
 				return;
 			localplayer.containerMenu = menu;
-			mc.setScreen(NFFGuiConstructorRegistry.createGuiFromMenu(menu));
+			mc.setScreen(NFFGUIConstructorRegistry.createGUIFromMenu(menu));
 		});
 	}
 }

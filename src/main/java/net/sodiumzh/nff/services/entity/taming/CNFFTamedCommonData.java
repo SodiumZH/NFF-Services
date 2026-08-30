@@ -408,7 +408,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			this.nbt = nbt.getCompound("additionalNBT").copy();
 			this.readSynchedData(nbt.getCompound("synchedData"));
 			//this.setIdentifier(nbt.getUUID("identifier"));
-			this.setInitialEntityType(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
+			this.setInitialEntityType(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(nbt.getString("initialEntityType"))));
 			//this.setOwnerName(nbt.getString("ownerName"));
 			//this.setOwnerUUID(nbt.getUUID("ownerUUID"));
 			//this.setEncounteredDate(nbt.getIntArray("encounteredDate"));
@@ -810,7 +810,7 @@ public interface CNFFTamedCommonData extends INBTSerializable<CompoundTag>, CEnt
 			{
 				if (player instanceof ServerPlayer sp)
 				{
-					NFFChannels.BM_CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
+					NFFChannels.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), packet);
 				}
 			}
 		}

@@ -28,7 +28,7 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
 
     private EntityType<? extends Mob> getInitialEntityTypeRaw() {
         return this.getVariable("initialType", ResourceLocation.class)
-            .map(loc -> (EntityType<? extends Mob>)ForgeRegistries.ENTITY_TYPES.getValue(loc)).orElse(null);
+            .map(loc -> (EntityType<? extends Mob>)ForgeRegistries.ENTITIES.getValue(loc)).orElse(null);
     }
 
     public INFFTamed getTamed() {
@@ -56,13 +56,13 @@ public class NFFTamedDataComponent extends EntityDataComponent<Mob> {
     @SuppressWarnings("unchecked")
     public void recordEntityType()
     {
-        this.putPermanentVariable("initialType", ForgeRegistries.ENTITY_TYPES.getKey(this.getEntity().getType()), NFUDataSerializers.RESOURCE_LOCATION);
+        this.putPermanentVariable("initialType", ForgeRegistries.ENTITIES.getKey(this.getEntity().getType()), NFUDataSerializers.RESOURCE_LOCATION);
     }
 
     @SuppressWarnings("unchecked")
     private void setInitialEntityType(@Nonnull EntityType<?> entityType)
     {
-        this.putPermanentVariable("initialType", ForgeRegistries.ENTITY_TYPES.getKey(entityType), NFUDataSerializers.RESOURCE_LOCATION);
+        this.putPermanentVariable("initialType", ForgeRegistries.ENTITIES.getKey(entityType), NFUDataSerializers.RESOURCE_LOCATION);
     }
 
     @SuppressWarnings("unchecked")
